@@ -1,0 +1,17 @@
+  ****  NISTP256_SSS_ULTRASPARC  ****
+
+------------------------------------------------------- 
+  Yassir Nawaz and Guang Gong
+  Dept. of Electrical and Computer Engineering 
+  University of Waterloo, Canada
+
+  ynawaz@engmail.uwaterloo.ca
+  G.Gong@ece.uwaterloo.ca
+-------------------------------------------------------
+
+
+NISTP256_SSS_ULTRASPARC is a secret sharing BAT (Benchmarkable Asymmeitric Tool)
+which uses a simple elliptic curve Diffie-Hellman secret sharing system.
+NISTP256_SSS_ULTRASPARC uses a floating point implementation of NIST P-256 
+elliptic curve. NISTP256_SSS_ULTRASPARC only runs on Sun's Ultrasparc processors.
+

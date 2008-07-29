@@ -1,0 +1,6 @@
+#define crypto_encrypt_ronald1536_openssl_MODULUSBITS 1536 
+#define crypto_encrypt_ronald1536_openssl_MODULUSBYTES (crypto_encrypt_ronald1536_openssl_MODULUSBITS / 8)
+
+#define crypto_encrypt_ronald1536_openssl_SECRETKEYBYTES (crypto_encrypt_ronald1536_openssl_MODULUSBYTES * 8)
+#define crypto_encrypt_ronald1536_openssl_PUBLICKEYBYTES (crypto_encrypt_ronald1536_openssl_MODULUSBYTES)
+#define crypto_encrypt_ronald1536_openssl_BYTES (crypto_encrypt_ronald1536_openssl_MODULUSBYTES)

@@ -1,0 +1,3 @@
+#define crypto_sign_rainbow_ref_SECRETKEYBYTES 20107
+#define crypto_sign_rainbow_ref_PUBLICKEYBYTES 31680
+#define crypto_sign_rainbow_ref_BYTES 43

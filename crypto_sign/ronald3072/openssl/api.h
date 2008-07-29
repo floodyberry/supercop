@@ -1,0 +1,6 @@
+#define crypto_sign_ronald3072_openssl_MODULUSBITS 3072 
+#define crypto_sign_ronald3072_openssl_MODULUSBYTES (crypto_sign_ronald3072_openssl_MODULUSBITS / 8)
+
+#define crypto_sign_ronald3072_openssl_SECRETKEYBYTES (crypto_sign_ronald3072_openssl_MODULUSBYTES * 8)
+#define crypto_sign_ronald3072_openssl_PUBLICKEYBYTES (crypto_sign_ronald3072_openssl_MODULUSBYTES)
+#define crypto_sign_ronald3072_openssl_BYTES (crypto_sign_ronald3072_openssl_MODULUSBYTES)

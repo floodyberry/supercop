@@ -1,0 +1,4 @@
+#include "api.h"
+#define SECRETKEY_BYTES crypto_dh_hector_ref_SECRETKEYBYTES 
+#define PUBLICKEY_BYTES crypto_dh_hector_ref_PUBLICKEYBYTES
+#define SHAREDSECRET_BYTES crypto_dh_hector_ref_BYTES

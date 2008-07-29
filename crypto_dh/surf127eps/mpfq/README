@@ -1,0 +1,6 @@
+This BAT is an implementation of a Genus 2 key exchange cryptosystem
+based on the Kummer surface.  (see "Fast genus 2 arithmetic based on
+Theta functions" by P. Gaudry.)  The curve has been built using the CM
+method. For that, tools developped by Thomas Houtmann were used.
+
+

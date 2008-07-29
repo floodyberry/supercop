@@ -1,0 +1,2 @@
+#define crypto_stream_tpypy_e_tpypy_KEYBYTES 32
+#define crypto_stream_tpypy_e_tpypy_NONCEBYTES 16

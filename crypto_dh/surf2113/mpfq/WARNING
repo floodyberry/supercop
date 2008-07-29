@@ -1,0 +1,4 @@
+This piece of software is not to be used for real applications! In the
+present state, there are many weaknesses. For instance, a key validation
+mecanism is completely missing.
+

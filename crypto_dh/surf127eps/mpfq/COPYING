@@ -1,0 +1,17 @@
+All the files, except those taken from the GMP distribution have been
+written by Pierrick Gaudry and Emmanuel Thomé. 
+
+Most of the important code is extracted from the MPFQ library that those two
+authors are currently writing. See http://www.mpfq.org (well, empty page
+for the moment!)
+
+When this library will be in a presentable state, it will be released
+under a free software license (LGPL presumably), and therefore the code
+of this BAT will also be free software. But right now, please consider
+that this code is non-free software (but still open-source): you are
+allowed to copy, compile and use only for benchmarking purpose. And you
+are allowed to modify it only to fix a bug in the benchmarking process.
+If you are interested in improving the code or in using it in some other
+software, please contact the authors.
+
+[last modified: Fri Dec  1 21:09:32 CET 2006]

@@ -1,0 +1,9 @@
+This is a BAT: just do a single
+  cc *.c -lgmp
+(and add the appropriate compiler options)
+Note that there are some asserts, and therefore using -DNDEBUG might
+help a bit.
+
+
+If you want a standalone binary (not for benchmarking), put the
+-DWANT_MAIN  option.

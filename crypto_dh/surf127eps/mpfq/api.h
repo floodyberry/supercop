@@ -1,0 +1,3 @@
+#define crypto_dh_surf127eps_mpfq_SECRETKEYBYTES 32
+#define crypto_dh_surf127eps_mpfq_PUBLICKEYBYTES 48
+#define crypto_dh_surf127eps_mpfq_BYTES 48

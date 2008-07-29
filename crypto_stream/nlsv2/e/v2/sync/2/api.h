@@ -1,0 +1,2 @@
+#define crypto_stream_nlsv2_e_v2_sync_2_KEYBYTES 16
+#define crypto_stream_nlsv2_e_v2_sync_2_NONCEBYTES 16

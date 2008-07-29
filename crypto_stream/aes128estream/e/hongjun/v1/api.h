@@ -1,0 +1,2 @@
+#define crypto_stream_aes128estream_e_hongjun_v1_KEYBYTES 16
+#define crypto_stream_aes128estream_e_hongjun_v1_NONCEBYTES 16

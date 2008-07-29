@@ -1,0 +1,58 @@
+#!/bin/sh -e
+
+okabi | (
+  while read abi
+  do
+
+    rm -f cpucycles.o cpucycles.h
+    
+    (
+      echo amd64tscfreq
+      echo amd64cpuinfo
+      echo x86tscfreq
+      echo x86cpuinfo
+      echo x86estimate
+      echo ia64cpuinfo
+      echo powerpclinux
+      echo powerpcmacos
+      echo powerpcaix
+      echo sparcpsrinfo
+      echo sparc32psrinfo
+      echo hppapstat
+      echo alpha
+      echo sgi
+      echo clockmonotonic
+      echo gettimeofday
+    ) | (
+      while read n
+      do
+        okc-$abi | (
+          while read c
+          do
+            echo "=== `date` === Trying $n.c with $c..." >&2
+            rm -f test cpucycles-impl.o cpucycles-impl.h cpucycles-impl.c
+            cp $n.c cpucycles-impl.c || continue
+            cp $n.h cpucycles-impl.h || continue
+            $c -c cpucycles-impl.c || continue
+            $c -o test test.c cpucycles-impl.o || continue
+            ./test || continue
+            echo "=== `date` === Success. Using $n.c." >&2
+            mkdir -p lib/$abi
+            mv cpucycles-impl.o lib/$abi/cpucycles.o
+            mkdir -p include/$abi
+            mv cpucycles-impl.h include/$abi/cpucycles.h
+            exit 0
+          done
+          exit 111
+        ) && exit 0
+      done
+      exit 111
+    ) || (
+      echo ===== Giving up. >&2
+      rm -f test cpucycles-impl.o cpucycles-impl.h cpucycles-impl.c
+      exit 111
+    ) || exit 111
+
+  done
+  exit 0
+) || exit 111

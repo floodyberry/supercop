@@ -1,0 +1,248 @@
+<html>
+<head>
+<title>cpucycles: counting CPU cycles</title>
+</head>
+<body>
+<h1><tt>cpucycles</tt>: counting CPU cycles</h1>
+A C or C++ program can
+call <tt>cpucycles()</tt> to receive a <tt>long long</tt> cycle count.
+The program has to
+<pre>
+     #include "cpucycles.h"
+</pre>
+and link to <tt>cpucycles.o</tt>.
+The program can look at the constant string <tt>cpucycles_implementation</tt>
+to see which implementation of <tt>cpucycles</tt> it's using.
+The program can also call <tt>cpucycles_persecond()</tt>
+to receive a <tt>long long</tt> estimate
+of the number of cycles per second.
+<p>
+Here's how to create <tt>cpucycles.h</tt> and <tt>cpucycles.o</tt>:
+<pre>
+     wget http://ebats.cr.yp.to/cpucycles-20060326.tar.gz
+     gunzip < cpucycles-20060326.tar.gz | tar -xf -
+     cd cpucycles-20060326
+     sh do
+</pre>
+The <tt>do</tt> script creates <tt>cpucycles.h</tt> and <tt>cpucycles.o</tt>.
+It also prints one line of output
+showing the implementation selected,
+the number of cycles per second,
+a double-check of the number of cycles per second,
+and the differences between several adjacent calls to the cpucycles() function.
+<p>
+Some systems have multiple incompatible formats for executable programs.
+The most important reason is that some CPUs
+(the Athlon 64, for example, and the UltraSPARC)
+have two incompatible modes, a 32-bit mode and a 64-bit mode.
+On these systems, you can run
+<pre>
+     env ARCHITECTURE=32 sh do
+</pre>
+to create a 32-bit <tt>cpucycles.o</tt>
+or
+<pre>
+     env ARCHITECTURE=64 sh do
+</pre>
+to create a 64-bit <tt>cpucycles.o</tt>.
+<h2>Notes on accuracy</h2>
+Benchmarking tools are encouraged
+to record several timings of a function:
+call cpucycles(), function(), cpucycles(), function(), etc.,
+and then print one line reporting the differences
+between successive cpucycles() results.
+The median of several differences
+is much more stable than the average.
+<p>
+Cycle counts continue to increase
+while other programs are running,
+while the operating system is handling an interruption such as a network packet,
+etc.
+This won't affect the median of several timings of a fast function---the
+function usually won't be interrupted---but it can affect
+the median of several timings of a slow function.
+Hopefully a benchmarking machine isn't running other programs.
+<p>
+On dual-CPU systems (and dual-core systems such as the Athlon 64 X2),
+the CPUs often don't have synchronized cycle counters,
+so a process that switches CPUs can have its cycle counts jump forwards
+or backwards.
+I've never seen this affect the median of several timings.
+<p>
+Some CPUs dynamically reduce CPU speed to save power,
+but deliberately keep their cycle counters running at full speed,
+the idea being that measuring time is more important than measuring cycles.
+Hopefully a benchmarking machine won't enter power-saving mode.
+<p>
+Cycle counts are occasionally off by a multiple of 2^32 on some CPUs,
+as discussed below.
+I've never seen this affect the median of several timings.
+<p>
+The estimate returned by <tt>cpucycles_persecond()</tt>
+may improve accuracy after cpucycles() has been called repeatedly.
+<h2>Implementations</h2>
+<b>alpha.</b>
+The Alpha's built-in cycle-counting function counts cycles modulo 2^32.
+<tt>cpucycles</tt> usually manages to fix this
+by calling <tt>gettimeofday</tt>
+(which takes a large but low-variance number of cycles)
+and automatically estimating the chip speed.
+In extreme situations the resulting cycle counts
+could still be off by a multiple of 2^32.
+<p>
+Results on td161:
+alpha 499845359 499838717 423 360 336 349 353 348 469 329 348 345 348 345 348 345 348 345 348 345 348 348 348 345 348 345 348 345 348 348 348 345 348 345 348 345 348 348 348 345 348 345 348 345 348 348 348 345 348 345 348 345 348 348 348 468 318 348 345 348 345 348 345 348 345 348
+<p>
+<b>amd64cpuinfo.</b>
+<tt>cpucycles</tt> uses the CPU's RDTSC instruction to count cycles,
+and reads <tt>/proc/cpuinfo</tt>
+to see the kernel's estimate of cycles per second.
+<p>
+Results on dancer with ARCHITECTURE=64 (default):
+amd64cpuinfo 2002653000 2002526765 22 9 9 8 8 17 6 10 5 9 8 8 8 17 6 10 5 9 8 8 8 17 6 10 5 9 8 8 8 17 6 10 5 9 8 8 11 14 15 28 10 8 9 12 23 106 10 8 8 8 8 8 8 17 6 10 5 9 8 8 8 17 6 10
+<p>
+<b>amd64tscfreq.</b>
+<tt>cpucycles</tt> uses the CPU's RDTSC instruction to count cycles,
+and uses <tt>sysctlbyname("machdep.tsc_freq",...)</tt>
+to see the kernel's estimate of cycles per second.
+<p>
+<b>clockmonotonic.</b>
+Backup option,
+using the POSIX clock_gettime(CLOCK_MONOTONIC) function to count nanoseconds
+and using <tt>sysctlbyname("machdep.tsc_freq",...)</tt>
+to see the kernel's estimate of cycles per second.
+This often has much worse than microsecond precision.
+<p>
+Results on whisper (artificially induced):
+clockmonotonic 1298904202 1298866469 2177 1815 2177 2177 1814 2177 2178 2177 1814 2178 2177 1814 2177 2177 1815 2177 2177 1814 2177 2179 1813 2178 2177 1815 2177 2177 1814 2177 2177 2177 1815 2178 2177 1813 2178 2177 1815 2177 2177 1814 2177 2177 1815 2177 2177 1814 2177 2179 2177 1814 2177 2177 2177 1815 2177 2177 1814 2177 2178 1814 2178 2177 1814 2177
+<p>
+<b>gettimeofday.</b>
+Backup option,
+using the POSIX gettimeofday() function to count microseconds
+and <tt>/proc/cpuinfo</tt>
+to see the kernel's estimate of cycles per second.
+This often has much worse than microsecond precision.
+<p>
+Results on dancer (artificially induced) with ARCHITECTURE=32:
+gettimeofday 2002653000 2002307748 2002 2003 2003 2002 2003 2003 2002 2003 2003 2002 2003 2003 2002 2003 2003 2002 2003 2003 2002 2003 2003 2002 2003 2003 4005 0 4005 2003 0 4005 2003 2002 2003 2003 2002 2003 2003 2002 2003 2002 2003 2003 2002 2003 2003 2002 2003 2003 2002 2003 2003 2002 2003 2003 2002 2003 4005 0 2003 4005 0 4006 2002 2003
+<p>
+Results on dancer (artificially induced) with ARCHITECTURE=64 (default):
+gettimeofday 2002653000 2002293956 2560 1792 2048 1792 2048 2304 1792 2048 1792 0 2048 2304 2048 1792 1792 2048 0 2304 2048 1792 2048 1792 2304 0 2048 1792 2048 1792 2048 0 2304 2048 1792 1792 2048 2304 2048 0 1792 2048 1792 2304 2048 1792 2048 0 1792 2560 1792 1792 2048 1792 0 2560 25600 2048 1792 2560 1792 0 2048 1792 2048 2304
+<p>
+<b>hppapstat.</b>
+<tt>cpucycles</tt> uses the CPU's MFCTL %cr16 instruction to count cycles,
+and <tt>pstat(PSTAT_PROCESSOR,...)</tt>
+to see the kernel's estimate of cycles per second.
+<p>
+Results on hp400:
+hppapstat 440000000 439994653 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11 11
+<p>
+<b>powerpcaix.</b>
+<tt>cpucycles</tt> uses the CPU's MFTB instruction to count ``time base'';
+uses <tt>/usr/sbin/lsattr -E -l proc0 -a frequency</tt>
+to see the kernel's estimate of cycles per second;
+and spends some time comparing MFTB to gettimeofday()
+to figure out the number of time-base counts per second.
+<p>
+I've seen
+a 533MHz PowerPC G4 (7410) with a 16-cycle time base;
+a 668MHz POWER RS64 IV (SStar) system with a 1-cycle time base;
+a 1452MHz POWER with an 8-cycle time base;
+and
+a 2000MHz PowerPC G5 (970) with a 60-cycle time base.
+<p>
+Results on tigger:
+powerpcaix 1452000000 1451981436 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64 56 64 64 64
+<p>
+<b>powerpclinux.</b>
+<tt>cpucycles</tt> uses the CPU's MFTB instruction to count ``time base'';
+reads <tt>/proc/cpuinfo</tt>
+to see the kernel's estimate of cycles per second;
+and spends some time comparing MFTB to gettimeofday()
+to figure out the number of time-base counts per second.
+<p>
+Results on gggg:
+powerpclinux 533000000 532650134 48 32 48 32 32 48 32 32 48 32 32 48 32 32 48 32 32 48 32 32 32 48 32 32 48 32 32 48 32 32 48 32 32 48 32 32 32 48 32 32 48 32 32 48 32 32 48 32 32 48 32 32 32 48 32 32 48 32 32 48 32 32 48 32
+<p>
+<b>powerpcmacos.</b>
+<tt>cpucycles</tt> uses the <tt>mach_absolute_time</tt> function
+to count ``time base'';
+uses <tt>sysctlbyname("hw.cpufrequency",...)</tt>
+to see the kernel's estimate of cycles per second;
+and uses <tt>sysctlbyname("hw.tbfrequency",...)</tt>
+to see the kernel's estimate of time-base counts per second.
+<p>
+Results on geespaz with ARCHITECTURE=32 (default):
+powerpcmacos 2000000000 1999891801 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60 60
+<p>
+Results on geespaz with ARCHITECTURE=64:
+powerpcmacos 2000000000 1999896339 420 60 60 60 60 60 60 0 60 60 60 60 60 60 60 60 0 60 60 60 60 60 60 60 60 60 0 60 60 60 60 60 60 60 60 60 0 60 60 60 60 60 60 60 0 60 60 60 60 60 60 60 60 0 60 60 60 60 60 60 60 60 0 60
+<p>
+<b>sparc32psrinfo.</b>
+<tt>cpucycles</tt> uses the CPU's RDTICK instruction
+in 32-bit mode to count cycles,
+and runs <tt>/usr/sbin/psrinfo -v</tt>
+to see the kernel's estimate of cycles per second.
+<p>
+Results on icarus with ARCHITECTURE=32 (default):
+sparc32psrinfo 900000000 899920056 297 23 23 18 22 23 18 17 22 18 17 22 23 18 17 129 17 17 17 17 17 17 17 97 17 17 17 17 17 17 17 85 17 17 17 17 17 17 17 97 17 17 17 17 17 17 17 85 17 17 17 17 17 17 17 97 17 17 17 17 17 17 17 85
+<p>
+Results on wessel with ARCHITECTURE=32 (default):
+sparc32psrinfo 900000000 899997269 39 23 18 22 18 25 72 17 22 18 17 22 23 26 71 17 17 17 17 17 17 17 85 17 17 17 17 17 17 17 97 17 17 17 17 17 17 17 85 17 17 17 17 17 17 17 97 17 17 17 17 17 17 17 85 17 17 17 17 17 17 17 109 17
+<p>
+<b>sparcpsrinfo.</b>
+<tt>cpucycles</tt> uses the CPU's RDTICK instruction
+in 64-bit mode to count cycles,
+and runs <tt>/usr/sbin/psrinfo -v</tt>
+to see the kernel's estimate of cycles per second.
+<p>
+Results on icarus with ARCHITECTURE=64:
+sparcpsrinfo 900000000 899920264 289 12 12 12 12 12 12 19 12 113 19 12 12 12 12 12 12 130 12 12 12 12 12 12 12 144 12 12 12 12 12 12 12 144 12 12 12 12 12 12 12 144 12 12 12 12 12 12 12 144 12 12 12 12 12 12 12 144 12 12 12 12 12 12
+<p>
+Results on wessel with ARCHITECTURE=64:
+sparcpsrinfo 900000000 899997032 29 19 12 19 19 19 12 12 123 12 12 12 12 12 12 12 174 12 12 12 12 12 12 12 174 12 12 12 12 12 12 12 174 12 12 12 12 12 12 12 174 12 12 12 12 12 12 12 174 12 12 12 12 12 12 12 174 12 12 12 12 12 12 12
+<p>
+<b>x86cpuinfo.</b>
+<tt>cpucycles</tt> uses the CPU's RDTSC instruction to count cycles,
+and reads <tt>/proc/cpuinfo</tt>
+to see the kernel's estimate of cycles per second.
+There have been reports of the 64-bit cycle counters on some x86 CPUs
+being occasionally off by 2^32;
+<tt>cpucycles</tt> makes no attempt to fix this.
+<p>
+Results on cruncher:
+x86cpuinfo 132957999 132951052 60 36 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32 32
+<p>
+Results on dali:
+x86cpuinfo 448882000 448881565 49 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45 45
+<p>
+Results on dancer with ARCHITECTURE=32:
+x86cpuinfo 2002653000 2002538651 26 11 9 11 10 17 11 10 10 10 9 10 9 12 9 173 11 10 10 10 10 17 11 10 10 10 9 10 9 17 11 10 10 10 9 10 9 17 11 10 10 10 9 10 9 17 11 10 10 10 9 10 9 17 11 10 10 10 9 10 9 17 11 10
+<p>
+Results on fireball:
+x86cpuinfo 1894550999 1894188944 104 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88
+<p>
+Results on neumann:
+x86cpuinfo 999534999 999456935 49 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44
+<p>
+Results on rzitsc:
+x86cpuinfo 2799309000 2799170567 132 96 100 104 100 100 96 96 96 100 96 108 104 104 112 96 112 96 108 96 112 96 96 96 100 112 120 100 96 100 104 112 96 96 96 88 96 128 108 96 116 96 100 100 108 96 100 96 108 96 104 100 112 96 100 96 100 100 88 108 100 108 92 96
+<p>
+Results on shell:
+x86cpuinfo 3391548999 3391341751 108 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88 88
+<p>
+Results on thoth:
+x86cpuinfo 900447000 900028758 67 19 18 18 19 188 16 16 16 19 19 18 19 147 16 16 16 19 19 17 16 16 16 16 16 19 19 17 16 16 16 16 16 19 19 17 16 16 16 16 16 19 19 18 19 156 16 16 16 19 19 18 19 147 16 16 16 19 19 18 19 147 16 16
+<p>
+<b>x86tscfreq.</b>
+<tt>cpucycles</tt> uses the CPU's RDTSC instruction to count cycles,
+and uses <tt>sysctlbyname("machdep.tsc_freq",...)</tt>
+to see the kernel's estimate of cycles per second.
+<p>
+Results on whisper:
+x86tscfreq 1298904202 1298892874 72 72 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53 53
+<h2>Version</h2>
+This is the cpucycles-20060326.html web page.
+This web page is in the public domain.
+</body>
+</html>

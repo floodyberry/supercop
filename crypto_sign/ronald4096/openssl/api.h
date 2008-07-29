@@ -1,0 +1,6 @@
+#define crypto_sign_ronald4096_openssl_MODULUSBITS 4096 
+#define crypto_sign_ronald4096_openssl_MODULUSBYTES (crypto_sign_ronald4096_openssl_MODULUSBITS / 8)
+
+#define crypto_sign_ronald4096_openssl_SECRETKEYBYTES (crypto_sign_ronald4096_openssl_MODULUSBYTES * 8)
+#define crypto_sign_ronald4096_openssl_PUBLICKEYBYTES (crypto_sign_ronald4096_openssl_MODULUSBYTES)
+#define crypto_sign_ronald4096_openssl_BYTES (crypto_sign_ronald4096_openssl_MODULUSBYTES)

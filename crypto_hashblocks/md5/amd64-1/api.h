@@ -1,0 +1,2 @@
+#define crypto_hashblocks_md5_amd64_1_STATEBYTES 16
+#define crypto_hashblocks_md5_amd64_1_BLOCKBYTES 64

@@ -1,0 +1,2 @@
+-msse2 -DTUNING="unroll" -I. -I../libraries/gmp-4.2.1 -DNDEBUG -funroll-loops
+-msse2 -DTUNING="nounroll" -I. -I../libraries/gmp-4.2.1 -DNDEBUG 

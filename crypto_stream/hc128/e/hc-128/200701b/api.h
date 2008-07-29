@@ -1,0 +1,2 @@
+#define crypto_stream_hc128_e_hc_128_200701b_KEYBYTES 16
+#define crypto_stream_hc128_e_hc_128_200701b_NONCEBYTES 16

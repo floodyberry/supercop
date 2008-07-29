@@ -1,0 +1,20 @@
+This BAT implements a key exchange based on an elliptic curve defined
+over GF(2^251). The curve E is
+  y^2 + xy = x^3 + A6,
+where A6 is t^13 + t^9 + t^8 + t^7 + t^2 + t + 1, with t defined by
+  t^251 + t^7 + t^4 + t^2 + 1.
+
+E and its twist have almost prime cardinalities:
+#E  = 4*904625697166532776746648320380374280087573892165070460659900068401211992033
+#Et = 2*1809251394333065553493296640760748560239539236471126704913249363444861317183
+
+The point with abscissa t^3+1 is taken as base point.
+
+The algorithm used for scalar multiplication is the Montgomery-like
+formulae of Stam (similar to Lopez-Dahab, projective coordinates on the
+Kummer line).
+
+Finite field arithmetic is imported from the Mpfq library. Elements are
+represented as polynomials modulo t^251 + t^7 + t^4 + t^2 + 1.
+Multiplication uses SSE-2 registers.
+

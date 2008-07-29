@@ -1,0 +1,1 @@
+#define crypto_hash_sha512_ref_BYTES 64

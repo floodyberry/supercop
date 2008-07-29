@@ -1,0 +1,49 @@
+Reference and fast implementations of the stream cipher SNOW 2.0
+
+This collection of programs generates four executables.
+
+testvectors  	 	: Generates test vectors using the 
+		          reference implementation of SNOW 2.0
+
+testvectors_fast  	: Generates test vectors using the 
+			  fast implementation of SNOW 2.0
+
+measure      		: Program to measure the key setup speed
+		  	  and the speed of keystream generation using the 
+			  reference implementation of SNOW 2.0
+
+measure_fast		: Program to measure the key setup speed 
+			  and the speed of keystream generation using the
+			  fast implementation of SNOW 2.0
+
+
+Also a sample output from the testvectors program has been included in the
+file TestVectors.Ref
+
+The programs have been written for the GNU gcc environment but should work on
+standard systems. Possible problems could be time measurement functions.
+Tested on Red Hat Linux and cygwin on Windows XP.
+
+To build:
+Edit the Makefile. 
+(1) Change the parameter "GCC"  to whatever compiler you use.
+(2) Change the parameter FASTOPTS to whatever make programs run fast on your machine.
+    Current FASTOPTS is for a Pentium processor using gcc as compiler.
+(3) Change the parameter CPUCLK_SPEED to the cpu clocking frequency in MHz of your machine.
+
+Run 
+> make
+
+Check the two implementations by running e.g.,
+> ./testvectors > reference.out
+> ./testvectors_fast > fast.out
+> diff reference.out fast.out
+It should only differ in the heading.
+
+Test speed of the reference implementation by running 
+> ./measure
+and for the fast implementation
+> ./measure_fast
+
+Regards
+Patrik Ekdahl and Thomas Johansson

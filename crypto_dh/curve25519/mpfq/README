@@ -1,0 +1,12 @@
+This BAT is an implementation of the curve25519 key exchange cryptosystem
+as described by Dan Bernstein. See http://cr.yp.to/ecdh.html for details.
+
+The purpose is to show that on a 64-bit computer with reasonnable integer
+arithmetic (Athlon64, and maybe also Intel Core2, but forget about
+Pentium 4 EMT64), using integer units is faster than using the x87
+coprocessor. Of course, this is a constantly evolving situation, since
+new processors are released every few months.
+
+Version 2:
+Faster base field arithmetic for AMD64.
+

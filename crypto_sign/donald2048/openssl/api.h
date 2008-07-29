@@ -1,0 +1,6 @@
+#define crypto_sign_donald2048_openssl_PRIMEBITS 2048
+#define crypto_sign_donald2048_openssl_PRIMEBYTES (crypto_sign_donald2048_openssl_PRIMEBITS / 8)
+
+#define crypto_sign_donald2048_openssl_SECRETKEYBYTES (crypto_sign_donald2048_openssl_PRIMEBYTES + 20)
+#define crypto_sign_donald2048_openssl_PUBLICKEYBYTES crypto_sign_donald2048_openssl_PRIMEBYTES
+#define crypto_sign_donald2048_openssl_BYTES 40

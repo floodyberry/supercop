@@ -1,0 +1,6 @@
+#define crypto_encrypt_ronald2048_openssl_MODULUSBITS 2048 
+#define crypto_encrypt_ronald2048_openssl_MODULUSBYTES (crypto_encrypt_ronald2048_openssl_MODULUSBITS / 8)
+
+#define crypto_encrypt_ronald2048_openssl_SECRETKEYBYTES (crypto_encrypt_ronald2048_openssl_MODULUSBYTES * 8)
+#define crypto_encrypt_ronald2048_openssl_PUBLICKEYBYTES (crypto_encrypt_ronald2048_openssl_MODULUSBYTES)
+#define crypto_encrypt_ronald2048_openssl_BYTES (crypto_encrypt_ronald2048_openssl_MODULUSBYTES)
