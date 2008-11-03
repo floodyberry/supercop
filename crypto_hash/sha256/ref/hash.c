@@ -1,3 +1,9 @@
+/*
+20080913
+D. J. Bernstein
+Public domain.
+*/
+
 #include "crypto_hashblocks_sha256.h"
 #include "crypto_hash.h"
 
@@ -18,13 +24,14 @@ static const char iv[32] = {
 
 int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long inlen)
 {
+  unsigned char h[32];
   unsigned char padded[128];
   int i;
   unsigned long long bits = inlen << 3;
 
-  for (i = 0;i < 32;++i) out[i] = iv[i];
+  for (i = 0;i < 32;++i) h[i] = iv[i];
 
-  blocks(out,in,inlen);
+  blocks(h,in,inlen);
   in += inlen;
   inlen &= 63;
   in -= inlen;
@@ -42,7 +49,7 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long in
     padded[61] = bits >> 16;
     padded[62] = bits >> 8;
     padded[63] = bits;
-    blocks(out,padded,64);
+    blocks(h,padded,64);
   } else {
     for (i = inlen + 1;i < 120;++i) padded[i] = 0;
     padded[120] = bits >> 56;
@@ -53,8 +60,10 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long in
     padded[125] = bits >> 16;
     padded[126] = bits >> 8;
     padded[127] = bits;
-    blocks(out,padded,128);
+    blocks(h,padded,128);
   }
+
+  for (i = 0;i < 32;++i) out[i] = h[i];
 
   return 0;
 }

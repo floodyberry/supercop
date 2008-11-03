@@ -1,3 +1,7 @@
+# D. J. Bernstein and Peter Schwabe
+# 2008.09.05
+# Public domain.
+
 int32 action
 int32 ctxp
 int32 inp
@@ -22,6 +26,7 @@ int32 tx3
 
 int32 table0
 int32 table1
+int32 table1p3
 int32 table2
 int32 table3
 
@@ -42,6 +47,7 @@ int32 in3
 
 int32 n0p
 int32 tmp1
+int32 check
 int32 d
 int32 tmpp
 int32 y0
@@ -116,6 +122,13 @@ stack32 x43
 
 stack128 tmp
 
+stack32 pre10
+
+stack32 pre20
+stack32 pre21
+stack32 pre22
+stack32 pre23
+
 int32 i12
 int32 i13
 int32 i14
@@ -174,7 +187,7 @@ stack32 i28_stack
 stack32 i29_stack
 
 # Enter the function
-enter ECRYPT_process_bytes_qhasm
+enter ECRYPT_process_bytes
 
 =? (uint32) length - 0
 goto donothing if =
@@ -205,6 +218,7 @@ constants |= &aes_big_constants & 0xffff
 # Set table constants:
 table0 = constants + 40
 table1 = constants + 48
+table1p3 = constants + 51
 table2 = constants + 44
 table3 = constants + 52
 
@@ -324,6 +338,8 @@ x37  = tx1
 x38  = tx2 
 x39  = tx3 
 
+y0 = *(uint32 *) (n0p + 0)
+
 #	Key generation round 10:
 tx0 = *(uint32 *) (ctxp + 52) 
 tx1 ^= tx0
@@ -334,21 +350,50 @@ x41  = tx1
 x42  = tx2 
 x43  = tx3 
 
-y0 = *(uint32 *) (n0p + 0)
+tx0 = x0
+y0 ^= tx0
+
+goto precompute
+
+mainloop:
+
+z0 ^= in0 
+inp += 16
+
+*(uint32 *) (outp + 0) = z0
+z1 ^= in1
+
+*(uint32 *) (outp + 4) = z1
+z2 ^= in2 
+
+*(uint32 *) (outp + 8) = z2
+z3 ^= in3 
+
+check = y0 & (65536 * 0xff00)
+=? (uint32) check - 0
+
+*(uint32 *) (outp + 12) = z3
+y0 ^= tx0
+
+z0 = pre10
+p00 = 4080 & (y0 <<< 12)
+
+p00 = *(uint32 *) (table0 + p00)
+outp += 16
+
+goto after_precompute if !=
+
+#################################################
+#####             Precomputation             ####
+#################################################
+#
+precompute:
+
 y1 = *(uint32 *) (n0p + 4)
 y2 = *(uint32 *) (n0p + 8)
 y3 = *(uint32 *) (n0p + 12)
 
-tx0 = x0
-y0 ^= tx0
-
-mainloop:
-
-################################################
-####             AES Round 1               ####
-################################################
 z0 = x4
-p00 = 4080 & (y0 <<< 12)
 
 p01 = 4080 & (y0 <<< 20)
 z1 = x5
@@ -360,7 +405,6 @@ p03 = 4080 & (y0 <<< 4)
 z3 = x7
 
 p10 = 4080 & (y1 <<< 12)
-p00 = *(uint32 *) (table0 + p00)
 
 p11 = 4080 & (y1 <<< 20) 
 p01 = *(uint32 *) (table1 + p01)
@@ -371,7 +415,6 @@ p02 = *(uint32 *) (table2 + p02)
 p13 = 4080 & (y1 <<< 4)
 p03 = *(uint32 *) (table3 + p03)
 
-z0 ^= p00
 p10 = *(uint32 *) (table0 + p10)
 
 z3 ^= p01
@@ -413,103 +456,131 @@ p32 = *(uint32 *) (table2 + p32)
 z2 ^= p13
 p33 = *(uint32 *) (table3 + p33)
 
-n0 = *(swapendian uint32 *) n0p 
 z2 ^= p20
-
 z1 ^= p21
-z0 ^= p22
 
-n0 = n0 + 1
+z0 ^= p22
 z3 ^= p23
 
-*(swapendian uint32 *) n0p = n0
 y2 = z2 ^ p31
-
 y3 = z3 ^ p30
-y1 = z1 ^ p32
 
-y0 = z0 ^ p33
+y1 = z1 ^ p32
+z0 = z0 ^ p33
+
+pre10 = z0
+
+# Precomputation of second round
+
+
+p10 = 4080 & (y1 <<< 12)
+z0 = x8
+
+p11 = 4080 & (y1 <<< 20) 
+z1 = x9
+
+p12 = 4080 & (y1 <<< 28) 
+z2 = x10
+
+p13 = 4080 & (y1 <<< 4)
+z3 = x11
+
+p10 = *(uint32 *) (table0 + p10)
+p20 = 4080 & (y2 <<< 12) 
+
+p11 = *(uint32 *) (table1 + p11)
+p21 = 4080 & (y2 <<< 20)
+
+p12 = *(uint32 *) (table2 + p12)
+p22 = 4080 & (y2 <<< 28)
+
+p13 = *(uint32 *) (table3 + p13)
+p23 = 4080 & (y2 <<< 4) 
+
+p20 = *(uint32 *) (table0 + p20)
+p30 = 4080 & (y3 <<< 12)
+
+p21 = *(uint32 *) (table1 + p21)
+z0 ^= p11
+
+p22 = *(uint32 *) (table2 + p22)
+p31 = 4080 & (y3 <<< 20)
+
+z1 ^= p10
+p23 = *(uint32 *) (table3 + p23)
+
+p32 = 4080 & (y3 <<< 28) 
+p30 = *(uint32 *) (table0 + p30)
+
+p33 = 4080 & (y3 <<< 4)
+p31 = *(uint32 *) (table1 + p31)
+
+z3 ^= p12
+p32 = *(uint32 *) (table2 + p32)
+
+z2 ^= p13
+p33 = *(uint32 *) (table3 + p33)
+
+z2 ^= p20
+z1 ^= p21
+
+z0 ^= p22
+z3 ^= p23
+
+z2 ^= p31
+z3 ^= p30
+
+z1 ^= p32
+pre22 = z2
+
+z0 ^= p33
+pre23 = z3
+
+pre20 = z0
+pre21 = z1
+
+z0 = pre10
+p00 = 4080 & (y0 <<< 12)
+p00 = *(uint32 *) (table0 + p00)
+
+after_precompute:
+
+################################################
+####             AES Round 1               ####
+################################################
+
+y0 = z0 ^ p00
+n0 = *(swapendian uint32 *) n0p 
 
 ################################################
 ####             AES Round 2               ####
 ################################################
 
-z0 = x8
-
 p00 = 4080 & (y0 <<< 12)
+z0 = pre20
+
 p01 = 4080 & (y0 <<< 20)
+z1 = pre21
 
-z1 = x9
 p02 = 4080 & (y0 <<< 28)
+z2 = pre22
 
-z2 = x10
 p03 = 4080 & (y0 <<< 4)
-
-z3 = x11
-p10 = 4080 & (y1 <<< 12)
+z3 = pre23
 
 p00 = *(uint32 *) (table0 + p00)
-p11 = 4080 & (y1 <<< 20) 
+n0 = n0 + 1
 
 p01 = *(uint32 *) (table1 + p01)
-p12 = 4080 & (y1 <<< 28) 
 
 p02 = *(uint32 *) (table2 + p02)
-p13 = 4080 & (y1 <<< 4)
 
 p03 = *(uint32 *) (table3 + p03)
-z0 ^= p00
+y0 = z0 ^ p00
 
-p10 = *(uint32 *) (table0 + p10)
-z3 ^= p01
-
-p11 = *(uint32 *) (table1 + p11)
-p20 = 4080 & (y2 <<< 12) 
-z2 ^= p02
-
-p12 = *(uint32 *) (table2 + p12)
-p21 = 4080 & (y2 <<< 20)
-z1 ^= p03
-
-p13 = *(uint32 *) (table3 + p13)
-p22 = 4080 & (y2 <<< 28)
-
-p20 = *(uint32 *) (table0 + p20)
-p23 = 4080 & (y2 <<< 4) 
-
-p21 = *(uint32 *) (table1 + p21)
-p30 = 4080 & (y3 <<< 12)
-z0 ^= p11
-
-p22 = *(uint32 *) (table2 + p22)
-p31 = 4080 & (y3 <<< 20)
-z1 ^= p10
-
-p23 = *(uint32 *) (table3 + p23)
-p32 = 4080 & (y3 <<< 28) 
-
-p30 = *(uint32 *) (table0 + p30)
-p33 = 4080 & (y3 <<< 4)
-
-p31 = *(uint32 *) (table1 + p31)
-z3 ^= p12
-
-p32 = *(uint32 *) (table2 + p32)
-z2 ^= p13
-
-p33 = *(uint32 *) (table3 + p33)
-z2 ^= p20
-z1 ^= p21
-
-z0 ^= p22
-z3 ^= p23
-
-y2 = z2 ^ p31
-y3 = z3 ^ p30
-
-y1 = z1 ^ p32
-y0 = z0 ^ p33
-
+y3 = z3 ^ p01
+y2 = z2 ^ p02
+y1 = z1 ^ p03
 
 ################################################
 ####             AES Round 3               ####
@@ -590,6 +661,7 @@ y0 = z0 ^ p33
 ################################################
 ####             AES Round 4               ####
 ################################################
+
 z0 = x16
 p00 = 4080 & (y0 <<< 12)
 p01 = 4080 & (y0 <<< 20)
@@ -661,6 +733,7 @@ y3 = z3 ^ p30
 
 y1 = z1 ^ p32
 y0 = z0 ^ p33
+
 
 
 ################################################
@@ -1049,125 +1122,96 @@ y0 = z0 ^ p33
 
 z0 = x40
 p00 = 4080 & (y0 <<< 12)
+
 z1 = x41
 p01 = 4080 & (y0 <<< 20)
+
 z2 = x42
 p02 = 4080 & (y0 <<< 28) 
+
 z3 = x43
 p03 = 4080 & (y0 <<< 4)
 
 p00 = *(uint32 *) (table2 + p00)
 p10 = 4080 & (y1 <<< 12)
+
 p01 = *(uint32 *) (table3 + p01)
 p11 = 4080 & (y1 <<< 20)
+
 p02 = *(uint32 *) (table0 + p02)
 p12 = 4080 & (y1 <<< 28) 
-p03 = *(uint32 *) (table1 + p03)
+
+p03 = *(uint8 *) (table1p3 + p03)
 p13 = 4080 & (y1 <<< 4)
 
-p00 = p00 & (65536 * 0xff00) 
-p01 = p01 & (65536 * 0xff) 
-p02 = p02 & 0xff00 
-p03 = p03 & 0xff 
-
-z0 ^= p00
-z3 ^= p01
-z2 ^= p02
-z1 ^= p03
+*(swapendian uint32 *) n0p = n0
+p20 = 4080 & (y2 <<< 12)
 
 p10 = *(uint32 *) (table2 + p10)
-p20 = 4080 & (y2 <<< 12)
-p11 = *(uint32 *) (table3 + p11)
 p21 = 4080 & (y2 <<< 20)
-p12 = *(uint32 *) (table0 + p12)
+
+p11 = *(uint32 *) (table3 + p11)
 p22 = 4080 & (y2 <<< 28) 
-p13 = *(uint32 *) (table1 + p13)
+
+p12 = *(uint32 *) (table0 + p12)
 p23 = 4080 & (y2 <<< 4)
 
-p10 = p10 & (65536 * 0xff00) 
-p11 = p11 & (65536 * 0xff) 
-p12 = p12 & 0xff00 
-p13 = p13 & 0xff 
+p13 = *(uint8 *) (table1p3 + p13)
+p03 bits 0xff000000 = p10 <<< 0
 
-z1 ^= p10
-z0 ^= p11
-z3 ^= p12
-z2 ^= p13
+p30 = 4080 & (y3 <<< 12)
+p00 bits 0x00ff0000 = p11 <<< 0
 
 p20 = *(uint32 *) (table2 + p20)
-p30 = 4080 & (y3 <<< 12)
+p01 bits 0x0000ff00 = p12 <<< 0
+
 p21 = *(uint32 *) (table3 + p21)
-p31 = 4080 & (y3 <<< 20)
+p02 bits 0x000000ff = p13 <<< 0
+
 p22 = *(uint32 *) (table0 + p22)
+p31 = 4080 & (y3 <<< 20)
+
+p23 = *(uint8 *) (table1p3 + p23)
 p32 = 4080 & (y3 <<< 28) 
-p23 = *(uint32 *) (table1 + p23)
-p33 = 4080 & (y3 <<< 4)
-
-
-p20 = p20 & (65536 * 0xff00) 
-p21 = p21 & (65536 * 0xff) 
-p22 = p22 & 0xff00 
-p23 = p23 & 0xff 
-
 
 p30 = *(uint32 *) (table2 + p30)
-z2 ^= p20
-p31 = *(uint32 *) (table3 + p31)
-z1 ^= p21
-p32 = *(uint32 *) (table0 + p32)
-z0 ^= p22
-p33 = *(uint32 *) (table1 + p33)
-z3 ^= p23
+p33 = 4080 & (y3 <<< 4)
 
+p31 = *(uint32 *) (table3 + p31)
+p02 bits 0xff000000 = p20 <<< 0
+
+p32 = *(uint32 *) (table0 + p32)
+p03 bits 0x00ff0000 = p21 <<< 0
+
+p33 = *(uint8 *) (table1p3 + p33)
+p00 bits 0x0000ff00 = p22 <<< 0
 
 y0 = *(uint32 *) (n0p + 0)
-p30 = p30 & (65536 * 0xff00) 
+p01 bits 0x000000ff = p23 <<< 0
 
-y1 = *(uint32 *) (n0p + 4)
-p31 = p31 & (65536 * 0xff) 
-
-y2 = *(uint32 *) (n0p + 8)
-p32 = p32 & 0xff00 
-
-y3 = *(uint32 *) (n0p + 12)
-p33 = p33 & 0xff 
-
+p01 bits 0xff000000 = p30 <<< 0
 tx0 = x0
-z3 ^= p30
 
 in0 = *(uint32 *) (inp + 0)
-z2 ^= p31
+z3 ^= p01
+
+p02 bits 0x00ff0000 = p31 <<< 0
+p03 bits 0x0000ff00 = p32 <<< 0
 
 in1 = *(uint32 *) (inp + 4)
-z1 ^= p32
+z2 ^= p02
 
 in2 = *(uint32 *) (inp + 8)
-z0 ^= p33
+p00 bits 0x000000ff = p33 <<< 0
+
+z1 ^= p03
+z0 ^= p00
 
 in3 = *(uint32 *) (inp + 12)
-y0 ^= tx0
-
-# if there are less then 16 bytes left, handle them differently:
 <? length -= 16
 
-goto atmost15bytesleft if <
-
-z0 ^= in0 
-inp += 16
-
-*(uint32 *) (outp + 0) = z0
-z1 ^= in1
-
-*(uint32 *) (outp + 4) = z1
-z2 ^= in2 
-
-*(uint32 *) (outp + 8) = z2
-z3 ^= in3 
-
-*(uint32 *) (outp + 12) = z3
-outp += 16
-
-goto mainloop
+# if there are less then 16 bytes left, handle them differently:
+goto mainloop if !<
 
 atmost15bytesleft:
 

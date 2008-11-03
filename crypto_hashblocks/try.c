@@ -1,5 +1,5 @@
 /*
- * crypto_hashblocks/try.c version 20080724
+ * crypto_hashblocks/try.c version 20080913
  * D. J. Bernstein
  * Public domain.
  */
@@ -11,17 +11,21 @@ extern unsigned char *alignedcalloc(unsigned long long);
 
 const char *primitiveimplementation = crypto_hashblocks_IMPLEMENTATION;
 
-#define MAXTEST_BYTES 10000
+#define MAXTEST_BYTES (10000 + crypto_hashblocks_STATEBYTES)
 #define CHECKSUM_BYTES 4096
 #define TUNE_BYTES 1536
 
 static unsigned char *h;
+static unsigned char *h2;
 static unsigned char *m;
+static unsigned char *m2;
 
 void allocate(void)
 {
   h = alignedcalloc(crypto_hashblocks_STATEBYTES);
+  h2 = alignedcalloc(crypto_hashblocks_STATEBYTES);
   m = alignedcalloc(MAXTEST_BYTES);
+  m2 = alignedcalloc(MAXTEST_BYTES);
 }
 
 void predoit(void)
@@ -41,12 +45,26 @@ const char *checksum_compute(void)
   long long j;
 
   for (i = 0;i < CHECKSUM_BYTES;++i) {
-    if (crypto_hashblocks(h,m,i) != 0) return "returns nonzero";
-    for (j = 0;j < i;++j)
-      m[j] ^= h[j % crypto_hashblocks_STATEBYTES];
-    m[i] = h[0];
+    long long hlen = crypto_hashblocks_STATEBYTES;
+    long long mlen = i;
+    for (j = -16;j < 0;++j) h[j] = random();
+    for (j = hlen;j < hlen + 16;++j) h[j] = random();
+    for (j = -16;j < hlen + 16;++j) h2[j] = h[j];
+    for (j = -16;j < 0;++j) m[j] = random();
+    for (j = mlen;j < mlen + 16;++j) m[j] = random();
+    for (j = -16;j < mlen + 16;++j) m2[j] = m[j];
+    if (crypto_hashblocks(h,m,mlen) != 0) return "crypto_hashblocks returns nonzero";
+    for (j = -16;j < mlen + 16;++j) if (m2[j] != m[j]) return "crypto_hashblocks writes to input";
+    for (j = -16;j < 0;++j) if (h2[j] != h[j]) return "crypto_hashblocks writes before output";
+    for (j = hlen;j < hlen + 16;++j) if (h2[j] != h[j]) return "crypto_hashblocks writes after output";
+    for (j = 0;j < hlen;++j) m2[j] = h2[j];
+    if (crypto_hashblocks(h2,m2,mlen) != 0) return "crypto_hashblocks returns nonzero";
+    if (crypto_hashblocks(m2,m2,mlen) != 0) return "crypto_hashblocks returns nonzero";
+    for (j = 0;j < hlen;++j) if (m2[j] != h2[j]) return "crypto_hashblocks does not handle overlap";
+    for (j = 0;j < mlen;++j) m[j] ^= h[j % hlen];
+    m[mlen] = h[0];
   }
-  if (crypto_hashblocks(h,m,CHECKSUM_BYTES) != 0) return "returns nonzero";
+  if (crypto_hashblocks(h,m,CHECKSUM_BYTES) != 0) return "crypto_hashblocks returns nonzero";
 
   for (i = 0;i < crypto_hashblocks_STATEBYTES;++i) {
     checksum[2 * i] = "0123456789abcdef"[15 & (h[i] >> 4)];

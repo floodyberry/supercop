@@ -1,0 +1,3 @@
+#define crypto_dh_curve25519_ref_SECRETKEYBYTES 32
+#define crypto_dh_curve25519_ref_PUBLICKEYBYTES 32
+#define crypto_dh_curve25519_ref_BYTES 32

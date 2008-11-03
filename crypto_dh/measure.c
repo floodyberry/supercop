@@ -14,7 +14,7 @@ extern void measure(void);
 
 const char *primitiveimplementation = crypto_dh_IMPLEMENTATION;
 const char *implementationversion = crypto_dh_VERSION;
-const char *sizenames[] = { "bytes", "publickeybytes", "secretkeybytes", 0 };
+const char *sizenames[] = { "outputbytes", "publickeybytes", "secretkeybytes", 0 };
 const long long sizes[] = { crypto_dh_BYTES, crypto_dh_PUBLICKEYBYTES, crypto_dh_SECRETKEYBYTES };
 
 static unsigned char *pk1;

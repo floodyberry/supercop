@@ -1,0 +1,4 @@
+#define crypto_secretbox_salsa20hmacsha512_ref_KEYBYTES 32
+#define crypto_secretbox_salsa20hmacsha512_ref_NONCEBYTES 8
+#define crypto_secretbox_salsa20hmacsha512_ref_ZEROBYTES 32
+#define crypto_secretbox_salsa20hmacsha512_ref_BOXZEROBYTES 0

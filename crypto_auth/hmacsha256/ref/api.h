@@ -1,0 +1,2 @@
+#define crypto_auth_hmacsha256_ref_BYTES 32
+#define crypto_auth_hmacsha256_ref_KEYBYTES 32

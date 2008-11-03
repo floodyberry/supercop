@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20080729
+version=20081103
 # D. J. Bernstein
 # Public domain.
 
@@ -87,14 +87,6 @@ cp -pr cpucycles/* "$work"
 cp -pr "$work"/lib/* "$lib"
 cp -pr "$work"/include/* "$include"
 
-echo "=== `date` === building randombytes"
-rm -rf "$work"
-mkdir -p "$work"
-cp -pr randombytes/* "$work"
-( cd "$work" && sh do )
-cp -pr "$work"/lib/* "$lib"
-cp -pr "$work"/include/* "$include"
-
 okabi \
 | while read abi
 do
@@ -109,17 +101,17 @@ do
     do
       for gmpabi in 64 32 2.0w 2.0n 1.0 o32 n32 aix64 mode64 mode32
       do
-        [ -s "$lib/$abi/libgmp.a" ] && continue
-        echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"
-        rm -rf "$work"
-        mkdir -p "$work"
-        cp -pr gmp-4.2.1/* "$work"
-        ( cd "$work" \
-          && ./configure --enable-cxx \
-             ABI="$gmpabi" \
-             CC="$c" CXX="$cpp" CFLAGS="$copts" CXXFLAGS="$cppopts" LDFLAGS="$copts" \
-          && make \
-          && make check \
+	[ -s "$lib/$abi/libgmp.a" ] && continue
+	echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"
+	rm -rf "$work"
+	mkdir -p "$work"
+	cp -pr gmp-4.2.1/* "$work"
+	( cd "$work" \
+	  && ./configure --enable-cxx \
+	     ABI="$gmpabi" \
+	     CC="$c" CXX="$cpp" CFLAGS="$copts" CXXFLAGS="$cppopts" LDFLAGS="$copts" \
+	  && make \
+	  && make check \
 	  && cp gmp.h gmpxx.h gmp-impl.h longlong.h config.h gmp-mparam.h fib_table.h mp_bases.h "$include/$abi" \
 	  && ( ranlib ".libs/libgmp.a" || : ) \
 	  && cp .libs/libgmp.a "$lib/$abi/libgmp.a" \
@@ -127,7 +119,7 @@ do
 	  && ( ranlib ".libs/libgmpxx.a" || : ) \
 	  && ( cp .libs/libgmpxx.a "$lib/$abi/libgmpxx.a" || : ) \
 	  && ( chmod 644 "$lib/$abi/libgmpxx.a" || : )
-        ) && break
+	) && break
       done
     done
   done
@@ -149,32 +141,8 @@ do
 done
 
 # loop over operations
-(
-  echo \
-    crypto_hashblocks \
-    :_STATEBYTES:_BLOCKBYTES \
-    '(unsigned char *,const unsigned char *,unsigned long long)'
-  echo \
-    crypto_hash \
-    :_BYTES \
-    '(unsigned char *,const unsigned char *,unsigned long long)'
-  echo \
-    crypto_stream \
-    :_xor:_KEYBYTES:_NONCEBYTES \
-    '(unsigned char *,unsigned long long,const unsigned char *,const unsigned char *):_xor(unsigned char *,const unsigned char *,unsigned long long,const unsigned char *,const unsigned char *)'
-  echo \
-    crypto_dh \
-    :_keypair:_BYTES:_SECRETKEYBYTES:_PUBLICKEYBYTES \
-    '(unsigned char *,const unsigned char *,const unsigned char *):_keypair(unsigned char *,unsigned char *)'
-  echo \
-    crypto_sign \
-    :_open:_keypair:_BYTES:_SECRETKEYBYTES:_PUBLICKEYBYTES \
-    '(unsigned char *,unsigned long long *,const unsigned char *,unsigned long long,const unsigned char *):_open(unsigned char *,unsigned long long *,const unsigned char *,unsigned long long,const unsigned char *):_keypair(unsigned char *,unsigned char *)'
-  echo \
-    crypto_encrypt \
-    :_open:_keypair:_BYTES:_SECRETKEYBYTES:_PUBLICKEYBYTES \
-    '(unsigned char *,unsigned long long *,const unsigned char *,unsigned long long,const unsigned char *):_open(unsigned char *,unsigned long long *,const unsigned char *,unsigned long long,const unsigned char *):_keypair(unsigned char *,unsigned char *)'
-) | while read o macros prototypes
+cat OPERATIONS \
+| while read o macros prototypes
 do
   [ -d "$o" ] || continue
 
@@ -194,7 +162,7 @@ do
     do
       echo "=== `date` === $abi $o/$p"
       libs=`"oklibs-$abi"`
-      libs="$lib/$abi/randombytes.o $lib/$abi/cpucycles.o $libs"
+      libs="$lib/$abi/cpucycles.o $libs"
       [ -f "$lib/$abi/libgmp.a" ] && libs="$lib/$abi/libgmp.a $libs"
       [ -f "$lib/$abi/libsupercop.a" ] && libs="$lib/$abi/libsupercop.a $libs"
 
@@ -207,31 +175,31 @@ do
       | sort \
       | while read doth
       do
-        implementationdir=`dirname $doth`
-        opi=`echo "$implementationdir" | tr ./- ___`
+	implementationdir=`dirname $doth`
+	opi=`echo "$implementationdir" | tr ./- ___`
 
-        echo "=== `date` === $abi $implementationdir"
+	echo "=== `date` === $abi $implementationdir"
 
-        rm -rf "$work/compile"
-        mkdir -p "$work/compile"
-        cp -pr "$implementationdir"/* "$work/compile"
+	rm -rf "$work/compile"
+	mkdir -p "$work/compile"
+	cp -pr "$implementationdir"/* "$work/compile"
   
-        cfiles=`ls "$work/compile" | grep '\.c$'`
-        sfiles=`ls "$work/compile" | grep '\.[sS]$'`
-        ccfiles=`ls "$work/compile" | grep '\.cc$'`
-        cppfiles=`ls "$work/compile" | grep '\.cpp$'`
+	cfiles=`ls "$work/compile" | grep '\.c$' || :`
+	sfiles=`ls "$work/compile" | grep '\.[sS]$' || :`
+	ccfiles=`ls "$work/compile" | grep '\.cc$' || :`
+	cppfiles=`ls "$work/compile" | grep '\.cpp$' || :`
 
-        language=c
-        [ "x$cppfiles" = x ] || language=cpp
-        [ "x$ccfiles" = x ] || language=cpp
+	language=c
+	[ "x$cppfiles" = x ] || language=cpp
+	[ "x$ccfiles" = x ] || language=cpp
   
-        cp -p "$o/try.c" "$work/compile/try.$language"
-        cp -p "$o/measure.c" "$work/compile/measure.$language"
-        cp -p "try-anything.c" "$work/compile/try-anything.$language"
-        cp -p "measure-anything.c" "$work/compile/measure-anything.$language"
+	cp -p "$o/try.c" "$work/compile/try.$language"
+	cp -p "$o/measure.c" "$work/compile/measure.$language"
+	cp -p "try-anything.c" "$work/compile/try-anything.$language"
+	cp -p "measure-anything.c" "$work/compile/measure-anything.$language"
 
-        (
-          cd "$work/compile"
+	(
+	  cd "$work/compile"
 	  (
 	    echo "#ifndef ${o}_H"
 	    echo "#define ${o}_H"
@@ -286,16 +254,16 @@ do
 	  ok${language}-$abi \
 	  | while read compiler
 	  do
-            echo "=== `date` === $abi $implementationdir $compiler"
+	    echo "=== `date` === $abi $implementationdir $compiler"
 	    ok=1
 	    for f in $cfiles $sfiles $ccfiles $cppfiles
 	    do
 	      if [ "$ok" = 1 ]
 	      then
-	        $compiler \
-	          -I. -I"$include" -I"$include/$abi" \
+		$compiler \
+		  -I. -I"$include" -I"$include/$abi" \
 		  -c "$f" >../errors 2>&1 \
-                || ok=0
+		|| ok=0
 		if [ `wc -l < ../errors` -lt 25 ]
 		then
 		  cat ../errors
@@ -303,7 +271,7 @@ do
 		  head ../errors
 		  echo ...
 		  tail ../errors
-	        fi
+		fi
 	      fi
 	    done
 	    [ "$ok" = 1 ] \
@@ -340,7 +308,8 @@ do
       && ( ranlib "$lib/$abi/libsupercop.a" || exit 0 ) \
       && cp -p "$work/$op.h" "$include/$abi/$op.h" \
       && [ -f "$o/$p/selected" ] \
-      && cp -p "$work/$o.h" "$include/$abi/$o.h"
+      && cp -p "$work/$o.h" "$include/$abi/$o.h" \
+      || :
     done
   done
 done

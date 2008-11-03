@@ -1,3 +1,9 @@
+/*
+20080913
+D. J. Bernstein
+Public domain.
+*/
+
 #include "crypto_hashblocks_sha512.h"
 #include "crypto_hash.h"
 
@@ -18,13 +24,14 @@ typedef unsigned long long uint64;
 
 int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long inlen)
 {
+  unsigned char h[64];
   unsigned char padded[256];
   int i;
   unsigned long long bytes = inlen;
 
-  for (i = 0;i < 64;++i) out[i] = iv[i];
+  for (i = 0;i < 64;++i) h[i] = iv[i];
 
-  blocks(out,in,inlen);
+  blocks(h,in,inlen);
   in += inlen;
   inlen &= 127;
   in -= inlen;
@@ -43,7 +50,7 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long in
     padded[125] = bytes >> 13;
     padded[126] = bytes >> 5;
     padded[127] = bytes << 3;
-    blocks(out,padded,128);
+    blocks(h,padded,128);
   } else {
     for (i = inlen + 1;i < 247;++i) padded[i] = 0;
     padded[247] = bytes >> 61;
@@ -55,8 +62,10 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long in
     padded[253] = bytes >> 13;
     padded[254] = bytes >> 5;
     padded[255] = bytes << 3;
-    blocks(out,padded,256);
+    blocks(h,padded,256);
   }
+
+  for (i = 0;i < 64;++i) out[i] = h[i];
 
   return 0;
 }

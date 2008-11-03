@@ -1,0 +1,19 @@
+gcc -c -O2 mrcore.c
+gcc -c -O2 mrarth0.c
+gcc -c -O2 mrarth1.c
+gcc -c -O2 mrio1.c
+gcc -c -O2 mrbits.c
+gcc -c -O2 mrarth2.c
+gcc -c -O2 mrmonty.c
+gcc -c -O2 mrxgcd.c
+gcc -c -O2 mrzzn2.c
+gcc -c -O2 mrecn2.c
+as mrmuldv.s -o mrmuldv.o
+as fp1271.s -o fp1271.o
+
+ar rc miracl.a mrcore.o mrarth0.o mrarth1.o mrarth2.o 
+ar r miracl.a mrio1.o mrxgcd.o mrbits.o fp1271.o
+ar r miracl.a mrmonty.o mrzzn2.o
+ar r miracl.a mrmuldv.o mrecn2.o
+rm mr*.o
+gcc -O2 gls1271.c miracl.a -o gls1271

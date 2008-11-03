@@ -2,8 +2,6 @@
 #define ECRYPT_API
 /* ecrypt-sync.h */
 
-#define ECRYPT_process_bytes ECRYPT_process_bytes_qhasm
-
 /* 
  * Header file for synchronous stream ciphers without authentication
  * mechanism.

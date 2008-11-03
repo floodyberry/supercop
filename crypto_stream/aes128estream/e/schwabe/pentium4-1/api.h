@@ -1,0 +1,2 @@
+#define crypto_stream_aes128estream_e_schwabe_pentium4_1_KEYBYTES 16
+#define crypto_stream_aes128estream_e_schwabe_pentium4_1_NONCEBYTES 16

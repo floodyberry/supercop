@@ -14,7 +14,7 @@ extern void measure(void);
 
 const char *primitiveimplementation = crypto_hash_IMPLEMENTATION;
 const char *implementationversion = crypto_hash_VERSION;
-const char *sizenames[] = { "bytes", 0 };
+const char *sizenames[] = { "outputbytes", 0 };
 const long long sizes[] = { crypto_hash_BYTES };
 
 #define MAXTEST_BYTES 4096

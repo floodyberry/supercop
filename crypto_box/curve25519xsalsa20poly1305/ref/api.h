@@ -1,0 +1,6 @@
+#define crypto_box_curve25519xsalsa20poly1305_ref_PUBLICKEYBYTES 32
+#define crypto_box_curve25519xsalsa20poly1305_ref_SECRETKEYBYTES 32
+#define crypto_box_curve25519xsalsa20poly1305_ref_BEFORENMBYTES 32
+#define crypto_box_curve25519xsalsa20poly1305_ref_NONCEBYTES 24
+#define crypto_box_curve25519xsalsa20poly1305_ref_ZEROBYTES 32
+#define crypto_box_curve25519xsalsa20poly1305_ref_BOXZEROBYTES 16

@@ -14,7 +14,7 @@ extern void measure(void);
 
 const char *primitiveimplementation = crypto_encrypt_IMPLEMENTATION;
 const char *implementationversion = crypto_encrypt_VERSION;
-const char *sizenames[] = { "bytes", "publickeybytes", "secretkeybytes", 0 };
+const char *sizenames[] = { "outputbytes", "publickeybytes", "secretkeybytes", 0 };
 const long long sizes[] = { crypto_encrypt_BYTES, crypto_encrypt_PUBLICKEYBYTES, crypto_encrypt_SECRETKEYBYTES };
 
 #define MAXTEST_BYTES 100000

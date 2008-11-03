@@ -14,7 +14,7 @@ extern void measure(void);
 
 const char *primitiveimplementation = crypto_sign_IMPLEMENTATION;
 const char *implementationversion = crypto_sign_VERSION;
-const char *sizenames[] = { "bytes", "publickeybytes", "secretkeybytes", 0 };
+const char *sizenames[] = { "outputbytes", "publickeybytes", "secretkeybytes", 0 };
 const long long sizes[] = { crypto_sign_BYTES, crypto_sign_PUBLICKEYBYTES, crypto_sign_SECRETKEYBYTES };
 
 #define MAXTEST_BYTES 100000
