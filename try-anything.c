@@ -125,7 +125,7 @@ static void bestmedian_get(void)
   FILE *fi;
   fi = fopen("../bestmedian","r");
   if (fi) {
-    fscanf(fi,"%lld",&bestmedian);
+    if (fscanf(fi,"%lld",&bestmedian) != 1) bestmedian = -1;
     fclose(fi);
   }
 }

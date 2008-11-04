@@ -8,9 +8,9 @@ int main(int argc,char **argv)
   printf("%s x86\n",argv[1]); return 0;
 #elif defined(__ia64__) || defined(__IA64__) || defined(__M_IA64)
   printf("%s ia64\n",argv[1]); return 0;
-#elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__)
+#elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(_ARCH_PPC64)
   printf("%s ppc64\n",argv[1]); return 0;
-#elif defined(__powerpc__) || defined(__ppc__) || defined(__PPC__)
+#elif defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)
   printf("%s ppc32\n",argv[1]); return 0;
 #elif defined(__sparcv9__) || defined(__sparcv9)
   printf("%s sparcv9\n",argv[1]); return 0;

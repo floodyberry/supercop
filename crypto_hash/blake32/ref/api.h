@@ -1,0 +1,1 @@
+#define crypto_hash_blake32_ref_BYTES 32

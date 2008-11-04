@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20081103
+version=20081104
 # D. J. Bernstein
 # Public domain.
 
@@ -76,6 +76,13 @@ echo "=== `date` === building cpuid"
 rm -rf "$work"
 mkdir -p "$work"
 cp -pr cpuid/* "$work"
+( cd "$work" && sh do )
+cp -pr "$work"/include/* "$include"
+
+echo "=== `date` === building inttypes"
+rm -rf "$work"
+mkdir -p "$work"
+cp -pr inttypes/* "$work"
 ( cd "$work" && sh do )
 cp -pr "$work"/include/* "$include"
 
