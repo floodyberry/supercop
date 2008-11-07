@@ -1,0 +1,1 @@
+#define crypto_hash_cubehash81_emmintrin2_BYTES 64

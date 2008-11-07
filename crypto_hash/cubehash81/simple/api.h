@@ -1,0 +1,1 @@
+#define crypto_hash_cubehash81_simple_BYTES 64

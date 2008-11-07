@@ -88,7 +88,7 @@ do
   done
 
   abi=`awk '{print length($0),$0}' < c-compatible \
-  | sort -n | head -1 | sed 's/ *$//' | sed 's/^[^ ]* //' | tr ' ' '_'`
+  | sort -n | head -1 | sed 's/ *$//' | sed 's/^[^ ]* //' | tr ' /' '__'`
 
   echo "echo '"$abi"'" >&7
 
