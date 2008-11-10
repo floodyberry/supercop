@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20081110
+version=20081111
 # D. J. Bernstein
 # Public domain.
 
@@ -227,7 +227,7 @@ do
 	    echo "#ifndef ${op}_H"
 	    echo "#define ${op}_H"
 	    echo ""
-	    cat "api.h"
+            sed 's/[    ]CRYPTO_/ '"${opi}"'_/g' < api.h
 	    if [ $language = c ]
 	    then
 	      echo '#ifdef __cplusplus'

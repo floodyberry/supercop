@@ -35,7 +35,7 @@ int main()
       putchar(c);
     }
 
-  printf("-%08x-%08x\n",y[0],y[3]);
+  printf("-%08x-%08x\n",(unsigned int) y[0],(unsigned int) y[3]);
 
   return 0;
 }

@@ -1,5 +1,5 @@
 /*
-20081106
+20081110
 D. J. Bernstein
 Public domain.
 */
@@ -116,7 +116,7 @@ HashReturn Update(hashState *state, const BitSequence *data,
   /* so state->pos is a multiple of 8 */
 
   while (databitlen >= 8) {
-    myuint32 u = *data;
+    crypto_uint32 u = *data;
     u <<= 8 * ((state->pos / 8) % 4);
     state->x[state->pos / 32] ^= u;
     data += 1;
@@ -128,7 +128,7 @@ HashReturn Update(hashState *state, const BitSequence *data,
     }
   }
   if (databitlen > 0) {
-    myuint32 u = *data;
+    crypto_uint32 u = *data;
     u <<= 8 * ((state->pos / 8) % 4);
     state->x[state->pos / 32] ^= u;
     state->pos += databitlen;
@@ -139,7 +139,7 @@ HashReturn Update(hashState *state, const BitSequence *data,
 HashReturn Final(hashState *state, BitSequence *hashval)
 {
   int i;
-  myuint32 u;
+  crypto_uint32 u;
 
   u = (128 >> (state->pos % 8));
   u <<= 8 * ((state->pos / 8) % 4);

@@ -11,12 +11,12 @@ typedef unsigned char BitSequence;
 typedef unsigned long long DataLength;
 typedef enum { SUCCESS = 0, FAIL = 1, BAD_HASHBITLEN = 2 } HashReturn;
 
-typedef unsigned int myuint32; /* must be exactly 32 bits */
+#include "crypto_uint32.h"
 
 typedef struct {
   int hashbitlen;
   int pos; /* number of bits read into x from current block */
-  myuint32 x[32];
+  crypto_uint32 x[32];
 } hashState;
 
 HashReturn Init(hashState *state, int hashbitlen);
