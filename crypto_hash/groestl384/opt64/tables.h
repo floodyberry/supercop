@@ -1,9 +1,7 @@
 #ifndef __tables_h
 #define __tables_h
 
-#include "brg_endian.h"
-#define NEED_UINT_64T
-#include "brg_types.h"
+#include "hash.h"
 
 #if (PLATFORM_BYTE_ORDER == IS_BIG_ENDIAN)
 const u64 T[8*256] = {

@@ -1,4 +1,4 @@
-/* hash.c     October 2008
+/* hash.c     November 2008
  * ANSI C code optimised for 64-bit machines
  * Authors: Soeren S. Thomsen
  *          Krystian Matusiewicz
@@ -79,7 +79,7 @@ void F(u64 *h, const u64 *m) {
 /* digest up to len bytes of input (full blocks only) */
 void Transform(context *ctx, 
 	       const unsigned char *in, 
-	       int len) {
+	       unsigned long long len) {
   /* increment block counter */
   ctx->block_counter += len/SIZE;
   
@@ -129,8 +129,8 @@ int Init(context* ctx) {
 /* update state with databitlen bits of input */
 int Update(context* ctx,
 	   const unsigned char* in,
-	   int len) {
-  int index = 0;
+	   unsigned long long len) {
+  unsigned long long index = 0;
 
   /* if the buffer contains data that has not yet been digested, first
      add data to buffer until full */
@@ -184,7 +184,7 @@ int Final(context* ctx,
   ctx->block_counter++;
   ctx->buf_ptr = SIZE;
   while (ctx->buf_ptr > SIZE-LENGTHFIELDLEN) {
-    ctx->buffer[--ctx->buf_ptr] = (u8)ctx->block_counter;
+    ctx->buffer[--ctx->buf_ptr] = (unsigned char)ctx->block_counter;
     ctx->block_counter >>= 8;
   }
 
@@ -210,9 +210,9 @@ int Final(context* ctx,
 }
 
 /* hash bit sequence */
-int crypto_hash_groestl224_opt64(unsigned char *out,
-				 const unsigned char *in,
-				 unsigned long long len) {
+int Hash(unsigned char *out,
+	 const unsigned char *in,
+	 unsigned long long len) {
   int ret;
   context ctx;
 

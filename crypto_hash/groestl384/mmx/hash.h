@@ -21,27 +21,25 @@ typedef crypto_uint64 u64;
 
 #define ROUNDS 14
 
-#define ROTL64(a,n) ((((a)<<(n))|((a)>>(64-(n))))&((u64)0xffffffffffffffff))
+#define ROTL32(a,n) ((((a)<<(n))|((a)>>(32-(n))))&((u32)0xffffffff))
 
 #if (PLATFORM_BYTE_ORDER == IS_BIG_ENDIAN)
-#define EXT_BYTE(var,n) ((u8)((u64)(var) >> (8*(7-(n)))))
-#define U64BIG(a) (a)
+#define EXT_BYTE(var,n) ((u8)((u32)(var) >> (8*(3-(n)))))
+#define U32BIG(a) (a)
 #endif /* IS_BIG_ENDIAN */
 
 #if (PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN)
-#define EXT_BYTE(var,n) ((u8)((u64)(var) >> (8*n)))
-#define U64BIG(a)				\
-  ((ROTL64(a, 8) & ((u64)0x000000ff000000ff)) |	\
-   (ROTL64(a,24) & ((u64)0x0000ff000000ff00)) |	\
-   (ROTL64(a,40) & ((u64)0x00ff000000ff0000)) |	\
-   (ROTL64(a,56) & ((u64)0xff000000ff000000)))
+#define EXT_BYTE(var,n) ((u8)((u32)(var) >> (8*n)))
+#define U32BIG(a)				\
+  ((ROTL32(a, 8) & ((u32)0x00ff00ff)) |		\
+   (ROTL32(a,24) & ((u32)0xff00ff00)))
 #endif /* IS_LITTLE_ENDIAN */
 
 typedef struct {
-  u64 state[COLS];             /* actual state */
-  u64 block_counter;           /* message block counter */
-  unsigned char buffer[SIZE];  /* data buffer */
-  int buf_ptr;                 /* data buffer pointer */
+  u32 state[2*COLS];        /* actual state */
+  u64 block_counter;        /* message block counter */
+  u8 buffer[SIZE];          /* data buffer */
+  int buf_ptr;              /* data buffer pointer */
 } context;
 
 #include "crypto_hash.h"

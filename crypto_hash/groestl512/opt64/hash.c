@@ -1,4 +1,4 @@
-/* hash.c     October 2008
+/* hash.c     November 2008
  * ANSI C code optimised for 64-bit machines
  * Authors: Soeren S. Thomsen
  *          Krystian Matusiewicz
@@ -41,8 +41,8 @@
     COLUMN(x,y, 0, 0, 1, 2, 3, 4, 5, 6,11,r,0);	\
 } while (0)
 
-/* the compression function */
-void F(u64 *h, const u64 *m) {
+/* the compression function (long variants) */
+__inline void F(u64 *h, const u64 *m) {
   u64 y[COLS];
   u64 z[COLS];
   u64 outQ[COLS];
@@ -54,54 +54,38 @@ void F(u64 *h, const u64 *m) {
   }
 
   /* compute Q(m) */
-  RND(m,y,0,0^0xff);
-  RND(y,z,0,1^0xff);
-  RND(z,y,0,2^0xff);
-  RND(y,z,0,3^0xff);
-  RND(z,y,0,4^0xff);
-  RND(y,z,0,5^0xff);
-  RND(z,y,0,6^0xff);
-  RND(y,z,0,7^0xff);
-  RND(z,y,0,8^0xff);
-  RND(y,z,0,9^0xff);
-  RND(z,y,0,10^0xff);
-  RND(y,z,0,11^0xff);
-  RND(z,y,0,12^0xff);
-  RND(y,outQ,0,13^0xff);
+  RND(m,y,0,0xff);
+  for (i = 1; i < ROUNDS-1; i += 2) {
+    RND(y,z,0,i^0xff);
+    RND(z,y,0,(i+1)^0xff);
+  }
+  RND(y,outQ,0,(ROUNDS-1)^0xff);
 	
   /* compute P(h+m) */
   RND(inP,z,0,0);
-  RND(z,y,1,0);
-  RND(y,z,2,0);
-  RND(z,y,3,0);
-  RND(y,z,4,0);
-  RND(z,y,5,0);
-  RND(y,z,6,0);
-  RND(z,y,7,0);
-  RND(y,z,8,0);
-  RND(z,y,9,0);
-  RND(y,z,10,0);
-  RND(z,y,11,0);
-  RND(y,z,12,0);
-  RND(z,y,13,0);
+  for (i = 1; i < ROUNDS-1; i += 2) {
+    RND(z,y, i,0);
+    RND(y,z, i+1,0);
+  }
+  RND(z,y,ROUNDS-1,0);
 	
   /* h' == h + Q(m) + P(h+m) */
   for (i = 0; i < COLS; i++) {
     h[i] ^= outQ[i] ^ y[i];
   }
-}
+} /* F */
 
 
-/* digest up to len bytes of input (full blocks only) */
+/* digest up to msglen bytes of input (full blocks only) */
 void Transform(context *ctx, 
-	       const unsigned char *in, 
-	       int len) {
+	       const unsigned char *input, 
+	       unsigned long long msglen) {
   /* increment block counter */
-  ctx->block_counter += len/SIZE;
+  ctx->block_counter += msglen/SIZE;
   
   /* digest message, one block at a time */
-  for (; len >= SIZE; len -= SIZE, in += SIZE) {
-    F(ctx->state, (u64*)in);
+  for (; msglen >= SIZE; msglen -= SIZE, input += SIZE) {
+    F(ctx->state,(u64*)input);
   }
 }
 
@@ -113,23 +97,16 @@ void OutputTransformation(context *ctx) {
   u64 z[COLS];
 
   RND(ctx->state,y,0,0);
-  RND(y,z,1,0);
-  RND(z,y,2,0);
-  RND(y,z,3,0);
-  RND(z,y,4,0);
-  RND(y,z,5,0);
-  RND(z,y,6,0);
-  RND(y,z,7,0);
-  RND(z,y,8,0);
-  RND(y,z,9,0);
-  RND(z,y,10,0);
-  RND(y,z,11,0);
-  RND(z,y,12,0);
-  RND(y,temp,13,0);
+  for (j = 1; j < ROUNDS-1; j += 2) {
+    RND(y,z,j,0);
+    RND(z,y,j+1,0);
+  }
+  RND(y,temp,ROUNDS-1,0);
   for (j = 0; j < COLS; j++) {
     ctx->state[j] ^= temp[j];
   }
 }
+
 
 /* initialise context */
 int Init(context* ctx) {
@@ -149,8 +126,8 @@ int Init(context* ctx) {
 /* update state with databitlen bits of input */
 int Update(context* ctx,
 	   const unsigned char* in,
-	   int len) {
-  int index = 0;
+	   unsigned long long len) {
+  unsigned long long index = 0;
 
   /* if the buffer contains data that has not yet been digested, first
      add data to buffer until full */
@@ -204,7 +181,7 @@ int Final(context* ctx,
   ctx->block_counter++;
   ctx->buf_ptr = SIZE;
   while (ctx->buf_ptr > SIZE-LENGTHFIELDLEN) {
-    ctx->buffer[--ctx->buf_ptr] = (u8)ctx->block_counter;
+    ctx->buffer[--ctx->buf_ptr] = (unsigned char)ctx->block_counter;
     ctx->block_counter >>= 8;
   }
 
@@ -230,9 +207,9 @@ int Final(context* ctx,
 }
 
 /* hash bit sequence */
-int crypto_hash_groestl512_opt64(unsigned char *out,
-				 const unsigned char *in,
-				 unsigned long long len) {
+int Hash(unsigned char *out,
+	 const unsigned char *in,
+	 unsigned long long len) {
   int ret;
   context ctx;
 
