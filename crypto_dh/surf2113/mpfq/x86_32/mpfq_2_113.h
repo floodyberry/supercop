@@ -568,12 +568,13 @@ void mpfq_2_113_mul_ur(mpfq_2_113_field_ptr K UNUSED_VARIABLE, mpfq_2_113_dst_el
 {
 	/* basecase e1=113 e2=113 slice=4 sse2=64x2 */
 	typedef uint64_t v2di __attribute__ ((vector_size (16)));
+	typedef long long gcc43bugfix __attribute__ ((vector_size (16)));
 	typedef union { v2di s; mp_limb_t x[4]; } v2di_proxy;
 	typedef uint32_t v4si __attribute__ ((vector_size (16)));
-#define SHL(x,r) (v2di)__builtin_ia32_psllqi128   ((x),(r))
-#define SHR(x,r) (v2di)__builtin_ia32_psrlqi128   ((x),(r))
-#define SHLD(x,r) (v2di)__builtin_ia32_pslldqi128 ((x),(r))
-#define SHRD(x,r) (v2di)__builtin_ia32_psrldqi128 ((x),(r))
+#define SHL(x,r) (v2di)__builtin_ia32_psllqi128   ((gcc43bugfix) (x),(r))
+#define SHR(x,r) (v2di)__builtin_ia32_psrlqi128   ((gcc43bugfix) (x),(r))
+#define SHLD(x,r) (v2di)__builtin_ia32_pslldqi128 ((gcc43bugfix) (x),(r))
+#define SHRD(x,r) (v2di)__builtin_ia32_psrldqi128 ((gcc43bugfix) (x),(r))
 	v2di u;
 	v2di t0;
 	v2di t1;

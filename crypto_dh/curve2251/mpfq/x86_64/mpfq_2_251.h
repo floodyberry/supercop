@@ -741,11 +741,12 @@ void mpfq_2_251_mul_basecase128x128s4X64x2(mpfq_2_251_dst_elt t, mpfq_2_251_src_
 {
 	/* basecase e1=128 e2=128 slice=4 sse2=64x2 */
 	typedef uint64_t v2di __attribute__ ((vector_size (16)));
+	typedef long long gcc43bugfix __attribute__ ((vector_size (16)));
 	typedef union { v2di s; mp_limb_t x[2]; } v2di_proxy;
-#define SHL(x,r) (v2di)__builtin_ia32_psllqi128   ((x),(r))
-#define SHR(x,r) (v2di)__builtin_ia32_psrlqi128   ((x),(r))
-#define SHLD(x,r) (v2di)__builtin_ia32_pslldqi128 ((x),(r))
-#define SHRD(x,r) (v2di)__builtin_ia32_psrldqi128 ((x),(r))
+#define SHL(x,r) (v2di)__builtin_ia32_psllqi128   ((gcc43bugfix) (x),(r))
+#define SHR(x,r) (v2di)__builtin_ia32_psrlqi128   ((gcc43bugfix) (x),(r))
+#define SHLD(x,r) (v2di)__builtin_ia32_pslldqi128 ((gcc43bugfix) (x),(r))
+#define SHRD(x,r) (v2di)__builtin_ia32_psrldqi128 ((gcc43bugfix) (x),(r))
 	v2di u;
 	v2di t0;
 	v2di t1;
@@ -918,11 +919,12 @@ void mpfq_2_251_mul_basecase123x123s4X64x2(mpfq_2_251_dst_elt t, mpfq_2_251_src_
 {
 	/* basecase e1=123 e2=123 slice=4 sse2=64x2 */
 	typedef uint64_t v2di __attribute__ ((vector_size (16)));
+	typedef long long gcc43bugfix __attribute__ ((vector_size (16)));
 	typedef union { v2di s; mp_limb_t x[2]; } v2di_proxy;
-#define SHL(x,r) (v2di)__builtin_ia32_psllqi128   ((x),(r))
-#define SHR(x,r) (v2di)__builtin_ia32_psrlqi128   ((x),(r))
-#define SHLD(x,r) (v2di)__builtin_ia32_pslldqi128 ((x),(r))
-#define SHRD(x,r) (v2di)__builtin_ia32_psrldqi128 ((x),(r))
+#define SHL(x,r) (v2di)__builtin_ia32_psllqi128   ((gcc43bugfix) (x),(r))
+#define SHR(x,r) (v2di)__builtin_ia32_psrlqi128   ((gcc43bugfix) (x),(r))
+#define SHLD(x,r) (v2di)__builtin_ia32_pslldqi128 ((gcc43bugfix) (x),(r))
+#define SHRD(x,r) (v2di)__builtin_ia32_psrldqi128 ((gcc43bugfix) (x),(r))
 	v2di u;
 	v2di t0;
 	v2di t1;
@@ -1092,11 +1094,12 @@ void mpfq_2_251_addmul_basecase128x128s4X64x2(mpfq_2_251_dst_elt t, mpfq_2_251_s
 {
 	/* basecase e1=128 e2=128 slice=4 add sse2=64x2 */
 	typedef uint64_t v2di __attribute__ ((vector_size (16)));
+	typedef long long gcc43bugfix __attribute__ ((vector_size (16)));
 	typedef union { v2di s; mp_limb_t x[2]; } v2di_proxy;
-#define SHL(x,r) (v2di)__builtin_ia32_psllqi128   ((x),(r))
-#define SHR(x,r) (v2di)__builtin_ia32_psrlqi128   ((x),(r))
-#define SHLD(x,r) (v2di)__builtin_ia32_pslldqi128 ((x),(r))
-#define SHRD(x,r) (v2di)__builtin_ia32_psrldqi128 ((x),(r))
+#define SHL(x,r) (v2di)__builtin_ia32_psllqi128   ((gcc43bugfix) (x),(r))
+#define SHR(x,r) (v2di)__builtin_ia32_psrlqi128   ((gcc43bugfix) (x),(r))
+#define SHLD(x,r) (v2di)__builtin_ia32_pslldqi128 ((gcc43bugfix) (x),(r))
+#define SHRD(x,r) (v2di)__builtin_ia32_psrldqi128 ((gcc43bugfix) (x),(r))
 	v2di u;
 	v2di t0;
 	v2di t1;
