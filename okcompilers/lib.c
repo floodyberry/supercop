@@ -17,3 +17,13 @@ double double5(void)
 {
   return 5.0;
 }
+
+int intbytes(void)
+{
+  return sizeof(int);
+}
+
+int longbytes(void)
+{
+  return sizeof(long);
+}

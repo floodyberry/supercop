@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <spu_mfcio.h>
 
 static long myround(double u)
 {
@@ -21,18 +22,9 @@ static long long microseconds(void)
 
 static long long timebase(void)
 {
-  unsigned long high;
-  unsigned long low;
-  unsigned long newhigh;
   unsigned long long result;
-  asm volatile(
-    "7:mftbu %0;mftb %1;mftbu %2;cmpw %0,%2;bne 7b"
-    : "=r" (high), "=r" (low), "=r" (newhigh)
-  );
-  result = high;
-  result <<= 32;
-  result |= low;
-  return result;
+  result = -spu_read_decrementer();
+  return 0xffffffff & result;
 }
 
 static double cpufrequency = 0;
@@ -58,15 +50,26 @@ static double guesstbcycles(void)
 static void init(void)
 {
   FILE *f;
+  int s;
   int loop;
   double guess1;
   double guess2;
 
-  f = popen("/usr/sbin/lsattr -E -l proc0 -a frequency","r");
+  spu_write_decrementer(0xffffffff);
+
+  f = fopen("/proc/cpuinfo","r");
   if (!f) return;
-  if (fscanf(f,"frequency %lf",&cpufrequency) < 1) cpufrequency = 0;
-  pclose(f);
+
+  for (;;) {
+    s = fscanf(f," clock : %lf MHz",&cpufrequency);
+    if (s > 0) break;
+    if (s == 0) s = fscanf(f,"%*[^\n]\n");
+    if (s < 0) { cpufrequency = 0; break; }
+  }
+
+  fclose(f);
   if (!cpufrequency) return;
+  cpufrequency *= 1000000.0;
 
   for (loop = 0;loop < 100;++loop) {
     guess1 = guesstbcycles();
@@ -81,13 +84,13 @@ static void init(void)
   tbcycles = 0;
 }
 
-long long cpucycles_powerpcaix(void)
+long long cpucycles_celllinux(void)
 {
   if (!tbcycles) init();
   return timebase() * tbcycles;
 }
 
-long long cpucycles_powerpcaix_persecond(void)
+long long cpucycles_celllinux_persecond(void)
 {
   if (!tbcycles) init();
   return cpufrequency;

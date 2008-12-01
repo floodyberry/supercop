@@ -6,14 +6,6 @@ gcc -m64 -maltivec -O3 -fomit-frame-pointer
 gcc -m64 -maltivec -Os -fomit-frame-pointer
 gcc -m64 -maltivec -O2 -fomit-frame-pointer
 gcc -m64 -maltivec -O -fomit-frame-pointer
-gcc -mpowerpc64 -O3 -fomit-frame-pointer
-gcc -mpowerpc64 -Os -fomit-frame-pointer
-gcc -mpowerpc64 -O2 -fomit-frame-pointer
-gcc -mpowerpc64 -O -fomit-frame-pointer
-gcc -mpowerpc64 -maltivec -O3 -fomit-frame-pointer
-gcc -mpowerpc64 -maltivec -Os -fomit-frame-pointer
-gcc -mpowerpc64 -maltivec -O2 -fomit-frame-pointer
-gcc -mpowerpc64 -maltivec -O -fomit-frame-pointer
 gcc -maix64 -mpowerpc64 -O3 -fomit-frame-pointer
 gcc -maix64 -mpowerpc64 -Os -fomit-frame-pointer
 gcc -maix64 -mpowerpc64 -O2 -fomit-frame-pointer
@@ -138,30 +130,6 @@ gcc -m64 -mcpu=G3 -maltivec -O3 -fomit-frame-pointer
 gcc -m64 -mcpu=G3 -maltivec -Os -fomit-frame-pointer
 gcc -m64 -mcpu=G3 -maltivec -O2 -fomit-frame-pointer
 gcc -m64 -mcpu=G3 -maltivec -O -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G5 -O3 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G5 -Os -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G5 -O2 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G5 -O -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G4 -O3 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G4 -Os -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G4 -O2 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G4 -O -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G3 -O3 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G3 -Os -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G3 -O2 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G3 -O -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G5 -maltivec -O3 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G5 -maltivec -Os -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G5 -maltivec -O2 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G5 -maltivec -O -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G4 -maltivec -O3 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G4 -maltivec -Os -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G4 -maltivec -O2 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G4 -maltivec -O -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G3 -maltivec -O3 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G3 -maltivec -Os -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G3 -maltivec -O2 -fomit-frame-pointer
-gcc -mpowerpc64 -mcpu=G3 -maltivec -O -fomit-frame-pointer
 gcc -m64 -march=k8 -O3 -fomit-frame-pointer
 gcc -m64 -march=k8 -Os -fomit-frame-pointer
 gcc -m64 -march=k8 -O2 -fomit-frame-pointer
@@ -618,6 +586,14 @@ gcc -march=i386 -O3 -fomit-frame-pointer
 gcc -march=i386 -Os -fomit-frame-pointer
 gcc -march=i386 -O2 -fomit-frame-pointer
 gcc -march=i386 -O -fomit-frame-pointer
+spu-gcc -mstdmain -march=celledp -O3 -fomit-frame-pointer
+spu-gcc -mstdmain -march=celledp -Os -fomit-frame-pointer
+spu-gcc -mstdmain -march=celledp -O2 -fomit-frame-pointer
+spu-gcc -mstdmain -march=celledp -O -fomit-frame-pointer
+spu-gcc -mstdmain -march=cell -O3 -fomit-frame-pointer
+spu-gcc -mstdmain -march=cell -Os -fomit-frame-pointer
+spu-gcc -mstdmain -march=cell -O2 -fomit-frame-pointer
+spu-gcc -mstdmain -march=cell -O -fomit-frame-pointer
 xlc -O2
 xlc -O
 xlc
@@ -646,14 +622,6 @@ gcc -funroll-loops -m64 -maltivec -O3 -fomit-frame-pointer
 gcc -funroll-loops -m64 -maltivec -Os -fomit-frame-pointer
 gcc -funroll-loops -m64 -maltivec -O2 -fomit-frame-pointer
 gcc -funroll-loops -m64 -maltivec -O -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -O3 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -Os -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -O2 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -O -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -maltivec -O3 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -maltivec -Os -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -maltivec -O2 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -maltivec -O -fomit-frame-pointer
 gcc -funroll-loops -maix64 -mpowerpc64 -O3 -fomit-frame-pointer
 gcc -funroll-loops -maix64 -mpowerpc64 -Os -fomit-frame-pointer
 gcc -funroll-loops -maix64 -mpowerpc64 -O2 -fomit-frame-pointer
@@ -778,30 +746,6 @@ gcc -funroll-loops -m64 -mcpu=G3 -maltivec -O3 -fomit-frame-pointer
 gcc -funroll-loops -m64 -mcpu=G3 -maltivec -Os -fomit-frame-pointer
 gcc -funroll-loops -m64 -mcpu=G3 -maltivec -O2 -fomit-frame-pointer
 gcc -funroll-loops -m64 -mcpu=G3 -maltivec -O -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G5 -O3 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G5 -Os -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G5 -O2 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G5 -O -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G4 -O3 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G4 -Os -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G4 -O2 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G4 -O -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G3 -O3 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G3 -Os -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G3 -O2 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G3 -O -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G5 -maltivec -O3 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G5 -maltivec -Os -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G5 -maltivec -O2 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G5 -maltivec -O -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G4 -maltivec -O3 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G4 -maltivec -Os -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G4 -maltivec -O2 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G4 -maltivec -O -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G3 -maltivec -O3 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G3 -maltivec -Os -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G3 -maltivec -O2 -fomit-frame-pointer
-gcc -funroll-loops -mpowerpc64 -mcpu=G3 -maltivec -O -fomit-frame-pointer
 gcc -funroll-loops -m64 -march=k8 -O3 -fomit-frame-pointer
 gcc -funroll-loops -m64 -march=k8 -Os -fomit-frame-pointer
 gcc -funroll-loops -m64 -march=k8 -O2 -fomit-frame-pointer
@@ -1247,3 +1191,11 @@ gcc -funroll-loops -march=i386 -O3 -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -Os -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -O2 -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -O -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=celledp -O3 -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=celledp -Os -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=celledp -O2 -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=celledp -O -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=cell -O3 -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=cell -Os -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=cell -O2 -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=cell -O -fomit-frame-pointer
