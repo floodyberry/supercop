@@ -16,6 +16,7 @@ okabi | (
       echo powerpclinux
       echo powerpcmacos
       echo powerpcaix
+      echo celllinux
       echo sparcpsrinfo
       echo sparc32psrinfo
       echo hppapstat

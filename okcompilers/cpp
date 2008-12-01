@@ -586,14 +586,14 @@ g++ -march=i386 -O3 -fomit-frame-pointer
 g++ -march=i386 -Os -fomit-frame-pointer
 g++ -march=i386 -O2 -fomit-frame-pointer
 g++ -march=i386 -O -fomit-frame-pointer
-spu-g++ -mstdmain -march=celledp -O3 -fomit-frame-pointer
-spu-g++ -mstdmain -march=celledp -Os -fomit-frame-pointer
-spu-g++ -mstdmain -march=celledp -O2 -fomit-frame-pointer
-spu-g++ -mstdmain -march=celledp -O -fomit-frame-pointer
-spu-g++ -mstdmain -march=cell -O3 -fomit-frame-pointer
-spu-g++ -mstdmain -march=cell -Os -fomit-frame-pointer
-spu-g++ -mstdmain -march=cell -O2 -fomit-frame-pointer
-spu-g++ -mstdmain -march=cell -O -fomit-frame-pointer
+spu-g++ -mstdmain -march=celledp -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-g++ -mstdmain -march=celledp -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-g++ -mstdmain -march=celledp -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-g++ -mstdmain -march=celledp -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-g++ -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-g++ -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-g++ -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-g++ -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 xlC -O2
 xlC -O
 xlC

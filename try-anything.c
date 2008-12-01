@@ -1,5 +1,5 @@
 /*
- * try-anything.c version 20080912
+ * try-anything.c version 20081201
  * D. J. Bernstein
  * Public domain.
  */
@@ -168,7 +168,6 @@ int main(int argc,char **argv)
 
   bestmedian_get();
   allocate();
-  alarm(ALARM);
   srandom(getpid());
 
   cycles[0] = cpucycles();

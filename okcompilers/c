@@ -586,14 +586,14 @@ gcc -march=i386 -O3 -fomit-frame-pointer
 gcc -march=i386 -Os -fomit-frame-pointer
 gcc -march=i386 -O2 -fomit-frame-pointer
 gcc -march=i386 -O -fomit-frame-pointer
-spu-gcc -mstdmain -march=celledp -O3 -fomit-frame-pointer
-spu-gcc -mstdmain -march=celledp -Os -fomit-frame-pointer
-spu-gcc -mstdmain -march=celledp -O2 -fomit-frame-pointer
-spu-gcc -mstdmain -march=celledp -O -fomit-frame-pointer
-spu-gcc -mstdmain -march=cell -O3 -fomit-frame-pointer
-spu-gcc -mstdmain -march=cell -Os -fomit-frame-pointer
-spu-gcc -mstdmain -march=cell -O2 -fomit-frame-pointer
-spu-gcc -mstdmain -march=cell -O -fomit-frame-pointer
+spu-gcc -mstdmain -march=celledp -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=celledp -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=celledp -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=celledp -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 xlc -O2
 xlc -O
 xlc
@@ -1191,11 +1191,11 @@ gcc -funroll-loops -march=i386 -O3 -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -Os -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -O2 -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -O -fomit-frame-pointer
-spu-gcc -funroll-loops -mstdmain -march=celledp -O3 -fomit-frame-pointer
-spu-gcc -funroll-loops -mstdmain -march=celledp -Os -fomit-frame-pointer
-spu-gcc -funroll-loops -mstdmain -march=celledp -O2 -fomit-frame-pointer
-spu-gcc -funroll-loops -mstdmain -march=celledp -O -fomit-frame-pointer
-spu-gcc -funroll-loops -mstdmain -march=cell -O3 -fomit-frame-pointer
-spu-gcc -funroll-loops -mstdmain -march=cell -Os -fomit-frame-pointer
-spu-gcc -funroll-loops -mstdmain -march=cell -O2 -fomit-frame-pointer
-spu-gcc -funroll-loops -mstdmain -march=cell -O -fomit-frame-pointer
+spu-gcc -funroll-loops -mstdmain -march=celledp -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -funroll-loops -mstdmain -march=celledp -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -funroll-loops -mstdmain -march=celledp -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -funroll-loops -mstdmain -march=celledp -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -funroll-loops -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -funroll-loops -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -funroll-loops -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -funroll-loops -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
