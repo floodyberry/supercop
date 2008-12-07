@@ -1,2 +1,0 @@
-#define crypto_smult_curve25519_donna_BYTES 32
-#define crypto_smult_curve25519_donna_SCALARBYTES 32

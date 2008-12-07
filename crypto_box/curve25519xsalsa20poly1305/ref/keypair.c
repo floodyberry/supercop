@@ -1,4 +1,4 @@
-#include "crypto_smult_curve25519.h"
+#include "crypto_scalarmult_curve25519.h"
 #include "crypto_box.h"
 #include "randombytes.h"
 
@@ -8,5 +8,5 @@ int crypto_box_keypair(
 )
 {
   randombytes(sk,32);
-  return crypto_smult_curve25519_base(pk,sk);
+  return crypto_scalarmult_curve25519_base(pk,sk);
 }

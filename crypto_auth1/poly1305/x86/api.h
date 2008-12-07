@@ -1,2 +1,0 @@
-#define crypto_auth1_poly1305_x86_BYTES 16
-#define crypto_auth1_poly1305_x86_KEYBYTES 32
