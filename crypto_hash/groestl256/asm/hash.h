@@ -17,24 +17,23 @@ typedef crypto_uint64 u64;
 #define LENGTHFIELDLEN ROWS
 #define COLS 8
 #define SIZE (ROWS*COLS)
-#define DIGESTSIZE 28
+#define DIGESTSIZE 32
 
 #define ROUNDS 10
 
-#define ROTL64(a,n) ((((a)<<(n))|((a)>>(64-(n))))&((u64)0xffffffffffffffff))
+#define ROTL64(a,n) ((((a)<<(n))|((a)>>(64-(n))))&((u64)0xffffffffffffffffULL))
 
 #if (PLATFORM_BYTE_ORDER == IS_BIG_ENDIAN)
-#define EXT_BYTE(var,n) ((u8)((u64)(var) >> (8*(7-(n)))))
-#define U64BIG(a) (a)
+#error
 #endif /* IS_BIG_ENDIAN */
 
 #if (PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN)
 #define EXT_BYTE(var,n) ((u8)((u64)(var) >> (8*n)))
 #define U64BIG(a)				\
-  ((ROTL64(a, 8) & ((u64)0x000000ff000000ff)) |	\
-   (ROTL64(a,24) & ((u64)0x0000ff000000ff00)) |	\
-   (ROTL64(a,40) & ((u64)0x00ff000000ff0000)) |	\
-   (ROTL64(a,56) & ((u64)0xff000000ff000000)))
+  ((ROTL64(a, 8) & ((u64)0x000000ff000000ffULL)) |	\
+   (ROTL64(a,24) & ((u64)0x0000ff000000ff00ULL)) |	\
+   (ROTL64(a,40) & ((u64)0x00ff000000ff0000ULL)) |	\
+   (ROTL64(a,56) & ((u64)0xff000000ff000000ULL)))
 #endif /* IS_LITTLE_ENDIAN */
 
 typedef struct {
@@ -43,8 +42,5 @@ typedef struct {
   unsigned char buffer[SIZE];  /* data buffer */
   int buf_ptr;                 /* data buffer pointer */
 } context;
-
-#include "crypto_hash.h"
-#define Hash crypto_hash
 
 #endif /* __hash_h */
