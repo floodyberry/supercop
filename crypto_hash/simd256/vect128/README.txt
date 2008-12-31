@@ -1,5 +1,5 @@
-SIMD reference implementation - version 1.0
-===========================================
+SIMD reference implementation - version 1.0.1
+=============================================
 
 The latest version of the specification of the SIMD hash function,
 supporting documentation, and reference code can be downloaded from
@@ -43,8 +43,26 @@ the iteration mode of the hash function) on top of this internal API.
 Known bugs
 ==========
 
-The vectorized implementation requires the input buffer to be 128-bit
-aligned.
+The optimized implementation assumes that the integers are represented
+in a two's-complement arithmetic, and that the right shift operation
+preserves the sign bit (which is an implementation defined behaviour).
+
+
+Changelog
+=========
+
+  * 1.0.1
+    + The vectorized version now compiles with GCC 4.3
+    + better endianness check in compat.h, using endian.h
+    + better alignment checks: each implementation can specify an alignment
+  
+  * 1.0
+      Initial release
+    + Fixed the typo (the constant in the inner code is 233, not 223)
+  
+  * 0.9
+      NIST submitted implementation
+    - This version contained a typo that makes it produce bad outputs
 
 
 TODO

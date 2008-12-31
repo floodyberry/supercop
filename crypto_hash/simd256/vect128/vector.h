@@ -10,13 +10,14 @@
 
 #if   defined(__SSE2__)
 
-typedef unsigned char v16qi __attribute__ ((vector_size (16)));
+//typedef unsigned char v16qi __attribute__ ((vector_size (16)));
+typedef char          v16qi __attribute__ ((vector_size (16)));
 typedef short          v8hi __attribute__ ((vector_size (16)));
 typedef int            v4si __attribute__ ((vector_size (16)));
 typedef float          v4sf __attribute__ ((vector_size (16)));
 
 typedef short          v4hi __attribute__ ((vector_size (8)));
-typedef unsigned char  v8qi  __attribute__ ((vector_size (8)));
+typedef unsigned char  v8qi __attribute__ ((vector_size (8)));
 
 typedef v16qi v8;
 typedef v8hi v16;

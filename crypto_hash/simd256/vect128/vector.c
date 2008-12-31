@@ -17,6 +17,9 @@ int SupportedLength(int hashbitlen) {
     return 1;
 }
 
+int RequiredAlignment(void) {
+  return 16;
+}
 
 static const union cv V128 = CV(128);
 static const union cv V255 = CV(255);

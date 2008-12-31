@@ -19,6 +19,13 @@ int SupportedLength(int hashbitlen) {
     return 1;
 }
 
+int RequiredAlignment(void) {
+#ifdef SIMD_LITTLE_ENDIAN
+  return 4;
+#else
+  return 1;
+#endif
+}
 
 /************* the round function ****************/
 
@@ -461,7 +468,7 @@ void SIMD_Compress(hashState * state, const unsigned char *M, int final) {
 #endif
 
   /* XOR the message to the chaining value */
-#if defined LITTLE_ENDIAN
+#ifdef SIMD_LITTLE_ENDIAN
   /* we can XOR word-by-word */
   
   {

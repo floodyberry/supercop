@@ -139,69 +139,60 @@ typedef int fft_t;
     (u64)hi << 32 | lo;                                                 \
   })                                                                    \
 
-#elif defined _MSC_VER
+#elif defined _MSC_VER && (defined _M_IX86 || defined _M_X64)
 
 #define rdtsc __rdtsc
 
 #endif
 
 /* 
- * The IS_ALIGNED macro tests if a char* pointer can be used as u32* pointer.
+ * The IS_ALIGNED macro tests if a char* pointer is aligned to an
+ * n-bit boundary.
  * It is defined as false on unknown architectures.
  */
 
 
-/*
- * Unaligned access are not expensive on x86 so we don't care
- */
+#define CHECK_ALIGNED(p,n) ((((unsigned char *) (p) - (unsigned char *) NULL) & ((n)-1)) == 0)
 
 #if defined __i386__ || defined __x86_64 || defined _M_IX86 || defined _M_X64
-#define IS_ALIGNED(p)    1
-#elif defined __sparcv9
-#define IS_ALIGNED(p)    ((((u64) (p)) & 3) == 0)
-#elif defined __sparc
-#define IS_ALIGNED(p)    ((((u32) (p)) & 3) == 0)
-#elif defined __arm
-#define IS_ALIGNED(p)    ((((u32) (p)) & 3) == 0)
-#elif defined __sparc
-#define IS_ALIGNED(p)    ((((u32) (p)) & 3) == 0)
-#elif defined __ia64 || defined __ia64__ || defined __itanium__ || defined __M_IA64
-#if defined __LP64__ || defined _LP64
-#define IS_ALIGNED(p)    ((((u64) (p)) & 3) == 0)
-#else
-#define IS_ALIGNED(p)    ((((u32) (p)) & 3) == 0)
+/*
+ * Unaligned 32-bit access are not expensive on x86 so we don't care
+ */
+#define IS_ALIGNED(p,n)    (n<=4 || CHECK_ALIGNED(p,n))
+#elif defined __sparcv9 || defined __sparc || defined __arm || \
+      defined __ia64 || defined __ia64__ || \
+      defined __itanium__ || defined __M_IA64
+#define IS_ALIGNED(p,n)    CHECK_ALIGNED(p,n)
+#define IS_ALIGNED(p,n)    0
 #endif
-#else
-#define IS_ALIGNED(p)    0
-#endif
+
+
 
 /* checks for endianness */
 
-#if defined __i386__
-#define LITTLE_ENDIAN   1
-#elif defined __x86_64
-#define LITTLE_ENDIAN   1
-#elif defined __sparcv9
-#define BIG_ENDIAN      1
-#elif defined __sparc
-#define BIG_ENDIAN      1
-#elif defined __arm__
-#define LITTLE_ENDIAN   1
-#elif defined __ia64 || defined __ia64__ || defined __itanium__
-#if defined __BIG_ENDIAN__ || defined _BIG_ENDIAN
-#define BIG_ENDIAN      1
-#else
-#define LITTLE_ENDIAN   1
-#endif
+#if defined (__linux__) || defined (__GLIBC__)
+#  include <endian.h>
+#elif defined (__FreeBSD__)
+#  include <machine/endian.h> 
+#elif defined (__OpenBSD__)
+#  include <sys/endian.h>
 #endif
 
-/* safety net...  */
-#if defined(__hppa__) || \
-    defined(__m68k__) || defined(mc68000) || defined(_M_M68K) || \
-    (defined(__MIPS__) && defined(__MISPEB__)) || \
-    defined(__ppc__) || defined(__POWERPC__) || defined(_M_PPC) || \
-    defined(__sparc__)
-#define BIG_ENDIAN
+#ifdef __BYTE_ORDER
+
+#  if __BYTE_ORDER == __LITTLE_ENDIAN
+#    define SIMD_LITTLE_ENDIAN
+#  elif __BYTE_ORDER == __BIG_ENDIAN
+#    define SIMD_BIG_ENDIAN
+#  endif
+
+#else
+
+#  if defined __i386__ || defined __x86_64 || defined _M_IX86 || defined _M_X64
+#    define SIMD_LITTLE_ENDIAN
+#  endif
+
 #endif
+
 
 #endif

@@ -16,6 +16,9 @@ int SupportedLength(int hashbitlen) {
     return 1;
 }
 
+int RequiredAlignment(void) {
+  return 1;
+}
 
 typedef u32 ( * boolean_function) (const u32, const u32, const u32);
 
@@ -279,7 +282,10 @@ void SIMD_Compress(hashState * const state, const unsigned char * const M, int f
    * XOR the message to the chaining value
    *  handle endianness problems smoothly
    */
-#define PACK(i)  (((u32) M[i]) ^ (((u32) M[i+1]) << 8) ^ (((u32) M[i+2]) << 16) ^ (((u32) M[i+3]) << 24))
+#define PACK(i)  ((((u32) M[i]))         ^              \
+                  (((u32) M[i+1]) << 8)  ^              \
+                  (((u32) M[i+2]) << 16) ^              \
+                  (((u32) M[i+3]) << 24))
   for(j=0; j<n; j++) {
     state->A[j] ^= PACK(4*j);
     state->B[j] ^= PACK(4*j+4*n);

@@ -57,7 +57,7 @@ HashReturn InitIV(hashState *state, int hashbitlen, const u32 *IV) {
   /*
    * Align the buffer to a 128 bit boundary.
    */
-  state->A += (state->A - (u32*)NULL)&3;
+  state->A += ((u32*)NULL - state->A)&3;
 
   state->B = state->A+n;
   state->C = state->B+n;
@@ -115,6 +115,10 @@ HashReturn Init(hashState *state, int hashbitlen) {
 HashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen) {
   unsigned current;
   unsigned int bs = state->blocksize;
+  static int align = -1;
+
+  if (align == -1)
+    align = RequiredAlignment();
 
 #ifdef HAS_64
   current = state->count & (bs - 1);
@@ -131,7 +135,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
   }
 
   while (databitlen > 0) {
-    if (IS_ALIGNED(data) && current == 0 && databitlen >= bs) {
+    if (IS_ALIGNED(data,align) && current == 0 && databitlen >= bs) {
       /* 
        * We can hash the data directly from the input buffer.
        */

@@ -46,9 +46,10 @@ HashReturn Hash(int hashbitlen, const BitSequence *data, DataLength databitlen,
 /* 
  * Internal API
  */
-int SupportedLength(int hashbitlen);
-void SIMD_Compress(hashState * state, const unsigned char *M, int final);
 char* VERSION(void);
+int SupportedLength(int hashbitlen);
+int RequiredAlignment(void);
+void SIMD_Compress(hashState * state, const unsigned char *M, int final);
 
 void fft128_natural(fft_t *a, unsigned char *x);
 void fft256_natural(fft_t *a, unsigned char *x);
