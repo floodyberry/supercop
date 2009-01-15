@@ -51,6 +51,14 @@ preserves the sign bit (which is an implementation defined behaviour).
 Changelog
 =========
 
+  * 1.0.3
+    + Fixed an endiannes error on the vectorized PPC implementation
+    + The vectorized version now compiles with GCC 3.3 on PCC
+
+  * 1.0.2
+    + Fixed a stupid typo in compat.h (only affected PCC and exotic arch)
+    + The vectorized version now compiles with GCC 4.3 on PCC
+
   * 1.0.1
     + The vectorized version now compiles with GCC 4.3
     + better endianness check in compat.h, using endian.h

@@ -117,7 +117,7 @@ typedef vector unsigned int   v32;
 #define CV32(x)  ((vector unsigned int  ) {x,x,x,x})
 
 union cv {
-  uint16_t u16[8];
+  unsigned short u16[8];
   v16 v16;
 };
 
@@ -127,22 +127,28 @@ union cv8 {
 };
 
 union ucv {
-  uint16_t u16[8];
+  unsigned short u16[8];
   vector unsigned char v16;
 };
 
 // Nasty hack to avoid macro expansion madness
 
-v16 vec_and_fun (v16 x, v16 y) {
+
+/* altivec.h is broken with Gcc 3.3 is C99 mode  */
+#if defined __STDC__ && __STDC_VERSION__ >= 199901L
+#define typeof __typeof
+#endif
+
+MAYBE_INLINE v16 vec_and_fun (v16 x, v16 y) {
   return vec_and (x, y);
 }
 
-v16 vec_or_fun (v16 x, v16 y) {
-  return vec_and (x, y);
+MAYBE_INLINE v16 vec_or_fun (v16 x, v16 y) {
+  return vec_or (x, y);
 }
 
-v16 vec_xor_fun (v16 x, v16 y) {
-  return vec_and (x, y);
+MAYBE_INLINE v16 vec_xor_fun (v16 x, v16 y) {
+  return vec_xor (x, y);
 }
 
 #undef vec_and
@@ -180,14 +186,14 @@ v16 v16_shift_l(v16 x,int s) {
 #define v16_shift_r(x,s)  vec_sra(x,CVU16(s))
 #define v16_cmp      vec_cmpgt
 
-#define v16_mergel(a,b)   vec_mergeh(b,a)
-#define v16_mergeh(a,b)   vec_mergel(b,a)
+#define v16_mergel(a,b)   V1632(vec_mergeh(b,a))
+#define v16_mergeh(a,b)   V1632(vec_mergel(b,a))
 
 #define v16_interleavel(a,b)   vec_mergeh(a,b)
 #define v16_interleaveh(a,b)   vec_mergel(a,b)
 
-#define v8_mergel(a,b) vec_mergeh(b,a)
-#define v8_mergeh(a,b) vec_mergel(b,a)
+#define v8_mergel(a,b) V816(vec_mergeh(b,a))
+#define v8_mergeh(a,b) V816(vec_mergel(b,a))
 
 #define v32_rotate(x,s)  vec_rl(x,CV32(s))
 
@@ -201,7 +207,8 @@ static const v8 SHUFROT_2 = {8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7};
 
 #define v32_shufrot(x,s) vector_shuffle(x,SHUFROT_##s)
 
-static const v8 SHUFSWAP = {15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
+//static const v8 SHUFSWAP = {15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
+static const v8 SHUFSWAP = {3,2,1,0,7,6,5,4,11,10,9,8,15,14,13,12};
 
 #define v32_bswap(x) vector_shuffle(x,SHUFSWAP)
 

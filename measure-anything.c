@@ -1,5 +1,5 @@
 /*
- * measure-anything.c version 20081103
+ * measure-anything.c version 20090114
  * D. J. Bernstein
  * Public domain.
  */
@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include "cpucycles.h"
 #include "cpuid.h"
 
@@ -95,56 +97,35 @@ unsigned char *alignedcalloc(unsigned long long len)
   return x;
 }
 
-static char *benchmarkversion;
-static char *hostname;
-static char *abi;
-static char *operation;
-static char *primitive;
-static char startdate[100];
-
-static void printcontext(void)
-{
-  printword(benchmarkversion);
-  printword(hostname);
-  printword(abi);
-  printword(startdate);
-  printword(operation);
-  printword(primitive);
-}
+static long long cyclespersecond;
 
 static void printimplementations(void)
 {
   int i;
 
-  printcontext();
   printword("implementation");
   printword(primitiveimplementation);
   printword(implementationversion);
   printf("\n"); fflush(stdout);
 
   for (i = 0;sizenames[i];++i) {
-    printcontext();
     printword(sizenames[i]);
     printnum(sizes[i]);
     printf("\n"); fflush(stdout);
   }
 
-  printcontext();
   printword("cpuid");
   printword(cpuid);
   printf("\n"); fflush(stdout);
 
-  printcontext();
   printword("cpucycles_persecond");
-  printnum(cpucycles_persecond());
+  printnum(cyclespersecond);
   printf("\n"); fflush(stdout);
 
-  printcontext();
   printword("cpucycles_implementation");
   printword(cpucycles_implementation);
   printf("\n"); fflush(stdout);
 
-  printcontext();
   printword("compiler");
   printword(COMPILER);
 #ifdef __VERSION__
@@ -162,7 +143,6 @@ void printentry(long long mbytes,const char *measuring,long long *m,long long ml
   long long belowj;
   long long abovej;
 
-  printcontext();
   printword(measuring);
   if (mbytes >= 0) printnum(mbytes); else printword("");
   if (mlen > 0) { 
@@ -181,25 +161,28 @@ void printentry(long long mbytes,const char *measuring,long long *m,long long ml
   printf("\n"); fflush(stdout);
 }
 
-int main(int argc,char **argv)
+void limits()
 {
-  time_t now;
-  struct tm *tm;
+  struct rlimit r;
+  r.rlim_cur = 0;
+  r.rlim_max = 0;
+#ifdef RLIMIT_NOFILE
+  setrlimit(RLIMIT_NOFILE,&r);
+#endif
+#ifdef RLIMIT_NPROC
+  setrlimit(RLIMIT_NPROC,&r);
+#endif
+#ifdef RLIMIT_CORE
+  setrlimit(RLIMIT_CORE,&r);
+#endif
+}
 
-  if (!*argv++) return 100;
-  benchmarkversion = *argv; if (!*argv++) return 100;
-  hostname = *argv; if (!*argv++) return 100;
-  abi = *argv; if (!*argv++) return 100;
-  operation = *argv; if (!*argv++) return 100;
-  primitive = *argv; if (!*argv++) return 100;
-
-  time(&now);
-  tm = gmtime(&now);
-  sprintf(startdate,"%d%02d%02d",1900 + tm->tm_year,tm->tm_mon + 1,tm->tm_mday);
-
+int main()
+{
+  cyclespersecond = cpucycles_persecond();
+  limits();
   printimplementations();
   allocate();
   measure();
-
   return 0;
 }

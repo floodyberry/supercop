@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20090101
+version=20090114
 # D. J. Bernstein
 # Public domain.
 
@@ -159,9 +159,11 @@ do
   | while read p
   do
     [ -d "$o/$p" ] || continue
-    checksum=''
-    [ -f "$o/$p/checksum" ] && checksum=`cat "$o/$p/checksum"`
+    expectedchecksum=''
+    [ -f "$o/$p/checksum" ] && expectedchecksum=`cat "$o/$p/checksum"`
     op="${o}_${p}"
+
+    startdate=`date +%Y%m%d`
 
     # for each operation primitive, loop over abis
     okabi \
@@ -262,6 +264,7 @@ do
 	  | while read compiler
 	  do
 	    echo "=== `date` === $abi $implementationdir $compiler"
+	    compilerword=`echo "$compiler" | tr ' ' '_'`
 	    ok=1
 	    for f in $cfiles $sfiles $ccfiles $cppfiles
 	    do
@@ -269,46 +272,92 @@ do
 	      then
 		$compiler \
 		  -I. -I"$include" -I"$include/$abi" \
-		  -c "$f" >../errors 2>&1 \
-		|| ok=0
-		if [ `wc -l < ../errors` -lt 25 ]
-		then
-		  cat ../errors
-		else
-		  head ../errors
-		  echo ...
-		  tail ../errors
-		fi
+		  -c "$f" >../errors 2>&1 || ok=0
+		( if [ `wc -l < ../errors` -lt 25 ]
+		  then
+		    cat ../errors
+		  else
+		    head ../errors
+		    echo ...
+		    tail ../errors
+		  fi 
+		) \
+		| while read err
+		do
+		  echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword $f $err" >&5
+		done
 	      fi
 	    done
-	    [ "$ok" = 1 ] \
-	    && okar-$abi cr "$op.a" *.o \
-	    && ( ranlib "$op.a" || exit 0 ) \
-	    && $compiler -D'COMPILER="'"$compiler"'"' \
+
+	    [ "$ok" = 1 ] || continue
+	    okar-$abi cr "$op.a" *.o || continue
+	    ranlib "$op.a"
+
+	    $compiler \
 	      -I. -I"$include" -I"$include/$abi" \
 	      -o try try.$language try-anything.$language \
-	      "$op.a" $libs \
-	    && ./try "$version" "$shorthostname" "$abi" "$o" "$p" "$checksum" >&5 \
-	    && $compiler -D'COMPILER="'"$compiler"'"' \
+	      "$op.a" $libs >../errors 2>&1 || ok=0
+	    cat ../errors \
+	    | while read err
+	    do
+	      echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword try.$language $err" >&5
+	    done
+	    [ "$ok" = 1 ] || continue
+
+	    if ./try >../errors 2>&1
+	    then
+	      checksum=`awk '{print $1}' < ../errors`
+	      cycles=`awk '{print $2}' < ../errors`
+	      checksumcycles=`awk '{print $3}' < ../errors`
+	      cyclespersecond=`awk '{print $4}' < ../errors`
+	      impl=`awk '{print $5}' < ../errors`
+	    else
+	      cat ../errors \
+	      | while read err
+	      do
+	        echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword $err" >&5
+	      done
+	      continue
+	    fi
+
+	    checksumok=fails
+	    [ "x$expectedchecksum" = "x$checksum" ] && checksumok=ok
+	    [ "x$expectedchecksum" = "x" ] && checksumok=unknown
+	    echo "$version $shorthostname $abi $startdate $o $p try $checksum $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
+
+	    [ -s ../bestmedian ] && [ `cat ../bestmedian` -le $cycles ] && continue
+	    echo "$cycles" > ../bestmedian
+
+	    $compiler -D'COMPILER="'"$compiler"'"' \
 	      -I. -I"$include" -I"$include/$abi" \
 	      -o measure measure.$language measure-anything.$language \
-	      "$op.a" $libs \
-	    && rm -f ../best/*.o ../best/measure \
-	    && for f in *.o
+	      "$op.a" $libs >../errors 2>&1 || ok=0
+	    cat ../errors \
+	    | while read err
+	    do
+	      echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword measure.$language $err" >&5
+	    done
+	    [ "$ok" = 1 ] || continue
+
+	    rm -f ../best/*.o ../best/measure || continue
+	    for f in *.o
 	    do
 	      cp -p "$f" "../best/${opi}-$f"
-	    done \
-	    && cp -p "$op.h" "../$op.h" \
-	    && cp -p "$o.h" "../$o.h" \
-	    && cp -p measure ../best/measure \
-	    || :
+	    done
+	    cp -p "$op.h" "../$op.h"
+	    cp -p "$o.h" "../$o.h"
+	    cp -p measure ../best/measure
 	  done
 	)
       done
 
       echo "=== `date` === $abi $o/$p measuring"
 
-      "$work/best/measure" "$version" "$shorthostname" "$abi" "$o" "$p" >&5
+      "$work/best/measure" \
+      | while read measurement
+      do
+	echo "$version $shorthostname $abi $startdate $o $p $measurement" >&5
+      done
 
       [ -f "$o/$p/used" ] \
       && okar-$abi cr "$lib/$abi/libsupercop.a" "$work/best"/*.o \

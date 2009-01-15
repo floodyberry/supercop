@@ -8,7 +8,7 @@
  * This file desfines some helper function for cross-platform compatibility.
  */
 
-#if defined __GNUC__ && (! defined __STRICT_ANSI__)
+#if defined __GNUC_PREREQ && (! defined __STRICT_ANSI__)
 #define GNU_EXT
 #endif
 
@@ -116,7 +116,7 @@ typedef int fft_t;
  */
 
 #if (defined __STDC__ && __STDC_VERSION__ >= 199901L) || defined GNU_EXT
-#define MAYBE_INLINE inline
+#define MAYBE_INLINE static inline
 #elif defined _MSC_VER
 #define MAYBE_INLINE __inline
 #else
@@ -159,10 +159,17 @@ typedef int fft_t;
  * Unaligned 32-bit access are not expensive on x86 so we don't care
  */
 #define IS_ALIGNED(p,n)    (n<=4 || CHECK_ALIGNED(p,n))
+
 #elif defined __sparcv9 || defined __sparc || defined __arm || \
       defined __ia64 || defined __ia64__ || \
-      defined __itanium__ || defined __M_IA64
+      defined __itanium__ || defined __M_IA64 || \
+      defined __powerpc__ || defined __powerpc
 #define IS_ALIGNED(p,n)    CHECK_ALIGNED(p,n)
+
+#else
+/* 
+ * Unkonwn architecture: play safe
+ */
 #define IS_ALIGNED(p,n)    0
 #endif
 
