@@ -1,5 +1,5 @@
 /*
- * crypto_secretbox/try.c version 20080914
+ * crypto_secretbox/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -27,6 +27,10 @@ static unsigned char *t2;
 
 #define klen crypto_secretbox_KEYBYTES
 #define nlen crypto_secretbox_NONCEBYTES
+
+void preallocate(void)
+{
+}
 
 void allocate(void)
 {

@@ -1,5 +1,5 @@
 /*
- * crypto_verify/try.c version 20080909
+ * crypto_verify/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -13,6 +13,10 @@ const char *primitiveimplementation = crypto_verify_IMPLEMENTATION;
 
 static unsigned char *x;
 static unsigned char *y;
+
+void preallocate(void)
+{
+}
 
 void allocate(void)
 {

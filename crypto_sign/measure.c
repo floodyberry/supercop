@@ -25,6 +25,13 @@ static unsigned char *m; unsigned long long mlen;
 static unsigned char *sm; unsigned long long smlen;
 static unsigned char *t; unsigned long long tlen;
 
+void preallocate(void)
+{
+#ifdef RAND_R_PRNG_NOT_SEEDED
+  RAND_status();
+#endif
+}
+
 void allocate(void)
 {
   pk = alignedcalloc(crypto_sign_PUBLICKEYBYTES);

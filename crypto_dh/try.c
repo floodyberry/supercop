@@ -1,5 +1,5 @@
 /*
- * crypto_dh/try.c version 20080724
+ * crypto_dh/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -17,6 +17,13 @@ static unsigned char *pk2;
 static unsigned char *sk2;
 static unsigned char *s1;
 static unsigned char *s2;
+
+void preallocate(void)
+{
+#ifdef RAND_R_PRNG_NOT_SEEDED
+  RAND_status();
+#endif
+}
 
 void allocate(void)
 {

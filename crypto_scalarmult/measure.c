@@ -22,6 +22,10 @@ static unsigned char *n;
 static unsigned char *p;
 static unsigned char *q;
 
+void preallocate(void)
+{
+}
+
 void allocate(void)
 {
   m = alignedcalloc(crypto_scalarmult_SCALARBYTES);

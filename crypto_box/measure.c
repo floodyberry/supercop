@@ -29,6 +29,10 @@ static unsigned char *c;
 static unsigned char *sa;
 static unsigned char *sb;
 
+void preallocate(void)
+{
+}
+
 void allocate(void)
 {
   ska = alignedcalloc(crypto_box_SECRETKEYBYTES);

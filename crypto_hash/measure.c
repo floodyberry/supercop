@@ -22,6 +22,10 @@ const long long sizes[] = { crypto_hash_BYTES };
 static unsigned char *h;
 static unsigned char *m;
 
+void preallocate(void)
+{
+}
+
 void allocate(void)
 {
   h = alignedcalloc(crypto_hash_BYTES);

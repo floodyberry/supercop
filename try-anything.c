@@ -1,5 +1,5 @@
 /*
- * try-anything.c version 20090117
+ * try-anything.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -56,6 +56,7 @@ void randombytes(unsigned char *x,unsigned long long xlen)
   }
 }
 
+extern void preallocate(void);
 extern void allocate(void);
 extern void predoit(void);
 extern void doit(void);
@@ -131,9 +132,7 @@ int main()
   const char *problem;
 
   cyclespersecond = cpucycles_persecond();
-#ifdef RAND_R_PRNG_NOT_SEEDED
-  RAND_status();
-#endif
+  preallocate();
   limits();
 
   allocate();

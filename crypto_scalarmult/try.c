@@ -1,5 +1,5 @@
 /*
- * crypto_scalarmult/try.c version 20080913
+ * crypto_scalarmult/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -28,6 +28,10 @@ static unsigned char *n2;
 static unsigned char *p2;
 static unsigned char *q2;
 static unsigned char *r2;
+
+void preallocate(void)
+{
+}
 
 void allocate(void)
 {

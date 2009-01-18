@@ -1,5 +1,5 @@
 /*
- * crypto_box/try.c version 20080914
+ * crypto_box/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -37,6 +37,10 @@ static unsigned char *t2;
 #define pklen crypto_box_PUBLICKEYBYTES
 #define nlen crypto_box_NONCEBYTES
 #define slen crypto_box_BEFORENMBYTES
+
+void preallocate(void)
+{
+}
 
 void allocate(void)
 {

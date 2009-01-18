@@ -24,6 +24,10 @@ static unsigned char *n;
 static unsigned char *m;
 static unsigned char *c;
 
+void preallocate(void)
+{
+}
+
 void allocate(void)
 {
   k = alignedcalloc(crypto_secretbox_KEYBYTES);

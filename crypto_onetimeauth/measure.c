@@ -22,6 +22,10 @@ static unsigned char *k;
 static unsigned char *m;
 static unsigned char *h;
 
+void preallocate(void)
+{
+}
+
 void allocate(void)
 {
   k = alignedcalloc(crypto_onetimeauth_KEYBYTES);

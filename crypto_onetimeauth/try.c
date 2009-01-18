@@ -1,5 +1,5 @@
 /*
- * crypto_onetimeauth/try.c version 20081203
+ * crypto_onetimeauth/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -21,6 +21,10 @@ static unsigned char *k;
 static unsigned char *h2;
 static unsigned char *m2;
 static unsigned char *k2;
+
+void preallocate(void)
+{
+}
 
 void allocate(void)
 {

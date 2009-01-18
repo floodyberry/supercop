@@ -1,5 +1,5 @@
 /*
- * crypto_hash/try.c version 20080913
+ * crypto_hash/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -19,6 +19,10 @@ static unsigned char *h;
 static unsigned char *h2;
 static unsigned char *m;
 static unsigned char *m2;
+
+void preallocate(void)
+{
+}
 
 void allocate(void)
 {

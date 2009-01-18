@@ -1,5 +1,5 @@
 /*
- * crypto_stream/try.c version 20080913
+ * crypto_stream/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -25,6 +25,10 @@ static unsigned char *n2;
 static unsigned char *m2;
 static unsigned char *c2;
 static unsigned char *s2;
+
+void preallocate(void)
+{
+}
 
 void allocate(void)
 {

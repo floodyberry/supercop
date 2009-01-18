@@ -1,5 +1,5 @@
 /*
- * crypto_sign/try.c version 20080727
+ * crypto_sign/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -20,6 +20,13 @@ static unsigned char *sk;
 static unsigned char *m; unsigned long long mlen;
 static unsigned char *sm; unsigned long long smlen;
 static unsigned char *t; unsigned long long tlen;
+
+void preallocate(void)
+{
+#ifdef RAND_R_PRNG_NOT_SEEDED
+  RAND_status();
+#endif
+}
 
 void allocate(void)
 {

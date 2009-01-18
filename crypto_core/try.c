@@ -1,5 +1,5 @@
 /*
- * crypto_core/try.c version 20080913
+ * crypto_core/try.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -24,6 +24,10 @@ static unsigned char *c2;
 #define nlen crypto_core_INPUTBYTES
 #define klen crypto_core_KEYBYTES
 #define clen crypto_core_CONSTBYTES
+
+void preallocate(void)
+{
+}
 
 void allocate(void)
 {

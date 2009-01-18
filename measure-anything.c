@@ -1,5 +1,5 @@
 /*
- * measure-anything.c version 20090117
+ * measure-anything.c version 20090118
  * D. J. Bernstein
  * Public domain.
  */
@@ -60,6 +60,7 @@ extern const char *primitiveimplementation;
 extern const char *implementationversion;
 extern const char *sizenames[];
 extern const long long sizes[];
+extern void preallocate(void);
 extern void allocate(void);
 extern void measure(void);
 
@@ -180,9 +181,7 @@ void limits()
 int main()
 {
   cyclespersecond = cpucycles_persecond();
-#ifdef RAND_R_PRNG_NOT_SEEDED
-  RAND_status();
-#endif
+  preallocate();
   limits();
   printimplementations();
   allocate();
