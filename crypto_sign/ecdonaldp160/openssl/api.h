@@ -1,3 +1,4 @@
+#include <openssl/rand.h>
 #define crypto_sign_ecdonaldp160_openssl_PRIMEBYTES 20
 #define crypto_sign_ecdonaldp160_openssl_SECRETKEYBYTES (crypto_sign_ecdonaldp160_openssl_PRIMEBYTES * 3)
 #define crypto_sign_ecdonaldp160_openssl_PUBLICKEYBYTES (crypto_sign_ecdonaldp160_openssl_PRIMEBYTES * 2)

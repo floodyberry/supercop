@@ -1,3 +1,4 @@
+#include <openssl/rand.h>
 #define crypto_sign_donald1024_openssl_PRIMEBITS 1024
 #define crypto_sign_donald1024_openssl_PRIMEBYTES (crypto_sign_donald1024_openssl_PRIMEBITS / 8)
 

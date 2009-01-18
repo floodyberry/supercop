@@ -1,3 +1,4 @@
+#include <openssl/rand.h>
 #define crypto_encrypt_ronald3072_openssl_MODULUSBITS 3072 
 #define crypto_encrypt_ronald3072_openssl_MODULUSBYTES (crypto_encrypt_ronald3072_openssl_MODULUSBITS / 8)
 

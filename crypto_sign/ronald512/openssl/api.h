@@ -1,3 +1,4 @@
+#include <openssl/rand.h>
 #define crypto_sign_ronald512_openssl_MODULUSBITS 512 
 #define crypto_sign_ronald512_openssl_MODULUSBYTES (crypto_sign_ronald512_openssl_MODULUSBITS / 8)
 

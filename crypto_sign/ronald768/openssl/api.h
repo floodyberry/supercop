@@ -1,3 +1,4 @@
+#include <openssl/rand.h>
 #define crypto_sign_ronald768_openssl_MODULUSBITS 768 
 #define crypto_sign_ronald768_openssl_MODULUSBYTES (crypto_sign_ronald768_openssl_MODULUSBITS / 8)
 

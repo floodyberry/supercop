@@ -1,5 +1,5 @@
 /*
- * try-anything.c version 20090114
+ * try-anything.c version 20090117
  * D. J. Bernstein
  * Public domain.
  */
@@ -131,6 +131,9 @@ int main()
   const char *problem;
 
   cyclespersecond = cpucycles_persecond();
+#ifdef RAND_R_PRNG_NOT_SEEDED
+  RAND_status();
+#endif
   limits();
 
   allocate();

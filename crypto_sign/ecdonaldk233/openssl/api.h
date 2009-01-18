@@ -1,3 +1,4 @@
+#include <openssl/rand.h>
 #define crypto_sign_ecdonaldk233_openssl_PRIMEBYTES 30
 #define crypto_sign_ecdonaldk233_openssl_SECRETKEYBYTES (crypto_sign_ecdonaldk233_openssl_PRIMEBYTES * 3)
 #define crypto_sign_ecdonaldk233_openssl_PUBLICKEYBYTES (crypto_sign_ecdonaldk233_openssl_PRIMEBYTES * 2)

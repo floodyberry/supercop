@@ -1,5 +1,5 @@
 /*
- * measure-anything.c version 20090114
+ * measure-anything.c version 20090117
  * D. J. Bernstein
  * Public domain.
  */
@@ -180,6 +180,9 @@ void limits()
 int main()
 {
   cyclespersecond = cpucycles_persecond();
+#ifdef RAND_R_PRNG_NOT_SEEDED
+  RAND_status();
+#endif
   limits();
   printimplementations();
   allocate();
