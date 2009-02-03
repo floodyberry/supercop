@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20090122
+version=20090203
 # D. J. Bernstein
 # Public domain.
 
@@ -304,7 +304,7 @@ do
 	    done
 	    [ "$ok" = 1 ] || continue
 
-	    if ./try >../errors 2>&1
+	    if sh -c './try' >../errors 2>&1
 	    then
 	      checksum=`awk '{print $1}' < ../errors`
 	      cycles=`awk '{print $2}' < ../errors`
@@ -312,6 +312,7 @@ do
 	      cyclespersecond=`awk '{print $4}' < ../errors`
 	      impl=`awk '{print $5}' < ../errors`
 	    else
+	      echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword error $?" >&5
 	      cat ../errors \
 	      | while read err
 	      do
@@ -324,6 +325,7 @@ do
 	    [ "x$expectedchecksum" = "x$checksum" ] && checksumok=ok
 	    [ "x$expectedchecksum" = "x" ] && checksumok=unknown
 	    echo "$version $shorthostname $abi $startdate $o $p try $checksum $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
+	    [ "$checksumok" = fails ] && continue
 
 	    [ -s ../bestmedian ] && [ `cat ../bestmedian` -le $cycles ] && continue
 	    echo "$cycles" > ../bestmedian

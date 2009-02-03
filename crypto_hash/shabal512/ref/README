@@ -1,0 +1,17 @@
+This is the "optimized" implementation of SHABAL, as submitted to the
+NIST SHA-3 competition, modified to fit the eBASH API. It should compile
+and operate cleanly on all architectures which eBASH runs on. The code
+includes some inline assembly for fast little-endian decoding of 32-bits
+aligned words; this code is protected by preprocessor directives which
+enable it only on those architectures and compilers which support such
+inline assembly. For all other architectures and compilers, a fall-back
+generic code is used.
+
+The code is meant to be freely redistributable and modifiable. There
+is no known copyright or patent infringement claim on this code and
+algorithm, and no plan to establish such a patent. In the words
+of the eBASH call for submission web page, this means a level 0
+of copyright protection, and a level 0 of patent protection.
+
+As indicated in the hash.c file, technical comments and questions
+may be addressed to: <thomas.pornin@cryptolog.com>
