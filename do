@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20090203
+version=20090204
 # D. J. Bernstein
 # Public domain.
 
@@ -304,7 +304,7 @@ do
 	    done
 	    [ "$ok" = 1 ] || continue
 
-	    if sh -c './try' >../errors 2>&1
+	    if sh -c './try; :' >../errors 2>&1
 	    then
 	      checksum=`awk '{print $1}' < ../errors`
 	      cycles=`awk '{print $2}' < ../errors`
