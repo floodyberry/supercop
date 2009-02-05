@@ -24,7 +24,7 @@
  */
 #include "crypto_uint32.h"
 
-typedef uint32 shabal_word32;
+typedef crypto_uint32 shabal_word32;
 
 #define SHABAL_BLOCK_SIZE   16
 #ifndef SHABAL_PARAM_R
