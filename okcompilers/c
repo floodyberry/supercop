@@ -209,6 +209,31 @@ xlc -q64 -qtune=pwr3 -O
 /opt/ansic/bin/cc +DD64
 /opt/MIPSpro/bin/cc -64 -Ofast
 /opt/MIPSpro/bin/cc -64
+icc -O3 -static
+icc -Os -static
+icc -O2 -static
+icc -O1 -static
+icc -O3 -xK -static
+icc -Os -xK -static
+icc -O2 -xK -static
+icc -O1 -xK -static
+icc -O3 -xW -static
+icc -Os -xW -static
+icc -O2 -xW -static
+icc -O1 -xW -static
+icc -O3 -xN -static
+icc -Os -xN -static
+icc -O2 -xN -static
+icc -O1 -xN -static
+icc -O3 -xP -static
+icc -Os -xP -static
+icc -O2 -xP -static
+icc -O1 -xP -static
+icc -O3 -xB -static
+icc -Os -xB -static
+icc -O2 -xB -static
+icc -O1 -xB -static
+icc
 gcc -m32 -O3 -fomit-frame-pointer
 gcc -m32 -Os -fomit-frame-pointer
 gcc -m32 -O2 -fomit-frame-pointer

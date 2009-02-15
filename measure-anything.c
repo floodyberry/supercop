@@ -1,5 +1,5 @@
 /*
- * measure-anything.c version 20090118
+ * measure-anything.c version 20090215
  * D. J. Bernstein
  * Public domain.
  */
@@ -9,6 +9,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <sys/resource.h>
 #include "cpucycles.h"
 #include "cpuid.h"
@@ -164,6 +165,7 @@ void printentry(long long mbytes,const char *measuring,long long *m,long long ml
 
 void limits()
 {
+#ifdef RLIM_INFINITY
   struct rlimit r;
   r.rlim_cur = 0;
   r.rlim_max = 0;
@@ -175,6 +177,7 @@ void limits()
 #endif
 #ifdef RLIMIT_CORE
   setrlimit(RLIMIT_CORE,&r);
+#endif
 #endif
 }
 

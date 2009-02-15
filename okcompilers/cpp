@@ -209,6 +209,31 @@ xlC -q64 -qtune=pwr3 -O
 /opt/aCC/bin/aCC +DD64
 /opt/MIPSpro/bin/CC -64 -Ofast
 /opt/MIPSpro/bin/CC -64
+icpc -O3 -static
+icpc -Os -static
+icpc -O2 -static
+icpc -O1 -static
+icpc -O3 -xK -static
+icpc -Os -xK -static
+icpc -O2 -xK -static
+icpc -O1 -xK -static
+icpc -O3 -xW -static
+icpc -Os -xW -static
+icpc -O2 -xW -static
+icpc -O1 -xW -static
+icpc -O3 -xN -static
+icpc -Os -xN -static
+icpc -O2 -xN -static
+icpc -O1 -xN -static
+icpc -O3 -xP -static
+icpc -Os -xP -static
+icpc -O2 -xP -static
+icpc -O1 -xP -static
+icpc -O3 -xB -static
+icpc -Os -xB -static
+icpc -O2 -xB -static
+icpc -O1 -xB -static
+icpc -static
 g++ -m32 -O3 -fomit-frame-pointer
 g++ -m32 -Os -fomit-frame-pointer
 g++ -m32 -O2 -fomit-frame-pointer

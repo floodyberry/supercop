@@ -1,5 +1,5 @@
 /*
- * try-anything.c version 20090118
+ * try-anything.c version 20090215
  * D. J. Bernstein
  * Public domain.
  */
@@ -10,6 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <sys/resource.h>
 #include "cpucycles.h"
 
@@ -107,6 +108,7 @@ static long long cycles[TIMINGS + 1];
 
 void limits()
 {
+#ifdef RLIM_INFINITY
   struct rlimit r;
   r.rlim_cur = 0;
   r.rlim_max = 0;
@@ -118,6 +120,7 @@ void limits()
 #endif
 #ifdef RLIMIT_CORE
   setrlimit(RLIMIT_CORE,&r);
+#endif
 #endif
 }
 
