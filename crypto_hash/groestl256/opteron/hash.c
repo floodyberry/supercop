@@ -13,7 +13,11 @@
 
 #ifdef __x86_64
 
-#include "PQ512-core2.h"
+#include "PQ512-amd64.h"
+
+#else
+
+//#include "PQ512-amd-32.h"
 
 #endif
 
