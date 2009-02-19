@@ -1,4 +1,4 @@
-SIMD reference implementation - version 1.0.1
+SIMD reference implementation - version 1.0.4
 =============================================
 
 The latest version of the specification of the SIMD hash function,
@@ -16,6 +16,7 @@ code currently includes 3 different implementations:
 - a slow reference implementation.
 - an optimized implementation.
 - a vectorized implementation for 128-bit vectors (SIMD-256 only).
+- a vectorized implementation for ARM with IwMMXt
 
 The reference and optimized versions are written in ANSI C, and supports
 all functions of the SIMD family.  Note that the so-called "optimized"
@@ -29,6 +30,12 @@ PowerPC.  It has been tested with gcc, icc, and msvc.  You might need to
 add a command line option to the compiler to allow it to use SSE or
 Altivec instructions; for GCC, try -msse2 or -maltivec.
 
+The IwMMXt implementation is written in C with massive use of inline
+assembly, because the GCC builtins that should implement IwMMXt
+instructions are just plain broken.  Note that you need to use the ARM
+Embedded ABI (EABI) in order to use IwMMXt instructions, which is
+incompatible with the old ABI.  For instance, this is available in the
+armel port of Debian GNU/Linux which now supersedes the old arm port.
 
 API
 ===
@@ -50,6 +57,9 @@ preserves the sign bit (which is an implementation defined behaviour).
 
 Changelog
 =========
+
+  * 1.0.4
+    + Includes a vectorized version for ARM with IwMMXt
 
   * 1.0.3
     + Fixed an endiannes error on the vectorized PPC implementation
@@ -80,7 +90,7 @@ A Future version of this code might include:
 
 - performance improvements
 - a vectorized implementation of SIMD-512
-- a 64-bit vector implementation (for VIS on Sparc, and IwMMXt on ARM)
+- vectorized implementation for more architectures (e.g. VIS on Sparc)
 - a version where SIMD instructions are simulated with 64-bit arithmetic
 
 

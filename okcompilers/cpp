@@ -2,6 +2,10 @@ g++ -m64 -O3 -fomit-frame-pointer
 g++ -m64 -Os -fomit-frame-pointer
 g++ -m64 -O2 -fomit-frame-pointer
 g++ -m64 -O -fomit-frame-pointer
+g++ -m64 -march=native -mtune=native -O3 -fomit-frame-pointer
+g++ -m64 -march=native -mtune=native -Os -fomit-frame-pointer
+g++ -m64 -march=native -mtune=native -O2 -fomit-frame-pointer
+g++ -m64 -march=native -mtune=native -O -fomit-frame-pointer
 g++ -m64 -maltivec -O3 -fomit-frame-pointer
 g++ -m64 -maltivec -Os -fomit-frame-pointer
 g++ -m64 -maltivec -O2 -fomit-frame-pointer
@@ -249,6 +253,10 @@ g++ -m32 -O3 -fomit-frame-pointer
 g++ -m32 -Os -fomit-frame-pointer
 g++ -m32 -O2 -fomit-frame-pointer
 g++ -m32 -O -fomit-frame-pointer
+g++ -m32 -march=native -mtune=native -O3 -fomit-frame-pointer
+g++ -m32 -march=native -mtune=native -Os -fomit-frame-pointer
+g++ -m32 -march=native -mtune=native -O2 -fomit-frame-pointer
+g++ -m32 -march=native -mtune=native -O -fomit-frame-pointer
 g++ -m32 -maltivec -O3 -fomit-frame-pointer
 g++ -m32 -maltivec -Os -fomit-frame-pointer
 g++ -m32 -maltivec -O2 -fomit-frame-pointer
@@ -630,6 +638,26 @@ g++ -march=i386 -O3 -fomit-frame-pointer
 g++ -march=i386 -Os -fomit-frame-pointer
 g++ -march=i386 -O2 -fomit-frame-pointer
 g++ -march=i386 -O -fomit-frame-pointer
+g++ -march=iwmmxt -O3 -fomit-frame-pointer
+g++ -march=iwmmxt -Os -fomit-frame-pointer
+g++ -march=iwmmxt -O2 -fomit-frame-pointer
+g++ -march=iwmmxt -O -fomit-frame-pointer
+g++ -funroll-loops -march=iwmmxt -O3 -fomit-frame-pointer
+g++ -funroll-loops -march=iwmmxt -Os -fomit-frame-pointer
+g++ -funroll-loops -march=iwmmxt -O2 -fomit-frame-pointer
+g++ -funroll-loops -march=iwmmxt -O -fomit-frame-pointer
+g++ -funroll-loops -fno-schedule-insns -march=iwmmxt -O3 -fomit-frame-pointer
+g++ -funroll-loops -fno-schedule-insns -march=iwmmxt -Os -fomit-frame-pointer
+g++ -funroll-loops -fno-schedule-insns -march=iwmmxt -O2 -fomit-frame-pointer
+g++ -funroll-loops -fno-schedule-insns -march=iwmmxt -O -fomit-frame-pointer
+g++ -fno-schedule-insns -O3 -fomit-frame-pointer
+g++ -fno-schedule-insns -Os -fomit-frame-pointer
+g++ -fno-schedule-insns -O2 -fomit-frame-pointer
+g++ -fno-schedule-insns -O -fomit-frame-pointer
+g++ -funroll-loops -fno-schedule-insns -O3 -fomit-frame-pointer
+g++ -funroll-loops -fno-schedule-insns -Os -fomit-frame-pointer
+g++ -funroll-loops -fno-schedule-insns -O2 -fomit-frame-pointer
+g++ -funroll-loops -fno-schedule-insns -O -fomit-frame-pointer
 spu-g++ -mstdmain -march=celledp -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-g++ -mstdmain -march=celledp -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-g++ -mstdmain -march=celledp -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand

@@ -11,6 +11,16 @@ static void init(void)
   double result;
   int s;
 
+  f = fopen("/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", "r");
+  if (f) {
+    s = fscanf(f,"%lf",&result);
+    fclose(f);
+    if (s > 0) {
+      cpufrequency = 1000.0 * result;
+      return;
+    }
+  }
+
   f = fopen("/proc/cpuinfo","r");
   if (!f) return;
 
