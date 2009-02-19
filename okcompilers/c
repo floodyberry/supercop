@@ -130,6 +130,10 @@ gcc -m64 -mcpu=G3 -maltivec -O3 -fomit-frame-pointer
 gcc -m64 -mcpu=G3 -maltivec -Os -fomit-frame-pointer
 gcc -m64 -mcpu=G3 -maltivec -O2 -fomit-frame-pointer
 gcc -m64 -mcpu=G3 -maltivec -O -fomit-frame-pointer
+gcc -m64 -march=core2 -O3 -fomit-frame-pointer
+gcc -m64 -march=core2 -Os -fomit-frame-pointer
+gcc -m64 -march=core2 -O2 -fomit-frame-pointer
+gcc -m64 -march=core2 -O -fomit-frame-pointer
 gcc -m64 -march=k8 -O3 -fomit-frame-pointer
 gcc -m64 -march=k8 -Os -fomit-frame-pointer
 gcc -m64 -march=k8 -O2 -fomit-frame-pointer
@@ -198,42 +202,6 @@ gcc -m64 -march=i386 -O3 -fomit-frame-pointer
 gcc -m64 -march=i386 -Os -fomit-frame-pointer
 gcc -m64 -march=i386 -O2 -fomit-frame-pointer
 gcc -m64 -march=i386 -O -fomit-frame-pointer
-xlc -q64 -O2
-xlc -q64 -O
-xlc -q64
-xlc -q64 -qtune=pwr3 -O2
-xlc -q64 -qtune=pwr3 -O
-/opt/SUNWspro/bin/cc -fast -xarch=v9
-/opt/SUNWspro/bin/cc -xarch=v9
-/opt/ansic/bin/cc +DD64 -fast
-/opt/ansic/bin/cc +DD64
-/opt/MIPSpro/bin/cc -64 -Ofast
-/opt/MIPSpro/bin/cc -64
-icc -O3 -static
-icc -Os -static
-icc -O2 -static
-icc -O1 -static
-icc -O3 -xK -static
-icc -Os -xK -static
-icc -O2 -xK -static
-icc -O1 -xK -static
-icc -O3 -xW -static
-icc -Os -xW -static
-icc -O2 -xW -static
-icc -O1 -xW -static
-icc -O3 -xN -static
-icc -Os -xN -static
-icc -O2 -xN -static
-icc -O1 -xN -static
-icc -O3 -xP -static
-icc -Os -xP -static
-icc -O2 -xP -static
-icc -O1 -xP -static
-icc -O3 -xB -static
-icc -Os -xB -static
-icc -O2 -xB -static
-icc -O1 -xB -static
-icc
 gcc -m32 -O3 -fomit-frame-pointer
 gcc -m32 -Os -fomit-frame-pointer
 gcc -m32 -O2 -fomit-frame-pointer
@@ -330,6 +298,10 @@ gcc -m32 -mcpu=ev4 -O3 -fomit-frame-pointer
 gcc -m32 -mcpu=ev4 -Os -fomit-frame-pointer
 gcc -m32 -mcpu=ev4 -O2 -fomit-frame-pointer
 gcc -m32 -mcpu=ev4 -O -fomit-frame-pointer
+gcc -mpowerpc -maix32 -O3 -fomit-frame-pointer
+gcc -mpowerpc -maix32 -Os -fomit-frame-pointer
+gcc -mpowerpc -maix32 -O2 -fomit-frame-pointer
+gcc -mpowerpc -maix32 -O -fomit-frame-pointer
 gcc -m32 -mcpu=G5 -O3 -fomit-frame-pointer
 gcc -m32 -mcpu=G5 -Os -fomit-frame-pointer
 gcc -m32 -mcpu=G5 -O2 -fomit-frame-pointer
@@ -354,6 +326,10 @@ gcc -m32 -mcpu=G3 -maltivec -O3 -fomit-frame-pointer
 gcc -m32 -mcpu=G3 -maltivec -Os -fomit-frame-pointer
 gcc -m32 -mcpu=G3 -maltivec -O2 -fomit-frame-pointer
 gcc -m32 -mcpu=G3 -maltivec -O -fomit-frame-pointer
+gcc -m32 -march=core2 -O3 -fomit-frame-pointer
+gcc -m32 -march=core2 -Os -fomit-frame-pointer
+gcc -m32 -march=core2 -O2 -fomit-frame-pointer
+gcc -m32 -march=core2 -O -fomit-frame-pointer
 gcc -m32 -march=k8 -O3 -fomit-frame-pointer
 gcc -m32 -march=k8 -Os -fomit-frame-pointer
 gcc -m32 -march=k8 -O2 -fomit-frame-pointer
@@ -611,34 +587,6 @@ gcc -march=i386 -O3 -fomit-frame-pointer
 gcc -march=i386 -Os -fomit-frame-pointer
 gcc -march=i386 -O2 -fomit-frame-pointer
 gcc -march=i386 -O -fomit-frame-pointer
-spu-gcc -mstdmain -march=celledp -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
-spu-gcc -mstdmain -march=celledp -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
-spu-gcc -mstdmain -march=celledp -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
-spu-gcc -mstdmain -march=celledp -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
-spu-gcc -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
-spu-gcc -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
-spu-gcc -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
-spu-gcc -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
-xlc -O2
-xlc -O
-xlc
-xlc -qarch=ppc -O2
-xlc -qarch=ppc -O
-xlc -qarch=pwr2 -O2
-xlc -qarch=pwr2 -O
-xlc -qarch=pwr -O2
-xlc -qarch=pwr -O
-xlc -qarch=com -O2
-xlc -qarch=com -O
-/opt/SUNWspro/bin/cc -fast
-/opt/SUNWspro/bin/cc
-/opt/ansic/bin/cc -fast
-/opt/ansic/bin/cc 
-/opt/MIPSpro/bin/cc -n32 -Ofast
-/opt/MIPSpro/bin/cc -n32
-/opt/MIPSpro/bin/cc -Ofast
-/opt/MIPSpro/bin/cc
-cc
 gcc -funroll-loops -m64 -O3 -fomit-frame-pointer
 gcc -funroll-loops -m64 -Os -fomit-frame-pointer
 gcc -funroll-loops -m64 -O2 -fomit-frame-pointer
@@ -1216,6 +1164,14 @@ gcc -funroll-loops -march=i386 -O3 -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -Os -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -O2 -fomit-frame-pointer
 gcc -funroll-loops -march=i386 -O -fomit-frame-pointer
+spu-gcc -mstdmain -march=celledp -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=celledp -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=celledp -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=celledp -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+spu-gcc -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=celledp -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=celledp -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=celledp -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
@@ -1224,3 +1180,89 @@ spu-gcc -funroll-loops -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=r
 spu-gcc -funroll-loops -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+icc -m64 -xHost -vec-report0 -static
+icc -m64 -O3 -static
+icc -m64 -Os -static
+icc -m64 -O2 -static
+icc -m64 -O1 -static
+icc -m32 -xHost -vec-report0 -static
+icc -m32 -O3 -static
+icc -m32 -Os -static
+icc -m32 -O2 -static
+icc -m32 -O1 -static
+icc -O3 -xK -static
+icc -Os -xK -static
+icc -O2 -xK -static
+icc -O1 -xK -static
+icc -O3 -xW -static
+icc -Os -xW -static
+icc -O2 -xW -static
+icc -O1 -xW -static
+icc -O3 -xN -static
+icc -Os -xN -static
+icc -O2 -xN -static
+icc -O1 -xN -static
+icc -O3 -xP -static
+icc -Os -xP -static
+icc -O2 -xP -static
+icc -O1 -xP -static
+icc -O3 -xB -static
+icc -Os -xB -static
+icc -O2 -xB -static
+icc -O1 -xB -static
+icc -O3 -static
+icc -Os -static
+icc -O2 -static
+icc -O1 -static
+icc
+pgcc -tp core2-64 -O2
+pgcc -tp core2-64 -O3
+pgcc -tp core2-64 -fast
+pgcc -tp x64 -O2
+pgcc -tp x64 -O3
+pgcc -tp x64 -fast
+pgcc -tp core2-32 -O2
+pgcc -tp core2-32 -O3
+pgcc -tp core2-32 -fast
+xlc -q64 -O2
+xlc -q64 -O2 -qmaxmem=-1 -qarch=auto -qtune=auto 
+xlc -q64 -O3
+xlc -q64 -O3 -qhot
+xlc -q64 -O4
+xlc -q64 -O5
+xlc -q64 -O
+xlc -q64
+xlc -q64 -qtune=pwr3 -O2
+xlc -q64 -qtune=pwr3 -O
+xlc -q32 -O2
+xlc -q32 -O2 -qmaxmem=-1 -qarch=auto -qtune=auto 
+xlc -q32 -O3
+xlc -q32 -O3 -qhot
+xlc -q32 -O4
+xlc -q32 -O5
+xlc -qarch=ppc -O2
+xlc -qarch=ppc -O
+xlc -qarch=pwr2 -O2
+xlc -qarch=pwr2 -O
+xlc -qarch=pwr -O2
+xlc -qarch=pwr -O
+xlc -qarch=com -O2
+xlc -qarch=com -O
+xlc -O2
+xlc -O
+xlc
+/opt/SUNWspro/bin/cc -fast -xarch=v9
+/opt/SUNWspro/bin/cc -xarch=v9
+/opt/SUNWspro/bin/cc -fast
+/opt/SUNWspro/bin/cc
+/opt/ansic/bin/cc +DD64 -fast
+/opt/ansic/bin/cc +DD64
+/opt/ansic/bin/cc -fast
+/opt/ansic/bin/cc 
+/opt/MIPSpro/bin/cc -64 -Ofast
+/opt/MIPSpro/bin/cc -64
+/opt/MIPSpro/bin/cc -n32 -Ofast
+/opt/MIPSpro/bin/cc -n32
+/opt/MIPSpro/bin/cc -Ofast
+/opt/MIPSpro/bin/cc
+cc

@@ -1,5 +1,5 @@
 /*
- * measure-anything.c version 20090215
+ * measure-anything.c version 20090218
  * D. J. Bernstein
  * Public domain.
  */
@@ -130,8 +130,25 @@ static void printimplementations(void)
 
   printword("compiler");
   printword(COMPILER);
-#ifdef __VERSION__
+#if defined(__VERSION__) && !defined(__ICC)
   printword(__VERSION__);
+#elif defined(__xlc__)
+  printword(__xlc__);
+#elif defined(__ICC)
+  {
+    char buf[256];
+
+    sprintf(buf, "%d.%d.%d", __ICC/100, __ICC%100,
+            __INTEL_COMPILER_BUILD_DATE);
+    printword(buf);
+  }
+#elif defined(__PGIC__)
+  {
+    char buf[256];
+
+    sprintf(buf, "%d.%d.%d", __PGIC__, __PGIC_MINOR__, __PGIC_PATCHLEVEL__);
+    printword(buf);
+  }
 #else
   printword("unknown compiler version");
 #endif

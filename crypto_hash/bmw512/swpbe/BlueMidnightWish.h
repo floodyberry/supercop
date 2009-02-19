@@ -13,33 +13,55 @@ typedef unsigned long long u_int64_t;
 typedef unsigned char BitSequence;
 typedef u_int64_t DataLength; // a typical 64-bit value
 typedef enum { SUCCESS = 0, FAIL = 1, BAD_HASHLEN = 2, BAD_CONSECUTIVE_CALL_TO_UPDATE = 3 } HashReturn;
-// EdonR allows to call Update() function consecutively only if the total length of stored 
+// Blue Midnight Wish allows to call Update() function consecutively only if the total length of stored 
 // unprocessed data and the new supplied data is less than or equal to the BLOCK_SIZE on which the 
 // compression functions operates. Otherwise BAD_CONSECUTIVE_CALL_TO_UPDATE is returned.
 
 
 // Specific algorithm definitions
-#define EdonR224_DIGEST_SIZE  28
-#define EdonR224_BLOCK_SIZE   64
-#define EdonR256_DIGEST_SIZE  32
-#define EdonR256_BLOCK_SIZE   64
-#define EdonR384_DIGEST_SIZE  48
-#define EdonR384_BLOCK_SIZE  128
-#define EdonR512_DIGEST_SIZE  64
-#define EdonR512_BLOCK_SIZE  128
+#define BlueMidnightWish224_DIGEST_SIZE  28
+#define BlueMidnightWish224_BLOCK_SIZE   64
+#define BlueMidnightWish256_DIGEST_SIZE  32
+#define BlueMidnightWish256_BLOCK_SIZE   64
+#define BlueMidnightWish384_DIGEST_SIZE  48
+#define BlueMidnightWish384_BLOCK_SIZE  128
+#define BlueMidnightWish512_DIGEST_SIZE  64
+#define BlueMidnightWish512_BLOCK_SIZE  128
 
-#define EdonR256_BLOCK_BITSIZE  512
-#define EdonR512_BLOCK_BITSIZE 1024
+#define BlueMidnightWish256_BLOCK_BITSIZE  512
+#define BlueMidnightWish512_BLOCK_BITSIZE 1024
+
+// Here we define the default Blue Midnight Wish tunable security parameters.
+// The parameters are named EXPAND_1_ROUNDS and EXPAND_2_ROUNDS.
+// Since Blue Midnight Wish has 16 rounds in its message expansion part, the 
+// following relation for these parameters should be satisfied:
+//
+//          EXPAND_1_ROUNDS + EXPAND_2_ROUNDS = 16
+//
+// Blue Midnight Wish in its message expansion part uses 2 different functions: 
+// expand_1 and expand_2.
+//
+// expand_1 is the more complex and more time consuming, but offers the fastest
+// diffusion of bit differences and produces variables that have the most complex
+// nonlinear relations with previous 16 variables in the message expansion part.
+//
+// expand_2 is faster than expand_1, and uses faster and simpler functions than 
+// expand_1. The produced variables still have complex nonlinear relations with 
+// previous 16 variables in the message expansion part.
+//
+#define EXPAND_1_ROUNDS 2
+#define EXPAND_2_ROUNDS 14
+
 
 typedef struct
 {
 	u_int32_t DoublePipe[32];
-	BitSequence LastPart[EdonR256_BLOCK_SIZE * 2];
+	BitSequence LastPart[BlueMidnightWish256_BLOCK_SIZE * 2];
 } Data256;
 typedef struct
 {
 	u_int64_t DoublePipe[32];
-	BitSequence LastPart[EdonR512_BLOCK_SIZE * 2];
+	BitSequence LastPart[BlueMidnightWish512_BLOCK_SIZE * 2];
 } Data512;
 
 typedef struct {
@@ -47,7 +69,7 @@ typedef struct {
 
 	// + algorithm specific parameters
 	int unprocessed_bits;
-	u_int64_t bits_processed;
+	DataLength bits_processed;
 	union
     { 
 		Data256  p256[1];
@@ -62,7 +84,7 @@ typedef struct {
 
 
 /*
- * Processor- and/or compiler-specific rotate builtins, add as appropriate
+ * Processor- and/or compilers-specific rotate builtins, add as appropriate
  */
 
 #if defined(_MSC_VER) && !defined(NO_ROTATE_BUILTINS)
@@ -101,6 +123,7 @@ typedef struct {
 #if !defined(__C99_RESTRICT)
 #define restrict /*restrict*/
 #endif
+
 
 HashReturn Init(hashState *state, int hashbitlen);
 HashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen);

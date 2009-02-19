@@ -130,6 +130,10 @@ g++ -m64 -mcpu=G3 -maltivec -O3 -fomit-frame-pointer
 g++ -m64 -mcpu=G3 -maltivec -Os -fomit-frame-pointer
 g++ -m64 -mcpu=G3 -maltivec -O2 -fomit-frame-pointer
 g++ -m64 -mcpu=G3 -maltivec -O -fomit-frame-pointer
+g++ -m64 -march=core2 -O3 -fomit-frame-pointer
+g++ -m64 -march=core2 -Os -fomit-frame-pointer
+g++ -m64 -march=core2 -O2 -fomit-frame-pointer
+g++ -m64 -march=core2 -O -fomit-frame-pointer
 g++ -m64 -march=k8 -O3 -fomit-frame-pointer
 g++ -m64 -march=k8 -Os -fomit-frame-pointer
 g++ -m64 -march=k8 -O2 -fomit-frame-pointer
@@ -199,6 +203,11 @@ g++ -m64 -march=i386 -Os -fomit-frame-pointer
 g++ -m64 -march=i386 -O2 -fomit-frame-pointer
 g++ -m64 -march=i386 -O -fomit-frame-pointer
 xlC -q64 -O2
+xlC -q64 -O2 -qmaxmem=-1 -qarch=auto -qtune=auto 
+xlC -q64 -O3
+xlC -q64 -O3 -qhot
+xlC -q64 -O4
+xlC -q64 -O5
 xlC -q64 -O
 xlC -q64
 xlC -q64 -qtune=pwr3 -O2
@@ -209,6 +218,8 @@ xlC -q64 -qtune=pwr3 -O
 /opt/aCC/bin/aCC +DD64
 /opt/MIPSpro/bin/CC -64 -Ofast
 /opt/MIPSpro/bin/CC -64
+icpc -m64 -xHost -vec-report0 -static
+icpc -m32 -xHost -vec-report0 -static
 icpc -O3 -static
 icpc -Os -static
 icpc -O2 -static
@@ -330,6 +341,10 @@ g++ -m32 -mcpu=ev4 -O3 -fomit-frame-pointer
 g++ -m32 -mcpu=ev4 -Os -fomit-frame-pointer
 g++ -m32 -mcpu=ev4 -O2 -fomit-frame-pointer
 g++ -m32 -mcpu=ev4 -O -fomit-frame-pointer
+g++ -maix32 -mpowerpc -O3 -fomit-frame-pointer
+g++ -maix32 -mpowerpc -Os -fomit-frame-pointer
+g++ -maix32 -mpowerpc -O2 -fomit-frame-pointer
+g++ -maix32 -mpowerpc -O -fomit-frame-pointer
 g++ -m32 -mcpu=G5 -O3 -fomit-frame-pointer
 g++ -m32 -mcpu=G5 -Os -fomit-frame-pointer
 g++ -m32 -mcpu=G5 -O2 -fomit-frame-pointer
@@ -354,6 +369,10 @@ g++ -m32 -mcpu=G3 -maltivec -O3 -fomit-frame-pointer
 g++ -m32 -mcpu=G3 -maltivec -Os -fomit-frame-pointer
 g++ -m32 -mcpu=G3 -maltivec -O2 -fomit-frame-pointer
 g++ -m32 -mcpu=G3 -maltivec -O -fomit-frame-pointer
+g++ -m32 -march=core2 -O3 -fomit-frame-pointer
+g++ -m32 -march=core2 -Os -fomit-frame-pointer
+g++ -m32 -march=core2 -O2 -fomit-frame-pointer
+g++ -m32 -march=core2 -O -fomit-frame-pointer
 g++ -m32 -march=k8 -O3 -fomit-frame-pointer
 g++ -m32 -march=k8 -Os -fomit-frame-pointer
 g++ -m32 -march=k8 -O2 -fomit-frame-pointer
@@ -619,6 +638,12 @@ spu-g++ -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=s
 spu-g++ -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-g++ -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-g++ -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+xlC -q32 -O2
+xlC -q32 -O2 -qmaxmem=-1 -qarch=auto -qtune=auto 
+xlC -q32 -O3
+xlC -q32 -O3 -qhot
+xlC -q32 -O4
+xlC -q32 -O5
 xlC -O2
 xlC -O
 xlC
@@ -638,4 +663,13 @@ xlC -qarch=com -O
 /opt/MIPSpro/bin/CC -n32
 /opt/MIPSpro/bin/CC -Ofast
 /opt/MIPSpro/bin/CC
+pgCC -tp core2-64 -O2
+pgCC -tp core2-64 -O3
+pgCC -tp core2-64 -fast
+pgCC -tp x64 -O2
+pgCC -tp x64 -O3
+pgCC -tp x64 -fast
+pgCC -tp core2-32 -O2
+pgCC -tp core2-32 -O3
+pgCC -tp core2-32 -fast
 CC
