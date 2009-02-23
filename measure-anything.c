@@ -1,5 +1,5 @@
 /*
- * measure-anything.c version 20090218
+ * measure-anything.c version 20090223
  * D. J. Bernstein
  * Public domain.
  */
@@ -147,6 +147,21 @@ static void printimplementations(void)
     char buf[256];
 
     sprintf(buf, "%d.%d.%d", __PGIC__, __PGIC_MINOR__, __PGIC_PATCHLEVEL__);
+    printword(buf);
+  }
+#elif defined(__SUNPRO_C)
+  {
+    char buf[256];
+    int major, minor, micro;
+
+    micro = __SUNPRO_C & 0xf;
+    minor = (__SUNPRO_C >> 4) & 0xf;
+    major = (__SUNPRO_C >> 8) & 0xf;
+
+    if (micro)
+      sprintf(buf, "%d.%d.%d", major, minor, micro);
+    else
+      sprintf(buf, "%d.%d", major, minor);
     printword(buf);
   }
 #else
