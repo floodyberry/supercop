@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20090226
+version=20090305
 # D. J. Bernstein
 # Public domain.
 
@@ -135,6 +135,28 @@ done
 okabi \
 | while read abi
 do
+  echo "=== `date` === building cryptopp for $abi"
+  mkdir -p "$lib/$abi"
+  mkdir -p "$include/$abi/cryptopp"
+  okcpp-$abi | head -1 \
+  | while read cpp cppopts
+  do
+    [ -s "$lib/$abi/libcryptopp.a" ] && continue
+    echo "=== `date` === trying CXX=$cpp CXXFLAGS=$cppopts"
+    rm -rf "$work"
+    mkdir -p "$work"
+    cp -pr cryptopp-20090302/* "$work"
+    ( cd "$work" \
+      && make CXX="$cpp" CXXFLAGS="$cppopts" LDFLAGS="$cppopts" \
+      && cp libcryptopp.a "$lib/$abi/libcryptopp.a" \
+      && cp *.h "$include/$abi/cryptopp/"
+    ) && break
+  done
+done
+
+okabi \
+| while read abi
+do
   rm -rf "$work"
   mkdir -p "$work"
   echo 'void supercop_base(void) { ; }' > "$work/supercop_base.c"
@@ -173,6 +195,7 @@ do
       libs=`"oklibs-$abi"`
       libs="$lib/$abi/cpucycles.o $libs"
       [ -f "$lib/$abi/libgmp.a" ] && libs="$lib/$abi/libgmp.a $libs"
+      [ -f "$lib/$abi/libcryptopp.a" ] && libs="$lib/$abi/libcryptopp.a $libs"
       [ -f "$lib/$abi/libsupercop.a" ] && libs="$lib/$abi/libsupercop.a $libs"
 
       rm -rf "$work"

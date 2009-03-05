@@ -1,5 +1,5 @@
-SIMD reference implementation - version 1.0.4
-=============================================
+SIMD reference implementation - version 1.1
+===========================================
 
 The latest version of the specification of the SIMD hash function,
 supporting documentation, and reference code can be downloaded from
@@ -11,7 +11,7 @@ Overview
 ========
 
 This is the reference implementation of the SIMD hash function.  This
-code currently includes 3 different implementations:
+code currently includes 4 different implementations:
 
 - a slow reference implementation.
 - an optimized implementation.
@@ -24,18 +24,20 @@ implementation is written in pure C and yield poor performance because
 the design of the hash function is targeted toward SIMD instruction set.
 
 The 128-bit vector implementation is written in C with compiler-specific
-extensions to use SIMD instructions.  It currently supports the SSE2
-instruction set of x86 processors and the Altivec instruction set of
-PowerPC.  It has been tested with gcc, icc, and msvc.  You might need to
-add a command line option to the compiler to allow it to use SSE or
-Altivec instructions; for GCC, try -msse2 or -maltivec.
+extensions to use SIMD instructions, and can compute all functions of
+the SIMD family.  It currently supports the SSE2 instruction set of x86
+processors and the Altivec instruction set of PowerPC.  It has been
+tested with gcc, icc, and msvc.  You might need to add a command line
+option to the compiler to allow it to use SSE2 or Altivec instructions;
+for GCC, try -msse2 or -maltivec.
 
 The IwMMXt implementation is written in C with massive use of inline
 assembly, because the GCC builtins that should implement IwMMXt
-instructions are just plain broken.  Note that you need to use the ARM
-Embedded ABI (EABI) in order to use IwMMXt instructions, which is
-incompatible with the old ABI.  For instance, this is available in the
-armel port of Debian GNU/Linux which now supersedes the old arm port.
+instructions are just plain broken.  This implementation only supports
+SIMD-n with n <= 256.  Note that you need to use the ARM Embedded ABI
+(EABI) in order to use IwMMXt instructions, which is incompatible with
+the old ABI.  For instance, this is available in the armel port of
+Debian GNU/Linux which now supersedes the old arm port.
 
 API
 ===
@@ -57,6 +59,9 @@ preserves the sign bit (which is an implementation defined behaviour).
 
 Changelog
 =========
+
+  * 1.1
+    + The 128-bit vector implementation now supports SIMD-512.
 
   * 1.0.4
     + Includes a vectorized version for ARM with IwMMXt
