@@ -17,6 +17,11 @@ const char *sizenames[] = { "outputbytes", "keybytes", 0 };
 const long long sizes[] = { crypto_auth_BYTES, crypto_auth_KEYBYTES };
 
 #define MAXTEST_BYTES 4096
+#ifdef SUPERCOP
+#define MGAP 8192
+#else
+#define MGAP 8
+#endif
 
 static unsigned char *k;
 static unsigned char *m;
@@ -43,7 +48,7 @@ void measure(void)
   int mlen;
 
   for (loop = 0;loop < 3;++loop) {
-    for (mlen = 0;mlen <= MAXTEST_BYTES;mlen += 1 + mlen / 8192) {
+    for (mlen = 0;mlen <= MAXTEST_BYTES;mlen += 1 + mlen / MGAP) {
       randombytes(k,crypto_auth_KEYBYTES);
       randombytes(m,mlen);
       randombytes(h,crypto_auth_BYTES);

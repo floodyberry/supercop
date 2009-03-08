@@ -1,10 +1,11 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20090305
+version=20090307
 # D. J. Bernstein
 # Public domain.
 
+project=supercop
 shorthostname=`hostname | sed 's/\..*//' | tr -cd '[a-z][A-Z][0-9]'`
 
 top="`pwd`/bench/$shorthostname"
@@ -147,7 +148,7 @@ do
     mkdir -p "$work"
     cp -pr cryptopp-20090302/* "$work"
     ( cd "$work" \
-      && make CXX="$cpp" CXXFLAGS="$cppopts" LDFLAGS="$cppopts" \
+      && make CXX="$cpp" CXXFLAGS="-DNDEBUG $cppopts" LDFLAGS="$cppopts" \
       && cp libcryptopp.a "$lib/$abi/libcryptopp.a" \
       && cp *.h "$include/$abi/cryptopp/"
     ) && break
@@ -159,14 +160,14 @@ okabi \
 do
   rm -rf "$work"
   mkdir -p "$work"
-  echo 'void supercop_base(void) { ; }' > "$work/supercop_base.c"
+  echo 'void crypto_'"$project"'_base(void) { ; }' > "$work/${project}_base.c"
   okc-$abi \
   | while read compiler
   do
-    ( cd "$work" && $compiler -c supercop_base.c ) && break
+    ( cd "$work" && $compiler -c ${project}_base.c ) && break
   done
-  okar-$abi cr "$lib/$abi/libsupercop.a" "$work/supercop_base.o"
-  ( ranlib "$lib/$abi/libsupercop.a" || exit 0 )
+  okar-$abi cr "$lib/$abi/lib${project}.a" "$work/${project}_base.o"
+  ( ranlib "$lib/$abi/lib${project}.a" || exit 0 )
 done
 
 # loop over operations
@@ -196,7 +197,7 @@ do
       libs="$lib/$abi/cpucycles.o $libs"
       [ -f "$lib/$abi/libgmp.a" ] && libs="$lib/$abi/libgmp.a $libs"
       [ -f "$lib/$abi/libcryptopp.a" ] && libs="$lib/$abi/libcryptopp.a $libs"
-      [ -f "$lib/$abi/libsupercop.a" ] && libs="$lib/$abi/libsupercop.a $libs"
+      [ -f "$lib/$abi/lib${project}.a" ] && libs="$lib/$abi/lib${project}.a $libs"
 
       rm -rf "$work"
       mkdir -p "$work"
@@ -252,7 +253,7 @@ do
 	    echo "#ifndef ${op}_H"
 	    echo "#define ${op}_H"
 	    echo ""
-            sed 's/[    ]CRYPTO_/ '"${opi}"'_/g' < api.h
+	    sed 's/[ 	]CRYPTO_/ '"${opi}"'_/g' < api.h
 	    if [ $language = c ]
 	    then
 	      echo '#ifdef __cplusplus'
@@ -303,7 +304,7 @@ do
 		    head ../errors
 		    echo ...
 		    tail ../errors
-		  fi 
+		  fi
 		) \
 		| while read err
 		do
@@ -354,6 +355,7 @@ do
 	    echo "$cycles" > ../bestmedian
 
 	    $compiler -D'COMPILER="'"$compiler"'"' \
+	      -DSUPERCOP \
 	      -I. -I"$include" -I"$include/$abi" \
 	      -o measure measure.$language measure-anything.$language \
 	      "$op.a" $libs >../errors 2>&1 || ok=0
@@ -385,8 +387,8 @@ do
       done
 
       [ -f "$o/$p/used" ] \
-      && okar-$abi cr "$lib/$abi/libsupercop.a" "$work/best"/*.o \
-      && ( ranlib "$lib/$abi/libsupercop.a" || exit 0 ) \
+      && okar-$abi cr "$lib/$abi/lib${project}.a" "$work/best"/*.o \
+      && ( ranlib "$lib/$abi/lib${project}.a" || exit 0 ) \
       && cp -p "$work/$op.h" "$include/$abi/$op.h" \
       && [ -f "$o/$p/selected" ] \
       && cp -p "$work/$o.h" "$include/$abi/$o.h" \

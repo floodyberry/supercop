@@ -206,49 +206,6 @@ g++ -m64 -march=i386 -O3 -fomit-frame-pointer
 g++ -m64 -march=i386 -Os -fomit-frame-pointer
 g++ -m64 -march=i386 -O2 -fomit-frame-pointer
 g++ -m64 -march=i386 -O -fomit-frame-pointer
-xlC -q64 -O2
-xlC -q64 -O2 -qmaxmem=-1 -qarch=auto -qtune=auto 
-xlC -q64 -O3
-xlC -q64 -O3 -qhot
-xlC -q64 -O4
-xlC -q64 -O5
-xlC -q64 -O
-xlC -q64
-xlC -q64 -qtune=pwr3 -O2
-xlC -q64 -qtune=pwr3 -O
-/opt/SUNWspro/bin/CC -fast -xarch=v9
-/opt/SUNWspro/bin/CC -xarch=v9
-/opt/aCC/bin/aCC +DD64 -fast
-/opt/aCC/bin/aCC +DD64
-/opt/MIPSpro/bin/CC -64 -Ofast
-/opt/MIPSpro/bin/CC -64
-icpc -m64 -xHost -vec-report0 -static
-icpc -m32 -xHost -vec-report0 -static
-icpc -O3 -static
-icpc -Os -static
-icpc -O2 -static
-icpc -O1 -static
-icpc -O3 -xK -static
-icpc -Os -xK -static
-icpc -O2 -xK -static
-icpc -O1 -xK -static
-icpc -O3 -xW -static
-icpc -Os -xW -static
-icpc -O2 -xW -static
-icpc -O1 -xW -static
-icpc -O3 -xN -static
-icpc -Os -xN -static
-icpc -O2 -xN -static
-icpc -O1 -xN -static
-icpc -O3 -xP -static
-icpc -Os -xP -static
-icpc -O2 -xP -static
-icpc -O1 -xP -static
-icpc -O3 -xB -static
-icpc -Os -xB -static
-icpc -O2 -xB -static
-icpc -O1 -xB -static
-icpc -static
 g++ -m32 -O3 -fomit-frame-pointer
 g++ -m32 -Os -fomit-frame-pointer
 g++ -m32 -O2 -fomit-frame-pointer
@@ -666,6 +623,49 @@ spu-g++ -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=rand -Dsrandom=s
 spu-g++ -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-g++ -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-g++ -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+xlC -q64 -O2
+xlC -q64 -O2 -qmaxmem=-1 -qarch=auto -qtune=auto 
+xlC -q64 -O3
+xlC -q64 -O3 -qhot
+xlC -q64 -O4
+xlC -q64 -O5
+xlC -q64 -O
+xlC -q64
+xlC -q64 -qtune=pwr3 -O2
+xlC -q64 -qtune=pwr3 -O
+/opt/SUNWspro/bin/CC -fast -xarch=v9
+/opt/SUNWspro/bin/CC -xarch=v9
+/opt/aCC/bin/aCC +DD64 -fast
+/opt/aCC/bin/aCC +DD64
+/opt/MIPSpro/bin/CC -64 -Ofast
+/opt/MIPSpro/bin/CC -64
+icpc -m64 -xHost -vec-report0 -static
+icpc -m32 -xHost -vec-report0 -static
+icpc -O3 -static
+icpc -Os -static
+icpc -O2 -static
+icpc -O1 -static
+icpc -O3 -xK -static
+icpc -Os -xK -static
+icpc -O2 -xK -static
+icpc -O1 -xK -static
+icpc -O3 -xW -static
+icpc -Os -xW -static
+icpc -O2 -xW -static
+icpc -O1 -xW -static
+icpc -O3 -xN -static
+icpc -Os -xN -static
+icpc -O2 -xN -static
+icpc -O1 -xN -static
+icpc -O3 -xP -static
+icpc -Os -xP -static
+icpc -O2 -xP -static
+icpc -O1 -xP -static
+icpc -O3 -xB -static
+icpc -Os -xB -static
+icpc -O2 -xB -static
+icpc -O1 -xB -static
+icpc -static
 xlC -q32 -O2
 xlC -q32 -O2 -qmaxmem=-1 -qarch=auto -qtune=auto 
 xlC -q32 -O3

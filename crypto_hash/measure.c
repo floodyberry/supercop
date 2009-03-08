@@ -18,6 +18,11 @@ const char *sizenames[] = { "outputbytes", 0 };
 const long long sizes[] = { crypto_hash_BYTES };
 
 #define MAXTEST_BYTES 4096
+#ifdef SUPERCOP
+#define MGAP 8192
+#else
+#define MGAP 8
+#endif
 
 static unsigned char *h;
 static unsigned char *m;
@@ -49,7 +54,7 @@ void measure(void)
   int mlen;
 
   for (loop = 0;loop < 3;++loop) {
-    for (mlen = 0;mlen <= MAXTEST_BYTES;mlen += 1 + mlen / 8192) {
+    for (mlen = 0;mlen <= MAXTEST_BYTES;mlen += 1 + mlen / MGAP) {
       randombytes(m,mlen);
       for (i = 0;i <= TIMINGS;++i) {
         cycles[i] = cpucycles();
