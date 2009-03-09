@@ -18,6 +18,8 @@ int main(int argc,char **argv)
   printf("%s sparcv9\n",argv[1]); return 0;
 #elif defined(__sparc__) || defined(__sparc)
   printf("%s sparcv8\n",argv[1]); return 0;
+#elif defined(__arm__)
+  printf("%s arm\n",argv[1]); return 0;
 #else
   printf("%s default\n",argv[1]); return 0;
 #endif
