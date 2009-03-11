@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20090309
+version=20090310
 # D. J. Bernstein
 # Public domain.
 
@@ -146,7 +146,7 @@ do
     echo "=== `date` === trying CXX=$cpp CXXFLAGS=$cppopts"
     rm -rf "$work"
     mkdir -p "$work"
-    cp -pr cryptopp-20090302/* "$work"
+    cp -pr cryptopp-20090310/* "$work"
     ( cd "$work" \
       && make CXX="$cpp" CXXFLAGS="-DNDEBUG $cppopts" LDFLAGS="$cppopts" \
       && cp libcryptopp.a "$lib/$abi/libcryptopp.a" \
@@ -202,6 +202,7 @@ do
       rm -rf "$work"
       mkdir -p "$work"
       mkdir -p "$work/best"
+      mkdir -p "$work/bestc"
 
       # for each operation primitive abi, loop over implementations
       find "$o/$p" -follow -name "api.h" \
@@ -254,22 +255,16 @@ do
 	    echo "#define ${op}_H"
 	    echo ""
 	    sed 's/[ 	]CRYPTO_/ '"${opi}"'_/g' < api.h
-	    if [ $language = c ]
-	    then
-	      echo '#ifdef __cplusplus'
-	      echo 'extern "C" {'
-	      echo '#endif'
-	    fi
+	    echo '#ifdef __cplusplus'
+	    echo 'extern "C" {'
+	    echo '#endif'
 	    echo "$prototypes" | tr : '\012' | while read prototype
 	    do
 	      echo "extern int ${opi}${prototype};"
 	    done
-	    if [ $language = c ]
-	    then
-	      echo '#ifdef __cplusplus'
-	      echo '}'
-	      echo '#endif'
-	    fi
+	    echo '#ifdef __cplusplus'
+	    echo '}'
+	    echo '#endif'
 	    echo ""
 	    echo "$macros" | tr : '\012' | while read macro
 	    do
@@ -351,8 +346,7 @@ do
 	    echo "$version $shorthostname $abi $startdate $o $p try $checksum $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
 	    [ "$checksumok" = fails ] && continue
 
-	    [ -s ../bestmedian ] && [ `cat ../bestmedian` -le $cycles ] && continue
-	    echo "$cycles" > ../bestmedian
+	    [ -s ../bestc/median ] && [ `cat ../bestc/median` -le $cycles ] && continue
 
 	    $compiler -D'COMPILER="'"$compiler"'"' \
 	      -DSUPERCOP \
@@ -365,15 +359,21 @@ do
 	      echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword measure.$language $err" >&5
 	    done
 	    [ "$ok" = 1 ] || continue
-
-	    rm -f ../best/*.o ../best/measure || continue
-	    for f in *.o
+  
+	    for b in best bestc
 	    do
-	      cp -p "$f" "../best/${opi}-$f"
+	      [ $language = cpp ] && [ $b = bestc ] && continue
+	      [ -s ../$b/median ] && [ `cat ../$b/median` -le $cycles ] && continue
+	      echo "$cycles" > ../$b/median
+	      rm -f ../$b/*.o ../$b/measure || continue
+	      for f in *.o
+	      do
+	        cp -p "$f" "../$b/${opi}-$f"
+	      done
+	      cp -p "$op.h" "../$b/$op.h"
+	      cp -p "$o.h" "../$b/$o.h"
+	      cp -p measure ../$b/measure
 	    done
-	    cp -p "$op.h" "../$op.h"
-	    cp -p "$o.h" "../$o.h"
-	    cp -p measure ../best/measure
 	  done
 	)
       done
@@ -387,11 +387,11 @@ do
       done
 
       [ -f "$o/$p/used" ] \
-      && okar-$abi cr "$lib/$abi/lib${project}.a" "$work/best"/*.o \
+      && okar-$abi cr "$lib/$abi/lib${project}.a" "$work/bestc"/*.o \
       && ( ranlib "$lib/$abi/lib${project}.a" || exit 0 ) \
-      && cp -p "$work/$op.h" "$include/$abi/$op.h" \
+      && cp -p "$work/bestc/$op.h" "$include/$abi/$op.h" \
       && [ -f "$o/$p/selected" ] \
-      && cp -p "$work/$o.h" "$include/$abi/$o.h" \
+      && cp -p "$work/bestc/$o.h" "$include/$abi/$o.h" \
       || :
     done
   done
