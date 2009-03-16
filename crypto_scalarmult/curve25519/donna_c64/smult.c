@@ -151,6 +151,8 @@ static void fmul(felem *output, const felem *in2, const felem *in) {
   t[4] &= 0x7ffffffffffff;
   t[1] += t[0] >> 51;
   t[0] &= 0x7ffffffffffff;
+  t[2] += t[1] >> 51;
+  t[1] &= 0x7ffffffffffff;
 
   output[0] = t[0];
   output[1] = t[1];
