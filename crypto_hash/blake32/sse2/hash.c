@@ -121,7 +121,7 @@ static int blake32_compress( hashstate * state, const u8 * datablock ) {
   row3 = _mm_set_epi32(0x03707344, 0x13198A2E, 0x85A308D3, 0x243F6A88);
 
   if (state->nullt) 
-    row4 = _mm_set_epi32(0xEC4E6C89, 0x082EFA98, 0x299F31D0, 0xA409382A);
+    row4 = _mm_set_epi32(0xEC4E6C89, 0x082EFA98, 0x299F31D0, 0xA4093822);
   else 
     row4 = _mm_set_epi32(0xEC4E6C89^state->t32[1], 0x082EFA98^state->t32[1],
 			 0x299F31D0^state->t32[0], 0xA4093822^state->t32[0]);
@@ -368,7 +368,7 @@ int main( int ac, char ** av) {
   for(i=0; i<72; ++i)
     data[i]=0;  
 
-  crypto_hash_blake32_ref( hash, data, 1 );    
+  crypto_hash_blake32_sse2( hash, data, 1 );    
   v=0;
   for(i=0; i<32; ++i) {
     printf("%02X", hash[i]);
@@ -379,7 +379,7 @@ int main( int ac, char ** av) {
   else
     printf("\nok\n");
 
-  crypto_hash_blake32_ref( hash, data, 72 );    
+  crypto_hash_blake32_sse2( hash, data, 72 );    
   v=0;
   for(i=0; i<32; ++i) {
     printf("%02X", hash[i]);
