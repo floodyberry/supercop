@@ -246,81 +246,81 @@ roundAESnokey(y0,y1,y2,y3,x0,x1,x2,x3);\
 
 void E512(u32 pt[16], u32 ct[16], u32 message[32], u32 counter[4])
 {
-   u32 state[16];
+   u32 state0,state1,state,2,state3,state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15;
    u32 x0,x1,x2,x3,y0,y1,y2,y3,i,j,k;
    u32 rk[ExpandedMessageSize512];
 
-   state[0]=pt[0]; 
-   state[1]=pt[1]; 
-   state[2]=pt[2]; 
-   state[3]=pt[3];
-   state[4]=pt[4];
-   state[5]=pt[5];
-   state[6]=pt[6];
-   state[7]=pt[7];
-   state[8]=pt[8]; 
-   state[9]=pt[9]; 
-   state[10]=pt[10]; 
-   state[11]=pt[11];
-   state[12]=pt[12];
-   state[13]=pt[13];
-   state[14]=pt[14];
-   state[15]=pt[15];
+   state0=pt[0]; 
+   state1=pt[1]; 
+   state2=pt[2]; 
+   state3=pt[3];
+   state4=pt[4];
+   state5=pt[5];
+   state6=pt[6];
+   state7=pt[7];
+   state8=pt[8]; 
+   state9=pt[9]; 
+   state10=pt[10]; 
+   state11=pt[11];
+   state12=pt[12];
+   state13=pt[13];
+   state14=pt[14];
+   state15=pt[15];
    
    for (i=0;i<32;i++) rk[i]=message[i];
+   oneround(state0,state1,state2,state3,state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15,x0,x1,x2,x3,y0,y1,y2,y3,rk,0);
    NonLinExpansion32(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansionRegular(rk,48,x0,x1,x2,x3,y0,y1,y2,y3);
+   oneround(state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15,state0,state1,state2,state3,x0,x1,x2,x3,y0,y1,y2,y3,rk,32);
    LinExpansion512(rk,64,i,j,k);
+   oneround(state8,state9,state10,state11,state12,state13,state14,state15,state0,state1,state2,state3,state4,state5,state6,state7,x0,x1,x2,x3,y0,y1,y2,y3,rk,64);
    NonLinExpansionRegular(rk,96,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansionRegular(rk,112,x0,x1,x2,x3,y0,y1,y2,y3);
+   oneround(state12,state13,state14,state15,state0,state1,state2,state3,state4,state5,state6,state7,state8,state9,state10,state11,x0,x1,x2,x3,y0,y1,y2,y3,rk,96);
    LinExpansion512(rk,128,i,j,k);
+   oneround(state0,state1,state2,state3,state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15,x0,x1,x2,x3,y0,y1,y2,y3,rk,128);
    NonLinExpansion160(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansionRegular(rk,176,x0,x1,x2,x3,y0,y1,y2,y3);
+   oneround(state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15,state0,state1,state2,state3,x0,x1,x2,x3,y0,y1,y2,y3,rk,160);
+
    LinExpansion512(rk,192,i,j,k);
+   oneround(state8,state9,state10,state11,state12,state13,state14,state15,state0,state1,state2,state3,state4,state5,state6,state7,x0,x1,x2,x3,y0,y1,y2,y3,rk,192);
    NonLinExpansionRegular(rk,224,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansionRegular(rk,240,x0,x1,x2,x3,y0,y1,y2,y3);
+   oneround(state12,state13,state14,state15,state0,state1,state2,state3,state4,state5,state6,state7,state8,state9,state10,state11,x0,x1,x2,x3,y0,y1,y2,y3,rk,224);
    LinExpansion512(rk,256,i,j,k);
+   oneround(state0,state1,state2,state3,state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15,x0,x1,x2,x3,y0,y1,y2,y3,rk,256);
    NonLinExpansionRegular(rk,288,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansion304(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
+   oneround(state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15,state0,state1,state2,state3,x0,x1,x2,x3,y0,y1,y2,y3,rk,288);
+
    LinExpansion512(rk,320,i,j,k);
+   oneround(state8,state9,state10,state11,state12,state13,state14,state15,state0,state1,state2,state3,state4,state5,state6,state7,x0,x1,x2,x3,y0,y1,y2,y3,rk,320);
    NonLinExpansionRegular(rk,352,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansionRegular(rk,368,x0,x1,x2,x3,y0,y1,y2,y3);
+   oneround(state12,state13,state14,state15,state0,state1,state2,state3,state4,state5,state6,state7,state8,state9,state10,state11,x0,x1,x2,x3,y0,y1,y2,y3,rk,352);
    LinExpansion512(rk,384,i,j,k);
+   oneround(state0,state1,state2,state3,state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15,x0,x1,x2,x3,y0,y1,y2,y3,rk,384);
    NonLinExpansionRegular(rk,416,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansion432(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
+   oneround(state4,state5,state6,state7,state8,state9,state10,state11,state12,state13,state14,state15,state0,state1,state2,state3,x0,x1,x2,x3,y0,y1,y2,y3,rk,416);
 
-
-   oneround(state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],x0,x1,x2,x3,y0,y1,y2,y3,rk,0);
-   oneround(state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],x0,x1,x2,x3,y0,y1,y2,y3,rk,32);
-   oneround(state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],x0,x1,x2,x3,y0,y1,y2,y3,rk,64);
-   oneround(state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],x0,x1,x2,x3,y0,y1,y2,y3,rk,96);
-   oneround(state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],x0,x1,x2,x3,y0,y1,y2,y3,rk,128);
-   oneround(state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],x0,x1,x2,x3,y0,y1,y2,y3,rk,160);
-   oneround(state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],x0,x1,x2,x3,y0,y1,y2,y3,rk,192);
-   oneround(state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],x0,x1,x2,x3,y0,y1,y2,y3,rk,224);
-   oneround(state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],x0,x1,x2,x3,y0,y1,y2,y3,rk,256);
-   oneround(state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],x0,x1,x2,x3,y0,y1,y2,y3,rk,288);
-   oneround(state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],x0,x1,x2,x3,y0,y1,y2,y3,rk,320);
-   oneround(state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],x0,x1,x2,x3,y0,y1,y2,y3,rk,352);
-   oneround(state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],x0,x1,x2,x3,y0,y1,y2,y3,rk,384);
-   oneround(state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],x0,x1,x2,x3,y0,y1,y2,y3,rk,416);
-
-   ct[0]=state[8]; 
-   ct[1]=state[9]; 
-   ct[2]=state[10]; 
-   ct[3]=state[11];
-   ct[4]=state[12];
-   ct[5]=state[13];
-   ct[6]=state[14];
-   ct[7]=state[15];
-   ct[8]=state[0]; 
-   ct[9]=state[1]; 
-   ct[10]=state[2]; 
-   ct[11]=state[3];
-   ct[12]=state[4];
-   ct[13]=state[5];
-   ct[14]=state[6];
-   ct[15]=state[7];
+   ct[0]=state8; 
+   ct[1]=state9; 
+   ct[2]=state10; 
+   ct[3]=state11;
+   ct[4]=state12;
+   ct[5]=state13;
+   ct[6]=state14;
+   ct[7]=state15;
+   ct[8]=state0; 
+   ct[9]=state1; 
+   ct[10]=state2; 
+   ct[11]=state3;
+   ct[12]=state4;
+   ct[13]=state5;
+   ct[14]=state6;
+   ct[15]=state7;
 
    return;
 }
