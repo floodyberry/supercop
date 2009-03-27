@@ -12,6 +12,7 @@ http://keccak.noekeon.org/
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "brg_endian.h"
 #include "KeccakNISTInterface.h"
@@ -22,47 +23,6 @@ typedef unsigned char UINT8;
 typedef unsigned short UINT16;
 typedef unsigned int UINT32;
 typedef unsigned long long int UINT64;
-
-#define nrRounds 18
-const UINT32 KeccakRoundConstants0[nrRounds] = {
-    0x00000001UL,
-    0x00000000UL,
-    0x00000000UL,
-    0x00000000UL,
-    0x00000001UL,
-    0x00000001UL,
-    0x00000001UL,
-    0x00000001UL,
-    0x00000000UL,
-    0x00000000UL,
-    0x00000001UL,
-    0x00000000UL,
-    0x00000001UL,
-    0x00000001UL,
-    0x00000001UL,
-    0x00000001UL,
-    0x00000000UL,
-    0x00000000UL };
-
-const UINT32 KeccakRoundConstants1[nrRounds] = {
-    0x00000000UL,
-    0x00000089UL,
-    0x8000008BUL,
-    0x80008080UL,
-    0x0000008BUL,
-    0x00008000UL,
-    0x80008088UL,
-    0x80000082UL,
-    0x0000000BUL,
-    0x0000000AUL,
-    0x00008082UL,
-    0x00008003UL,
-    0x0000808BUL,
-    0x8000000BUL,
-    0x8000008AUL,
-    0x80000081UL,
-    0x80000081UL,
-    0x80000008UL };
 
 #ifdef UseInterleaveTables
 int interleaveTablesBuilt = 0;
@@ -181,7 +141,7 @@ void setInterleavedWordsInto8bytes(UINT8* dest, UINT64 evenAndOdd)
 #define ROL32(a, offset) ((((UINT32)a) << offset) ^ (((UINT32)a) >> (32-offset)))
 #endif
 
-#include "KeccakPermutationOptimized32.macros"
+#include "KeccakF-1600-18-32.macros"
 #include "KeccakPermutationOptimized.macros"
 
 void KeccakPermutationOnWords(UINT32 *state)

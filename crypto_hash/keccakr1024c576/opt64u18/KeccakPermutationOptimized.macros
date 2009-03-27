@@ -1,65 +1,90 @@
+/*
+Algorithm Name: Keccak
+Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
+Date: March 26, 2009
+
+This code, originally by Guido Bertoni, Joan Daemen, Michaël Peeters and
+Gilles Van Assche as a part of the SHA-3 submission, is hereby put in the
+public domain. It is given as is, without any guarantee.
+
+For more information, feedback or questions, please refer to our website:
+http://keccak.noekeon.org/
+*/
+
 #if (Unrolling == 18)
 #define rounds \
-    firstRound(0) \
-    middleRound(1) \
-    middleRound(2) \
-    middleRound(3) \
-    middleRound(4) \
-    middleRound(5) \
-    middleRound(6) \
-    middleRound(7) \
-    middleRound(8) \
-    middleRound(9) \
-    middleRound(10) \
-    middleRound(11) \
-    middleRound(12) \
-    middleRound(13) \
-    middleRound(14) \
-    middleRound(15) \
-    middleRound(16) \
-    lastRound(17) \
-    copyToState(state, E)
+	prepareTheta \
+	thetaRhoPiChiIotaPrepareTheta( 0, A, E) \
+	thetaRhoPiChiIotaPrepareTheta( 1, E, A) \
+	thetaRhoPiChiIotaPrepareTheta( 2, A, E) \
+	thetaRhoPiChiIotaPrepareTheta( 3, E, A) \
+	thetaRhoPiChiIotaPrepareTheta( 4, A, E) \
+	thetaRhoPiChiIotaPrepareTheta( 5, E, A) \
+	thetaRhoPiChiIotaPrepareTheta( 6, A, E) \
+	thetaRhoPiChiIotaPrepareTheta( 7, E, A) \
+	thetaRhoPiChiIotaPrepareTheta( 8, A, E) \
+	thetaRhoPiChiIotaPrepareTheta( 9, E, A) \
+	thetaRhoPiChiIotaPrepareTheta(10, A, E) \
+	thetaRhoPiChiIotaPrepareTheta(11, E, A) \
+	thetaRhoPiChiIotaPrepareTheta(12, A, E) \
+	thetaRhoPiChiIotaPrepareTheta(13, E, A) \
+	thetaRhoPiChiIotaPrepareTheta(14, A, E) \
+	thetaRhoPiChiIotaPrepareTheta(15, E, A) \
+	thetaRhoPiChiIotaPrepareTheta(16, A, E) \
+	thetaRhoPiChiIota(17, E, A) \
+    copyToState(state, A)
 #elif (Unrolling == 9)
 #define rounds \
     prepareTheta \
     for(i=0; i<18; i+=9) { \
-        middleRound(i) \
-        middleRound(i+1) \
-        middleRound(i+2) \
-        middleRound(i+3) \
-        middleRound(i+4) \
-        middleRound(i+5) \
-        middleRound(i+6) \
-        middleRound(i+7) \
-        middleRound(i+8) \
+		thetaRhoPiChiIotaPrepareTheta(i  , A, E) \
+		thetaRhoPiChiIotaPrepareTheta(i+1, E, A) \
+		thetaRhoPiChiIotaPrepareTheta(i+2, A, E) \
+		thetaRhoPiChiIotaPrepareTheta(i+3, E, A) \
+		thetaRhoPiChiIotaPrepareTheta(i+4, A, E) \
+		thetaRhoPiChiIotaPrepareTheta(i+5, E, A) \
+		thetaRhoPiChiIotaPrepareTheta(i+6, A, E) \
+		thetaRhoPiChiIotaPrepareTheta(i+7, E, A) \
+		thetaRhoPiChiIotaPrepareTheta(i+8, A, E) \
+		copyStateVariables(A, E) \
     } \
     copyToState(state, A)
 #elif (Unrolling == 6)
 #define rounds \
     prepareTheta \
     for(i=0; i<18; i+=6) { \
-        middleRound(i) \
-        middleRound(i+1) \
-        middleRound(i+2) \
-        middleRound(i+3) \
-        middleRound(i+4) \
-        middleRound(i+5) \
+		thetaRhoPiChiIotaPrepareTheta(i  , A, E) \
+		thetaRhoPiChiIotaPrepareTheta(i+1, E, A) \
+		thetaRhoPiChiIotaPrepareTheta(i+2, A, E) \
+		thetaRhoPiChiIotaPrepareTheta(i+3, E, A) \
+		thetaRhoPiChiIotaPrepareTheta(i+4, A, E) \
+		thetaRhoPiChiIotaPrepareTheta(i+5, E, A) \
     } \
     copyToState(state, A)
 #elif (Unrolling == 3)
 #define rounds \
     prepareTheta \
     for(i=0; i<18; i+=3) { \
-        middleRound(i) \
-        middleRound(i+1) \
-        middleRound(i+2) \
+		thetaRhoPiChiIotaPrepareTheta(i  , A, E) \
+		thetaRhoPiChiIotaPrepareTheta(i+1, E, A) \
+		thetaRhoPiChiIotaPrepareTheta(i+2, A, E) \
+		copyStateVariables(A, E) \
+    } \
+    copyToState(state, A)
+#elif (Unrolling == 2)
+#define rounds \
+    prepareTheta \
+    for(i=0; i<18; i+=2) { \
+        thetaRhoPiChiIotaPrepareTheta(i  , A, E) \
+        thetaRhoPiChiIotaPrepareTheta(i+1, E, A) \
     } \
     copyToState(state, A)
 #elif (Unrolling == 1)
 #define rounds \
     prepareTheta \
     for(i=0; i<18; i++) { \
-        middleRound(i) \
+		thetaRhoPiChiIotaPrepareTheta(i  , A, E) \
+		copyStateVariables(A, E) \
     } \
     copyToState(state, A)
 #else
