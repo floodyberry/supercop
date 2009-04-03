@@ -1,0 +1,22 @@
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrcore.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrarth0.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrarth1.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrio1.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrbits.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrarth2.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrmonty.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrxgcd.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrzzn2.c
+gcc -c -march=k8 -O3  -fomit-frame-pointer mrecn2.c
+
+as mrmuldv.s -o mrmuldv.o
+as fp1271.s -o fp1271.o
+
+rm miracl.a
+ar rc miracl.a mrcore.o mrarth0.o mrarth1.o mrarth2.o
+ar r miracl.a mrio1.o mrxgcd.o mrbits.o
+ar r miracl.a mrmonty.o mrzzn2.o fp1271.o 
+ar r miracl.a mrmuldv.o mrecn2.o 
+rm mr*.o
+gcc -march=k8 -O3 -fomit-frame-pointer gls1271.c miracl.a -o gls1271
+

@@ -1,3 +1,0 @@
-#define crypto_dh_gls1271_ref3_SECRETKEYBYTES 32
-#define crypto_dh_gls1271_ref3_PUBLICKEYBYTES 32
-#define crypto_dh_gls1271_ref3_BYTES 32
