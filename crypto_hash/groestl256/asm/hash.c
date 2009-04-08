@@ -12,9 +12,9 @@
 #include "tables.h"
 
 #ifdef __x86_64
-
 #include "PQ512-core2.h"
-
+#else
+#include "PQ512-32.h"
 #endif
 
 /* digest up to len bytes of input (full blocks only) */
