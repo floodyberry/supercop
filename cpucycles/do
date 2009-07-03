@@ -9,8 +9,10 @@ okabi | (
     (
       echo amd64tscfreq
       echo amd64cpuinfo
+      echo amd64cpuspeed
       echo x86tscfreq
       echo x86cpuinfo
+      echo x86cpuspeed
       echo x86estimate
       echo ia64cpuinfo
       echo powerpclinux

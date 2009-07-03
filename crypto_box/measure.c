@@ -61,28 +61,28 @@ void measure(void)
       crypto_box_keypair(pka,ska);
     }
     for (i = 0;i < TIMINGS;++i) cycles[i] = cycles[i + 1] - cycles[i];
-    printentry(mlen,"keypair_cycles",cycles,TIMINGS);
+    printentry(-1,"keypair_cycles",cycles,TIMINGS);
 
     for (i = 0;i <= TIMINGS;++i) {
       cycles[i] = cpucycles();
       crypto_box_keypair(pkb,skb);
     }
     for (i = 0;i < TIMINGS;++i) cycles[i] = cycles[i + 1] - cycles[i];
-    printentry(mlen,"keypair_cycles",cycles,TIMINGS);
+    printentry(-1,"keypair_cycles",cycles,TIMINGS);
 
     for (i = 0;i <= TIMINGS;++i) {
       cycles[i] = cpucycles();
       crypto_box_beforenm(sa,pkb,ska);
     }
     for (i = 0;i < TIMINGS;++i) cycles[i] = cycles[i + 1] - cycles[i];
-    printentry(mlen,"beforenm_cycles",cycles,TIMINGS);
+    printentry(-1,"beforenm_cycles",cycles,TIMINGS);
 
     for (i = 0;i <= TIMINGS;++i) {
       cycles[i] = cpucycles();
       crypto_box_beforenm(sb,pka,skb);
     }
     for (i = 0;i < TIMINGS;++i) cycles[i] = cycles[i + 1] - cycles[i];
-    printentry(mlen,"beforenm_cycles",cycles,TIMINGS);
+    printentry(-1,"beforenm_cycles",cycles,TIMINGS);
 
     for (mlen = 0;mlen <= MAXTEST_BYTES;mlen += 1 + mlen / 8) {
       randombytes(n,crypto_box_NONCEBYTES);

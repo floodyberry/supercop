@@ -1,1 +1,1 @@
-#define crypto_hash_blake64_sse2_BYTES 64
+#define CRYPTO_BYTES 64

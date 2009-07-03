@@ -3,6 +3,7 @@
 //# Revision: 08.01.2009 
 
 #include <stdio.h>
+#include <string.h>
 #include "mcssha4.h"
 #include "mcssha4_macros.h"
 
