@@ -2,7 +2,7 @@
 # Implementation of the ECHO hash function in its 256-bit outputs variant.  #
 # Optimized for Pentium4, 32-bit mode                                       #
 #                                                                           #
-# Date:     2009-07-03                                                      #
+# Date:     28 Jul 2009                                                     #
 #                                                                           #
 # Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       #
 #           Olivier Billet  <billet@eurecom.fr>                             #
@@ -16,14150 +16,11213 @@ Compress:
 	pushl	%ebp
 	movl	%esp, %ebp
 #APP
-# 473 "echo32.c" 1
+# 475 "echo32.c" 1
 	.intel_syntax noprefix
 # 0 "" 2
-# 474 "echo32.c" 1
+# 476 "echo32.c" 1
 	pusha
 # 0 "" 2
-# 476 "echo32.c" 1
+# 478 "echo32.c" 1
 	mov    dword ptr [SHA3_R], 8
 # 0 "" 2
-# 481 "echo32.c" 1
+# 483 "echo32.c" 1
 	mov    eax, dword ptr [SHA3_S+264]
 # 0 "" 2
-# 482 "echo32.c" 1
+# 484 "echo32.c" 1
 	mov    ecx, dword ptr [SHA3_S+264]
 # 0 "" 2
-# 483 "echo32.c" 1
+# 485 "echo32.c" 1
 	mov    edx, eax
 # 0 "" 2
-# 484 "echo32.c" 1
+# 486 "echo32.c" 1
 	sar    edx, 31
 # 0 "" 2
-# 485 "echo32.c" 1
+# 487 "echo32.c" 1
 	add    eax, dword ptr [SHA3_S+256]
 # 0 "" 2
-# 486 "echo32.c" 1
+# 488 "echo32.c" 1
 	adc    edx, dword ptr [SHA3_S+260]
 # 0 "" 2
-# 487 "echo32.c" 1
+# 489 "echo32.c" 1
 	mov    dword ptr [SHA3_CNT],   0
 # 0 "" 2
-# 488 "echo32.c" 1
+# 490 "echo32.c" 1
 	mov    dword ptr [SHA3_CNT+4], 0
 # 0 "" 2
-# 489 "echo32.c" 1
+# 491 "echo32.c" 1
 	test   ecx, ecx
 # 0 "" 2
-# 490 "echo32.c" 1
+# 492 "echo32.c" 1
 	mov    dword ptr [SHA3_S+256], eax
 # 0 "" 2
-# 491 "echo32.c" 1
+# 493 "echo32.c" 1
 	mov    dword ptr [SHA3_S+260], edx
 # 0 "" 2
-# 492 "echo32.c" 1
+# 494 "echo32.c" 1
 	je     L2
 # 0 "" 2
-# 493 "echo32.c" 1
+# 495 "echo32.c" 1
 	mov    dword ptr [SHA3_CNT],   eax
 # 0 "" 2
-# 494 "echo32.c" 1
+# 496 "echo32.c" 1
 	mov    dword ptr [SHA3_CNT+4], edx
 # 0 "" 2
-# 495 "echo32.c" 1
+# 497 "echo32.c" 1
 	L2:
 # 0 "" 2
-# 496 "echo32.c" 1
+# 498 "echo32.c" 1
 	mov    edx, dword ptr [SHA3_CNT+4]
 # 0 "" 2
-# 497 "echo32.c" 1
-	mov    dword ptr [SHA3_S+264], 0
-# 0 "" 2
-# 498 "echo32.c" 1
-	mov    eax, dword ptr [SHA3_CNT]
-# 0 "" 2
 # 499 "echo32.c" 1
-	cmp    edx, 0
+	mov    dword ptr [SHA3_S+264], 0
 # 0 "" 2
 # 500 "echo32.c" 1
-	ja     OVERFLOW
+	mov    eax, dword ptr [SHA3_CNT]
+# 0 "" 2
+# 501 "echo32.c" 1
+	cmp    edx, 0
 # 0 "" 2
 # 502 "echo32.c" 1
-	cmp    eax, -130
-# 0 "" 2
-# 507 "echo32.c" 1
 	ja     OVERFLOW
 # 0 "" 2
-# 510 "echo32.c" 1
+# 504 "echo32.c" 1
+	cmp    eax, -130
+# 0 "" 2
+# 509 "echo32.c" 1
+	ja     OVERFLOW
+# 0 "" 2
+# 512 "echo32.c" 1
 	NO_OVERFLOW1:
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	movaps  xmm0, [SHA3_S]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	movaps  xmm1, [SHA3_S+16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	movaps  xmm2, [SHA3_S+2*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	movaps  xmm3, [SHA3_S+3*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+4*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+4*16+16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+4*16+2*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+4*16+3*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+8*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+8*16+16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+8*16+2*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+8*16+3*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+12*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+12*16+16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+12*16+2*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+12*16+3*16]
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	movaps  [OLDCV],	   xmm0
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	movaps  [OLDCV+16],   xmm1
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	movaps  [OLDCV+2*16], xmm2
 # 0 "" 2
-# 512 "echo32.c" 1
+# 514 "echo32.c" 1
 	movaps  [OLDCV+3*16], xmm3
 # 0 "" 2
-# 517 "echo32.c" 1
+# 519 "echo32.c" 1
 	xor    ebx,ebx
-# 0 "" 2
-# 518 "echo32.c" 1
-	xor    edx,edx
 # 0 "" 2
 # 520 "echo32.c" 1
-	mov    [SHA3_ESP], esp
+	xor    edx,edx
 # 0 "" 2
 # 522 "echo32.c" 1
+	mov    [SHA3_ESP], esp
+# 0 "" 2
+# 524 "echo32.c" 1
 	LABEL_BIG_ROUND_NO1:
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+0]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+0+4]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+0+8]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+0+12]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+0+8],  ebp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+0+12], esi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+0+8]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+0+12]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+0],    edi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+0+4],  esp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+0+8],  ebp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+0+12], esi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+16]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+16+4]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+16+8]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+16+12]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+16+8],  ebp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+16+12], esi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+16+8]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+16+12]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+16],    edi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+16+4],  esp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+16+8],  ebp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+16+12], esi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+32]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+32+4]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+32+8]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+32+12]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+32+8],  ebp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+32+12], esi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+32+8]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+32+12]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+32],    edi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+32+4],  esp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+32+8],  ebp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+32+12], esi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+48]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+48+4]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+48+8]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+48+12]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+48+8],  ebp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+48+12], esi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    ecx, [SHA3_S+48+8]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    eax, [SHA3_S+48+12]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+48],    edi
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+48+4],  esp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+48+8],  ebp
 # 0 "" 2
-# 523 "echo32.c" 1
+# 525 "echo32.c" 1
 	mov    [SHA3_S+48+12], esi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+64]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+64+4]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+64+8]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+64+12]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+64+8],  ebp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+64+12], esi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+64+8]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+64+12]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+64],    edi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+64+4],  esp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+64+8],  ebp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+64+12], esi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+80]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+80+4]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+80+8]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+80+12]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+80+8],  ebp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+80+12], esi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+80+8]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+80+12]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+80],    edi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+80+4],  esp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+80+8],  ebp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+80+12], esi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+96]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+96+4]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+96+8]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+96+12]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+96+8],  ebp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+96+12], esi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+96+8]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+96+12]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+96],    edi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+96+4],  esp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+96+8],  ebp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+96+12], esi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+112]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+112+4]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+112+8]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+112+12]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+112+8],  ebp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+112+12], esi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    ecx, [SHA3_S+112+8]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    eax, [SHA3_S+112+12]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+112],    edi
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+112+4],  esp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+112+8],  ebp
 # 0 "" 2
-# 524 "echo32.c" 1
+# 526 "echo32.c" 1
 	mov    [SHA3_S+112+12], esi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+128]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+128+4]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+128+8]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+128+12]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+128+8],  ebp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+128+12], esi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+128+8]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+128+12]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+128],    edi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+128+4],  esp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+128+8],  ebp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+128+12], esi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+144]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+144+4]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+144+8]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+144+12]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+144+8],  ebp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+144+12], esi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+144+8]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+144+12]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+144],    edi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+144+4],  esp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+144+8],  ebp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+144+12], esi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+160]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+160+4]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+160+8]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+160+12]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+160+8],  ebp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+160+12], esi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+160+8]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+160+12]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+160],    edi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+160+4],  esp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+160+8],  ebp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+160+12], esi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+176]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+176+4]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+176+8]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+176+12]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+176+8],  ebp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+176+12], esi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    ecx, [SHA3_S+176+8]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    eax, [SHA3_S+176+12]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+176],    edi
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+176+4],  esp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+176+8],  ebp
 # 0 "" 2
-# 525 "echo32.c" 1
+# 527 "echo32.c" 1
 	mov    [SHA3_S+176+12], esi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+192]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+192+4]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+192+8]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+192+12]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+192+8],  ebp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+192+12], esi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+192+8]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+192+12]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+192],    edi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+192+4],  esp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+192+8],  ebp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+192+12], esi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+208]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+208+4]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+208+8]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+208+12]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+208+8],  ebp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+208+12], esi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+208+8]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+208+12]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+208],    edi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+208+4],  esp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+208+8],  ebp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+208+12], esi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+224]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+224+4]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+224+8]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+224+12]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+224+8],  ebp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+224+12], esi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+224+8]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+224+12]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+224],    edi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+224+4],  esp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+224+8],  ebp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+224+12], esi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+240]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+240+4]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+240+8]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+240+12]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+240+8],  ebp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+240+12], esi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    ecx, [SHA3_S+240+8]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    eax, [SHA3_S+240+12]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 526 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+240],    edi
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+240+4],  esp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+240+8],  ebp
-# 0 "" 2
-# 526 "echo32.c" 1
-	mov    [SHA3_S+240+12], esi
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*0]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*5]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*10]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm4, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm4, xmm1
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm5, xmm2
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm5, xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm6, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm6, xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm7, xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm7, xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlw    xmm4, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm4, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlw    xmm5, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm5, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllq    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlq    xmm6, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm6, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0,  [SHA3_S]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm0,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm0,  xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S],   xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*5], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,     xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,     xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,     xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,     xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16], xmm1
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*2]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*10], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm2,      xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm2,      xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*2],  xmm2
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*3]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm3,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm3,  xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*3], xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*4]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*9]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*14]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm4, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm4, xmm1
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm5, xmm2
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm5, xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm6, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm6, xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm7, xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm7, xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlw    xmm4, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm4, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlw    xmm5, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm5, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllq    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlq    xmm6, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm6, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*4]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm0,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm0,  xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*4], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*5]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*9], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*5], xmm1
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*6]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*14], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm2,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm2,  xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*6], xmm2
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*7]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm3,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm3,  xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*7], xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*8]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*13]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*10]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm4, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm4, xmm1
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm5, xmm2
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm5, xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm6, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm6, xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm7, xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm7, xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlw    xmm4, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm4, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlw    xmm5, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm5, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllq    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlq    xmm6, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm6, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*8]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm0,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm0,  xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*8], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*9]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*13], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*9], xmm1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm2,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm2,  xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*10], xmm2
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*11]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm3,      xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm3,      xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*11], xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*12]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*13]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*14]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm4, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm4, xmm1
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm5, xmm2
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm5, xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm6, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm6, xmm3
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm7, xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm7, xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlw    xmm4, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm4, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlw    xmm5, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm5, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	psllq    xmm0, 1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 527 "echo32.c" 1
-	psrlq    xmm6, 7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm6, xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*12]
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm0,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm0,  xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*12], xmm0
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm4
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm1,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*13], xmm1
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm2,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm2,  xmm5
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*14], xmm2
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm3,  xmm7
-# 0 "" 2
-# 527 "echo32.c" 1
-	pxor     xmm3,  xmm6
-# 0 "" 2
-# 527 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm3
 # 0 "" 2
 # 528 "echo32.c" 1
-	subd [SHA3_R], 1
+	mov    ecx, [SHA3_S+192]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+192+4]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+192+8]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+192+12]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+192+8],  ebp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+192+12], esi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+192+8]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+192+12]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+192],    edi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+192+4],  esp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+192+8],  ebp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+192+12], esi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+208]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+208+4]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+208+8]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+208+12]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+208+8],  ebp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+208+12], esi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+208+8]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+208+12]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+208],    edi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+208+4],  esp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+208+8],  ebp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+208+12], esi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+224]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+224+4]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+224+8]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+224+12]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+224+8],  ebp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+224+12], esi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+224+8]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+224+12]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+224],    edi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+224+4],  esp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+224+8],  ebp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+224+12], esi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+240]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+240+4]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+240+8]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+240+12]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+240+8],  ebp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+240+12], esi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    ecx, [SHA3_S+240+8]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    eax, [SHA3_S+240+12]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 528 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+240],    edi
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+240+4],  esp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+240+8],  ebp
+# 0 "" 2
+# 528 "echo32.c" 1
+	mov    [SHA3_S+240+12], esi
 # 0 "" 2
 # 529 "echo32.c" 1
-	jne LABEL_BIG_ROUND_NO1
+	movaps   xmm0, [SHA3_S+16*0]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*5]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*10]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0,  [SHA3_S]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S],   xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*5], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,     xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,     xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,     xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,     xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16], xmm1
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*2]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*10], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm2,      xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm2,      xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*2],  xmm2
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*3]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*3], xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*4]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*9]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*14]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*4]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*4], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*5]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*9], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*5], xmm1
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*6]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*14], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*6], xmm2
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*7]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*7], xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*8]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*13]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*10]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*8]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*8], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*9]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*13], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*9], xmm1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*10], xmm2
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*11]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm3,      xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm3,      xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*11], xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*12]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*13]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*14]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 529 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*12]
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*12], xmm0
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*13], xmm1
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*14], xmm2
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 529 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 529 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm3
 # 0 "" 2
 # 530 "echo32.c" 1
-	jmp END
+	subd [SHA3_R], 1
+# 0 "" 2
+# 531 "echo32.c" 1
+	jne LABEL_BIG_ROUND_NO1
 # 0 "" 2
 # 532 "echo32.c" 1
-	OVERFLOW:
-# 0 "" 2
-# 533 "echo32.c" 1
-	mov    ecx, eax
-# 0 "" 2
-# 534 "echo32.c" 1
-	mov    ebx, edx
-# 0 "" 2
-# 536 "echo32.c" 1
-	add    ecx, 128
-# 0 "" 2
-# 541 "echo32.c" 1
-	adc    ebx, 0
-# 0 "" 2
-# 542 "echo32.c" 1
-	cmp    ebx, edx
-# 0 "" 2
-# 543 "echo32.c" 1
-	je     NO_OVERFLOW2
-# 0 "" 2
-# 545 "echo32.c" 1
-	movaps  xmm0, [SHA3_S]
-# 0 "" 2
-# 545 "echo32.c" 1
-	movaps  xmm1, [SHA3_S+16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	movaps  xmm2, [SHA3_S+2*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	movaps  xmm3, [SHA3_S+3*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm0, [SHA3_S+4*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm1, [SHA3_S+4*16+16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm2, [SHA3_S+4*16+2*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm3, [SHA3_S+4*16+3*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm0, [SHA3_S+8*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm1, [SHA3_S+8*16+16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm2, [SHA3_S+8*16+2*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm3, [SHA3_S+8*16+3*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm0, [SHA3_S+12*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm1, [SHA3_S+12*16+16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm2, [SHA3_S+12*16+2*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	pxor    xmm3, [SHA3_S+12*16+3*16]
-# 0 "" 2
-# 545 "echo32.c" 1
-	movaps  [OLDCV],	   xmm0
-# 0 "" 2
-# 545 "echo32.c" 1
-	movaps  [OLDCV+16],   xmm1
-# 0 "" 2
-# 545 "echo32.c" 1
-	movaps  [OLDCV+2*16], xmm2
-# 0 "" 2
-# 545 "echo32.c" 1
-	movaps  [OLDCV+3*16], xmm3
-# 0 "" 2
-# 550 "echo32.c" 1
-	xor    ebx,ebx
-# 0 "" 2
-# 551 "echo32.c" 1
-	xor    edx,edx
-# 0 "" 2
-# 553 "echo32.c" 1
-	mov    [SHA3_ESP], esp
-# 0 "" 2
-# 554 "echo32.c" 1
-	LABEL_BIG_ROUND_O:
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+0]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+0+4]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+0+8]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+0+12]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 555 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+0+8],  ebp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+0+12], esi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+0+8]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+0+12]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+0],    edi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+0+4],  esp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+0+8],  ebp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+0+12], esi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+16]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+16+4]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+16+8]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+16+12]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 555 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+16+8],  ebp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+16+12], esi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+16+8]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+16+12]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+16],    edi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+16+4],  esp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+16+8],  ebp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+16+12], esi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+32]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+32+4]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+32+8]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+32+12]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 555 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+32+8],  ebp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+32+12], esi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+32+8]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+32+12]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+32],    edi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+32+4],  esp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+32+8],  ebp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+32+12], esi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+48]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+48+4]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+48+8]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+48+12]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 555 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+48+8],  ebp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+48+12], esi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    ecx, [SHA3_S+48+8]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    eax, [SHA3_S+48+12]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 555 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+48],    edi
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+48+4],  esp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+48+8],  ebp
-# 0 "" 2
-# 555 "echo32.c" 1
-	mov    [SHA3_S+48+12], esi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+64]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+64+4]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+64+8]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+64+12]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 556 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+64+8],  ebp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+64+12], esi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+64+8]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+64+12]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+64],    edi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+64+4],  esp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+64+8],  ebp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+64+12], esi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+80]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+80+4]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+80+8]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+80+12]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 556 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+80+8],  ebp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+80+12], esi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+80+8]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+80+12]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+80],    edi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+80+4],  esp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+80+8],  ebp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+80+12], esi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+96]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+96+4]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+96+8]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+96+12]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 556 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+96+8],  ebp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+96+12], esi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+96+8]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+96+12]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+96],    edi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+96+4],  esp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+96+8],  ebp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+96+12], esi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+112]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+112+4]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+112+8]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+112+12]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 556 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+112+8],  ebp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+112+12], esi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    ecx, [SHA3_S+112+8]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    eax, [SHA3_S+112+12]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 556 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+112],    edi
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+112+4],  esp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+112+8],  ebp
-# 0 "" 2
-# 556 "echo32.c" 1
-	mov    [SHA3_S+112+12], esi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+128]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+128+4]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+128+8]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+128+12]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 557 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+128+8],  ebp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+128+12], esi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+128+8]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+128+12]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+128],    edi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+128+4],  esp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+128+8],  ebp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+128+12], esi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+144]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+144+4]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+144+8]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+144+12]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 557 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+144+8],  ebp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+144+12], esi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+144+8]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+144+12]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+144],    edi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+144+4],  esp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+144+8],  ebp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+144+12], esi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+160]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+160+4]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+160+8]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+160+12]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 557 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+160+8],  ebp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+160+12], esi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+160+8]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+160+12]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+160],    edi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+160+4],  esp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+160+8],  ebp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+160+12], esi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+176]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+176+4]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+176+8]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+176+12]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 557 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+176+8],  ebp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+176+12], esi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    ecx, [SHA3_S+176+8]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    eax, [SHA3_S+176+12]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 557 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+176],    edi
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+176+4],  esp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+176+8],  ebp
-# 0 "" 2
-# 557 "echo32.c" 1
-	mov    [SHA3_S+176+12], esi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+192]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+192+4]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+192+8]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+192+12]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 558 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+192+8],  ebp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+192+12], esi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+192+8]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+192+12]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+192],    edi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+192+4],  esp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+192+8],  ebp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+192+12], esi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+208]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+208+4]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+208+8]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+208+12]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 558 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+208+8],  ebp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+208+12], esi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+208+8]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+208+12]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+208],    edi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+208+4],  esp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+208+8],  ebp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+208+12], esi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+224]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+224+4]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+224+8]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+224+12]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 558 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+224+8],  ebp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+224+12], esi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+224+8]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+224+12]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+224],    edi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+224+4],  esp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+224+8],  ebp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+224+12], esi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+240]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+240+4]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [SHA3_CNT]  
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+240+8]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+240+12]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [SHA3_CNT+4]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx   edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	addd   [SHA3_CNT],   1
-# 0 "" 2
-# 558 "echo32.c" 1
-	addd   [SHA3_CNT+4], 1
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+240+8],  ebp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+240+12], esi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, edi
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, esp
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    edi, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esp, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    esi, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ebp, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    ecx, [SHA3_S+240+8]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    eax, [SHA3_S+240+12]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*edx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, ch
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ebx]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, ah
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*edx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 16
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    ebp, [Te+8*ebx+3]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    edx, cl
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*edx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	movzx    ebx, al
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esp, [Te+8*ebx+2]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    ecx, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    esi, [Te+8*ecx+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	shr    eax, 8
-# 0 "" 2
-# 558 "echo32.c" 1
-	xor    edi, [Te+8*eax+1]
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+240],    edi
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+240+4],  esp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+240+8],  ebp
-# 0 "" 2
-# 558 "echo32.c" 1
-	mov    [SHA3_S+240+12], esi
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*0]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*5]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*10]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm4, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm4, xmm1
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm5, xmm2
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm5, xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm6, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm6, xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm7, xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm7, xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlw    xmm4, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm4, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlw    xmm5, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm5, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllq    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlq    xmm6, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm6, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0,  [SHA3_S]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm0,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm0,  xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S],   xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*5], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,     xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,     xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,     xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,     xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16], xmm1
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*2]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*10], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm2,      xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm2,      xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*2],  xmm2
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*3]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm3,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm3,  xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*3], xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*4]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*9]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*14]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm4, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm4, xmm1
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm5, xmm2
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm5, xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm6, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm6, xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm7, xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm7, xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlw    xmm4, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm4, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlw    xmm5, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm5, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllq    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlq    xmm6, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm6, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*4]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm0,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm0,  xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*4], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*5]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*9], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*5], xmm1
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*6]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*14], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm2,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm2,  xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*6], xmm2
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*7]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm3,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm3,  xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*7], xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*8]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*13]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*10]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm4, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm4, xmm1
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm5, xmm2
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm5, xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm6, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm6, xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm7, xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm7, xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlw    xmm4, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm4, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlw    xmm5, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm5, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllq    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlq    xmm6, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm6, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*8]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm0,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm0,  xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*8], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*9]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*13], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*9], xmm1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm2,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm2,  xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*10], xmm2
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*11]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm3,      xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm3,      xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*11], xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*12]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*13]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*14]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm4, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm4, xmm1
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm5, xmm2
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm5, xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm6, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm6, xmm3
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm7, xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm7, xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlw    xmm4, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm4, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllw    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlw    xmm5, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm5, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	psllq    xmm0, 1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
-# 0 "" 2
-# 559 "echo32.c" 1
-	psrlq    xmm6, 7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm6, xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*12]
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm0,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm0,  xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*12], xmm0
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm4
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm1,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*13], xmm1
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm2,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm2,  xmm5
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*14], xmm2
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm3,  xmm7
-# 0 "" 2
-# 559 "echo32.c" 1
-	pxor     xmm3,  xmm6
-# 0 "" 2
-# 559 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm3
-# 0 "" 2
-# 560 "echo32.c" 1
-	subd [SHA3_R], 1
-# 0 "" 2
-# 561 "echo32.c" 1
-	jne LABEL_BIG_ROUND_O
-# 0 "" 2
-# 562 "echo32.c" 1
 	jmp END
 # 0 "" 2
-# 564 "echo32.c" 1
-	NO_OVERFLOW2:
+# 534 "echo32.c" 1
+	OVERFLOW:
 # 0 "" 2
-# 565 "echo32.c" 1
-	mov    dword ptr [SHA3_S+264], 0
+# 535 "echo32.c" 1
+	mov    ecx, eax
 # 0 "" 2
-# 567 "echo32.c" 1
+# 536 "echo32.c" 1
+	mov    ebx, edx
+# 0 "" 2
+# 538 "echo32.c" 1
+	add    ecx, 128
+# 0 "" 2
+# 543 "echo32.c" 1
+	adc    ebx, 0
+# 0 "" 2
+# 544 "echo32.c" 1
+	cmp    ebx, edx
+# 0 "" 2
+# 545 "echo32.c" 1
+	je     NO_OVERFLOW2
+# 0 "" 2
+# 547 "echo32.c" 1
 	movaps  xmm0, [SHA3_S]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	movaps  xmm1, [SHA3_S+16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	movaps  xmm2, [SHA3_S+2*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	movaps  xmm3, [SHA3_S+3*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+4*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+4*16+16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+4*16+2*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+4*16+3*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+8*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+8*16+16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+8*16+2*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+8*16+3*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+12*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+12*16+16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+12*16+2*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+12*16+3*16]
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	movaps  [OLDCV],	   xmm0
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	movaps  [OLDCV+16],   xmm1
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	movaps  [OLDCV+2*16], xmm2
 # 0 "" 2
-# 567 "echo32.c" 1
+# 547 "echo32.c" 1
 	movaps  [OLDCV+3*16], xmm3
 # 0 "" 2
-# 572 "echo32.c" 1
+# 552 "echo32.c" 1
 	xor    ebx,ebx
 # 0 "" 2
-# 573 "echo32.c" 1
+# 553 "echo32.c" 1
 	xor    edx,edx
 # 0 "" 2
-# 575 "echo32.c" 1
+# 555 "echo32.c" 1
 	mov    [SHA3_ESP], esp
 # 0 "" 2
-# 577 "echo32.c" 1
-	LABEL_BIG_ROUND_NO2:
+# 556 "echo32.c" 1
+	LABEL_BIG_ROUND_O:
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+0]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+0+4]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+0+8]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+0+12]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 557 "echo32.c" 1
 	mov    [SHA3_S+0+8],  ebp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+0+12], esi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+0+8]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+0+12]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+0],    edi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+0+4],  esp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+0+8],  ebp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+0+12], esi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+16]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+16+4]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+16+8]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+16+12]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 557 "echo32.c" 1
 	mov    [SHA3_S+16+8],  ebp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+16+12], esi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+16+8]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+16+12]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+16],    edi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+16+4],  esp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+16+8],  ebp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+16+12], esi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+32]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+32+4]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+32+8]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+32+12]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 557 "echo32.c" 1
 	mov    [SHA3_S+32+8],  ebp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+32+12], esi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+32+8]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+32+12]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+32],    edi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+32+4],  esp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+32+8],  ebp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+32+12], esi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+48]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+48+4]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+48+8]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+48+12]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 557 "echo32.c" 1
 	mov    [SHA3_S+48+8],  ebp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+48+12], esi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    ecx, [SHA3_S+48+8]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    eax, [SHA3_S+48+12]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+48],    edi
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+48+4],  esp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+48+8],  ebp
 # 0 "" 2
-# 578 "echo32.c" 1
+# 557 "echo32.c" 1
 	mov    [SHA3_S+48+12], esi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+64]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+64+4]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+64+8]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+64+12]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 558 "echo32.c" 1
 	mov    [SHA3_S+64+8],  ebp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+64+12], esi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+64+8]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+64+12]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+64],    edi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+64+4],  esp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+64+8],  ebp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+64+12], esi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+80]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+80+4]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+80+8]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+80+12]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 558 "echo32.c" 1
 	mov    [SHA3_S+80+8],  ebp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+80+12], esi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+80+8]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+80+12]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+80],    edi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+80+4],  esp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+80+8],  ebp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+80+12], esi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+96]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+96+4]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+96+8]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+96+12]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 558 "echo32.c" 1
 	mov    [SHA3_S+96+8],  ebp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+96+12], esi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+96+8]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+96+12]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+96],    edi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+96+4],  esp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+96+8],  ebp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+96+12], esi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+112]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+112+4]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+112+8]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+112+12]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 558 "echo32.c" 1
 	mov    [SHA3_S+112+8],  ebp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+112+12], esi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    ecx, [SHA3_S+112+8]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    eax, [SHA3_S+112+12]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+112],    edi
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+112+4],  esp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+112+8],  ebp
 # 0 "" 2
-# 579 "echo32.c" 1
+# 558 "echo32.c" 1
 	mov    [SHA3_S+112+12], esi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+128]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+128+4]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+128+8]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+128+12]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 559 "echo32.c" 1
 	mov    [SHA3_S+128+8],  ebp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+128+12], esi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+128+8]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+128+12]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+128],    edi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+128+4],  esp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+128+8],  ebp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+128+12], esi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+144]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+144+4]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+144+8]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+144+12]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 559 "echo32.c" 1
 	mov    [SHA3_S+144+8],  ebp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+144+12], esi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+144+8]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+144+12]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+144],    edi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+144+4],  esp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+144+8],  ebp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+144+12], esi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+160]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+160+4]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+160+8]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+160+12]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 559 "echo32.c" 1
 	mov    [SHA3_S+160+8],  ebp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+160+12], esi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+160+8]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+160+12]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+160],    edi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+160+4],  esp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+160+8],  ebp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+160+12], esi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+176]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+176+4]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+176+8]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+176+12]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 559 "echo32.c" 1
 	mov    [SHA3_S+176+8],  ebp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+176+12], esi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    ecx, [SHA3_S+176+8]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    eax, [SHA3_S+176+12]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+176],    edi
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+176+4],  esp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+176+8],  ebp
 # 0 "" 2
-# 580 "echo32.c" 1
+# 559 "echo32.c" 1
 	mov    [SHA3_S+176+12], esi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+192]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+192+4]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+192+8]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+192+12]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 560 "echo32.c" 1
 	mov    [SHA3_S+192+8],  ebp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+192+12], esi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+192+8]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+192+12]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+192],    edi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+192+4],  esp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+192+8],  ebp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+192+12], esi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+208]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+208+4]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+208+8]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+208+12]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 560 "echo32.c" 1
 	mov    [SHA3_S+208+8],  ebp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+208+12], esi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+208+8]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+208+12]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+208],    edi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+208+4],  esp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+208+8],  ebp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+208+12], esi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+224]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+224+4]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [SHA3_CNT]  
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+224+8]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+224+12]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx   edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	addd   [SHA3_CNT],   1
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 560 "echo32.c" 1
 	mov    [SHA3_S+224+8],  ebp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+224+12], esi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, edi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, esp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    edi, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esp, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    esi, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+224+8]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    eax, [SHA3_S+224+12]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*edx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, ch
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ebx]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, ah
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*edx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 16
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*edx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	movzx    ebx, al
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    ecx, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	shr    eax, 8
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+224],    edi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+224+4],  esp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+224+8],  ebp
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    [SHA3_S+224+12], esi
 # 0 "" 2
-# 581 "echo32.c" 1
+# 560 "echo32.c" 1
 	mov    ecx, [SHA3_S+240]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    eax, [SHA3_S+240+4]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    ecx, [SHA3_S+240+8]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    eax, [SHA3_S+240+12]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 560 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 560 "echo32.c" 1
+	addd   [SHA3_CNT+4], 1
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    [SHA3_S+240+8],  ebp
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    [SHA3_S+240+12], esi
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    ecx, [SHA3_S+240+8]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    eax, [SHA3_S+240+12]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 560 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 560 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 560 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    [SHA3_S+240],    edi
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    [SHA3_S+240+4],  esp
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    [SHA3_S+240+8],  ebp
+# 0 "" 2
+# 560 "echo32.c" 1
+	mov    [SHA3_S+240+12], esi
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*0]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*5]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*10]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0,  [SHA3_S]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S],   xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*5], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,     xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,     xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,     xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,     xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16], xmm1
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*2]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*10], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm2,      xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm2,      xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*2],  xmm2
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*3]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*3], xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*4]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*9]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*14]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*4]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*4], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*5]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*9], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*5], xmm1
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*6]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*14], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*6], xmm2
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*7]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*7], xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*8]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*13]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*10]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*8]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*8], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*9]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*13], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*9], xmm1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*10], xmm2
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*11]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm3,      xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm3,      xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*11], xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*12]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*13]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*14]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 561 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*12]
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*12], xmm0
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*13], xmm1
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*14], xmm2
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 561 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 561 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm3
+# 0 "" 2
+# 562 "echo32.c" 1
+	subd [SHA3_R], 1
+# 0 "" 2
+# 563 "echo32.c" 1
+	jne LABEL_BIG_ROUND_O
+# 0 "" 2
+# 564 "echo32.c" 1
+	jmp END
+# 0 "" 2
+# 566 "echo32.c" 1
+	NO_OVERFLOW2:
+# 0 "" 2
+# 567 "echo32.c" 1
+	mov    dword ptr [SHA3_S+264], 0
+# 0 "" 2
+# 569 "echo32.c" 1
+	movaps  xmm0, [SHA3_S]
+# 0 "" 2
+# 569 "echo32.c" 1
+	movaps  xmm1, [SHA3_S+16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	movaps  xmm2, [SHA3_S+2*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	movaps  xmm3, [SHA3_S+3*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm0, [SHA3_S+4*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm1, [SHA3_S+4*16+16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm2, [SHA3_S+4*16+2*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm3, [SHA3_S+4*16+3*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm0, [SHA3_S+8*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm1, [SHA3_S+8*16+16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm2, [SHA3_S+8*16+2*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm3, [SHA3_S+8*16+3*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm0, [SHA3_S+12*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm1, [SHA3_S+12*16+16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm2, [SHA3_S+12*16+2*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	pxor    xmm3, [SHA3_S+12*16+3*16]
+# 0 "" 2
+# 569 "echo32.c" 1
+	movaps  [OLDCV],	   xmm0
+# 0 "" 2
+# 569 "echo32.c" 1
+	movaps  [OLDCV+16],   xmm1
+# 0 "" 2
+# 569 "echo32.c" 1
+	movaps  [OLDCV+2*16], xmm2
+# 0 "" 2
+# 569 "echo32.c" 1
+	movaps  [OLDCV+3*16], xmm3
+# 0 "" 2
+# 574 "echo32.c" 1
+	xor    ebx,ebx
+# 0 "" 2
+# 575 "echo32.c" 1
+	xor    edx,edx
+# 0 "" 2
+# 577 "echo32.c" 1
+	mov    [SHA3_ESP], esp
+# 0 "" 2
+# 579 "echo32.c" 1
+	LABEL_BIG_ROUND_NO2:
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+0]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+0+4]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+0+8]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+0+12]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+0+8],  ebp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+0+12], esi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+0+8]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+0+12]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+0],    edi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+0+4],  esp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+0+8],  ebp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+0+12], esi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+16]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+16+4]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+16+8]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+16+12]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+16+8],  ebp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+16+12], esi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+16+8]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+16+12]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+16],    edi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+16+4],  esp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+16+8],  ebp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+16+12], esi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+32]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+32+4]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+32+8]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+32+12]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+32+8],  ebp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+32+12], esi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+32+8]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+32+12]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+32],    edi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+32+4],  esp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+32+8],  ebp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+32+12], esi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+48]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+48+4]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+48+8]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+48+12]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+48+8],  ebp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+48+12], esi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    ecx, [SHA3_S+48+8]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    eax, [SHA3_S+48+12]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 580 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+48],    edi
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+48+4],  esp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+48+8],  ebp
+# 0 "" 2
+# 580 "echo32.c" 1
+	mov    [SHA3_S+48+12], esi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+64]
 # 0 "" 2
 # 581 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    eax, [SHA3_S+240+4]
+	mov    eax, [SHA3_S+64+4]
 # 0 "" 2
 # 581 "echo32.c" 1
 	movzx    ebx, al
@@ -14216,13 +11279,13 @@ Compress:
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    ecx, [SHA3_S+240+8]
+	mov    ecx, [SHA3_S+64+8]
 # 0 "" 2
 # 581 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    eax, [SHA3_S+240+12]
+	mov    eax, [SHA3_S+64+12]
 # 0 "" 2
 # 581 "echo32.c" 1
 	movzx    ebx, al
@@ -14282,10 +11345,10 @@ Compress:
 	addd   [SHA3_CNT],   1
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    [SHA3_S+240+8],  ebp
+	mov    [SHA3_S+64+8],  ebp
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    [SHA3_S+240+12], esi
+	mov    [SHA3_S+64+12], esi
 # 0 "" 2
 # 581 "echo32.c" 1
 	mov    ecx, edi
@@ -14348,13 +11411,13 @@ Compress:
 	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    ecx, [SHA3_S+240+8]
+	mov    ecx, [SHA3_S+64+8]
 # 0 "" 2
 # 581 "echo32.c" 1
 	movzx    edx, cl
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    eax, [SHA3_S+240+12]
+	mov    eax, [SHA3_S+64+12]
 # 0 "" 2
 # 581 "echo32.c" 1
 	movzx    ebx, al
@@ -14408,729 +11471,3666 @@ Compress:
 	xor    edi, [Te+8*eax+1]
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    [SHA3_S+240],    edi
+	mov    [SHA3_S+64],    edi
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    [SHA3_S+240+4],  esp
+	mov    [SHA3_S+64+4],  esp
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    [SHA3_S+240+8],  ebp
+	mov    [SHA3_S+64+8],  ebp
 # 0 "" 2
 # 581 "echo32.c" 1
-	mov    [SHA3_S+240+12], esi
+	mov    [SHA3_S+64+12], esi
 # 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+80]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+80+4]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+80+8]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+80+12]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+80+8],  ebp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+80+12], esi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+80+8]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+80+12]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+80],    edi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+80+4],  esp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+80+8],  ebp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+80+12], esi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+96]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+96+4]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+96+8]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+96+12]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+96+8],  ebp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+96+12], esi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+96+8]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+96+12]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+96],    edi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+96+4],  esp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+96+8],  ebp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+96+12], esi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+112]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+112+4]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+112+8]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+112+12]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+112+8],  ebp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+112+12], esi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    ecx, [SHA3_S+112+8]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    eax, [SHA3_S+112+12]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 581 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+112],    edi
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+112+4],  esp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+112+8],  ebp
+# 0 "" 2
+# 581 "echo32.c" 1
+	mov    [SHA3_S+112+12], esi
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ecx, [SHA3_S+128]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    eax, [SHA3_S+128+4]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ecx, [SHA3_S+128+8]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    eax, [SHA3_S+128+12]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    [SHA3_S+128+8],  ebp
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    [SHA3_S+128+12], esi
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ecx, [SHA3_S+128+8]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    eax, [SHA3_S+128+12]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    [SHA3_S+128],    edi
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    [SHA3_S+128+4],  esp
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    [SHA3_S+128+8],  ebp
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    [SHA3_S+128+12], esi
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ecx, [SHA3_S+144]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    eax, [SHA3_S+144+4]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ecx, [SHA3_S+144+8]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    eax, [SHA3_S+144+12]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 582 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    [SHA3_S+144+8],  ebp
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    [SHA3_S+144+12], esi
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 582 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 582 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 582 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*0]
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*5]
+	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*10]
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
+	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm4, xmm0
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm4, xmm1
+	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm5, xmm2
+	mov    ecx, [SHA3_S+144+8]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm5, xmm3
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm6, xmm0
+	mov    eax, [SHA3_S+144+12]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm6, xmm3
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm7, xmm4
+	xor    ebp, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm7, xmm5
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm4
+	xor    esi, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllw    xmm0, 1
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	xor    esp, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlw    xmm4, 7
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
+	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm4, xmm0
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm5
+	xor    edi, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllw    xmm0, 1
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlw    xmm5, 7
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
+	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm5, xmm0
+	xor    edi, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm6
+	mov    [SHA3_S+144],    edi
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllq    xmm0, 1
+	mov    [SHA3_S+144+4],  esp
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	mov    [SHA3_S+144+8],  ebp
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlq    xmm6, 7
+	mov    [SHA3_S+144+12], esi
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
+	mov    ecx, [SHA3_S+160]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm6, xmm0
+	mov    eax, [SHA3_S+160+4]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0,  [SHA3_S]
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm0,  xmm7
+	mov    edi, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm0,  xmm4
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S],   xmm0
+	mov    esp, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16]
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*5], xmm0
+	mov    esi, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,     xmm4
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,     xmm5
+	xor    edi, [SHA3_CNT]  
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,     xmm6
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,     xmm7
+	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16], xmm1
+	movzx   edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*2]
+	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*10], xmm0
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm2,      xmm7
+	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm2,      xmm5
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*2],  xmm2
+	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*3]
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
+	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm3,  xmm7
+	mov    ecx, [SHA3_S+160+8]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm3,  xmm6
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*3], xmm3
+	mov    eax, [SHA3_S+160+12]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*4]
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*9]
+	xor    ebp, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*14]
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
+	xor    esi, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm4, xmm0
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm4, xmm1
+	xor    esp, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm5, xmm2
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm5, xmm3
+	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm6, xmm0
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm6, xmm3
+	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm7, xmm4
+	movzx   edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm7, xmm5
+	xor    edi, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm4
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllw    xmm0, 1
+	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlw    xmm4, 7
+	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
+	xor    edi, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm4, xmm0
+	addd   [SHA3_CNT],   1
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm5
+	mov    [SHA3_S+160+8],  ebp
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllw    xmm0, 1
+	mov    [SHA3_S+160+12], esi
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	mov    ecx, edi
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlw    xmm5, 7
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
+	mov    eax, esp
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm5, xmm0
+	mov    edi, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm6
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllq    xmm0, 1
+	mov    esp, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlq    xmm6, 7
+	mov    esi, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm6, xmm0
+	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*4]
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm0,  xmm7
+	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm0,  xmm4
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*4], xmm0
+	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*5]
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*9], xmm0
+	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm4
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm5
+	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm6
+	mov    ecx, [SHA3_S+160+8]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm7
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*5], xmm1
+	mov    eax, [SHA3_S+160+12]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*6]
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*14], xmm0
+	xor    ebp, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm2,  xmm7
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm2,  xmm5
+	xor    esi, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*6], xmm2
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*7]
+	xor    esp, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm3,  xmm7
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm3,  xmm6
+	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*7], xmm3
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*8]
+	xor    edi, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*13]
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*10]
+	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm4, xmm0
+	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm4, xmm1
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm5, xmm2
+	xor    edi, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm5, xmm3
+	mov    [SHA3_S+160],    edi
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm6, xmm0
+	mov    [SHA3_S+160+4],  esp
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm6, xmm3
+	mov    [SHA3_S+160+8],  ebp
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm7, xmm4
+	mov    [SHA3_S+160+12], esi
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm7, xmm5
+	mov    ecx, [SHA3_S+176]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm4
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllw    xmm0, 1
+	mov    eax, [SHA3_S+176+4]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlw    xmm4, 7
+	mov    edi, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
+	mov    esp, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm4, xmm0
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm5
+	mov    esi, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllw    xmm0, 1
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	xor    edi, [SHA3_CNT]  
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlw    xmm5, 7
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
+	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
+	movzx   edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm5, xmm0
+	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm6
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllq    xmm0, 1
+	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlq    xmm6, 7
+	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
+	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm6, xmm0
+	mov    ecx, [SHA3_S+176+8]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*8]
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm0,  xmm7
+	mov    eax, [SHA3_S+176+12]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm0,  xmm4
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*8], xmm0
+	xor    ebp, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*9]
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*13], xmm0
+	xor    esi, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm4
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm5
+	xor    esp, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm6
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm7
+	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*9], xmm1
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm2,  xmm7
+	xor    esp, [SHA3_CNT+4]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm2,  xmm5
+	movzx   edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*10], xmm2
+	xor    edi, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*11]
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm0
+	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm3,      xmm7
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm3,      xmm6
+	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*11], xmm3
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*12]
+	xor    edi, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm1, [SHA3_S+16*13]
+	addd   [SHA3_CNT],   1
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm2, [SHA3_S+16*14]
+	mov    [SHA3_S+176+8],  ebp
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm3, [SHA3_S+16*15]
+	mov    [SHA3_S+176+12], esi
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm4, xmm0
+	mov    ecx, edi
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm4, xmm1
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm5, xmm2
+	mov    eax, esp
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm5, xmm3
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm6, xmm0
+	mov    edi, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm6, xmm3
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm7, xmm4
+	mov    esp, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm7, xmm5
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm4
+	mov    esi, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllw    xmm0, 1
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlw    xmm4, 7
+	xor    edi, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm4, [MEM_CST+16]
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm4, [MEM_CST+32]
+	mov    ebp, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm4, xmm0
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm5
+	xor    esi, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllw    xmm0, 1
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	xor    esp, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlw    xmm5, 7
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm5, [MEM_CST+16]
+	xor    ebp, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm5, [MEM_CST+32]
+	mov    ecx, [SHA3_S+176+8]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm5, xmm0
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, xmm6
+	mov    eax, [SHA3_S+176+12]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psllq    xmm0, 1
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm0, [MEM_CST]
+	xor    ebp, [Te+8*edx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	psrlq    xmm6, 7
+	movzx    edx, ch
 # 0 "" 2
 # 582 "echo32.c" 1
-	pand     xmm6, [MEM_CST+16]
+	xor    esi, [Te+8*ebx]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pmullw   xmm6, [MEM_CST+32]
+	movzx    ebx, ah
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm6, xmm0
+	xor    esp, [Te+8*edx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   xmm0, [SHA3_S+16*12]
+	shr    ecx, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm0,  xmm7
+	shr    eax, 16
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm0,  xmm4
+	xor    ebp, [Te+8*ebx+3]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*12], xmm0
+	movzx    edx, cl
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm4
+	xor    edi, [Te+8*edx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm5
+	movzx    ebx, al
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm6
+	xor    esp, [Te+8*ebx+2]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm1,  xmm7
+	shr    ecx, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*13], xmm1
+	xor    esi, [Te+8*ecx+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm2,  xmm7
+	shr    eax, 8
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm2,  xmm5
+	xor    edi, [Te+8*eax+1]
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*14], xmm2
+	mov    [SHA3_S+176],    edi
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm3,  xmm7
+	mov    [SHA3_S+176+4],  esp
 # 0 "" 2
 # 582 "echo32.c" 1
-	pxor     xmm3,  xmm6
+	mov    [SHA3_S+176+8],  ebp
 # 0 "" 2
 # 582 "echo32.c" 1
-	movaps   [SHA3_S+16*15], xmm3
+	mov    [SHA3_S+176+12], esi
 # 0 "" 2
 # 583 "echo32.c" 1
-	subd [SHA3_R], 1
+	mov    ecx, [SHA3_S+192]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+192+4]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+192+8]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+192+12]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+192+8],  ebp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+192+12], esi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+192+8]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+192+12]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+192],    edi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+192+4],  esp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+192+8],  ebp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+192+12], esi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+208]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+208+4]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+208+8]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+208+12]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+208+8],  ebp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+208+12], esi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+208+8]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+208+12]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+208],    edi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+208+4],  esp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+208+8],  ebp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+208+12], esi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+224]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+224+4]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+224+8]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+224+12]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+224+8],  ebp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+224+12], esi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+224+8]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+224+12]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+224],    edi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+224+4],  esp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+224+8],  ebp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+224+12], esi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+240]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+240+4]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [SHA3_CNT]  
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+240+8]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+240+12]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [SHA3_CNT+4]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx   edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	addd   [SHA3_CNT],   1
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+240+8],  ebp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+240+12], esi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, edi
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, esp
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    edi, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esp, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    esi, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ebp, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    ecx, [SHA3_S+240+8]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    eax, [SHA3_S+240+12]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*edx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, ch
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ebx]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, ah
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*edx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 16
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    ebp, [Te+8*ebx+3]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    edx, cl
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*edx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	movzx    ebx, al
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esp, [Te+8*ebx+2]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    ecx, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    esi, [Te+8*ecx+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	shr    eax, 8
+# 0 "" 2
+# 583 "echo32.c" 1
+	xor    edi, [Te+8*eax+1]
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+240],    edi
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+240+4],  esp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+240+8],  ebp
+# 0 "" 2
+# 583 "echo32.c" 1
+	mov    [SHA3_S+240+12], esi
 # 0 "" 2
 # 584 "echo32.c" 1
-	jne LABEL_BIG_ROUND_NO2
+	movaps   xmm0, [SHA3_S+16*0]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*5]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*10]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0,  [SHA3_S]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S],   xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*5], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,     xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,     xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,     xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,     xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16], xmm1
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*2]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*10], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm2,      xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm2,      xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*2],  xmm2
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*3]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*3], xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*4]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*9]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*14]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*4]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*4], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*5]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*9], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*5], xmm1
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*6]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*14], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*6], xmm2
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*7]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*7], xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*8]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*13]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*10]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*8]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*8], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*9]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*13], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*9], xmm1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*10], xmm2
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*11]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm3,      xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm3,      xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*11], xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*12]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm1, [SHA3_S+16*13]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm2, [SHA3_S+16*14]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm3, [SHA3_S+16*15]
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm4, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm4, xmm1
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm5, xmm2
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm5, xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm6, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm6, xmm3
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm7, xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm7, xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlw    xmm4, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm4, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm4, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm4, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllw    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlw    xmm5, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm5, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm5, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm5, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	psllq    xmm0, 1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm0, [MEM_CST]
+# 0 "" 2
+# 584 "echo32.c" 1
+	psrlq    xmm6, 7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pand     xmm6, [MEM_CST+16]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pmullw   xmm6, [MEM_CST+32]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm6, xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   xmm0, [SHA3_S+16*12]
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm0,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm0,  xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*12], xmm0
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm4
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm1,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*13], xmm1
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm2,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm2,  xmm5
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*14], xmm2
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm3,  xmm7
+# 0 "" 2
+# 584 "echo32.c" 1
+	pxor     xmm3,  xmm6
+# 0 "" 2
+# 584 "echo32.c" 1
+	movaps   [SHA3_S+16*15], xmm3
+# 0 "" 2
+# 585 "echo32.c" 1
+	subd [SHA3_R], 1
 # 0 "" 2
 # 586 "echo32.c" 1
+	jne LABEL_BIG_ROUND_NO2
+# 0 "" 2
+# 588 "echo32.c" 1
 	END:
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	movaps  xmm0, [OLDCV]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	movaps  xmm1, [OLDCV+16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	movaps  xmm2, [OLDCV+2*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	movaps  xmm3, [OLDCV+3*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm0, [SHA3_S]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+1*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+2*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+3*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+4*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+5*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+6*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+7*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+8*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+9*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+10*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+11*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm0, [SHA3_S+12*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm1, [SHA3_S+13*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm2, [SHA3_S+14*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	pxor    xmm3, [SHA3_S+15*16]
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	movaps  [SHA3_S]     , xmm0
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	movaps  [SHA3_S+1*16], xmm1
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	movaps  [SHA3_S+2*16], xmm2
 # 0 "" 2
-# 588 "echo32.c" 1
+# 590 "echo32.c" 1
 	movaps  [SHA3_S+3*16], xmm3
 # 0 "" 2
-# 594 "echo32.c" 1
+# 596 "echo32.c" 1
 	mov    esp, [SHA3_ESP]
 # 0 "" 2
-# 595 "echo32.c" 1
+# 597 "echo32.c" 1
 	popa
 # 0 "" 2
-# 596 "echo32.c" 1
+# 598 "echo32.c" 1
 	.att_syntax noprefix
 # 0 "" 2
 #NO_APP
@@ -15141,64 +15141,67 @@ Compress:
 .globl Init
 	.type	Init, @function
 Init:
+	movl	SHA3_S+276, %edx
 	pushl	%ebp
 	movl	%esp, %ebp
+	pushl	%edi
+	movl	8(%ebp), %edi
 	pushl	%esi
+	testl	%edx, %edx
 	movl	12(%ebp), %esi
 	pushl	%ebx
-	movl	SHA3_S+276, %ebx
-	testl	%ebx, %ebx
 	je	.L4
-	cmpl	$SHA3_S+16, %ebx
-	leal	16(%ebx), %edx
+	cmpl	%edi, %edx
+	je	.L4
+	cmpl	$SHA3_S+16, %edx
+	leal	16(%edx), %ecx
 	jbe	.L25
 .L18:
 	movdqa	SHA3_S, %xmm0
-	movdqa	%xmm0, (%ebx)
+	movdqa	%xmm0, (%edx)
 	movdqa	SHA3_S+16, %xmm0
-	movdqa	%xmm0, 16(%ebx)
-	movdqa	SHA3_S+32, %xmm0
 	movdqa	%xmm0, 16(%edx)
+	movdqa	SHA3_S+32, %xmm0
+	movdqa	%xmm0, 16(%ecx)
 	movdqa	SHA3_S+48, %xmm0
-	movdqa	%xmm0, 32(%edx)
+	movdqa	%xmm0, 32(%ecx)
 	movdqa	SHA3_S+64, %xmm0
-	movdqa	%xmm0, 48(%edx)
+	movdqa	%xmm0, 48(%ecx)
 	movdqa	SHA3_S+80, %xmm0
-	movdqa	%xmm0, 64(%edx)
+	movdqa	%xmm0, 64(%ecx)
 	movdqa	SHA3_S+96, %xmm0
-	movdqa	%xmm0, 80(%edx)
+	movdqa	%xmm0, 80(%ecx)
 	movdqa	SHA3_S+112, %xmm0
-	movdqa	%xmm0, 96(%edx)
+	movdqa	%xmm0, 96(%ecx)
 	movdqa	SHA3_S+128, %xmm0
-	movdqa	%xmm0, 112(%edx)
+	movdqa	%xmm0, 112(%ecx)
 	movdqa	SHA3_S+144, %xmm0
-	movdqa	%xmm0, 128(%edx)
+	movdqa	%xmm0, 128(%ecx)
 	movdqa	SHA3_S+160, %xmm0
-	movdqa	%xmm0, 144(%edx)
+	movdqa	%xmm0, 144(%ecx)
 	movdqa	SHA3_S+176, %xmm0
-	movdqa	%xmm0, 160(%edx)
+	movdqa	%xmm0, 160(%ecx)
 	movdqa	SHA3_S+192, %xmm0
-	movdqa	%xmm0, 176(%edx)
+	movdqa	%xmm0, 176(%ecx)
 	movdqa	SHA3_S+208, %xmm0
-	movdqa	%xmm0, 192(%edx)
+	movdqa	%xmm0, 192(%ecx)
 	movdqa	SHA3_S+224, %xmm0
-	movdqa	%xmm0, 208(%edx)
+	movdqa	%xmm0, 208(%ecx)
 	movdqa	SHA3_S+240, %xmm0
-	movdqa	%xmm0, 224(%edx)
+	movdqa	%xmm0, 224(%ecx)
 	movdqa	SHA3_S+256, %xmm0
-	movdqa	%xmm0, 240(%edx)
-	movl	SHA3_S+272, %eax
-	movl	SHA3_S+276, %edx
-	movl	%eax, 272(%ebx)
-	movl	%edx, 276(%ebx)
+	movdqa	%xmm0, 240(%ecx)
+	movl	SHA3_S+272, %ecx
+	movl	SHA3_S+276, %ebx
+	movl	%ecx, 272(%edx)
+	movl	%ebx, 276(%edx)
 .L4:
-	movl	8(%ebp), %eax
 	leal	-160(%esi), %edx
+	movl	$2, %eax
 	cmpl	$352, %edx
+	movl	%edi, SHA3_S+276
 	movl	$-16843010, MEM_CST
 	movl	$-16843010, MEM_CST+4
-	movl	%eax, SHA3_S+276
-	movl	$2, %eax
 	movl	$-16843010, MEM_CST+8
 	movl	$-16843010, MEM_CST+12
 	movl	$16843009, MEM_CST+16
@@ -15263,21 +15266,22 @@ Init:
 .L9:
 	popl	%ebx
 	popl	%esi
+	popl	%edi
 	popl	%ebp
 	ret
 	.p2align 4,,7
 	.p2align 3
 .L25:
 	xorl	%eax, %eax
-	cmpl	$SHA3_S, %edx
+	cmpl	$SHA3_S, %ecx
 	jb	.L18
 	.p2align 4,,7
 	.p2align 3
 .L19:
-	movl	SHA3_S(,%eax,8), %edx
-	movl	SHA3_S+4(,%eax,8), %ecx
-	movl	%edx, (%ebx,%eax,8)
-	movl	%ecx, 4(%ebx,%eax,8)
+	movl	SHA3_S(,%eax,8), %ecx
+	movl	SHA3_S+4(,%eax,8), %ebx
+	movl	%ecx, (%edx,%eax,8)
+	movl	%ebx, 4(%edx,%eax,8)
 	addl	$1, %eax
 	cmpl	$35, %eax
 	jne	.L19
@@ -16082,8 +16086,9 @@ Final:
 	cmpl	%eax, %ecx
 	ja	.L132
 .L131:
-	addl	$28, %esp
+	movl	$0, SHA3_S+276
 	xorl	%eax, %eax
+	addl	$28, %esp
 	popl	%ebx
 	popl	%esi
 	popl	%edi
@@ -16150,18 +16155,21 @@ T.41:
 	pushl	%ebp
 	movl	%esp, %ebp
 	pushl	%edi
+	movl	%ecx, %edi
 	pushl	%esi
-	movl	%ecx, %esi
+	movl	%edx, %esi
 	pushl	%ebx
-	movl	%edx, %ebx
 	subl	$332, %esp
 	movl	SHA3_S+276, %ecx
 	movl	%eax, -316(%ebp)
+	leal	-312(%ebp), %ebx
 	testl	%ecx, %ecx
+	je	.L149
+	cmpl	%ebx, %ecx
 	je	.L149
 	cmpl	$SHA3_S+16, %ecx
 	leal	16(%ecx), %edx
-	jbe	.L157
+	jbe	.L158
 .L155:
 	movdqa	SHA3_S, %xmm0
 	movdqa	%xmm0, (%ecx)
@@ -16202,13 +16210,13 @@ T.41:
 	movl	%eax, 272(%ecx)
 	movl	%edx, 276(%ecx)
 .L149:
-	leal	-312(%ebp), %edi
 	movdqa	.LC0, %xmm0
+	movl	%ebx, SHA3_S+276
 	movdqa	%xmm0, SHA3_S
 	movdqa	%xmm0, SHA3_S+16
 	movdqa	%xmm0, SHA3_S+32
 	movdqa	%xmm0, SHA3_S+48
-	movl	%edi, SHA3_S+276
+	movl	$-16843010, MEM_CST
 	pxor	%xmm0, %xmm0
 	movdqa	%xmm0, SHA3_S+64
 	movdqa	%xmm0, SHA3_S+80
@@ -16219,7 +16227,6 @@ T.41:
 	movdqa	%xmm0, SHA3_S+160
 	movdqa	%xmm0, SHA3_S+176
 	movdqa	%xmm0, SHA3_S+192
-	movl	$-16843010, MEM_CST
 	movl	$-16843010, MEM_CST+4
 	movl	$-16843010, MEM_CST+8
 	movl	$-16843010, MEM_CST+12
@@ -16239,48 +16246,48 @@ T.41:
 	movl	$4, SHA3_S+272
 	movdqa	%xmm0, SHA3_S+208
 	movdqa	%xmm0, SHA3_S+224
-	movl	%ebx, 8(%esp)
+	movl	%esi, 8(%esp)
 	movdqa	%xmm0, SHA3_S+240
-	movl	%esi, 12(%esp)
-	movl	-316(%ebp), %esi
+	movl	%edi, 12(%esp)
+	movl	-316(%ebp), %edi
 	movl	$0, SHA3_S+256
 	movl	$0, SHA3_S+260
 	movl	$0, SHA3_S+264
-	movl	%esi, 4(%esp)
-	movl	%edi, (%esp)
+	movl	%edi, 4(%esp)
+	movl	%ebx, (%esp)
 	call	Update
 	testl	%eax, %eax
-	je	.L158
+	je	.L159
 	addl	$332, %esp
 	popl	%ebx
 	popl	%esi
 	popl	%edi
 	popl	%ebp
 	ret
-.L157:
+.L158:
 	cmpl	$SHA3_S, %edx
 	jb	.L155
 	movl	-316(%ebp), %eax
 	xorl	%edx, %edx
-	movl	%ebx, -328(%ebp)
-	movl	%esi, -324(%ebp)
+	movl	%esi, -328(%ebp)
+	movl	%edi, -324(%ebp)
 .L152:
-	movl	SHA3_S(,%edx,8), %ebx
-	movl	SHA3_S+4(,%edx,8), %esi
-	movl	%ebx, (%ecx,%edx,8)
-	movl	%esi, 4(%ecx,%edx,8)
+	movl	SHA3_S(,%edx,8), %esi
+	movl	SHA3_S+4(,%edx,8), %edi
+	movl	%esi, (%ecx,%edx,8)
+	movl	%edi, 4(%ecx,%edx,8)
 	addl	$1, %edx
 	cmpl	$35, %edx
 	jne	.L152
 	movl	%eax, -316(%ebp)
-	movl	-328(%ebp), %ebx
-	movl	-324(%ebp), %esi
+	movl	-328(%ebp), %esi
+	movl	-324(%ebp), %edi
 	jmp	.L149
 	.p2align 4,,7
 	.p2align 3
-.L158:
+.L159:
 	movl	8(%ebp), %eax
-	movl	%edi, (%esp)
+	movl	%ebx, (%esp)
 	movl	%eax, 4(%esp)
 	call	Final
 	addl	$332, %esp
@@ -16321,63 +16328,61 @@ Hash:
 	pushl	%esi
 	pushl	%ebx
 	subl	$332, %esp
-	movl	SHA3_S+276, %ebx
-	movl	16(%ebp), %eax
 	movl	20(%ebp), %edx
-	movl	8(%ebp), %esi
-	testl	%ebx, %ebx
-	movl	%eax, -320(%ebp)
-	movl	%edx, -316(%ebp)
-	je	.L164
-	cmpl	$SHA3_S+16, %ebx
-	leal	16(%ebx), %edx
-	jbe	.L185
-.L178:
-	movdqa	SHA3_S, %xmm0
-	movdqa	%xmm0, (%ebx)
-	movdqa	SHA3_S+16, %xmm0
-	movdqa	%xmm0, 16(%ebx)
-	movdqa	SHA3_S+32, %xmm0
-	movdqa	%xmm0, 16(%edx)
-	movdqa	SHA3_S+48, %xmm0
-	movdqa	%xmm0, 32(%edx)
-	movdqa	SHA3_S+64, %xmm0
-	movdqa	%xmm0, 48(%edx)
-	movdqa	SHA3_S+80, %xmm0
-	movdqa	%xmm0, 64(%edx)
-	movdqa	SHA3_S+96, %xmm0
-	movdqa	%xmm0, 80(%edx)
-	movdqa	SHA3_S+112, %xmm0
-	movdqa	%xmm0, 96(%edx)
-	movdqa	SHA3_S+128, %xmm0
-	movdqa	%xmm0, 112(%edx)
-	movdqa	SHA3_S+144, %xmm0
-	movdqa	%xmm0, 128(%edx)
-	movdqa	SHA3_S+160, %xmm0
-	movdqa	%xmm0, 144(%edx)
-	movdqa	SHA3_S+176, %xmm0
-	movdqa	%xmm0, 160(%edx)
-	movdqa	SHA3_S+192, %xmm0
-	movdqa	%xmm0, 176(%edx)
-	movdqa	SHA3_S+208, %xmm0
-	movdqa	%xmm0, 192(%edx)
-	movdqa	SHA3_S+224, %xmm0
-	movdqa	%xmm0, 208(%edx)
-	movdqa	SHA3_S+240, %xmm0
-	movdqa	%xmm0, 224(%edx)
-	movdqa	SHA3_S+256, %xmm0
-	movdqa	%xmm0, 240(%edx)
-	movl	SHA3_S+272, %eax
-	movl	SHA3_S+276, %edx
-	movl	%eax, 272(%ebx)
-	movl	%edx, 276(%ebx)
-.L164:
-	leal	-160(%esi), %edx
-	movl	$2, %eax
+	movl	16(%ebp), %eax
 	leal	-312(%ebp), %ebx
-	cmpl	$352, %edx
-	movl	%ebx, SHA3_S+276
+	movl	%edx, -316(%ebp)
+	movl	SHA3_S+276, %edx
+	movl	%eax, -320(%ebp)
+	testl	%edx, %edx
+	je	.L165
+	cmpl	%ebx, %edx
+	je	.L165
+	cmpl	$SHA3_S+16, %edx
+	leal	16(%edx), %ecx
+	jbe	.L187
+.L179:
+	movdqa	SHA3_S, %xmm0
+	movdqa	%xmm0, (%edx)
+	movdqa	SHA3_S+16, %xmm0
+	movdqa	%xmm0, 16(%edx)
+	movdqa	SHA3_S+32, %xmm0
+	movdqa	%xmm0, 16(%ecx)
+	movdqa	SHA3_S+48, %xmm0
+	movdqa	%xmm0, 32(%ecx)
+	movdqa	SHA3_S+64, %xmm0
+	movdqa	%xmm0, 48(%ecx)
+	movdqa	SHA3_S+80, %xmm0
+	movdqa	%xmm0, 64(%ecx)
+	movdqa	SHA3_S+96, %xmm0
+	movdqa	%xmm0, 80(%ecx)
+	movdqa	SHA3_S+112, %xmm0
+	movdqa	%xmm0, 96(%ecx)
+	movdqa	SHA3_S+128, %xmm0
+	movdqa	%xmm0, 112(%ecx)
+	movdqa	SHA3_S+144, %xmm0
+	movdqa	%xmm0, 128(%ecx)
+	movdqa	SHA3_S+160, %xmm0
+	movdqa	%xmm0, 144(%ecx)
+	movdqa	SHA3_S+176, %xmm0
+	movdqa	%xmm0, 160(%ecx)
+	movdqa	SHA3_S+192, %xmm0
+	movdqa	%xmm0, 176(%ecx)
+	movdqa	SHA3_S+208, %xmm0
+	movdqa	%xmm0, 192(%ecx)
+	movdqa	SHA3_S+224, %xmm0
+	movdqa	%xmm0, 208(%ecx)
+	movdqa	SHA3_S+240, %xmm0
+	movdqa	%xmm0, 224(%ecx)
+	movdqa	SHA3_S+256, %xmm0
+	movdqa	%xmm0, 240(%ecx)
+	movl	SHA3_S+272, %esi
+	movl	SHA3_S+276, %edi
+	movl	%esi, 272(%edx)
+	movl	%edi, 276(%edx)
+.L165:
 	movl	$-16843010, MEM_CST
+	movl	$2, %eax
 	movl	$-16843010, MEM_CST+4
 	movl	$-16843010, MEM_CST+8
 	movl	$-16843010, MEM_CST+12
@@ -16393,20 +16398,27 @@ Hash:
 	movl	$0, MEM_CST+52
 	movl	$0, MEM_CST+56
 	movl	$0, MEM_CST+60
-	ja	.L169
+	movl	8(%ebp), %edx
+	movl	%ebx, SHA3_S+276
+	subl	$160, %edx
+	cmpl	$352, %edx
+	ja	.L170
+	movl	8(%ebp), %edi
 	xorl	%ecx, %ecx
-	cmpl	$257, %esi
-	setge	%cl
-	movl	%esi, %edi
-	leal	4(,%ecx,4), %ecx
 	movl	$SHA3_S, %eax
-	movl	%esi, SHA3_S+268
-	sarl	$31, %edi
+	cmpl	$257, %edi
+	movl	%edi, %edx
+	setge	%cl
+	movl	%edi, %esi
+	sarl	$31, %edx
+	leal	4(,%ecx,4), %ecx
+	movl	%edi, SHA3_S+268
+	movl	%edx, %edi
 	xorl	%edx, %edx
 	movl	%ecx, SHA3_S+272
 	.p2align 4,,7
 	.p2align 3
-.L171:
+.L172:
 	addl	$1, %edx
 	movl	%esi, (%eax)
 	movl	%edi, 4(%eax)
@@ -16414,42 +16426,42 @@ Hash:
 	movl	$0, 12(%eax)
 	addl	$16, %eax
 	cmpl	%ecx, %edx
-	jl	.L171
+	jl	.L172
 	cmpl	$15, %ecx
-	jg	.L173
+	jg	.L174
 	movl	%ecx, %esi
 	notl	%esi
 	addl	$17, %esi
 	cmpl	$1, %esi
-	ja	.L186
-.L174:
+	ja	.L188
+.L175:
 	sall	$4, %ecx
 	addl	$SHA3_S, %ecx
 	.p2align 4,,7
 	.p2align 3
-.L176:
+.L177:
 	movl	$0, (%ecx)
 	movl	$0, 4(%ecx)
 	movl	$0, 8(%ecx)
 	movl	$0, 12(%ecx)
 	addl	$16, %ecx
 	cmpl	$SHA3_S+256, %ecx
-	jne	.L176
-.L173:
-	movl	-320(%ebp), %eax
-	movl	-316(%ebp), %edx
+	jne	.L177
+.L174:
+	movl	-320(%ebp), %esi
+	movl	-316(%ebp), %edi
 	movl	$0, SHA3_S+256
 	movl	$0, SHA3_S+260
-	movl	%eax, 8(%esp)
-	movl	%edx, 12(%esp)
+	movl	%esi, 8(%esp)
+	movl	%edi, 12(%esp)
 	movl	12(%ebp), %eax
 	movl	$0, SHA3_S+264
 	movl	%ebx, (%esp)
 	movl	%eax, 4(%esp)
 	call	Update
 	testl	%eax, %eax
-	je	.L187
-.L169:
+	je	.L189
+.L170:
 	addl	$332, %esp
 	popl	%ebx
 	popl	%esi
@@ -16458,43 +16470,46 @@ Hash:
 	ret
 	.p2align 4,,7
 	.p2align 3
-.L185:
+.L187:
 	xorl	%eax, %eax
-	cmpl	$SHA3_S, %edx
-	jb	.L178
+	cmpl	$SHA3_S, %ecx
+	jb	.L179
+	movl	8(%ebp), %esi
+	movl	%edx, %edi
 	.p2align 4,,7
 	.p2align 3
-.L179:
+.L181:
 	movl	SHA3_S(,%eax,8), %edx
 	movl	SHA3_S+4(,%eax,8), %ecx
-	movl	%edx, (%ebx,%eax,8)
-	movl	%ecx, 4(%ebx,%eax,8)
+	movl	%edx, (%edi,%eax,8)
+	movl	%ecx, 4(%edi,%eax,8)
 	addl	$1, %eax
 	cmpl	$35, %eax
-	jne	.L179
-	jmp	.L164
+	jne	.L181
+	movl	%esi, 8(%ebp)
+	jmp	.L165
 	.p2align 4,,7
 	.p2align 3
-.L186:
+.L188:
 	testl	%esi, %esi
-	je	.L174
+	je	.L175
 	sall	$4, %ecx
 	xorl	%eax, %eax
 	pxor	%xmm0, %xmm0
 	addl	$SHA3_S, %ecx
 	.p2align 4,,7
 	.p2align 3
-.L175:
+.L176:
 	movl	%eax, %edx
 	addl	$1, %eax
 	sall	$4, %edx
 	cmpl	%eax, %esi
 	movdqa	%xmm0, (%ecx,%edx)
-	ja	.L175
-	jmp	.L173
+	ja	.L176
+	jmp	.L174
 	.p2align 4,,7
 	.p2align 3
-.L187:
+.L189:
 	movl	24(%ebp), %eax
 	movl	%ebx, (%esp)
 	movl	%eax, 4(%esp)
@@ -17024,12 +17039,12 @@ Te:
 	.long	-692339859
 	.long	974525996
 	.long	974525996
-	.comm	SHA3_S,280,32
 	.comm	OLDCV,64,32
 	.comm	MEM_CST,64,32
 	.comm	SHA3_CNT,8,8
 	.comm	SHA3_ESP,4,4
 	.comm	SHA3_R,4,4
+	.comm	SHA3_S,280,32
 	.section	.rodata.cst16,"aM",@progbits,16
 	.align 16
 .LC0:
@@ -17037,5 +17052,5 @@ Te:
 	.long	0
 	.long	0
 	.long	0
-	.ident	"GCC: (Debian 4.4.0-10) 4.4.0"
+	.ident	"GCC: (Debian 4.4.1-1) 4.4.1"
 	.section	.note.GNU-stack,"",@progbits

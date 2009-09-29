@@ -2,7 +2,7 @@
 /* Implementation of the ECHO hash function in its 512-bit outputs variant.  */
 /* Optimized for Pentium MMX, PII, PIII, amd K7                              */
 /*                                                                           */
-/* Date:     2009-07-03                                                      */
+/* Date:     02 Jul 2009                                                     */
 /*                                                                           */
 /* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       */
 /*           Olivier Billet  <billet@eurecom.fr>                             */
