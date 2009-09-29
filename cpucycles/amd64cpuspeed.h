@@ -1,5 +1,5 @@
 /*
-cpucycles amd64cpuspeed.h version 20090531
+cpucycles amd64cpuspeed.h version 20090716
 Matthew Dempsky
 Public domain.
 */

@@ -1,5 +1,5 @@
 /*
-cpucycles x86cpuspeed.h version 20090531
+cpucycles x86cpuspeed.h version 20090716
 Matthew Dempsky
 Public domain.
 */

@@ -20,5 +20,5 @@ long long cpucycles_x86cpuspeed_persecond(void)
   size = sizeof val;
   if (sysctl(oid,2,&val,&size,0,0) == -1) return 0;
   if (size != sizeof val) return 0;
-  return val * 1000000;
+  return val * 1000000LL;
 }
