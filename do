@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20090715
+version=20091009
 # D. J. Bernstein
 # Public domain.
 
@@ -86,6 +86,13 @@ mkdir -p "$work"
 cp -pr inttypes/* "$work"
 ( cd "$work" && sh do )
 cp -pr "$work"/include/* "$include"
+
+echo "=== `date` === building killafter"
+rm -rf "$work"
+mkdir -p "$work"
+cp -pr killafter/* "$work"
+( cd "$work" && sh do )
+cp -p "$work"/bin/* "$bin"
 
 echo "=== `date` === building cpucycles"
 rm -rf "$work"
@@ -312,6 +319,7 @@ do
 	    okar-$abi cr "$op.a" *.o || continue
 	    ranlib "$op.a"
 
+	    killafter 300 \
 	    $compiler \
 	      -I. -I"$include" -I"$include/$abi" \
 	      -o try try.$language try-anything.$language \
@@ -348,6 +356,7 @@ do
 
 	    [ -s ../bestc/median ] && [ `cat ../bestc/median` -le $cycles ] && continue
 
+	    killafter 600 \
 	    $compiler -D'COMPILER="'"$compiler"'"' \
 	      -DSUPERCOP \
 	      -I. -I"$include" -I"$include/$abi" \

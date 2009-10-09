@@ -1208,6 +1208,39 @@ spu-gcc -funroll-loops -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=r
 spu-gcc -funroll-loops -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+icc -m64 -O3 -static -no-vec
+icc -m64 -Os -static -no-vec
+icc -m64 -O2 -static -no-vec
+icc -m64 -O1 -static -no-vec
+icc -m32 -O3 -static -no-vec
+icc -m32 -Os -static -no-vec
+icc -m32 -O2 -static -no-vec
+icc -m32 -O1 -static -no-vec
+icc -O3 -xK -static -no-vec
+icc -Os -xK -static -no-vec
+icc -O2 -xK -static -no-vec
+icc -O1 -xK -static -no-vec
+icc -O3 -xW -static -no-vec
+icc -Os -xW -static -no-vec
+icc -O2 -xW -static -no-vec
+icc -O1 -xW -static -no-vec
+icc -O3 -xN -static -no-vec
+icc -Os -xN -static -no-vec
+icc -O2 -xN -static -no-vec
+icc -O1 -xN -static -no-vec
+icc -O3 -xP -static -no-vec
+icc -Os -xP -static -no-vec
+icc -O2 -xP -static -no-vec
+icc -O1 -xP -static -no-vec
+icc -O3 -xB -static -no-vec
+icc -Os -xB -static -no-vec
+icc -O2 -xB -static -no-vec
+icc -O1 -xB -static -no-vec
+icc -O3 -static -no-vec
+icc -Os -static -no-vec
+icc -O2 -static -no-vec
+icc -O1 -static -no-vec
+icc -no-vec
 icc -m64 -xHost -vec-report0 -static
 icc -m64 -O3 -static
 icc -m64 -Os -static
