@@ -1,3 +1,4 @@
+
 #include <string.h>
 #include <stdio.h>
 #include <emmintrin.h>
@@ -306,12 +307,13 @@ void blake32_final( state *S, u8 *digest ) {
 }
 
 
-void crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long inlen ) {
+int crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long inlen ) {
 
   state S;  
   blake32_init( &S );
   blake32_update( &S, in, inlen*8 );
   blake32_final( &S, out );
+  return 0;
 }
 
 /*
