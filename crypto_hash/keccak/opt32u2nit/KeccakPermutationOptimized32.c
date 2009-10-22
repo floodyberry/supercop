@@ -217,6 +217,22 @@ void KeccakPermutationOnWordsAfterXoring1024bits(UINT32 *state, const UINT8 *inp
     rounds
 }
 
+void KeccakPermutationOnWordsAfterXoring1088bits(UINT32 *state, const UINT8 *input)
+{
+    declareABCDE
+    unsigned int i;
+
+#ifdef UseInterleaveTables
+    for(i=0; i<17; i++)
+        xor8bytesIntoInterleavedWords(state+i*2, state+i*2+1, input+i*8);
+#else
+    for(i=0; i<17; i++)
+        xor8bytesIntoInterleavedWords(state+i*2, input+i*8);
+#endif
+    copyFromState(A, state)
+    rounds
+}
+
 void KeccakInitialize()
 {
 #ifdef UseInterleaveTables
@@ -252,6 +268,11 @@ void KeccakPermutation(unsigned char *state)
 void KeccakAbsorb1024bits(unsigned char *state, const unsigned char *data)
 {
     KeccakPermutationOnWordsAfterXoring1024bits((UINT32*)state, data);
+}
+
+void KeccakAbsorb1088bits(unsigned char *state, const unsigned char *data)
+{
+    KeccakPermutationOnWordsAfterXoring1088bits((UINT32*)state, data);
 }
 
 void KeccakAbsorb(unsigned char *state, const unsigned char *data, unsigned int laneCount)

@@ -1,7 +1,7 @@
 /*
 Algorithm Name: Keccak
 Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
-Date: September 14, 2009
+Date: October 13, 2009
 
 This code, originally by Guido Bertoni, Joan Daemen, Michaël Peeters and
 Gilles Van Assche as a part of the SHA-3 submission, is hereby put in the
@@ -66,7 +66,7 @@ typedef unsigned long long int UINT64;
     typedef __m64 V64;
     #define ANDnu64(a, b)       _mm_andnot_si64(a, b)
 
-    #if defined(_MSC_VER)
+    #if (defined(_MSC_VER) || defined (__INTEL_COMPILER))
         #define LOAD64(a)       *(V64*)&(a)
         #define CONST64(a)      *(V64*)&(a)
         #define STORE64(a, b)   *(V64*)&(a) = b
@@ -141,6 +141,20 @@ void KeccakPermutationOnWordsAfterXoring1024bits(UINT64 *state, const UINT64 *in
 #endif
 }
 
+void KeccakPermutationOnWordsAfterXoring1088bits(UINT64 *state, const UINT64 *input)
+{
+    declareABCDE
+#if (Unrolling != 24)
+    unsigned int i;
+#endif
+
+    copyFromStateAndXor1088bits(A, state, input)
+    rounds
+#if defined(UseMMX)
+    _mm_empty();
+#endif
+}
+
 void KeccakInitialize()
 {
 }
@@ -184,6 +198,20 @@ void KeccakAbsorb1024bits(unsigned char *state, const unsigned char *data)
     for(i=0; i<16; i++)
         fromBytesToWord(dataAsWords+i, data+(i*8));
     KeccakPermutationOnWordsAfterXoring1024bits((UINT64*)state, dataAsWords);
+#endif
+}
+
+void KeccakAbsorb1088bits(unsigned char *state, const unsigned char *data)
+{
+#if (PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN)
+    KeccakPermutationOnWordsAfterXoring1088bits((UINT64*)state, (const UINT64*)data);
+#else
+    UINT64 dataAsWords[17];
+    unsigned int i;
+
+    for(i=0; i<17; i++)
+        fromBytesToWord(dataAsWords+i, data+(i*8));
+    KeccakPermutationOnWordsAfterXoring1088bits((UINT64*)state, dataAsWords);
 #endif
 }
 

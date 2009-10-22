@@ -1,7 +1,7 @@
 /*
 Algorithm Name: Keccak
 Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
-Date: September 14, 2009
+Date: October 12, 2009
 
 This code, originally by Guido Bertoni, Joan Daemen, Michaël Peeters and
 Gilles Van Assche as a part of the SHA-3 submission, is hereby put in the
@@ -18,6 +18,7 @@ void KeccakInitialize();
 void KeccakInitializeState(unsigned char *state);
 void KeccakPermutation(unsigned char *state);
 void KeccakAbsorb1024bits(unsigned char *state, const unsigned char *data);
+void KeccakAbsorb1088bits(unsigned char *state, const unsigned char *data);
 void KeccakAbsorb(unsigned char *state, const unsigned char *data, unsigned int laneCount);
 void KeccakExtract1024bits(const unsigned char *state, unsigned char *data);
 void KeccakExtract(const unsigned char *state, unsigned char *data, unsigned int laneCount);

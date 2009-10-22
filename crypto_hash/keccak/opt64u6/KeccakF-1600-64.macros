@@ -509,6 +509,33 @@ const UINT64 KeccakF1600RoundConstants[24] = {
     X##so = state[23]; \
     X##su = state[24]; \
 
+#define copyFromStateAndXor1088bits(X, state, input) \
+    X##ba = state[ 0]^input[ 0]; \
+    X##be = state[ 1]^input[ 1]; \
+    X##bi = state[ 2]^input[ 2]; \
+    X##bo = state[ 3]^input[ 3]; \
+    X##bu = state[ 4]^input[ 4]; \
+    X##ga = state[ 5]^input[ 5]; \
+    X##ge = state[ 6]^input[ 6]; \
+    X##gi = state[ 7]^input[ 7]; \
+    X##go = state[ 8]^input[ 8]; \
+    X##gu = state[ 9]^input[ 9]; \
+    X##ka = state[10]^input[10]; \
+    X##ke = state[11]^input[11]; \
+    X##ki = state[12]^input[12]; \
+    X##ko = state[13]^input[13]; \
+    X##ku = state[14]^input[14]; \
+    X##ma = state[15]^input[15]; \
+    X##me = state[16]^input[16]; \
+    X##mi = state[17]; \
+    X##mo = state[18]; \
+    X##mu = state[19]; \
+    X##sa = state[20]; \
+    X##se = state[21]; \
+    X##si = state[22]; \
+    X##so = state[23]; \
+    X##su = state[24]; \
+
 #define copyFromState(X, state) \
     X##ba = state[ 0]; \
     X##be = state[ 1]; \

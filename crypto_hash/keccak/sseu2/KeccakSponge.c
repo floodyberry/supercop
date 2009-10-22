@@ -1,7 +1,7 @@
 /*
 Algorithm Name: Keccak
 Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
-Date: September 14, 2009
+Date: October 12, 2009
 
 This code, originally by Guido Bertoni, Joan Daemen, Michaël Peeters and
 Gilles Van Assche as a part of the SHA-3 submission, is hereby put in the
@@ -61,6 +61,8 @@ void AbsorbQueue(hashState *state)
     memset(state->dataQueue+state->bitsInQueue/8, 0, state->rate/8-state->bitsInQueue/8);
     if (state->rate == 1024)
         KeccakAbsorb1024bits(state->state, state->dataQueue);
+    else if (state->rate == 1088)
+        KeccakAbsorb1088bits(state->state, state->dataQueue);
     else
         KeccakAbsorb(state->state, state->dataQueue, state->rate/64);
     state->bitsInQueue = 0;
@@ -89,6 +91,14 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
                     displayBytes(1, "Data to be absorbed", curData, state->rate/8);
                     #endif
                     KeccakAbsorb1024bits(state->state, curData);
+                }
+            }
+            else if (state->rate == 1088) {
+                for(j=0; j<wholeBlocks; j++, curData+=1088/8) {
+                    #ifdef KeccakReference
+                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    #endif
+                    KeccakAbsorb1088bits(state->state, curData);
                 }
             }
             else {
