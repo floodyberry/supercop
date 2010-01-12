@@ -1,11 +1,29 @@
+/* Blue Midnight Wish hash function as it will be submitted to 
+   NIST for the second round of SHA-3 competition.
+   Changes in this version (compared to the version submitted for the Round 1):
+
+   1. Corrected IV for 224 and 384 version.
+
+   2. Tweaked f0() and f1()
+
+   3. Use of final compression function invocation.
+
+*/													
+
+/* 
+   This is a reference C code for Blue Midnight Wish hash function 
+   as it will be submitted to NIST for the second round of SHA-3 competition.
+
+   Programmed by Danilo Gligoroski, August 2009.
+*/
 #include <string.h> 
 #include "BlueMidnightWish.h"
 
-#define rotl32(x,n)   (((x) << n) | ((x) >> (32 - n)))
-#define rotr32(x,n)   (((x) >> n) | ((x) << (32 - n)))
+#define rotl32(x,n)   (((x) << (n)) | ((x) >> (32 - (n))))
+#define rotr32(x,n)   (((x) >> (n)) | ((x) << (32 - (n))))
 
-#define rotl64(x,n)   (((x) << n) | ((x) >> (64 - n)))
-#define rotr64(x,n)   (((x) >> n) | ((x) << (64 - n)))
+#define rotl64(x,n)   (((x) << (n)) | ((x) >> (64 - (n))))
+#define rotr64(x,n)   (((x) >> (n)) | ((x) << (64 - (n))))
 
 #define shl(x,n)      ((x) << n)
 #define shr(x,n)      ((x) >> n)
@@ -15,15 +33,19 @@ const u_int32_t i224p2[16] =
 {   0x00010203ul, 0x04050607ul, 0x08090a0bul, 0x0c0d0e0ful,
     0x10111213ul, 0x14151617ul, 0x18191a1bul, 0x1c1d1e1ful,
     0x20212223ul, 0x24252627ul, 0x28292a2bul, 0x2c2d2e2ful,
-    0x30313233ul, 0x24353637ul, 0x38393a3bul, 0x3c3d3e3ful,
+    0x30313233ul, 0x34353637ul, 0x38393a3bul, 0x3c3d3e3ful,
 };
 
 /* BlueMidnightWish256 initial double chaining pipe */
 const u_int32_t i256p2[16] =
-{   0x40414243ul, 0x44454647ul, 0x48494a4bul, 0x4c4d4e4ful,
-    0x50515253ul, 0x54555657ul, 0x58595a5bul, 0x5c5d5e5ful,
-    0x60616263ul, 0x64656667ul, 0x68696a6bul, 0x6c6d6e6ful,
-    0x70717273ul, 0x74757677ul, 0x78797a7bul, 0x7c7d7e7ful,
+{   0x40414243ul, 0x44454647ul, 
+    0x48494a4bul, 0x4c4d4e4ful,
+    0x50515253ul, 0x54555657ul, 
+	0x58595a5bul, 0x5c5d5e5ful,
+    0x60616263ul, 0x64656667ul, 
+	0x68696a6bul, 0x6c6d6e6ful,
+    0x70717273ul, 0x74757677ul, 
+	0x78797a7bul, 0x7c7d7e7ful,
 };
 
 /* BlueMidnightWish384 initial double chaining pipe */
@@ -32,7 +54,7 @@ const u_int64_t i384p2[16] =
     0x0001020304050607ull, 0x08090a0b0c0d0e0full,
     0x1011121314151617ull, 0x18191a1b1c1d1e1full,
     0x2021222324252627ull, 0x28292a2b2c2d2e2full,
-    0x3031323324353637ull, 0x38393a3b3c3d3e3full,
+    0x3031323334353637ull, 0x38393a3b3c3d3e3full,
     0x4041424344454647ull, 0x48494a4b4c4d4e4full,
     0x5051525354555657ull, 0x58595a5b5c5d5e5full,
     0x6061626364656667ull, 0x68696a6b6c6d6e6full,
@@ -51,6 +73,7 @@ const u_int64_t i512p2[16] =
     0xe0e1e2e3e4e5e6e7ull, 0xe8e9eaebecedeeefull,
     0xf0f1f2f3f4f5f6f7ull, 0xf8f9fafbfcfdfeffull
 };
+
 
 #define hashState224(x)  ((x)->pipe->p256)
 #define hashState256(x)  ((x)->pipe->p256)
@@ -72,142 +95,115 @@ const u_int64_t i512p2[16] =
 #define r32_06(x) rotl32((x), 23)
 #define r32_07(x) rotl32((x), 27)
 
-/* Code for Message expansion part */
-#define expand32_1(i) p256[i]  = s32_1(p256[i - 16])      + s32_2(p256[i - 15])   + s32_3(p256[i - 14]  ) + s32_0(p256[i - 13] )\
-                               + s32_1(p256[i - 12])      + s32_2(p256[i - 11])   + s32_3(p256[i - 10]  ) + s32_0(p256[i -  9] )\
-							   + s32_1(p256[i -  8])      + s32_2(p256[i -  7])   + s32_3(p256[i -  6]  ) + s32_0(p256[i -  5] )\
-							   + s32_1(p256[i -  4])      + s32_2(p256[i -  3])   + s32_3(p256[i -  2]  ) + s32_0(p256[i -  1] )\
-							   + i*(0x05555555ul)         + data32[(i-16)%16]     + data32[(i-13)%16]     - data32[(i-6)%16]
-/* Code for Message expansion part */
-#define expand32_2(i) p256[i]  = p256[i - 16]             + r32_01(p256[i - 15])  +        p256[i - 14]   + r32_02(p256[i - 13])\
-                               + p256[i - 12]             + r32_03(p256[i - 11])  +        p256[i - 10]   + r32_04(p256[i -  9])\
-							   + p256[i -  8]             + r32_05(p256[i -  7])  +        p256[i -  6]   + r32_06(p256[i -  5])\
-							   + p256[i -  4]             + r32_07(p256[i -  3])  + s32_5( p256[i -  2] ) + s32_4( p256[i -  1])\
-							   + i*(0x05555555ul)         + data32[(i-16)%16]     + data32[(i-13)%16]     - data32[(i-6)%16]
-/* Code for Message expansion part */
-#define expand32_21(i) p256[i] = TempOdd32                + r32_01(p256[i - 15])                          + r32_02(p256[i - 13])\
-                                                          + r32_03(p256[i - 11])                          + r32_04(p256[i -  9])\
-							                              + r32_05(p256[i -  7])                          + r32_06(p256[i -  5])\
-							                              + r32_07(p256[i -  3])  + s32_5( p256[i -  2] ) + s32_4( p256[i -  1])\
-							   + i*(0x05555555ul)         + data32[(i-16)%16]     + data32[(i-13)%16]     - data32[(i-6)%16]
-/* Code for Message expansion part */
-#define expand32_22(i) p256[i] = TempEven32               + r32_01(p256[i - 15])                          + r32_02(p256[i - 13])\
-                                                          + r32_03(p256[i - 11])                          + r32_04(p256[i -  9])\
-							                              + r32_05(p256[i -  7])                          + r32_06(p256[i -  5])\
-							                              + r32_07(p256[i -  3])  + s32_5( p256[i -  2] ) + s32_4( p256[i -  1])\
-							   + i*(0x05555555ul)         + data32[(i-16)%16]     + data32[(i-13)%16]     - data32[(i-6)%16]
+/* Message expansion function 1 */
+u_int32_t expand32_1(int i, u_int32_t *M32, u_int32_t *H, u_int32_t *Q)
+{
+return ( s32_1(Q[i - 16])      + s32_2(Q[i - 15])   + s32_3(Q[i - 14]  ) + s32_0(Q[i - 13] )
+           + s32_1(Q[i - 12])      + s32_2(Q[i - 11])   + s32_3(Q[i - 10]  ) + s32_0(Q[i -  9] )
+		   + s32_1(Q[i -  8])      + s32_2(Q[i -  7])   + s32_3(Q[i -  6]  ) + s32_0(Q[i -  5] )
+		   + s32_1(Q[i -  4])      + s32_2(Q[i -  3])   + s32_3(Q[i -  2]  ) + s32_0(Q[i -  1] )
+		   + ((i*(0x05555555ul) + rotl32(M32[(i-16)%16],((i-16)%16)+1) + rotl32(M32[(i-13)%16],((i-13)%16)+1) - rotl32(M32[(i-6)%16],((i-6)%16)+1)) ^ H[(i-16+7)%16]) );
+}
+
+/* Message expansion function 2 */
+u_int32_t expand32_2(int i, u_int32_t *M32, u_int32_t *H, u_int32_t *Q)
+{
+	return ( Q[i - 16]             + r32_01(Q[i - 15])  +        Q[i - 14]   + r32_02(Q[i - 13])
+           + Q[i - 12]             + r32_03(Q[i - 11])  +        Q[i - 10]   + r32_04(Q[i -  9])
+		   + Q[i -  8]             + r32_05(Q[i -  7])  +        Q[i -  6]   + r32_06(Q[i -  5])
+		   + Q[i -  4]             + r32_07(Q[i -  3])  + s32_4( Q[i -  2] ) + s32_5( Q[i -  1])
+		   + ((i*(0x05555555ul) + rotl32(M32[(i-16)%16],((i-16)%16)+1) + rotl32(M32[(i-13)%16],((i-13)%16)+1) - rotl32(M32[(i-6)%16],((i-6)%16)+1)) ^ H[(i-16+7)%16]) );
+}
+
+void Compression256(u_int32_t *M32, u_int32_t *H)
+{
+	int i;
+	u_int32_t XL32, XH32, W[32], Q[32];
+
+	/*  This part is the function f0 - in the documentation */
+
+	/*  First we mix the message block *M32 (M in the documatation)        */
+	/*  with the previous double pipe *H.                                  */
+	/*  For a fixed previous double pipe, or fixed message block, this     */
+	/*  part is bijection.                                                 */
+	/*  This transformation diffuses every one bit difference in 5 words.  */
+    W[ 0] = (M32[ 5] ^ H[ 5]) - (M32[ 7] ^ H[ 7]) + (M32[10] ^ H[10]) + (M32[13] ^ H[13]) + (M32[14] ^ H[14]);
+    W[ 1] = (M32[ 6] ^ H[ 6]) - (M32[ 8] ^ H[ 8]) + (M32[11] ^ H[11]) + (M32[14] ^ H[14]) - (M32[15] ^ H[15]);
+    W[ 2] = (M32[ 0] ^ H[ 0]) + (M32[ 7] ^ H[ 7]) + (M32[ 9] ^ H[ 9]) - (M32[12] ^ H[12]) + (M32[15] ^ H[15]);
+    W[ 3] = (M32[ 0] ^ H[ 0]) - (M32[ 1] ^ H[ 1]) + (M32[ 8] ^ H[ 8]) - (M32[10] ^ H[10]) + (M32[13] ^ H[13]);
+    W[ 4] = (M32[ 1] ^ H[ 1]) + (M32[ 2] ^ H[ 2]) + (M32[ 9] ^ H[ 9]) - (M32[11] ^ H[11]) - (M32[14] ^ H[14]);
+    W[ 5] = (M32[ 3] ^ H[ 3]) - (M32[ 2] ^ H[ 2]) + (M32[10] ^ H[10]) - (M32[12] ^ H[12]) + (M32[15] ^ H[15]);
+    W[ 6] = (M32[ 4] ^ H[ 4]) - (M32[ 0] ^ H[ 0]) - (M32[ 3] ^ H[ 3]) - (M32[11] ^ H[11]) + (M32[13] ^ H[13]);
+    W[ 7] = (M32[ 1] ^ H[ 1]) - (M32[ 4] ^ H[ 4]) - (M32[ 5] ^ H[ 5]) - (M32[12] ^ H[12]) - (M32[14] ^ H[14]);
+    W[ 8] = (M32[ 2] ^ H[ 2]) - (M32[ 5] ^ H[ 5]) - (M32[ 6] ^ H[ 6]) + (M32[13] ^ H[13]) - (M32[15] ^ H[15]);
+    W[ 9] = (M32[ 0] ^ H[ 0]) - (M32[ 3] ^ H[ 3]) + (M32[ 6] ^ H[ 6]) - (M32[ 7] ^ H[ 7]) + (M32[14] ^ H[14]);
+    W[10] = (M32[ 8] ^ H[ 8]) - (M32[ 1] ^ H[ 1]) - (M32[ 4] ^ H[ 4]) - (M32[ 7] ^ H[ 7]) + (M32[15] ^ H[15]);
+    W[11] = (M32[ 8] ^ H[ 8]) - (M32[ 0] ^ H[ 0]) - (M32[ 2] ^ H[ 2]) - (M32[ 5] ^ H[ 5]) + (M32[ 9] ^ H[ 9]);
+    W[12] = (M32[ 1] ^ H[ 1]) + (M32[ 3] ^ H[ 3]) - (M32[ 6] ^ H[ 6]) - (M32[ 9] ^ H[ 9]) + (M32[10] ^ H[10]);
+    W[13] = (M32[ 2] ^ H[ 2]) + (M32[ 4] ^ H[ 4]) + (M32[ 7] ^ H[ 7]) + (M32[10] ^ H[10]) + (M32[11] ^ H[11]);
+    W[14] = (M32[ 3] ^ H[ 3]) - (M32[ 5] ^ H[ 5]) + (M32[ 8] ^ H[ 8]) - (M32[11] ^ H[11]) - (M32[12] ^ H[12]);
+    W[15] = (M32[12] ^ H[12]) - (M32[ 4] ^ H[ 4]) - (M32[ 6] ^ H[ 6]) - (M32[ 9] ^ H[ 9]) + (M32[13] ^ H[13]);
+
+	/*  Diffuse the differences in every word in a bijective manner with s32_i, and then add the values of the previous double pipe.*/
+	Q[ 0] = s32_0(W[ 0]) + H[ 1];
+	Q[ 1] = s32_1(W[ 1]) + H[ 2];
+	Q[ 2] = s32_2(W[ 2]) + H[ 3];
+	Q[ 3] = s32_3(W[ 3]) + H[ 4];
+	Q[ 4] = s32_4(W[ 4]) + H[ 5];
+	Q[ 5] = s32_0(W[ 5]) + H[ 6];
+	Q[ 6] = s32_1(W[ 6]) + H[ 7];
+	Q[ 7] = s32_2(W[ 7]) + H[ 8];
+	Q[ 8] = s32_3(W[ 8]) + H[ 9];
+	Q[ 9] = s32_4(W[ 9]) + H[10];
+	Q[10] = s32_0(W[10]) + H[11];
+	Q[11] = s32_1(W[11]) + H[12];
+	Q[12] = s32_2(W[12]) + H[13];
+	Q[13] = s32_3(W[13]) + H[14];
+	Q[14] = s32_4(W[14]) + H[15];
+	Q[15] = s32_0(W[15]) + H[ 0];
+
+	/* This is the Message expansion or f_1 in the documentation.       */
+	/* It has 16 rounds.                                                */
+	/* Blue Midnight Wish has two tunable security parameters.          */
+	/* The parameters are named EXPAND_1_ROUNDS and EXPAND_2_ROUNDS.    */
+	/* The following relation for these parameters should is satisfied: */
+	/* EXPAND_1_ROUNDS + EXPAND_2_ROUNDS = 16                           */
+
+	for (i=0; i<EXPAND_1_ROUNDS; i++)
+		Q[i+16] = expand32_1(i+16, M32, H, Q);
+	for (i=EXPAND_1_ROUNDS; i<EXPAND_1_ROUNDS + EXPAND_2_ROUNDS; i++)
+		Q[i+16] = expand32_2(i+16, M32, H, Q);
+
+	/* Blue Midnight Wish has two temporary cummulative variables that accumulate via XORing */
+	/* 16 new variables that are prooduced in the Message Expansion part.                    */
+	XL32 = Q[16]^Q[17]^Q[18]^Q[19]^Q[20]^Q[21]^Q[22]^Q[23];
+	XH32 = XL32^Q[24]^Q[25]^Q[26]^Q[27]^Q[28]^Q[29]^Q[30]^Q[31];
 
 
-#define Compression256()\
-{\
-				/*  Mix the message block with the previous double pipe.       */\
-                p256[ 0] ^=data32[ 0]; p256[ 1] ^=data32[ 1]; p256[ 2] ^=data32[ 2]; p256[ 3] ^=data32[ 3];\
-				p256[ 4] ^=data32[ 4]; p256[ 5] ^=data32[ 5]; p256[ 6] ^=data32[ 6]; p256[ 7] ^=data32[ 7];\
-				p256[ 8] ^=data32[ 8]; p256[ 9] ^=data32[ 9]; p256[10] ^=data32[10]; p256[11] ^=data32[11];\
-				p256[12] ^=data32[12]; p256[13] ^=data32[13]; p256[14] ^=data32[14]; p256[15] ^=data32[15];\
-\
-				p256[16+ 0] = ( p256[ 5]-p256[ 7]+p256[10]+p256[13]+p256[14]);\
-				p256[16+ 1] = ( p256[ 6]-p256[ 8]+p256[11]+p256[14]-p256[15]);\
-				p256[16+ 2] = ( p256[ 0]+p256[ 7]+p256[ 9]-p256[12]+p256[15]);\
-				p256[16+ 3] = ( p256[ 0]-p256[ 1]+p256[ 8]-p256[10]+p256[13]);\
-				p256[16+ 4] = ( p256[ 1]+p256[ 2]+p256[ 9]-p256[11]-p256[14]);\
-	 			p256[16+ 5] = ( p256[ 3]-p256[ 2]+p256[10]-p256[12]+p256[15]);\
-				p256[16+ 6] = ( p256[ 4]-p256[ 0]-p256[ 3]-p256[11]+p256[13]);\
-				p256[16+ 7] = ( p256[ 1]-p256[ 4]-p256[ 5]-p256[12]-p256[14]);\
-				p256[16+ 8] = ( p256[ 2]-p256[ 5]-p256[ 6]+p256[13]-p256[15]);\
-				p256[16+ 9] = ( p256[ 0]-p256[ 3]+p256[ 6]-p256[ 7]+p256[14]);\
-				p256[16+10] = ( p256[ 8]-p256[ 1]-p256[ 4]-p256[ 7]+p256[15]);\
-				p256[16+11] = ( p256[ 8]-p256[ 0]-p256[ 2]-p256[ 5]+p256[ 9]);\
-				p256[16+12] = ( p256[ 1]+p256[ 3]-p256[ 6]-p256[ 9]+p256[10]);\
-				p256[16+13] = ( p256[ 2]+p256[ 4]+p256[ 7]+p256[10]+p256[11]);\
-				p256[16+14] = ( p256[ 3]-p256[ 5]+p256[ 8]-p256[11]-p256[12]);\
-				p256[16+15] = ( p256[12]-p256[ 4]-p256[ 6]-p256[ 9]+p256[13]);\
-\
-				p256[ 0] = s32_0(p256[16+ 0]);\
-				p256[ 1] = s32_1(p256[16+ 1]);\
-				p256[ 2] = s32_2(p256[16+ 2]);\
-				p256[ 3] = s32_3(p256[16+ 3]);\
-				p256[ 4] = s32_4(p256[16+ 4]);\
-				p256[ 5] = s32_0(p256[16+ 5]);\
-				p256[ 6] = s32_1(p256[16+ 6]);\
-				p256[ 7] = s32_2(p256[16+ 7]);\
-				p256[ 8] = s32_3(p256[16+ 8]);\
-				p256[ 9] = s32_4(p256[16+ 9]);\
-				p256[10] = s32_0(p256[16+10]);\
-				p256[11] = s32_1(p256[16+11]);\
-				p256[12] = s32_2(p256[16+12]);\
-				p256[13] = s32_3(p256[16+13]);\
-				p256[14] = s32_4(p256[16+14]);\
-				p256[15] = s32_0(p256[16+15]);\
-\
-				/* This is the Message expansion. */\
-				/* It has 16 rounds.              */\
-				expand32_1(16); XL32 =  p256[16]; expand32_1(17); XL32 ^= p256[17];\
-				TempEven32 = p256[14] + p256[12] + p256[10] + p256[ 8] + p256[ 6] + p256[ 4] + p256[ 2];\
-				TempOdd32  = p256[15] + p256[13] + p256[11] + p256[ 9] + p256[ 7] + p256[ 5] + p256[ 3];\
-\
-				expand32_22(18); XL32 ^= p256[18];\
-				expand32_21(19); XL32 ^= p256[19];\
-				TempEven32+=p256[16]; TempEven32-=p256[ 2]; expand32_22(20); XL32 ^= p256[20];\
-				TempOdd32 +=p256[17]; TempOdd32 -=p256[ 3]; expand32_21(21); XL32 ^= p256[21];\
-				TempEven32+=p256[18]; TempEven32-=p256[ 4]; expand32_22(22); XL32 ^= p256[22];\
-				TempOdd32 +=p256[19]; TempOdd32 -=p256[ 5]; expand32_21(23); XL32 ^= p256[23];\
-				TempEven32+=p256[20]; TempEven32-=p256[ 6]; expand32_22(24); XH32 =  XL32^p256[24];\
-				TempOdd32 +=p256[21]; TempOdd32 -=p256[ 7]; expand32_21(25); XH32 ^= p256[25];\
-				TempEven32+=p256[22]; TempEven32-=p256[ 8]; expand32_22(26); XH32 ^= p256[26];\
-				TempOdd32 +=p256[23]; TempOdd32 -=p256[ 9]; expand32_21(27); XH32 ^= p256[27];\
-				TempEven32+=p256[24]; TempEven32-=p256[10]; expand32_22(28); XH32 ^= p256[28];\
-				TempOdd32 +=p256[25]; TempOdd32 -=p256[11]; expand32_21(29); XH32 ^= p256[29];\
-				TempEven32+=p256[26]; TempEven32-=p256[12]; expand32_22(30); XH32 ^= p256[30];\
-				TempOdd32 +=p256[27]; TempOdd32 -=p256[13]; expand32_21(31); XH32 ^= p256[31];\
-\
-				/*  Compute the double chaining pipe for the next message block. */\
-				p256[0] =                       (shl(XH32, 5) ^ shr(p256[16],5) ^ data32[ 0]) + (    XL32    ^ p256[24] ^ p256[ 0]);\
-				p256[1] =                       (shr(XH32, 7) ^ shl(p256[17],8) ^ data32[ 1]) + (    XL32    ^ p256[25] ^ p256[ 1]);\
-				p256[2] =                       (shr(XH32, 5) ^ shl(p256[18],5) ^ data32[ 2]) + (    XL32    ^ p256[26] ^ p256[ 2]);\
-				p256[3] =                       (shr(XH32, 1) ^ shl(p256[19],5) ^ data32[ 3]) + (    XL32    ^ p256[27] ^ p256[ 3]);\
-				p256[4] =                       (shr(XH32, 3) ^     p256[20]    ^ data32[ 4]) + (    XL32    ^ p256[28] ^ p256[ 4]);\
-				p256[5] =                       (shl(XH32, 6) ^ shr(p256[21],6) ^ data32[ 5]) + (    XL32    ^ p256[29] ^ p256[ 5]);\
-				p256[6] =                       (shr(XH32, 4) ^ shl(p256[22],6) ^ data32[ 6]) + (    XL32    ^ p256[30] ^ p256[ 6]);\
-				p256[7] =                       (shr(XH32,11) ^ shl(p256[23],2) ^ data32[ 7]) + (    XL32    ^ p256[31] ^ p256[ 7]);\
-\
-				p256[ 8] = rotl32(p256[4], 9) + (    XH32     ^     p256[24]    ^ data32[ 8]) + (shl(XL32,8) ^ p256[23] ^ p256[ 8]);\
-				p256[ 9] = rotl32(p256[5],10) + (    XH32     ^     p256[25]    ^ data32[ 9]) + (shr(XL32,6) ^ p256[16] ^ p256[ 9]);\
-				p256[10] = rotl32(p256[6],11) + (    XH32     ^     p256[26]    ^ data32[10]) + (shl(XL32,6) ^ p256[17] ^ p256[10]);\
-				p256[11] = rotl32(p256[7],12) + (    XH32     ^     p256[27]    ^ data32[11]) + (shl(XL32,4) ^ p256[18] ^ p256[11]);\
-				p256[12] = rotl32(p256[0],13) + (    XH32     ^     p256[28]    ^ data32[12]) + (shr(XL32,3) ^ p256[19] ^ p256[12]);\
-				p256[13] = rotl32(p256[1],14) + (    XH32     ^     p256[29]    ^ data32[13]) + (shr(XL32,4) ^ p256[20] ^ p256[13]);\
-				p256[14] = rotl32(p256[2],15) + (    XH32     ^     p256[30]    ^ data32[14]) + (shr(XL32,7) ^ p256[21] ^ p256[14]);\
-				p256[15] = rotl32(p256[3],16) + (    XH32     ^     p256[31]    ^ data32[15]) + (shr(XL32,2) ^ p256[22] ^ p256[15]);\
+	/*  This part is the function f_2 - in the documentation            */
+
+	/*  Compute the double chaining pipe for the next message block.    */
+	H[0] =                    (shl(XH32, 5) ^ shr(Q[16],5) ^ M32[ 0]) + (    XL32    ^ Q[24] ^ Q[ 0]);
+	H[1] =                    (shr(XH32, 7) ^ shl(Q[17],8) ^ M32[ 1]) + (    XL32    ^ Q[25] ^ Q[ 1]);
+	H[2] =                    (shr(XH32, 5) ^ shl(Q[18],5) ^ M32[ 2]) + (    XL32    ^ Q[26] ^ Q[ 2]);
+	H[3] =                    (shr(XH32, 1) ^ shl(Q[19],5) ^ M32[ 3]) + (    XL32    ^ Q[27] ^ Q[ 3]);
+	H[4] =                    (shr(XH32, 3) ^     Q[20]    ^ M32[ 4]) + (    XL32    ^ Q[28] ^ Q[ 4]);
+	H[5] =                    (shl(XH32, 6) ^ shr(Q[21],6) ^ M32[ 5]) + (    XL32    ^ Q[29] ^ Q[ 5]);
+	H[6] =                    (shr(XH32, 4) ^ shl(Q[22],6) ^ M32[ 6]) + (    XL32    ^ Q[30] ^ Q[ 6]);
+	H[7] =                    (shr(XH32,11) ^ shl(Q[23],2) ^ M32[ 7]) + (    XL32    ^ Q[31] ^ Q[ 7]);
+
+	H[ 8] = rotl32(H[4], 9) + (    XH32     ^     Q[24]    ^ M32[ 8]) + (shl(XL32,8) ^ Q[23] ^ Q[ 8]);
+	H[ 9] = rotl32(H[5],10) + (    XH32     ^     Q[25]    ^ M32[ 9]) + (shr(XL32,6) ^ Q[16] ^ Q[ 9]);
+	H[10] = rotl32(H[6],11) + (    XH32     ^     Q[26]    ^ M32[10]) + (shl(XL32,6) ^ Q[17] ^ Q[10]);
+	H[11] = rotl32(H[7],12) + (    XH32     ^     Q[27]    ^ M32[11]) + (shl(XL32,4) ^ Q[18] ^ Q[11]);
+	H[12] = rotl32(H[0],13) + (    XH32     ^     Q[28]    ^ M32[12]) + (shr(XL32,3) ^ Q[19] ^ Q[12]);
+	H[13] = rotl32(H[1],14) + (    XH32     ^     Q[29]    ^ M32[13]) + (shr(XL32,4) ^ Q[20] ^ Q[13]);
+	H[14] = rotl32(H[2],15) + (    XH32     ^     Q[30]    ^ M32[14]) + (shr(XL32,7) ^ Q[21] ^ Q[14]);
+	H[15] = rotl32(H[3],16) + (    XH32     ^     Q[31]    ^ M32[15]) + (shr(XL32,2) ^ Q[22] ^ Q[15]);
 }
 
 
-
 /* Components used for 384 and 512 bit version */
-#define expand64_1(i) p512[i]   = s64_1(p512[i - 16])     + s64_2(p512[i - 15])   + s64_3(p512[i - 14]  ) + s64_0(p512[i - 13] )\
-	                            + s64_1(p512[i - 12])     + s64_2(p512[i - 11])   + s64_3(p512[i - 10]  ) + s64_0(p512[i -  9] )\
-				      		    + s64_1(p512[i -  8])     + s64_2(p512[i -  7])   + s64_3(p512[i -  6]  ) + s64_0(p512[i -  5] )\
-						        + s64_1(p512[i -  4])     + s64_2(p512[i -  3])   + s64_3(p512[i -  2]  ) + s64_0(p512[i -  1] )\
-					            + i*0x0555555555555555ull + data64[(i-16)%16]     + data64[(i-13)%16]     - data64[(i-6)%16]
-/* Code for Message expansion part */
-#define expand64_2(i) p512[i]   = p512[i - 16]            + r64_01(p512[i - 15])  +        p512[i - 14]   + r64_02(p512[i - 13])\
-	                            + p512[i - 12]            + r64_03(p512[i - 11])  +        p512[i - 10]   + r64_04(p512[i -  9])\
-						        + p512[i -  8]            + r64_05(p512[i -  7])  +        p512[i -  6]   + r64_06(p512[i -  5])\
-						        + p512[i -  4]            + r64_07(p512[i -  3])  + s64_5( p512[i -  2] ) + s64_4( p512[i -  1])\
-					            + i*0x0555555555555555ull + data64[(i-16)%16]     + data64[(i-13)%16]     - data64[(i-6)%16]
-/* Code for Message expansion part */
-#define expand64_21(i) p512[i] = TempOdd64                + r64_01(p512[i - 15])                          + r64_02(p512[i - 13])\
-                                                          + r64_03(p512[i - 11])                          + r64_04(p512[i -  9])\
-							                              + r64_05(p512[i -  7])                          + r64_06(p512[i -  5])\
-							                              + r64_07(p512[i -  3])  + s64_5( p512[i -  2] ) + s64_4( p512[i -  1])\
-							   + i*0x0555555555555555ull  + data64[(i-16)%16]     + data64[(i-13)%16]     - data64[(i-6)%16]
-/* Code for Message expansion part */
-#define expand64_22(i) p512[i] = TempEven64               + r64_01(p512[i - 15])                          + r64_02(p512[i - 13])\
-                                                          + r64_03(p512[i - 11])                          + r64_04(p512[i -  9])\
-							                              + r64_05(p512[i -  7])                          + r64_06(p512[i -  5])\
-							                              + r64_07(p512[i -  3])  + s64_5( p512[i -  2] ) + s64_4( p512[i -  1])\
-							   + i*0x0555555555555555ull  + data64[(i-16)%16]     + data64[(i-13)%16]     - data64[(i-6)%16]
-
 #define s64_0(x)  (shr((x), 1) ^ shl((x), 3) ^ rotl64((x),  4) ^ rotl64((x), 37))
 #define s64_1(x)  (shr((x), 1) ^ shl((x), 2) ^ rotl64((x), 13) ^ rotl64((x), 43))
 #define s64_2(x)  (shr((x), 2) ^ shl((x), 1) ^ rotl64((x), 19) ^ rotl64((x), 53))
@@ -222,90 +218,114 @@ const u_int64_t i512p2[16] =
 #define r64_06(x) rotl64((x), 43)
 #define r64_07(x) rotl64((x), 53)
 
-#define Compression512()\
-{\
-				/*  Mix the message block with the previous double pipe.       */\
-                p512[ 0] ^=data64[ 0]; p512[ 1] ^=data64[ 1]; p512[ 2] ^=data64[ 2]; p512[ 3] ^=data64[ 3];\
-				p512[ 4] ^=data64[ 4]; p512[ 5] ^=data64[ 5]; p512[ 6] ^=data64[ 6]; p512[ 7] ^=data64[ 7];\
-				p512[ 8] ^=data64[ 8]; p512[ 9] ^=data64[ 9]; p512[10] ^=data64[10]; p512[11] ^=data64[11];\
-				p512[12] ^=data64[12]; p512[13] ^=data64[13]; p512[14] ^=data64[14]; p512[15] ^=data64[15];\
-\
-				p512[16+ 0] = ( p512[ 5]-p512[ 7]+p512[10]+p512[13]+p512[14]);\
-				p512[16+ 1] = ( p512[ 6]-p512[ 8]+p512[11]+p512[14]-p512[15]);\
-				p512[16+ 2] = ( p512[ 0]+p512[ 7]+p512[ 9]-p512[12]+p512[15]);\
-				p512[16+ 3] = ( p512[ 0]-p512[ 1]+p512[ 8]-p512[10]+p512[13]);\
-				p512[16+ 4] = ( p512[ 1]+p512[ 2]+p512[ 9]-p512[11]-p512[14]);\
-				p512[16+ 5] = ( p512[ 3]-p512[ 2]+p512[10]-p512[12]+p512[15]);\
-				p512[16+ 6] = ( p512[ 4]-p512[ 0]-p512[ 3]-p512[11]+p512[13]);\
-				p512[16+ 7] = ( p512[ 1]-p512[ 4]-p512[ 5]-p512[12]-p512[14]);\
-				p512[16+ 8] = ( p512[ 2]-p512[ 5]-p512[ 6]+p512[13]-p512[15]);\
-				p512[16+ 9] = ( p512[ 0]-p512[ 3]+p512[ 6]-p512[ 7]+p512[14]);\
-				p512[16+10] = ( p512[ 8]-p512[ 1]-p512[ 4]-p512[ 7]+p512[15]);\
-				p512[16+11] = ( p512[ 8]-p512[ 0]-p512[ 2]-p512[ 5]+p512[ 9]);\
-				p512[16+12] = ( p512[ 1]+p512[ 3]-p512[ 6]-p512[ 9]+p512[10]);\
-				p512[16+13] = ( p512[ 2]+p512[ 4]+p512[ 7]+p512[10]+p512[11]);\
-				p512[16+14] = ( p512[ 3]-p512[ 5]+p512[ 8]-p512[11]-p512[12]);\
-				p512[16+15] = ( p512[12]-p512[ 4]-p512[ 6]-p512[ 9]+p512[13]);\
-\
-				/*  Diffuse the differences in every word in a */\
-				/*  bijective manner.                          */\
-				p512[ 0] = s64_0(p512[16+ 0]);\
-				p512[ 1] = s64_1(p512[16+ 1]);\
-				p512[ 2] = s64_2(p512[16+ 2]);\
-				p512[ 3] = s64_3(p512[16+ 3]);\
-				p512[ 4] = s64_4(p512[16+ 4]);\
-				p512[ 5] = s64_0(p512[16+ 5]);\
-				p512[ 6] = s64_1(p512[16+ 6]);\
-				p512[ 7] = s64_2(p512[16+ 7]);\
-				p512[ 8] = s64_3(p512[16+ 8]);\
-				p512[ 9] = s64_4(p512[16+ 9]);\
-				p512[10] = s64_0(p512[16+10]);\
-				p512[11] = s64_1(p512[16+11]);\
-				p512[12] = s64_2(p512[16+12]);\
-				p512[13] = s64_3(p512[16+13]);\
-				p512[14] = s64_4(p512[16+14]);\
-				p512[15] = s64_0(p512[16+15]);\
-\
-				/* This is the Message expansion */\
-				/* It has 16 rounds              */\
-				expand64_1(16); XL64 =  p512[16]; expand64_1(17); XL64 ^= p512[17];\
-				TempEven64 = p512[14] + p512[12] + p512[10] + p512[ 8] + p512[ 6] + p512[ 4] + p512[ 2];\
-				TempOdd64  = p512[15] + p512[13] + p512[11] + p512[ 9] + p512[ 7] + p512[ 5] + p512[ 3];\
-\
-				expand64_22(18); XL64 ^= p512[18];\
-				expand64_21(19); XL64 ^= p512[19];\
-				TempEven64+=p512[16]; TempEven64-=p512[ 2]; expand64_22(20); XL64 ^= p512[20];\
-				TempOdd64 +=p512[17]; TempOdd64 -=p512[ 3]; expand64_21(21); XL64 ^= p512[21];\
-				TempEven64+=p512[18]; TempEven64-=p512[ 4]; expand64_22(22); XL64 ^= p512[22];\
-				TempOdd64 +=p512[19]; TempOdd64 -=p512[ 5]; expand64_21(23); XL64 ^= p512[23];\
-				TempEven64+=p512[20]; TempEven64-=p512[ 6]; expand64_22(24); XH64 =  XL64^p512[24];\
-				TempOdd64 +=p512[21]; TempOdd64 -=p512[ 7]; expand64_21(25); XH64 ^= p512[25];\
-				TempEven64+=p512[22]; TempEven64-=p512[ 8]; expand64_22(26); XH64 ^= p512[26];\
-				TempOdd64 +=p512[23]; TempOdd64 -=p512[ 9]; expand64_21(27); XH64 ^= p512[27];\
-				TempEven64+=p512[24]; TempEven64-=p512[10]; expand64_22(28); XH64 ^= p512[28];\
-				TempOdd64 +=p512[25]; TempOdd64 -=p512[11]; expand64_21(29); XH64 ^= p512[29];\
-				TempEven64+=p512[26]; TempEven64-=p512[12]; expand64_22(30); XH64 ^= p512[30];\
-				TempOdd64 +=p512[27]; TempOdd64 -=p512[13]; expand64_21(31); XH64 ^= p512[31];\
-\
-				/*  Compute the double chaining pipe for the next message block. */\
-				p512[0] =                       (shl(XH64, 5) ^ shr(p512[16],5) ^ data64[ 0]) + (    XL64    ^ p512[24] ^ p512[ 0]);\
-				p512[1] =                       (shr(XH64, 7) ^ shl(p512[17],8) ^ data64[ 1]) + (    XL64    ^ p512[25] ^ p512[ 1]);\
-				p512[2] =                       (shr(XH64, 5) ^ shl(p512[18],5) ^ data64[ 2]) + (    XL64    ^ p512[26] ^ p512[ 2]);\
-				p512[3] =                       (shr(XH64, 1) ^ shl(p512[19],5) ^ data64[ 3]) + (    XL64    ^ p512[27] ^ p512[ 3]);\
-				p512[4] =                       (shr(XH64, 3) ^     p512[20]    ^ data64[ 4]) + (    XL64    ^ p512[28] ^ p512[ 4]);\
-				p512[5] =                       (shl(XH64, 6) ^ shr(p512[21],6) ^ data64[ 5]) + (    XL64    ^ p512[29] ^ p512[ 5]);\
-				p512[6] =                       (shr(XH64, 4) ^ shl(p512[22],6) ^ data64[ 6]) + (    XL64    ^ p512[30] ^ p512[ 6]);\
-				p512[7] =                       (shr(XH64,11) ^ shl(p512[23],2) ^ data64[ 7]) + (    XL64    ^ p512[31] ^ p512[ 7]);\
-\
-				p512[ 8] = rotl64(p512[4], 9) + (    XH64     ^     p512[24]    ^ data64[ 8]) + (shl(XL64,8) ^ p512[23] ^ p512[ 8]);\
-				p512[ 9] = rotl64(p512[5],10) + (    XH64     ^     p512[25]    ^ data64[ 9]) + (shr(XL64,6) ^ p512[16] ^ p512[ 9]);\
-				p512[10] = rotl64(p512[6],11) + (    XH64     ^     p512[26]    ^ data64[10]) + (shl(XL64,6) ^ p512[17] ^ p512[10]);\
-				p512[11] = rotl64(p512[7],12) + (    XH64     ^     p512[27]    ^ data64[11]) + (shl(XL64,4) ^ p512[18] ^ p512[11]);\
-				p512[12] = rotl64(p512[0],13) + (    XH64     ^     p512[28]    ^ data64[12]) + (shr(XL64,3) ^ p512[19] ^ p512[12]);\
-				p512[13] = rotl64(p512[1],14) + (    XH64     ^     p512[29]    ^ data64[13]) + (shr(XL64,4) ^ p512[20] ^ p512[13]);\
-				p512[14] = rotl64(p512[2],15) + (    XH64     ^     p512[30]    ^ data64[14]) + (shr(XL64,7) ^ p512[21] ^ p512[14]);\
-				p512[15] = rotl64(p512[3],16) + (    XH64     ^     p512[31]    ^ data64[15]) + (shr(XL64,2) ^ p512[22] ^ p512[15]);\
+
+/* Message expansion function 1 */
+u_int64_t expand64_1(int i, u_int64_t *M64, u_int64_t *H, u_int64_t *Q)
+{
+	return ( s64_1(Q[i - 16])          + s64_2(Q[i - 15])   + s64_3(Q[i - 14]  ) + s64_0(Q[i - 13] )
+           + s64_1(Q[i - 12])          + s64_2(Q[i - 11])   + s64_3(Q[i - 10]  ) + s64_0(Q[i -  9] )
+		   + s64_1(Q[i -  8])          + s64_2(Q[i -  7])   + s64_3(Q[i -  6]  ) + s64_0(Q[i -  5] )
+		   + s64_1(Q[i -  4])          + s64_2(Q[i -  3])   + s64_3(Q[i -  2]  ) + s64_0(Q[i -  1] )
+		   + ((i*(0x0555555555555555ull) + rotl64(M64[(i-16)%16],((i-16)%16)+1) + rotl64(M64[(i-13)%16],((i-13)%16)+1) - rotl64(M64[(i-6)%16],((i-6)%16)+1)) ^ H[(i-16+7)%16]) );
 }
+
+/* Message expansion function 2 */
+u_int64_t expand64_2(int i, u_int64_t *M64, u_int64_t *H, u_int64_t *Q)
+{
+	return ( Q[i - 16]                 + r64_01(Q[i - 15])  +        Q[i - 14]   + r64_02(Q[i - 13])
+           + Q[i - 12]                 + r64_03(Q[i - 11])  +        Q[i - 10]   + r64_04(Q[i -  9])
+		   + Q[i -  8]                 + r64_05(Q[i -  7])  +        Q[i -  6]   + r64_06(Q[i -  5])
+		   + Q[i -  4]                 + r64_07(Q[i -  3])  + s64_4( Q[i -  2] ) + s64_5( Q[i -  1])
+		   + ((i*(0x0555555555555555ull) + rotl64(M64[(i-16)%16],((i-16)%16)+1) + rotl64(M64[(i-13)%16],((i-13)%16)+1) - rotl64(M64[(i-6)%16],((i-6)%16)+1)) ^ H[(i-16+7)%16]) );
+}
+
+void Compression512(u_int64_t *M64, u_int64_t *H)
+{
+	int i;
+	u_int64_t XL64, XH64, W[32], Q[32];
+
+	/*  This part is the function f0 - in the documentation */
+
+	/*  First we mix the message block *M64 (M in the documatation)        */
+	/*  with the previous double pipe *P.                                  */
+	/*  For a fixed previous double pipe, or fixed message block, this     */
+	/*  part is bijection.                                                 */
+	/*  This transformation diffuses every one bit difference in 5 words.  */
+    W[ 0] = (M64[ 5] ^ H[ 5]) - (M64[ 7] ^ H[ 7]) + (M64[10] ^ H[10]) + (M64[13] ^ H[13]) + (M64[14] ^ H[14]);
+    W[ 1] = (M64[ 6] ^ H[ 6]) - (M64[ 8] ^ H[ 8]) + (M64[11] ^ H[11]) + (M64[14] ^ H[14]) - (M64[15] ^ H[15]);
+    W[ 2] = (M64[ 0] ^ H[ 0]) + (M64[ 7] ^ H[ 7]) + (M64[ 9] ^ H[ 9]) - (M64[12] ^ H[12]) + (M64[15] ^ H[15]);
+    W[ 3] = (M64[ 0] ^ H[ 0]) - (M64[ 1] ^ H[ 1]) + (M64[ 8] ^ H[ 8]) - (M64[10] ^ H[10]) + (M64[13] ^ H[13]);
+    W[ 4] = (M64[ 1] ^ H[ 1]) + (M64[ 2] ^ H[ 2]) + (M64[ 9] ^ H[ 9]) - (M64[11] ^ H[11]) - (M64[14] ^ H[14]);
+    W[ 5] = (M64[ 3] ^ H[ 3]) - (M64[ 2] ^ H[ 2]) + (M64[10] ^ H[10]) - (M64[12] ^ H[12]) + (M64[15] ^ H[15]);
+    W[ 6] = (M64[ 4] ^ H[ 4]) - (M64[ 0] ^ H[ 0]) - (M64[ 3] ^ H[ 3]) - (M64[11] ^ H[11]) + (M64[13] ^ H[13]);
+    W[ 7] = (M64[ 1] ^ H[ 1]) - (M64[ 4] ^ H[ 4]) - (M64[ 5] ^ H[ 5]) - (M64[12] ^ H[12]) - (M64[14] ^ H[14]);
+    W[ 8] = (M64[ 2] ^ H[ 2]) - (M64[ 5] ^ H[ 5]) - (M64[ 6] ^ H[ 6]) + (M64[13] ^ H[13]) - (M64[15] ^ H[15]);
+    W[ 9] = (M64[ 0] ^ H[ 0]) - (M64[ 3] ^ H[ 3]) + (M64[ 6] ^ H[ 6]) - (M64[ 7] ^ H[ 7]) + (M64[14] ^ H[14]);
+    W[10] = (M64[ 8] ^ H[ 8]) - (M64[ 1] ^ H[ 1]) - (M64[ 4] ^ H[ 4]) - (M64[ 7] ^ H[ 7]) + (M64[15] ^ H[15]);
+    W[11] = (M64[ 8] ^ H[ 8]) - (M64[ 0] ^ H[ 0]) - (M64[ 2] ^ H[ 2]) - (M64[ 5] ^ H[ 5]) + (M64[ 9] ^ H[ 9]);
+    W[12] = (M64[ 1] ^ H[ 1]) + (M64[ 3] ^ H[ 3]) - (M64[ 6] ^ H[ 6]) - (M64[ 9] ^ H[ 9]) + (M64[10] ^ H[10]);
+    W[13] = (M64[ 2] ^ H[ 2]) + (M64[ 4] ^ H[ 4]) + (M64[ 7] ^ H[ 7]) + (M64[10] ^ H[10]) + (M64[11] ^ H[11]);
+    W[14] = (M64[ 3] ^ H[ 3]) - (M64[ 5] ^ H[ 5]) + (M64[ 8] ^ H[ 8]) - (M64[11] ^ H[11]) - (M64[12] ^ H[12]);
+    W[15] = (M64[12] ^ H[12]) - (M64[ 4] ^ H[ 4]) - (M64[ 6] ^ H[ 6]) - (M64[ 9] ^ H[ 9]) + (M64[13] ^ H[13]);
+
+	/*  Diffuse the differences in every word in a bijective manner with s64_i, and then add the values of the previous double pipe.*/
+	Q[ 0] = s64_0(W[ 0]) + H[ 1];
+	Q[ 1] = s64_1(W[ 1]) + H[ 2];
+	Q[ 2] = s64_2(W[ 2]) + H[ 3];
+	Q[ 3] = s64_3(W[ 3]) + H[ 4];
+	Q[ 4] = s64_4(W[ 4]) + H[ 5];
+	Q[ 5] = s64_0(W[ 5]) + H[ 6];
+	Q[ 6] = s64_1(W[ 6]) + H[ 7];
+	Q[ 7] = s64_2(W[ 7]) + H[ 8];
+	Q[ 8] = s64_3(W[ 8]) + H[ 9];
+	Q[ 9] = s64_4(W[ 9]) + H[10];
+	Q[10] = s64_0(W[10]) + H[11];
+	Q[11] = s64_1(W[11]) + H[12];
+	Q[12] = s64_2(W[12]) + H[13];
+	Q[13] = s64_3(W[13]) + H[14];
+	Q[14] = s64_4(W[14]) + H[15];
+	Q[15] = s64_0(W[15]) + H[ 0];
+
+	/* This is the Message expansion or f_1 in the documentation.       */
+	/* It has 16 rounds.                                                */
+	/* Blue Midnight Wish has two tunable security parameters.          */
+	/* The parameters are named EXPAND_1_ROUNDS and EXPAND_2_ROUNDS.    */
+	/* The following relation for these parameters should is satisfied: */
+	/* EXPAND_1_ROUNDS + EXPAND_2_ROUNDS = 16                           */
+
+	for (i=0; i<EXPAND_1_ROUNDS; i++)
+		Q[i+16] = expand64_1(i+16, M64, H, Q);
+	for (i=EXPAND_1_ROUNDS; i<EXPAND_1_ROUNDS + EXPAND_2_ROUNDS; i++)
+		Q[i+16] = expand64_2(i+16, M64, H, Q);
+
+	/* Blue Midnight Wish has two temporary cummulative variables that accumulate via XORing */
+	/* 16 new variables that are prooduced in the Message Expansion part.                    */
+	XL64 = Q[16]^Q[17]^Q[18]^Q[19]^Q[20]^Q[21]^Q[22]^Q[23];
+	XH64 = XL64^Q[24]^Q[25]^Q[26]^Q[27]^Q[28]^Q[29]^Q[30]^Q[31];
+
+
+	/*  This part is the function f_2 - in the documentation            */
+
+	/*  Compute the double chaining pipe for the next message block.    */
+	H[0] =                    (shl(XH64, 5) ^ shr(Q[16],5) ^ M64[ 0]) + (    XL64    ^ Q[24] ^ Q[ 0]);
+	H[1] =                    (shr(XH64, 7) ^ shl(Q[17],8) ^ M64[ 1]) + (    XL64    ^ Q[25] ^ Q[ 1]);
+	H[2] =                    (shr(XH64, 5) ^ shl(Q[18],5) ^ M64[ 2]) + (    XL64    ^ Q[26] ^ Q[ 2]);
+	H[3] =                    (shr(XH64, 1) ^ shl(Q[19],5) ^ M64[ 3]) + (    XL64    ^ Q[27] ^ Q[ 3]);
+	H[4] =                    (shr(XH64, 3) ^     Q[20]    ^ M64[ 4]) + (    XL64    ^ Q[28] ^ Q[ 4]);
+	H[5] =                    (shl(XH64, 6) ^ shr(Q[21],6) ^ M64[ 5]) + (    XL64    ^ Q[29] ^ Q[ 5]);
+	H[6] =                    (shr(XH64, 4) ^ shl(Q[22],6) ^ M64[ 6]) + (    XL64    ^ Q[30] ^ Q[ 6]);
+	H[7] =                    (shr(XH64,11) ^ shl(Q[23],2) ^ M64[ 7]) + (    XL64    ^ Q[31] ^ Q[ 7]);
+
+	H[ 8] = rotl64(H[4], 9) + (    XH64     ^     Q[24]    ^ M64[ 8]) + (shl(XL64,8) ^ Q[23] ^ Q[ 8]);
+	H[ 9] = rotl64(H[5],10) + (    XH64     ^     Q[25]    ^ M64[ 9]) + (shr(XL64,6) ^ Q[16] ^ Q[ 9]);
+	H[10] = rotl64(H[6],11) + (    XH64     ^     Q[26]    ^ M64[10]) + (shl(XL64,6) ^ Q[17] ^ Q[10]);
+	H[11] = rotl64(H[7],12) + (    XH64     ^     Q[27]    ^ M64[11]) + (shl(XL64,4) ^ Q[18] ^ Q[11]);
+	H[12] = rotl64(H[0],13) + (    XH64     ^     Q[28]    ^ M64[12]) + (shr(XL64,3) ^ Q[19] ^ Q[12]);
+	H[13] = rotl64(H[1],14) + (    XH64     ^     Q[29]    ^ M64[13]) + (shr(XL64,4) ^ Q[20] ^ Q[13]);
+	H[14] = rotl64(H[2],15) + (    XH64     ^     Q[30]    ^ M64[14]) + (shr(XL64,7) ^ Q[21] ^ Q[14]);
+	H[15] = rotl64(H[3],16) + (    XH64     ^     Q[31]    ^ M64[15]) + (shr(XL64,2) ^ Q[22] ^ Q[15]);
+}
+
 
 HashReturn Init(hashState *state, int hashbitlen)
 {
@@ -354,12 +374,8 @@ HashReturn Init(hashState *state, int hashbitlen)
 
 HashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen)
 {
-	u_int32_t *data32, *p256;
-	u_int32_t XL32, XH32, TempEven32, TempOdd32;
-
-	u_int64_t *data64, *p512;
-	u_int64_t XL64, XH64, TempEven64, TempOdd64;
-
+	u_int32_t *M32, *H256;
+	u_int64_t *M64, *H512;
 	int LastBytes;
 
 	switch(state->hashbitlen)
@@ -378,27 +394,27 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
 					memcpy(hashState256(state)->LastPart + (state->unprocessed_bits >> 3), data, LastBytes );
 					state->unprocessed_bits += (int)databitlen;
 					databitlen = state->unprocessed_bits;
-					data32 = (u_int32_t *)hashState256(state)->LastPart;
+					M32 = (u_int32_t *)hashState256(state)->LastPart;
 				}
 			}
 			else 
-				data32 = (u_int32_t *)data;
+				M32 = (u_int32_t *)data;
 
-			p256   = hashState256(state)->DoublePipe;
+			H256   = hashState256(state)->DoublePipe;
 			while (databitlen >= BlueMidnightWish256_BLOCK_SIZE * 8)
 			{
 				databitlen -= BlueMidnightWish256_BLOCK_SIZE * 8;
 				// #1 Between comments #1 and #2 add algorithm specifics
 
 				state->bits_processed += BlueMidnightWish256_BLOCK_SIZE * 8;
-				Compression256();
-				data32 += 16;
+				Compression256(M32, H256);
+				M32 += 16;
 			}
 			state->unprocessed_bits = (int)databitlen;
 			if (databitlen > 0)
 			{
 				LastBytes = ((~(((- (int)databitlen)>>3) & 0x01ff)) + 1) & 0x01ff;  // LastBytes = Ceil(databitlen / 8)
-				memcpy(hashState256(state)->LastPart, data32, LastBytes );
+				memcpy(hashState256(state)->LastPart, M32, LastBytes );
 			}
 			// #2 Between comments #1 and #2 add algorithm specifics
 			return(SUCCESS);
@@ -418,27 +434,27 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
 					memcpy(hashState512(state)->LastPart + (state->unprocessed_bits >> 3), data, LastBytes );
 					state->unprocessed_bits += (int)databitlen;
 					databitlen = state->unprocessed_bits;
-					data64 = (u_int64_t *)hashState512(state)->LastPart;
+					M64 = (u_int64_t *)hashState512(state)->LastPart;
 				}
 			}
 			else 
-				data64 = (u_int64_t *)data;
+				M64 = (u_int64_t *)data;
 
-			p512   = hashState512(state)->DoublePipe;
+			H512   = hashState512(state)->DoublePipe;
 			while (databitlen >= BlueMidnightWish512_BLOCK_SIZE * 8)
 			{
 				databitlen -= BlueMidnightWish512_BLOCK_SIZE * 8;
 				// #1 Between comments #1 and #2 add algorithm specifics
 
 				state->bits_processed += BlueMidnightWish512_BLOCK_SIZE * 8;
-				Compression512();
-				data64 += 16;
+				Compression512(M64, H512);
+				M64 += 16;
 			}
 			state->unprocessed_bits = (int)databitlen;
 			if (databitlen > 0)
 			{
 				LastBytes = ((~(((- (int)databitlen)>>3) & 0x03ff)) + 1) & 0x03ff; // LastBytes = Ceil(databitlen / 8)
-				memcpy(hashState512(state)->LastPart, data64, LastBytes );
+				memcpy(hashState512(state)->LastPart, M64, LastBytes );
 			}
 			// #2 Between comments #1 and #2 add algorithm specifics
 			return(SUCCESS);
@@ -450,15 +466,31 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
 
 HashReturn Final(hashState *state, BitSequence *hashval)
 {
-	u_int32_t *data32, *p256;
-	u_int32_t XL32, XH32, TempEven32, TempOdd32;
-
-	u_int64_t *data64, *p512;
-	u_int64_t XL64, XH64, TempEven64, TempOdd64;
-
+	u_int32_t *M32, *H256;
+	u_int64_t *M64, *H512;
 	DataLength databitlen;
-
 	int LastByte, PadOnePosition;
+	u_int32_t CONST32final[16] =
+	{
+		0xaaaaaaa0ul,  0xaaaaaaa1ul,  0xaaaaaaa2ul, 0xaaaaaaa3ul,
+		0xaaaaaaa4ul,  0xaaaaaaa5ul,  0xaaaaaaa6ul, 0xaaaaaaa7ul,
+		0xaaaaaaa8ul,  0xaaaaaaa9ul,  0xaaaaaaaaul, 0xaaaaaaabul,
+		0xaaaaaaacul,  0xaaaaaaadul,  0xaaaaaaaeul, 0xaaaaaaaful
+	};
+	
+	u_int64_t CONST64final[16] =
+	{
+		0xaaaaaaaaaaaaaaa0ull,  0xaaaaaaaaaaaaaaa1ull,
+		0xaaaaaaaaaaaaaaa2ull,  0xaaaaaaaaaaaaaaa3ull, 
+		0xaaaaaaaaaaaaaaa4ull,  0xaaaaaaaaaaaaaaa5ull, 
+		0xaaaaaaaaaaaaaaa6ull,  0xaaaaaaaaaaaaaaa7ull, 
+		0xaaaaaaaaaaaaaaa8ull,  0xaaaaaaaaaaaaaaa9ull, 
+		0xaaaaaaaaaaaaaaaaull,  0xaaaaaaaaaaaaaaabull, 
+		0xaaaaaaaaaaaaaaacull,  0xaaaaaaaaaaaaaaadull, 
+		0xaaaaaaaaaaaaaaaeull,  0xaaaaaaaaaaaaaaafull
+	};
+
+	H256 = NULL, H512 = NULL;
 
 	switch(state->hashbitlen)
 	{
@@ -466,31 +498,31 @@ HashReturn Final(hashState *state, BitSequence *hashval)
 		case 256:
 			LastByte = (int)state->unprocessed_bits >> 3;
 			PadOnePosition = 7 - (state->unprocessed_bits & 0x07);
-			hashState256(state)->LastPart[LastByte] = hashState256(state)->LastPart[LastByte] & (0xff << (PadOnePosition + 1) )\
+			hashState256(state)->LastPart[LastByte] = (hashState256(state)->LastPart[LastByte] & (0xff << (PadOnePosition + 1) )) \
 				                                    ^ (0x01 << PadOnePosition);
-			data64 = (u_int64_t *)hashState256(state)->LastPart;
+			M64 = (u_int64_t *)hashState256(state)->LastPart;
 
 			if (state->unprocessed_bits < 448)
 			{
 				memset( (hashState256(state)->LastPart) + LastByte + 1, 0x00, BlueMidnightWish256_BLOCK_SIZE - LastByte - 9 );
 				databitlen = BlueMidnightWish256_BLOCK_SIZE * 8;
-				data64[7] = state->bits_processed + state->unprocessed_bits;
+				M64[7] = state->bits_processed + state->unprocessed_bits;
 			}
 			else
 			{
 				memset( (hashState256(state)->LastPart) + LastByte + 1, 0x00, BlueMidnightWish256_BLOCK_SIZE * 2 - LastByte - 9 );
 				databitlen = BlueMidnightWish256_BLOCK_SIZE * 16;
-				data64[15] = state->bits_processed + state->unprocessed_bits;
+				M64[15] = state->bits_processed + state->unprocessed_bits;
 			}
 
-			data32   = (u_int32_t *)hashState256(state)->LastPart;
-			p256     = hashState256(state)->DoublePipe;
+			M32   = (u_int32_t *)hashState256(state)->LastPart;
+			H256     = hashState256(state)->DoublePipe;
 			while (databitlen >= BlueMidnightWish256_BLOCK_SIZE * 8)
 			{
 				databitlen -= BlueMidnightWish256_BLOCK_SIZE * 8;
 				// #1 Between comments #1 and #2 add algorithm specifics
-				Compression256();
-				data32 += 16;
+				Compression256(M32, H256);
+				M32 += 16;
 			}
 			// #2 Between comments #1 and #2 add algorithm specifics
 			break;
@@ -500,33 +532,53 @@ HashReturn Final(hashState *state, BitSequence *hashval)
 		case 512:
 			LastByte = (int)state->unprocessed_bits >> 3;
 			PadOnePosition = 7 - (state->unprocessed_bits & 0x07);
-			hashState512(state)->LastPart[LastByte] = hashState512(state)->LastPart[LastByte] & (0xff << (PadOnePosition + 1) )\
+			hashState512(state)->LastPart[LastByte] = (hashState512(state)->LastPart[LastByte] & (0xff << (PadOnePosition + 1) )) \
 				                                    ^ (0x01 << PadOnePosition);
-			data64 = (u_int64_t *)hashState512(state)->LastPart;
+			M64 = (u_int64_t *)hashState512(state)->LastPart;
 
 			if (state->unprocessed_bits < 960)
 			{
 				memset( (hashState512(state)->LastPart) + LastByte + 1, 0x00, BlueMidnightWish512_BLOCK_SIZE - LastByte - 9 );
 				databitlen = BlueMidnightWish512_BLOCK_SIZE * 8;
-				data64[15] = state->bits_processed + state->unprocessed_bits;
+				M64[15] = state->bits_processed + state->unprocessed_bits;
 			}
 			else
 			{
 				memset( (hashState512(state)->LastPart) + LastByte + 1, 0x00, BlueMidnightWish512_BLOCK_SIZE * 2 - LastByte - 9 );
 				databitlen = BlueMidnightWish512_BLOCK_SIZE * 16;
-				data64[31] = state->bits_processed + state->unprocessed_bits;
+				M64[31] = state->bits_processed + state->unprocessed_bits;
 			}
 
-			p512   = hashState512(state)->DoublePipe;
+			H512   = hashState512(state)->DoublePipe;
 			while (databitlen >= BlueMidnightWish512_BLOCK_SIZE * 8)
 			{
 				databitlen -= BlueMidnightWish512_BLOCK_SIZE * 8;
 				// #1 Between comments #1 and #2 add algorithm specifics
-				Compression512();
-				data64 += 16;
+				Compression512(M64, H512);
+				M64 += 16;
 			}
 			break;
 			// #2 Between comments #1 and #2 add algorithm specifics
+		
+		default:    return(BAD_HASHLEN); //This should never happen
+	}
+
+	// This is the tweak for Blue Midnight Wish, to be submitted on 15 September 2009.
+	// Below is a code for final invocation of the compression function after digesting the
+	// whole padded message. Here, the role of the message has the obtained final double pipe, 
+	// and the role of the initial double pipe is a constant.
+	switch(state->hashbitlen)
+	{
+		case 224:
+		case 256:
+			Compression256(H256, CONST32final);
+			break;
+
+
+		case 384:
+		case 512:
+			Compression512(H512, CONST64final);
+			break;
 		
 		default:    return(BAD_HASHLEN); //This should never happen
 	}
@@ -535,16 +587,16 @@ HashReturn Final(hashState *state, BitSequence *hashval)
 	switch(state->hashbitlen)
 	{
 		case 224:
-			memcpy(hashval, p256 + 9, BlueMidnightWish224_DIGEST_SIZE );
+			memcpy(hashval, CONST32final + 9, BlueMidnightWish224_DIGEST_SIZE );
 			return(SUCCESS);
 		case 256:
-			memcpy(hashval, p256 + 8, BlueMidnightWish256_DIGEST_SIZE );
+			memcpy(hashval, CONST32final + 8, BlueMidnightWish256_DIGEST_SIZE );
 			return(SUCCESS);
 		case 384:
-			memcpy(hashval, p512 + 10, BlueMidnightWish384_DIGEST_SIZE );
+			memcpy(hashval, CONST64final + 10, BlueMidnightWish384_DIGEST_SIZE );
 			return(SUCCESS);
 		case 512:
-			memcpy(hashval, p512 + 8,  BlueMidnightWish512_DIGEST_SIZE );
+			memcpy(hashval, CONST64final + 8,  BlueMidnightWish512_DIGEST_SIZE );
 			return(SUCCESS);
 		default:    return(BAD_HASHLEN); //This should never happen
 	}

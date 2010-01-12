@@ -1,0 +1,10 @@
+Blue Midnight Wish - 256 as submitted to NIST on 15 Sept 2009.
+This eBASH implementation is just an eBASH wrapping around 
+reference C version submitted to NIST.
+
+Programmer:  Danilo Gligoroski, 
+             email: danilog@item.ntnu.no 
+             December 2009
+
+Level of copyright protection: 0
+Level of patent protection: 0

@@ -1177,7 +1177,7 @@ movdqa 32(%r8),%xmm2
 
 movdqa 48(%r8),%xmm3
 
-mov  $20,%rdx
+mov  $12,%rdx
 
 ._mainloop2:
 

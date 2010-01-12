@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20091022
+version=20100112
 # D. J. Bernstein
 # Public domain.
 
@@ -120,7 +120,7 @@ do
 	echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"
 	rm -rf "$work"
 	mkdir -p "$work"
-	cp -pr gmp-4.2.4/* "$work"
+	cp -pr gmp-5.0.0/* "$work"
 	( cd "$work" \
 	  && ./configure --enable-cxx \
 	     ABI="$gmpabi" \
