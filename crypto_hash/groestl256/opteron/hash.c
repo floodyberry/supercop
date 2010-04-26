@@ -1,8 +1,8 @@
-/* hash.c     February 2009
+/* hash.c     April 2010
  *
  * Groestl implementation with inline assembly containing mmx and sse
  * instructions.
- * Author: Krystian Matusiewicz
+ * Authors: Krystian Matusiewicz and Soren S. Thomsen
  *
  * This code is placed in the public domain
  */
@@ -11,15 +11,7 @@
 #include "hash.h"
 #include "tables.h"
 
-#ifdef __x86_64
-
 #include "PQ512-amd64.h"
-
-#else
-
-//#include "PQ512-amd-32.h"
-
-#endif
 
 /* digest up to len bytes of input (full blocks only) */
 void Transform(context *ctx, 
@@ -42,13 +34,8 @@ void Transform(context *ctx,
       z[i] = m[i] ^ h[i];
     }
 
-#ifdef __x86_64    
     Q512ASM(y);
     P512ASM(z);
-#else
-    Q512ASM((u32*)y);
-    P512ASM((u32*)z);
-#endif
     
     /* h' == h + Q(m) + P(h+m) */
     for (i = 0; i < COLS; i++) {
@@ -67,11 +54,7 @@ void OutputTransformation(context *ctx) {
     z[j] = ctx->state[j];
   }
   asm volatile ("emms");
-#ifdef __x86_64    
   P512ASM(z);
-#else
-  P512ASM((u32*)z);
-#endif
   asm volatile ("emms");
   for (j = 0; j < COLS; j++) {
     ctx->state[j] ^= z[j];
