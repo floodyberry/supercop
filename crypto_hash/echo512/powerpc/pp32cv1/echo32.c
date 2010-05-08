@@ -1,12 +1,12 @@
-/*---------------------------------------------------------------------------*/
-/* Implementation of the ECHO hash function in its 512-bit outputs variant.  */
-/* Optimized for PowerPC                                                     */
-/*                                                                           */
-/* Date:     02 Jul 2009                                                     */
-/*                                                                           */
-/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       */
-/*           Olivier Billet  <billet@eurecom.fr>                             */
-/*---------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------ */
+/* Implementation of the double pipe ECHO hash function in its 512-bit outputs variant.*/
+/* Optimized for PowerPC                                                               */
+/*                                                                                     */
+/* Date:     2010-04-12                                                                */
+/*                                                                                     */
+/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 */
+/*           Olivier Billet  <billet@eurecom.fr>                                       */
+/*------------------------------------------------------------------------------------ */
 #include "echo32.h"
 #include "api.h"
 

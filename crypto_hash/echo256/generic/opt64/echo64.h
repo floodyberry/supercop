@@ -1,12 +1,12 @@
-/*---------------------------------------------------------------------------*/
-/* Implementation of the ECHO hash function in its 256-bit outputs variant.  */
-/* Optimized for ANSI C, 64-bit mode                                         */
-/*                                                                           */
-/* Date:     02 Jul 2009                                                     */
-/*                                                                           */
-/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       */
-/*           Olivier Billet  <billet@eurecom.fr>                             */
-/*---------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------ */
+/* Implementation of the double pipe ECHO hash function in its 256-bit outputs variant.*/
+/* Optimized for ANSI C, 64-bit mode                                                   */
+/*                                                                                     */
+/* Date:     2010-04-12                                                                */
+/*                                                                                     */
+/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 */
+/*           Olivier Billet  <billet@eurecom.fr>                                       */
+/*------------------------------------------------------------------------------------ */
 #ifndef ECHO_64_H
 #define ECHO_64_H
 

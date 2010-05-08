@@ -1,12 +1,12 @@
-/*---------------------------------------------------------------------------*/
-/* Implementation of the ECHO hash function in its 256-bit outputs variant.  */
-/* Optimized for ANSI C, 32-bit mode                                         */
-/*                                                                           */
-/* Date:     02 Jul 2009                                                     */
-/*                                                                           */
-/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       */
-/*           Olivier Billet  <billet@eurecom.fr>                             */
-/*---------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------ */
+/* Implementation of the double pipe ECHO hash function in its 256-bit outputs variant.*/
+/* Optimized for ANSI C, 32-bit mode                                                   */
+/*                                                                                     */
+/* Date:     2010-04-12                                                                */
+/*                                                                                     */
+/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 */
+/*           Olivier Billet  <billet@eurecom.fr>                                       */
+/*------------------------------------------------------------------------------------ */
 #include "echo32.h"
 #include "api.h"
 
@@ -108,9 +108,9 @@ HashReturn Init(hashState *state, unsigned int hashbitlen)
 	memset(state->state, 0, 16*16);
   	/* set some initial values	    */
   	if(hashbitlen <= 256)
-	 	state->end_cv = 16;
+	 	state->end_cv = (16*16-(BSIZE256/8))/sizeof(int);
   	else
-	  	state->end_cv = 2*16;
+	 	state->end_cv = (16*16-(BSIZE512/8))/sizeof(int);
 
   	/* load the IV in the internal state */
  	for(i=0; i< state->end_cv; i++){
@@ -126,9 +126,9 @@ HashReturn Init(hashState *state, unsigned int hashbitlen)
 	state->hashbitlen = hashbitlen;
 	state->messbitlen = 0;
 	if(hashbitlen <= 256)
-		state->m_blocksize = 1536;
+		state->m_blocksize = BSIZE256;
 	else
-		state->m_blocksize = 1024;
+		state->m_blocksize = BSIZE512;
 
     	/* set the counter */
   	state->CNT = 0;
@@ -276,10 +276,10 @@ HashReturn Init(hashState *state, unsigned int hashbitlen)
 
 #define LOADmessage(state, data) do {\
 	if(state->hashbitlen <= 256){\
-		memcpy(state->state+16, data, 1536 >> 3);\
+		memcpy(state->state+state->end_cv, data, BSIZE256 >> 3);\
 	}\
 	else{\
-		memcpy(state->state+2*16, data, 1024 >> 3);\
+		memcpy(state->state+state->end_cv, data, BSIZE512 >> 3);\
 	}\
 }while(0);
 
@@ -291,9 +291,9 @@ HashReturn Init(hashState *state, unsigned int hashbitlen)
 
 #define FEEDforward(state, oldcv) do{\
 	if(state->end_cv == 16){\
-		XOR_MEM(state->state, 			state->state + state->end_cv, 	state->end_cv);\
-		XOR_MEM(state->state + 2*state->end_cv, state->state + 3*state->end_cv, state->end_cv);\
-		XOR_MEM(state->state, 			state->state + 2*state->end_cv, state->end_cv);\
+		XOR_MEM(state->state, 			state->state + 16, 	state->end_cv);\
+		XOR_MEM(state->state + 2*state->end_cv, state->state + 3*16, state->end_cv);\
+		XOR_MEM(state->state, 			state->state + 2*16, state->end_cv);\
 		XOR_MEM(state->state, 			oldcv, 				state->end_cv);\
 	}\
 	else{\
@@ -333,7 +333,12 @@ HashReturn Init(hashState *state, unsigned int hashbitlen)
 HashReturn Compress(hashState *state)
 { 	
 	/*	Saving the old chaining variable for feedforwarding			*/
+#ifdef ECHO_DP
 	unsigned int oldcv[2*16];
+#endif
+#ifdef ECHO_SP
+	unsigned int oldcv[16];
+#endif
 	unsigned int i;
 	unsigned long long c0, c1;
 

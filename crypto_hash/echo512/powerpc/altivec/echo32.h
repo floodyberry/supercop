@@ -1,12 +1,12 @@
-/*---------------------------------------------------------------------------*/
-/* Implementation of the ECHO hash function in its 512-bit outputs variant.  */
-/* Optimized for PowerPC with Altivec                                        */
-/*                                                                           */
-/* Date:     02 Jul 2009                                                     */
-/*                                                                           */
-/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       */
-/*           Olivier Billet  <billet@eurecom.fr>                             */
-/*---------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------ */
+/* Implementation of the double pipe ECHO hash function in its 512-bit outputs variant.*/
+/* Optimized for PowerPC with Altivec                                                  */
+/*                                                                                     */
+/* Date:     2010-04-12                                                                */
+/*                                                                                     */
+/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 */
+/*           Olivier Billet  <billet@eurecom.fr>                                       */
+/*------------------------------------------------------------------------------------ */
 #ifndef ECHO_32_H
 #define ECHO_32_H
 

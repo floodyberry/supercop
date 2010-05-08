@@ -1,16 +1,30 @@
-/*---------------------------------------------------------------------------*/
-/* Implementation of the ECHO hash function in its 256-bit outputs variant.  */
-/* Optimized for ANSI C, 32-bit mode                                         */
-/*                                                                           */
-/* Date:     02 Jul 2009                                                     */
-/*                                                                           */
-/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       */
-/*           Olivier Billet  <billet@eurecom.fr>                             */
-/*---------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------ */
+/* Implementation of the double pipe ECHO hash function in its 256-bit outputs variant.*/
+/* Optimized for ANSI C, 32-bit mode                                                   */
+/*                                                                                     */
+/* Date:     2010-04-12                                                                */
+/*                                                                                     */
+/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 */
+/*           Olivier Billet  <billet@eurecom.fr>                                       */
+/*------------------------------------------------------------------------------------ */
 #ifndef ECHO_32_H
 #define ECHO_32_H
 
 #include <string.h>
+
+/*  ECHOP DP by default		*/
+#ifndef ECHO_SP
+#define ECHO_DP
+#endif
+
+#ifdef ECHO_DP
+#define BSIZE256 1536
+#define BSIZE512 1024
+#endif
+#ifdef ECHO_SP
+#define BSIZE256 1792
+#define BSIZE512 1536
+#endif
 
 typedef unsigned char BitSequence;
 typedef unsigned long long DataLength;
@@ -28,7 +42,7 @@ typedef struct {
   /* (chaining variable + message)							*/
   unsigned int state[4*16];
   /*  current data buffer								*/
-  BitSequence data[1536 >> 3];
+  BitSequence data[BSIZE256 >> 3];
   /* the size of the output hash							*/
   unsigned int hashbitlen;
   /* the size of the message bit length							*/

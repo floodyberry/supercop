@@ -1,12 +1,12 @@
-/*---------------------------------------------------------------------------*/
-/* Implementation of the ECHO hash function in its 256-bit outputs variant.  */
-/* Optimized for ANSI C, 64-bit mode                                         */
-/*                                                                           */
-/* Date:     02 Jul 2009                                                     */
-/*                                                                           */
-/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       */
-/*           Olivier Billet  <billet@eurecom.fr>                             */
-/*---------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------ */
+/* Implementation of the double pipe ECHO hash function in its 256-bit outputs variant.*/
+/* Optimized for ANSI C, 64-bit mode                                                   */
+/*                                                                                     */
+/* Date:     2010-04-12                                                                */
+/*                                                                                     */
+/* Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 */
+/*           Olivier Billet  <billet@eurecom.fr>                                       */
+/*------------------------------------------------------------------------------------ */
 #include "echo64.h"
 #include "api.h"
 
@@ -442,26 +442,29 @@ HashReturn Final(hashState *state, BitSequence *hashval)
    * zeros up to the next block and call Compress) */
   if((block_length-filled_space) < 145){
     message[filled_space/8] |= (1 << (7-filled_space%8));
-    filled_space++;
+    message[filled_space/8] &= (0xff << (7-filled_space%8));
+    filled_space += 7-filled_space%8;
     if(filled_space > 0){
-      while(block_length-filled_space){
-        message[filled_space/8] &= (0xff ^ (1 << (7-filled_space%8)));
-        filled_space++;
-      }
+      memset(&(message[filled_space/8])+1, 0, (block_length-filled_space)/8);
       Compress(state);
       filled_space = 0;
     } 
   } else {
+    /*  Add the 1 and fill the remaining bits of the byte with zeros  */
     message[filled_space/8] |= (1 << (7-filled_space%8));
-    filled_space++;
+    message[filled_space/8] &= (0xff << (7-filled_space%8));
+    filled_space += 7-filled_space%8;
   }
-
   /* now fill with zeros up to the last 144 bits */
   message  = (unsigned char*)(state->state);
   message += (state->cv_blocks << 4);
   cnt = state->counter + state->message_bitlen;
-  for(i=filled_space; i<(block_length-144); i++)
-    message[i/8] &= (0xff ^ (1 << (7-(i%8))));
+  if(filled_space == 0){
+    memset(&(message[filled_space/8])  , 0, (block_length-144)/8);
+  }
+  else{
+    memset(&(message[filled_space/8])+1, 0, (block_length-144-filled_space)/8);
+  }
   message += (256-16*state->cv_blocks-18);
   PushString(state->hashbitlen, message, USINT);
   PushString(cnt, message+2, ULL);

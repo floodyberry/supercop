@@ -5,7 +5,6 @@
 #include "Counter.h"
 
 #include <cstring>
-#include <string.h>
 
 using namespace std;
 
@@ -15,8 +14,8 @@ class Ocelot1
 {
 //****************************************************************************
 //
-// The OCELOT1 stream ciphering method method, Version 1.0.0
-// Copyright (C) 2009-2010, George Anescu, www.scgen.com
+// The OCELOT1 stream ciphering method method, Version 1.1.0 (01 May 2010)
+// Copyright (C) 2009-2010, George Anescu, www.sc-gen.com
 // All right reserved.
 //
 // This is the C++ implementation of a new stream ciphering method called OCELOT1. It is accepting any practical key size and can
@@ -27,22 +26,22 @@ class Ocelot1
 // code, but any ideas about improving the code are welcomed and will be recognized if implemented.
 //
 // If you are interested in testing the code, in research collaborations for possible security holes in the method, or in any
-// other information please contact the author at <george.anescu@scgen.com>.
+// other information please contact the author at <george.anescu@sc-gen.com>.
 //
 // Test Samples:
 //
 // 1)
 // statesize=4, key="XXXXXXX"
-// hexresult="CD65720C9646545824ED2B21F97CA7B56B7C912073E9D6..."
-// hexresult="...AC51A904D073429309AAA69DCDBF6EAD1FA24E7DF0FC78"
+// hexresult="1DF27C916D3443EA5CB3D1C44EC8F6C3D01C0BDBF3CBD5"...
+// hexresult=..."56051B30C8BAE9EB96A5A44178A5254E01419D95D48A13"
 //
 // 2)
 // statesize=4, key="YXXXXXX"
-// hexresult="6F52278BC3BC76AF7EF9486094510C13EF4B8C5343CEFA40C814D9E53C6A75FEE0F39B5D8893856001C0B91654DB75B2C6A1..."
+// hexresult="87D9B363BACC5EA792DFE7CF2331F19F44DD3526A2483BCA9851037AFD5D2F66DF6FFA29E39FFABB715C5A0B75E3E5D74ED8"...
 //
 // 3)
-// statesize=4, key="\0\0\0\0"
-// hexresult="B672627E5DAEABA9A2F7DEDB7A14F82B75D0ABDB5541DC..."
+// statesize=8, key="\0\0\0\0"
+// hexresult="16CF935B0A0EB611EC0840E578A8521215D9D938D18C5F"...
 //
 //****************************************************************************
 public:
@@ -63,6 +62,8 @@ public:
 		memcpy(_ss, _ss0, 256);            
 		_cnt.Reset();
 		_ix = _ix0;
+		_ix1 = _ix1_0;
+		_incr = _incr0;
 	}
 
 	void GetNextByte(BYTE& rnd);
@@ -113,7 +114,28 @@ private:
 		}
 	}
 
+	//Fast modulo
+	static int Mod(int a, int b)
+	{
+		int s = b;
+		while (s <= a)
+		{
+			s <<= 1;
+		}
+		int r = a;
+		while (r >= b)
+		{
+			s >>= 1;
+			if (s <= r)
+			{
+				r -= s;
+			}
+		}
+		return r;
+	}
+
 	const static BYTE _sss[256];
+	const static short _sarrprimes[256];
 
 	Counter _cnt;
 	BYTE _data0[256];
@@ -123,10 +145,12 @@ private:
 	BYTE _val;
 	int _ssix;
 	int _ix;
+	int _ix1;
+	int _incr;
 	int _ix0;
-	int _size; //should be a power of 2
-	int _sizem1;
-	int _sized2;
+	int _ix1_0;
+	int _incr0;
+	int _size;
 };
 
 #endif // __OCELOT1_H__

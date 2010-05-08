@@ -16,8 +16,8 @@ class Atelopus
 {
 //****************************************************************************
 //
-// The ATELOPUS hashing method, Version 1.0.0
-// Copyright (C) 2009-2010, George Anescu, www.scgen.com
+// The ATELOPUS hashing method, Version 1.1.0 (29 April 2010)
+// Copyright (C) 2009-2010, George Anescu, www.sc-gen.com
 // All right reserved.
 //
 // This is the C++ implementation of a new cryptographic hashing method called ATELOPUS, which can be considered an universal
@@ -29,7 +29,7 @@ class Atelopus
 // code, but any ideas about improving the code are welcomed and will be recognized if implemented.
 //
 // If you are interested in testing the code, in research collaborations for possible security holes in the method, or in any
-// other information please contact the author at <george.anescu@scgen.com>.
+// other information please contact the author at <george.anescu@sc-gen.com>.
 //
 // Test Samples:
 //
@@ -37,52 +37,42 @@ class Atelopus
 //
 // 1)
 // data=""
-// hexresult="07454442857189"
+// hexresult="1772623E426DFF"
 //
 // 2)
 // data="AABB"
-// hexresult="259C268CE3C240"
+// hexresult="7AFBA04E669206"
 //
 // 3)
 // data="AAAABBBB"
-// hexresult="D8F9F5C2E76B0E"
+// hexresult="4528CA1A80938B"
 //
 // 4)
 // data="AAAABBBBAAAABBBB"
-// hexresult="E2586CE901D319"
+// hexresult="812D97F0AFAEC6"
 //
 // 5)
 // data="AAAABBBBAAAABBBBAAAABBBBAAAABBBB"
-// hexresult="94FFC8C773CB04"
+// hexresult="57EE34A21740E4"
 //
 // 6)
 // data="AAAABBBBAAAABBBBAAAABBBBAAAABBBBAAAABBBBAAAABBBBAAAABBBBAAAABBBB"
-// hexresult="439D22BF339689"
+// hexresult="7732F9F5564FB7"
 //
 // hashsize=16, iter=3, blocksize=16
 //
 // 7)
 // data="YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
-// hexresult="B2C7F2A54C2C91D451F6B228F02C0E29"
+// hexresult="A44FC28053B7F8C2C26626EE1D1489D5"
 //
 // 8)
 // data="XYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
-// hexresult="BBF663019801E630223F23D38B16067F"
+// hexresult="9222BC4180F94DA932BCCA977F5FC091"
 //
 // 9)
-// hashsize=10, iter=3, blocksize=16
+// hashsize=20, iter=3, blocksize=16
 // data="YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
-// hexresult="F45C99BCFE7A6CBE5A252ADFF085E7BFEFDDDDDB"
-//
-// 10)
-// hashsize=32, iter=3, blocksize=128
-// data=""
-// hexresult="3AA507C2695D0C82F655F1F95DC4455CEE1024661715D3353FB9FF43C7CC5CAB"
-//
-// 11)
-// hashsize=64, iter=3, blocksize=256
-// data=""
-// hexresult="0D1C34400C8C9DD3D1E6B6D993CFFE6842A9A49D49D406BD71C3ED03366FB49FAD2B77D706EC40D9CB285B9598658E0FA79A0B7697EE67EA9659A584041AD66A"
+// hexresult="F59E193F9CED8E4871C85003B5E6EE4CDC03E983"
 //
 //****************************************************************************
 public:

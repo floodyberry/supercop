@@ -5,7 +5,6 @@
 #include "Counter.h"
 
 #include <cstring>
-#include <string.h>
 
 using namespace std;
 
@@ -15,7 +14,7 @@ class Ocelot2
 {
 //****************************************************************************
 //
-// The OCELOT2 stream ciphering method, Version 1.0.0
+// The OCELOT2 stream ciphering method, Version 1.1.0 (01 May 2010)
 // Copyright (C) 2009-2010, George Anescu, www.scgen.com
 // All right reserved.
 //
@@ -33,16 +32,16 @@ class Ocelot2
 //
 // 1)
 // statesize=4, key="XXXXXXX"
-// hexresult="BBA7DD84AB169294C09ACEEFD805F4B1B3F82729D47F64..."
-// hexresult="...BB8A257A93CFF95E6AC2FDC464AFB526A7C5051278324F"
+// hexresult="C715A8AF784E134081380CB043F5F80D3F90E7CEB7C609"...
+// hexresult=..."28117C76072E4EBE8E8829B3C754C6BAA2A7E760F71FFE"
 //
 // 2)
 // statesize=4, key="YXXXXXX"
-// hexresult="2A33740E0F1E92A3CFFC3FC8FAA71B7ABF8FE5F50CDBA6B97573620E7F3A3D5CD2BF859F881F142C1C50E85B38C3DD8560F1..."
+// hexresult="1725F7CB32F6E12EFA4439C17D25483CD8C32A3D2D912A8C4270258CEBCB536FCAA1191D3D497F86C615CABA9DE4C3216EA3"...
 //
 // 3)
-// statesize=4, key="\0\0\0\0"
-// hexresult="9AF3D789B062E6B842832B5E8E9FACCA2DE05344C45C8F..."
+// statesize=8, key="\0\0\0\0"
+// hexresult="1B27EFFACA9E829A6EBB2DE7A3117F3047CFE83AE2D4DD"...
 //
 //****************************************************************************
 public:
@@ -63,6 +62,8 @@ public:
 		memcpy(_ss, _ss0, 256);            
 		_cnt.Reset();
 		_ix = _ix0;
+		_ix1 = _ix1_0;
+		_incr = _incr0;
 	}
 
 	void GetNextByte(BYTE& rnd);
@@ -113,7 +114,28 @@ private:
 		}
 	}
 
+	//Fast modulo
+	static int Mod(int a, int b)
+	{
+		int s = b;
+		while (s <= a)
+		{
+			s <<= 1;
+		}
+		int r = a;
+		while (r >= b)
+		{
+			s >>= 1;
+			if (s <= r)
+			{
+				r -= s;
+			}
+		}
+		return r;
+	}
+
 	const static BYTE _sss[256];
+	const static short _sarrprimes[256];
 
 	Counter _cnt;
 	BYTE _data0[256];
@@ -123,10 +145,12 @@ private:
 	BYTE _val;
 	int _ssix;
 	int _ix;
+	int _ix1;
+	int _incr;
 	int _ix0;
-	int _size; //should be a power of 2
-	int _sizem1;
-	int _sized2;
+	int _ix1_0;
+	int _incr0;
+	int _size;
 };
 
 #endif // __OCELOT2_H__

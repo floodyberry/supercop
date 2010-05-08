@@ -3,6 +3,7 @@
 #define __COUNTER_H__
 
 #include <cstring>
+#include <string.h>
 
 using namespace std;
 

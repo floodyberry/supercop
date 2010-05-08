@@ -1,7 +1,7 @@
-Implementation of the ECHO hash function in its 256-bit outputs variant.
+Implementation of the double pipe ECHO hash function in its 256-bit outputs variant.
 Optimized for Pentium4, 64-bit mode
 
-Date:     28 Jul 2009
+Date:     2010-04-12
 
 Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>
           Olivier Billet  <billet@eurecom.fr>

@@ -3,8 +3,8 @@
 
 //****************************************************************************
 //
-// The ATELOPUS hashing method, Version 1.0.0
-// Copyright (C) 2009-2010, George Anescu, www.scgen.com
+// The ATELOPUS hashing method, Version 1.1.0 (29 April 2010)
+// Copyright (C) 2009-2010, George Anescu, www.sc-gen.com
 // All right reserved.
 //
 //****************************************************************************
@@ -22,7 +22,6 @@ const BYTE Atelopus::_skk1[256] = {
 	102, 128, 249, 238, 213, 120, 111, 64, 170, 93, 85, 82, 28, 252, 116, 112, 203, 17, 197, 254, 14, 185, 73, 92, 31,
 	38, 199, 159, 55, 89, 69, 74, 182, 172,
 };
-
 
 const short Atelopus::_sarrprimes[256] = {
 	719, 1229, 1759, 467, 971, 1489, 2053, 709, 1223, 1753, 
@@ -57,7 +56,8 @@ void Atelopus::HashPrimitive(BYTE const* data, BYTE* res, int len)
 {
 	//Copy in work buffer
 	BYTE bytes[BlockSize256], temp1, temp2;
-	memcpy(bytes, data, len); 
+	memcpy(bytes, data, len);
+	int len1 = len - 1;
 	int lend2 = len >> 1;
 	//Introduce a data difference based on _size
 	bytes[0] ^= _kk1[(BYTE)_size];
@@ -70,37 +70,25 @@ void Atelopus::HashPrimitive(BYTE const* data, BYTE* res, int len)
 		ix = Atelopus::Mod(_kk1[_val1 ^ _val2], len);
 		ix1 = ix + lend2;
 		if (ix1 >= len) ix1 = 0;
+		temp1 = _kk1[_val1] ^ _val2;
+		temp2 = _val1 + _kk1[_val2];
+		if (temp2 == temp1)
+		{
+			temp2++;
+		}
+		incr1 = _sarrprimes[temp1];
+		incr2 = _sarrprimes[temp2];
+		incr1 = Atelopus::Mod(incr1, len);
+		incr2 = Atelopus::Mod(incr2, len);
+		pos1 = Atelopus::Mod(_val1, len);
+		pos2 = Atelopus::Mod(_val2, len);
+		if ((incr1 == incr2) && (pos1 == pos2))
+		{
+			pos2++;
+			if (pos2 >= len) pos2 = 0;
+		}
 		for (i = 0; i < len; i++)
 		{
-			if (i == 0)
-			{
-				pos1 = _val1;
-				pos2 = _val2;
-				pos1 = Atelopus::Mod(pos1, len);
-				pos2 = Atelopus::Mod(pos2, len);
-				if (pos1 == pos2)
-				{
-					pos2++;
-					if (pos2 >= len) pos2 = 0;
-				}
-				temp1 = _kk1[_val1] ^ _val2;
-				temp2 = _val1 + _kk1[_val2];
-				if (temp2 == temp1)
-				{
-					temp2++;
-				}
-				incr1 = _sarrprimes[temp1];
-				incr2 = _sarrprimes[temp2];
-				incr1 = Atelopus::Mod(incr1, len);
-				incr2 = Atelopus::Mod(incr2, len);
-			}
-			else
-			{
-				pos1 += incr1;
-				if (pos1 >= len) pos1 -= len;
-				pos2 += incr2;
-				if (pos2 >= len) pos2 -= len;
-			}
 			if (pos1 == pos2)
 			{
 				temp1 = bytes[pos1];
@@ -124,33 +112,55 @@ void Atelopus::HashPrimitive(BYTE const* data, BYTE* res, int len)
 				Atelopus::Swap(_kk1, (bytes[pos1] = Atelopus::G1(temp1) ^ _kk1[_val1]), _val2);
 				bytes[pos2] = Atelopus::F2(temp2) + _kk1[_val2];
 			}
-			ix++;
-			if (ix == len) ix = 0;
-			ix1++;
-			if (ix1 == len) ix1 = 0;
+			if (i < len1)
+			{
+				ix++;
+				if (ix == len) ix = 0;
+				ix1++;
+				if (ix1 == len) ix1 = 0;
+				pos1 += incr1;
+				if (pos1 >= len) pos1 -= len;
+				pos2 += incr2;
+				if (pos2 >= len) pos2 -= len;
+			}
 		}
 	}
 	//2) Contracting
 	i = 0;
 	ix = lend2;
 	int max = _size - lend2;
+	temp1 = _kk1[_val1] ^ _val2;
+	temp2 = _val1 + _kk1[_val2];
+	if (temp2 == temp1)
+	{
+		temp2++;
+	}
+	incr1 = _sarrprimes[temp1];
+	incr2 = _sarrprimes[temp2];
+	incr1 = Atelopus::Mod(incr1, len);
+	incr2 = Atelopus::Mod(incr2, len);
+	pos1 = Atelopus::Mod(_val1, len);
+	pos2 = Atelopus::Mod(_val2, len);
+	if ((incr1 == incr2) && (pos1 == pos2))
+	{
+		pos2++;
+		if (pos2 >= len) pos2 = 0;
+	}
 	for (k = 0; k < _size; k++, i++, ix++)
 	{
 		if (i == len) i = 0;
 		if (ix == len) ix = 0;
-		temp1 = bytes[i];
-		temp2 = bytes[ix];
-		_val1 += _kk1[temp1];
-		_val1 ^= temp2;
-		res[k] = (_val2 += Atelopus::G1(_val1));
-		_val2 ^= _kk1[temp2];
-		_val2 += temp1;
-		Atelopus::Swap(_kk1, temp2, _val2);
-		if (k < max)
-		{
-			bytes[i] = Atelopus::G2(temp1) + _kk1[_val1];
-			bytes[ix] = Atelopus::F1(temp2) ^ _kk1[_val2];
-		}
+		temp1 = bytes[pos1];
+		_val1 ^= _kk1[temp1];
+		_val1 += bytes[i];
+		res[k] = (_val2 ^= Atelopus::F1(_val1));
+		_val2 += _kk1[bytes[pos2]];
+		_val2 ^= bytes[ix];
+		Atelopus::Swap(_kk1, Atelopus::G1(temp1) ^ _kk1[_val1], _val2);
+		pos1 += incr1;
+		if (pos1 >= len) pos1 -= len;
+		pos2 += incr2;
+		if (pos2 >= len) pos2 -= len;
 	}
 	//3) Combining with the original
 	max = (len < _size) ? _size : len;

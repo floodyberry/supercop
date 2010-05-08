@@ -1,12 +1,12 @@
-#---------------------------------------------------------------------------#
-# Implementation of the ECHO hash function in its 256-bit outputs variant.  #
-# Optimized for Pentium, legacy x86                                         #
-#                                                                           #
-# Date:     28 Jul 2009                                                     #
-#                                                                           #
-# Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                       #
-#           Olivier Billet  <billet@eurecom.fr>                             #
-#---------------------------------------------------------------------------#
+#------------------------------------------------------------------------------------ #
+# Implementation of the double pipe ECHO hash function in its 256-bit outputs variant.#
+# Optimized for Pentium, legacy x86                                                   #
+#                                                                                     #
+# Date:     2010-04-12                                                                #
+#                                                                                     #
+# Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 #
+#           Olivier Billet  <billet@eurecom.fr>                                       #
+#------------------------------------------------------------------------------------ #
 	.file	"echo32.c"
 	.text
 	.p2align 4,,15
@@ -22257,167 +22257,201 @@ Final:
 	pushl	%edi
 	pushl	%esi
 	pushl	%ebx
-	subl	$28, %esp
-	movl	8(%ebp), %ebx
-	movl	SHA3_S+276, %esi
-	cmpl	%ebx, %esi
+	subl	$44, %esp
+	movl	8(%ebp), %esi
+	movl	SHA3_S+276, %edi
+	cmpl	%esi, %edi
 	je	.L83
+	movl	12(%ebp), %ebx
 	xorl	%eax, %eax
 	.p2align 4,,7
 	.p2align 3
 .L84:
 	movl	SHA3_S(,%eax,8), %edx
 	movl	SHA3_S+4(,%eax,8), %ecx
-	movl	%edx, (%esi,%eax,8)
-	movl	%ecx, 4(%esi,%eax,8)
+	movl	%edx, (%edi,%eax,8)
+	movl	%ecx, 4(%edi,%eax,8)
 	addl	$1, %eax
 	cmpl	$35, %eax
 	jne	.L84
+	movl	%ebx, 12(%ebp)
 	xorb	%al, %al
 	.p2align 4,,7
 	.p2align 3
 .L85:
-	movl	(%ebx,%eax,8), %edx
-	movl	4(%ebx,%eax,8), %ecx
+	movl	(%esi,%eax,8), %edx
+	movl	4(%esi,%eax,8), %ecx
 	movl	%edx, SHA3_S(,%eax,8)
 	movl	%ecx, SHA3_S+4(,%eax,8)
 	addl	$1, %eax
 	cmpl	$35, %eax
 	jne	.L85
-	movl	%ebx, SHA3_S+276
+	movl	%ebx, 12(%ebp)
+	movl	%esi, SHA3_S+276
 .L83:
-	movl	SHA3_S+272, %ebx
-	movl	$16, %edi
+	movl	SHA3_S+272, %edx
+	movl	$16, %esi
 	movl	SHA3_S+264, %eax
-	subl	%ebx, %edi
-	sall	$7, %edi
-	movl	%edi, %edx
-	sall	$4, %ebx
+	subl	%edx, %esi
+	sall	$7, %esi
+	sall	$4, %edx
+	leal	SHA3_S(%edx), %ebx
+	movl	%esi, %edx
 	subl	%eax, %edx
-	addl	$SHA3_S, %ebx
 	cmpl	$144, %edx
 	jg	.L86
 	movl	%eax, %edx
 	sarl	$31, %edx
 	shrl	$29, %edx
 	leal	(%edx,%eax), %ecx
-	movl	%ecx, %esi
+	movl	%ecx, %edi
 	andl	$7, %ecx
 	subl	%ecx, %edx
-	sarl	$3, %esi
+	sarl	$3, %edi
+	addl	%ebx, %edi
 	leal	7(%edx), %ecx
 	movl	$1, %edx
+	movl	%edi, -32(%ebp)
 	sall	%cl, %edx
-	orb	%dl, (%ebx,%esi)
-	leal	1(%eax), %edx
-	testl	%edx, %edx
-	movl	%edx, %eax
-	jle	.L88
-	cmpl	%edx, %edi
-	je	.L89
+	orb	(%edi), %dl
+	movl	$255, %edi
+	sall	%cl, %edi
+	leal	(%ecx,%eax), %eax
+	andl	%edi, %edx
+	movl	-32(%ebp), %edi
+	testl	%eax, %eax
+	movb	%dl, (%edi)
+	jle	.L87
+	movl	%esi, %ecx
+	subl	%eax, %ecx
+	movl	%ecx, %edx
+	sarl	$31, %edx
+	shrl	$29, %edx
+	addl	%ecx, %edx
+	sarl	$3, %eax
+	sarl	$3, %edx
+	leal	1(%ebx,%eax), %eax
+	movl	%edx, 8(%esp)
+	movl	$0, 4(%esp)
+	movl	%eax, (%esp)
+	call	memset
+	call	Compress
+	movl	SHA3_S+264, %edx
+	movl	SHA3_S+272, %edi
+	movl	%edx, %ecx
+	sall	$4, %edi
+	sarl	$31, %ecx
+	addl	$SHA3_S, %edi
+	addl	SHA3_S+256, %edx
+	adcl	SHA3_S+260, %ecx
+.L88:
+	subl	$144, %esi
+	sarl	$3, %esi
+	movl	%edx, -36(%ebp)
+	movl	%ecx, -40(%ebp)
+	movl	%esi, 8(%esp)
+	movl	$0, 4(%esp)
+	movl	%edi, (%esp)
+	call	memset
+	movl	-36(%ebp), %edx
+	movl	-40(%ebp), %ecx
+	jmp	.L90
 	.p2align 4,,7
 	.p2align 3
-.L96:
-	movl	%edx, %esi
+.L86:
+	movl	%eax, %edx
+	sarl	$31, %edx
+	shrl	$29, %edx
+	leal	(%edx,%eax), %ecx
+	movl	%ecx, %edi
+	andl	$7, %ecx
+	sarl	$3, %edi
+	subl	%ecx, %edx
+	leal	7(%edx), %ecx
+	movl	$1, %edx
+	leal	(%edi,%ebx), %ebx
+	movl	$255, %edi
+	sall	%cl, %edx
+	orb	(%ebx), %dl
+	sall	%cl, %edi
+	leal	(%ecx,%eax), %eax
+	andl	%edi, %edx
+	movb	%dl, (%ebx)
+.L87:
+	movl	SHA3_S+264, %edx
+	movl	SHA3_S+272, %edi
+	movl	%edx, %ecx
+	sall	$4, %edi
+	sarl	$31, %ecx
+	addl	$SHA3_S, %edi
+	addl	SHA3_S+256, %edx
+	adcl	SHA3_S+260, %ecx
+	testl	%eax, %eax
+	je	.L88
+	leal	-144(%esi), %ebx
+	subl	%eax, %ebx
+	movl	%ebx, %esi
 	sarl	$31, %esi
 	shrl	$29, %esi
-	leal	(%esi,%edx), %ecx
-	addl	$1, %edx
-	movl	%ecx, %eax
-	andl	$7, %ecx
-	subl	%esi, %ecx
-	movl	$7, %esi
-	subl	%ecx, %esi
-	movl	%esi, %ecx
-	movl	$1, %esi
-	sall	%cl, %esi
+	addl	%esi, %ebx
+	movl	%eax, %esi
+	sarl	$31, %esi
+	shrl	$29, %esi
+	addl	%esi, %eax
 	sarl	$3, %eax
-	movl	%esi, %ecx
-	notl	%ecx
-	andb	%cl, (%ebx,%eax)
-	cmpl	%edi, %edx
-	jne	.L96
-.L89:
-	call	Compress
-	xorl	%eax, %eax
-.L88:
-	movl	SHA3_S+264, %ecx
-	movl	SHA3_S+272, %edx
-	movl	%ecx, %ebx
-	movl	%edx, %esi
-	sarl	$31, %ebx
-	sall	$4, %esi
-	movl	%ecx, -24(%ebp)
-	movl	SHA3_S+256, %ecx
-	addl	$SHA3_S, %esi
-	movl	%ebx, -20(%ebp)
-	movl	SHA3_S+260, %ebx
-	addl	%ecx, -24(%ebp)
-	adcl	%ebx, -20(%ebp)
-	subl	$144, %edi
-	cmpl	%eax, %edi
-	jbe	.L91
-	movl	%eax, %edx
-	notl	%edx
-	movl	%edi, -36(%ebp)
-	.p2align 4,,7
-	.p2align 3
-.L92:
-	movl	%edx, %edi
-	movl	%eax, %ebx
-	andl	$7, %edi
-	addl	$1, %eax
-	movl	%edi, -28(%ebp)
-	movzbl	-28(%ebp), %ecx
-	movl	$1, %edi
-	shrl	$3, %ebx
-	subl	$1, %edx
-	sall	%cl, %edi
-	movl	%edi, -28(%ebp)
-	movzbl	-28(%ebp), %ecx
-	notl	%ecx
-	andb	%cl, (%esi,%ebx)
-	cmpl	-36(%ebp), %eax
-	jb	.L92
-	movl	SHA3_S+272, %edx
-.L91:
+	leal	1(%edi,%eax), %eax
+	sarl	$3, %ebx
+	movl	%edx, -36(%ebp)
+	movl	%ecx, -40(%ebp)
+	movl	%ebx, 8(%esp)
+	movl	$0, 4(%esp)
+	movl	%eax, (%esp)
+	call	memset
+	movl	-40(%ebp), %ecx
+	movl	-36(%ebp), %edx
+.L90:
+	movl	SHA3_S+268, %esi
 	movl	$16, %eax
-	subl	%edx, %eax
-	movl	SHA3_S+268, %edx
+	subl	SHA3_S+272, %eax
 	sall	$4, %eax
-	leal	-18(%esi,%eax), %eax
-	movb	%dl, (%eax)
-	movl	SHA3_S+268, %edx
-	sarl	$8, %edx
-	movb	%dl, 1(%eax)
-	movzbl	-24(%ebp), %edx
+	movl	%esi, %ebx
+	leal	-18(%edi,%eax), %eax
+	movl	%ecx, %edi
+	movb	%bl, (%eax)
+	movl	SHA3_S+268, %esi
 	movb	%dl, 2(%eax)
-	movl	-20(%ebp), %ecx
-	movl	-24(%ebp), %edx
-	shrdl	$8, %ecx, %edx
-	movb	%dl, 3(%eax)
-	movl	-20(%ebp), %ecx
-	movl	-24(%ebp), %edx
-	shrdl	$16, %ecx, %edx
-	movb	%dl, 4(%eax)
-	movl	-24(%ebp), %edx
-	movl	-20(%ebp), %ecx
-	shrdl	$24, %ecx, %edx
-	movb	%dl, 5(%eax)
-	movl	-20(%ebp), %edx
-	movb	%dl, 6(%eax)
-	movl	-20(%ebp), %edx
-	shrl	$8, %edx
-	movb	%dl, 7(%eax)
-	movl	-20(%ebp), %edx
-	shrl	$16, %edx
-	movb	%dl, 8(%eax)
-	movl	-20(%ebp), %edx
+	movb	%cl, 6(%eax)
 	movb	$0, 10(%eax)
+	sarl	$8, %esi
+	movl	%esi, %ebx
+	movl	%edx, %esi
+	shrdl	$8, %edi, %esi
+	movl	%ecx, %edi
+	movb	%bl, 1(%eax)
+	movl	%esi, %ebx
+	movl	%edx, %esi
+	shrdl	$16, %edi, %esi
+	movl	%ecx, %edi
+	movb	%bl, 3(%eax)
+	movl	%esi, %ebx
+	movl	%edx, %esi
+	shrdl	$24, %edi, %esi
+	movl	%ecx, %edx
+	movb	%bl, 4(%eax)
+	movl	%esi, %ebx
+	movl	%ecx, %esi
+	shrl	$8, %esi
+	movb	%bl, 5(%eax)
+	movl	%esi, %ebx
+	movl	%ecx, %esi
+	shrl	$16, %esi
+	movb	%bl, 7(%eax)
+	shrl	$24, %edx
+	movl	%esi, %ebx
+	movb	%bl, 8(%eax)
+	movb	%dl, 9(%eax)
 	movb	$0, 11(%eax)
 	movb	$0, 12(%eax)
-	shrl	$24, %edx
-	movb	%dl, 9(%eax)
 	movb	$0, 13(%eax)
 	movb	$0, 14(%eax)
 	movb	$0, 15(%eax)
@@ -22427,12 +22461,12 @@ Final:
 	movl	SHA3_S+268, %eax
 	sarl	$3, %eax
 	testl	%eax, %eax
-	je	.L93
+	je	.L91
 	movl	12(%ebp), %edx
 	xorl	%eax, %eax
 	.p2align 4,,7
 	.p2align 3
-.L94:
+.L92:
 	movl	%eax, %ebx
 	movl	%eax, %ecx
 	shrl	$3, %ebx
@@ -22443,45 +22477,28 @@ Final:
 	shrdl	%esi, %ebx
 	shrl	%cl, %esi
 	testb	$32, %cl
-	je	.L102
+	je	.L97
 	movl	%esi, %ebx
-.L102:
+.L97:
 	movb	%bl, (%edx,%eax)
 	movl	SHA3_S+268, %ecx
 	addl	$1, %eax
 	sarl	$3, %ecx
 	cmpl	%eax, %ecx
-	ja	.L94
-.L93:
+	ja	.L92
+.L91:
 	movl	$0, SHA3_S+276
 	xorl	%eax, %eax
-	addl	$28, %esp
+	addl	$44, %esp
 	popl	%ebx
 	popl	%esi
 	popl	%edi
 	popl	%ebp
 	ret
-	.p2align 4,,7
-	.p2align 3
-.L86:
-	movl	%eax, %edx
-	sarl	$31, %edx
-	shrl	$29, %edx
-	leal	(%edx,%eax), %ecx
-	addl	$1, %eax
-	movl	%ecx, %esi
-	andl	$7, %ecx
-	subl	%ecx, %edx
-	leal	7(%edx), %ecx
-	movl	$1, %edx
-	sarl	$3, %esi
-	sall	%cl, %edx
-	orb	%dl, (%ebx,%esi)
-	jmp	.L88
 	.size	Final, .-Final
 	.p2align 4,,15
-	.type	T.34, @function
-T.34:
+	.type	T.39, @function
+T.39:
 	pushl	%ebp
 	movl	%esp, %ebp
 	pushl	%edi
@@ -22493,20 +22510,20 @@ T.34:
 	leal	-312(%ebp), %ebx
 	movl	%ecx, -316(%ebp)
 	testl	%esi, %esi
-	je	.L104
+	je	.L99
 	cmpl	%ebx, %esi
-	je	.L104
+	je	.L99
 	xorl	%ecx, %ecx
 	movl	%esi, %edx
-.L105:
+.L100:
 	movl	SHA3_S(,%ecx,8), %esi
 	movl	SHA3_S+4(,%ecx,8), %edi
 	movl	%esi, (%edx,%ecx,8)
 	movl	%edi, 4(%edx,%ecx,8)
 	addl	$1, %ecx
 	cmpl	$35, %ecx
-	jne	.L105
-.L104:
+	jne	.L100
+.L99:
 	movl	%ebx, SHA3_S+276
 	movl	$-16843010, MEM_CST
 	movl	$-16843010, MEM_CST+4
@@ -22601,7 +22618,7 @@ T.34:
 	movl	%ebx, (%esp)
 	call	Update
 	testl	%eax, %eax
-	je	.L110
+	je	.L105
 	addl	$332, %esp
 	popl	%ebx
 	popl	%esi
@@ -22610,7 +22627,7 @@ T.34:
 	ret
 	.p2align 4,,7
 	.p2align 3
-.L110:
+.L105:
 	movl	8(%ebp), %eax
 	movl	%ebx, (%esp)
 	movl	%eax, 4(%esp)
@@ -22621,7 +22638,7 @@ T.34:
 	popl	%edi
 	popl	%ebp
 	ret
-	.size	T.34, .-T.34
+	.size	T.39, .-T.39
 	.p2align 4,,15
 .globl crypto_hash_echo256_pentium_pentiumvnommx
 	.type	crypto_hash_echo256_pentium_pentiumvnommx, @function
@@ -22636,7 +22653,7 @@ crypto_hash_echo256_pentium_pentiumvnommx:
 	movl	12(%ebp), %eax
 	shldl	$3, %edx, %ecx
 	sall	$3, %edx
-	call	T.34
+	call	T.39
 	leave
 	cmpl	$1, %eax
 	sbbl	%eax, %eax
@@ -22661,21 +22678,21 @@ Hash:
 	testl	%esi, %esi
 	movl	%eax, -320(%ebp)
 	movl	%edx, -316(%ebp)
-	je	.L116
+	je	.L111
 	cmpl	%ebx, %esi
-	je	.L116
+	je	.L111
 	xorl	%eax, %eax
 	.p2align 4,,7
 	.p2align 3
-.L117:
+.L112:
 	movl	SHA3_S(,%eax,8), %edx
 	movl	SHA3_S+4(,%eax,8), %ecx
 	movl	%edx, (%esi,%eax,8)
 	movl	%ecx, 4(%esi,%eax,8)
 	addl	$1, %eax
 	cmpl	$35, %eax
-	jne	.L117
-.L116:
+	jne	.L112
+.L111:
 	leal	-160(%edi), %edx
 	movl	$2, %eax
 	cmpl	$352, %edx
@@ -22696,7 +22713,7 @@ Hash:
 	movl	$0, MEM_CST+52
 	movl	$0, MEM_CST+56
 	movl	$0, MEM_CST+60
-	ja	.L119
+	ja	.L114
 	xorl	%ecx, %ecx
 	cmpl	$257, %edi
 	setge	%cl
@@ -22709,7 +22726,7 @@ Hash:
 	sarl	$31, %edi
 	.p2align 4,,7
 	.p2align 3
-.L121:
+.L116:
 	addl	$1, %edx
 	movl	%esi, (%eax)
 	movl	%edi, 4(%eax)
@@ -22717,22 +22734,22 @@ Hash:
 	movl	$0, 12(%eax)
 	addl	$16, %eax
 	cmpl	%ecx, %edx
-	jl	.L121
+	jl	.L116
 	cmpl	$15, %ecx
-	jg	.L123
+	jg	.L118
 	sall	$4, %ecx
 	addl	$SHA3_S, %ecx
 	.p2align 4,,7
 	.p2align 3
-.L124:
+.L119:
 	movl	$0, (%ecx)
 	movl	$0, 4(%ecx)
 	movl	$0, 8(%ecx)
 	movl	$0, 12(%ecx)
 	addl	$16, %ecx
 	cmpl	$SHA3_S+256, %ecx
-	jne	.L124
-.L123:
+	jne	.L119
+.L118:
 	movl	-320(%ebp), %eax
 	movl	-316(%ebp), %edx
 	movl	$0, SHA3_S+256
@@ -22745,15 +22762,15 @@ Hash:
 	movl	%eax, 4(%esp)
 	call	Update
 	testl	%eax, %eax
-	je	.L130
-.L119:
+	je	.L125
+.L114:
 	addl	$332, %esp
 	popl	%ebx
 	popl	%esi
 	popl	%edi
 	popl	%ebp
 	ret
-.L130:
+.L125:
 	movl	24(%ebp), %eax
 	movl	%ebx, (%esp)
 	movl	%eax, 4(%esp)
@@ -23289,5 +23306,5 @@ Te:
 	.comm	SHA3_ESP,4,4
 	.comm	SHA3_R,4,4
 	.comm	SHA3_S,280,32
-	.ident	"GCC: (Debian 4.4.1-1) 4.4.1"
+	.ident	"GCC: (Debian 4.4.3-3) 4.4.3"
 	.section	.note.GNU-stack,"",@progbits
