@@ -1,0 +1,9 @@
+Blue Midnight Wish - 256 as submitted to NIST on 15 Sept 2009.
+This is an optimized C + SSSE3 intrinsic eBASH implementation pre-compiled by ICC 11.1 for 32-bit x86 architectures.
+
+Programmer:  Rune E. Jensen, 
+             email: runeerle@stud.ntnu.no 
+             May 2010
+
+Level of copyright protection: 0
+Level of patent protection: 0

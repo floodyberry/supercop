@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # supercop/do
-version=20100509
+version=20100604
 # D. J. Bernstein
 # Public domain.
 

@@ -1,0 +1,8 @@
+Blue Midnight Wish 512 big endian optimized ANSI C  eBASH implementation
+author: Jorn Amundsen <jorn.amundsen@ntnu.no>
+
+This version should compile and run on both big endian and little endian
+Unix systems.
+
+Level of copyright protection: 0
+Level of patent protection: 0
