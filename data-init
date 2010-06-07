@@ -1,0 +1,205 @@
+#!/bin/sh -e
+
+# supercop/data-init
+# D. J. Bernstein
+# Public domain.
+
+. ./data-vars
+
+mkdir -p "$top"
+
+exec </dev/null
+exec >"$top/log"
+exec 2>&1
+exec 6>"$top/$abi/todo"
+
+echo "=== `date` === starting data-init"
+
+echo "=== `date` === hostname"
+hostname || :
+echo "=== `date` === uname -a"
+uname -a || :
+echo "=== `date` === uname -M"
+uname -M || :
+echo "=== `date` === uname -F"
+uname -F || :
+echo "=== `date` === /usr/sbin/lscfg | grep proc"
+/usr/sbin/lscfg | grep proc || :
+echo "=== `date` === /usr/sbin/lsattr -El proc0"
+/usr/sbin/lsattr -El proc0 || :
+echo "=== `date` === cat /proc/cpuinfo"
+cat /proc/cpuinfo || :
+echo "=== `date` === sysctl hw.model"
+sysctl hw.model || :
+echo "=== `date` === /usr/sbin/psrinfo -v"
+/usr/sbin/psrinfo -v || :
+
+
+echo "=== `date` === building okcompilers"
+rm -rf "$top/okcompilers"
+mkdir -p "$top/okcompilers"
+cp -pr okcompilers/* "$top/okcompilers"
+( cd "$top/okcompilers" && sh do )
+
+echo "=== `date` === building killafter"
+rm -rf "$top/killafter"
+mkdir -p "$top/killafter"
+cp -pr killafter/* "$top/killafter"
+( cd "$top/killafter" && sh do )
+
+
+okabi \
+| while read abi
+do
+  mkdir -p "$top/$abi"
+  mkdir -p "$top/$abi/bin"
+  mkdir -p "$top/$abi/lib"
+  mkdir -p "$top/$abi/include"
+  find "$top/$abi" -name BUILD -exec rm '{}' ';'
+  find "$top/$abi" -name LOCKED -exec rm '{}' ';'
+  find "$top/$abi" -name LOCK -exec rm '{}' ';'
+
+  mkdir -p "$top/$abi/base"
+  touch "$top/$abi/base/BUILD"
+  touch "$top/$abi/base/LOCK"
+  echo "$abi/base" >&6
+
+  mkdir -p "$top/$abi/cryptopp"
+  touch "$top/$abi/cryptopp/BUILD"
+  touch "$top/$abi/cryptopp/LOCK"
+  echo "$abi/cryptopp" >&6
+
+  mkdir -p "$top/$abi/gmp"
+  touch "$top/$abi/gmp/BUILD"
+  touch "$top/$abi/gmp/LOCK"
+  echo "$abi/gmp" >&6
+done
+
+
+cat OPERATIONS \
+| while read o macros prototypes
+do
+  ls "$o" \
+  | sort \
+  | while read p
+  do
+    [ -d "$o" ] || continue
+    okabi \
+    | while read abi
+    do
+      [ -d "$o/$p" ] || continue
+      find "$o/$p" -follow -name "api.h" \
+      | sort \
+      | while read doth
+      do
+	implementationdir=`dirname $doth`
+        echo "=== `date` === preparing try $abi $implementationdir"
+	opi=`echo "$implementationdir" | tr ./- !!!`
+
+	cfiles=`ls "$implementationdir" | grep '\.c$' || :`
+	sfiles=`ls "$implementationdir" | grep '\.[sS]$' || :`
+	ccfiles=`ls "$implementationdir" | grep '\.cc$' || :`
+	cppfiles=`ls "$implementationdir" | grep '\.cpp$' || :`
+
+	language=c
+	[ "x$cppfiles" = x ] || language=cpp
+	[ "x$ccfiles" = x ] || language=cpp
+
+	ok${language}-$abi \
+	| while read compiler
+	do
+	  compilerword=`echo "$compiler" | tr ' ' ':'`
+          mkdir -p "$top/$abi/try/$language/$compilerword/$implementationdir"
+          touch "$top/$abi/try/$language/$compilerword/$implementationdir/BUILD"
+          touch "$top/$abi/try/$language/$compilerword/$implementationdir/LOCK"
+          echo "$abi/try/$language/$compilerword/$implementationdir" >&6
+	done
+      done
+    done
+  done
+
+  ls "$o" \
+  | sort \
+  | while read p
+  do
+    [ -d "$o" ] || continue
+    okabi \
+    | while read abi
+    do
+      [ -d "$o/$p" ] || continue
+      echo "=== `date` === preparing integrate $abi $o/$p"
+      mkdir -p "$top/$abi/integrate/$o/$p"
+      touch "$top/$abi/integrate/$o/$p/BUILD"
+      touch "$top/$abi/integrate/$o/$p/LOCK"
+      echo "$abi/integrate/$o/$p" >&6
+    done
+  done
+done
+
+for m in 1 2 3
+do
+  cat OPERATIONS \
+  | while read o macros prototypes
+  do
+    ls "$o" \
+    | sort \
+    | while read p
+    do
+      [ -d "$o" ] || continue
+      okabi \
+      | while read abi
+      do
+        [ -d "$o/$p" ] || continue
+        echo "=== `date` === preparing measure$m $abi $o/$p"
+        mkdir -p "$top/$abi/measure$m/$o/$p"
+        touch "$top/$abi/measure$m/$o/$p/BUILD"
+        touch "$top/$abi/measure$m/$o/$p/LOCK"
+        echo "$abi/measure$m/$o/$p" >&6
+      done
+    done
+  done
+done
+
+echo "=== `date` === building baseinclude"
+okabi \
+| while read abi
+do
+  cp -p include/* "$top/$abi/include/"
+done
+
+echo "=== `date` === building cpuid"
+rm -rf "$top/cpuid"
+mkdir -p "$top/cpuid"
+cp -pr cpuid/* "$top/cpuid"
+( cd "$top/cpuid" && sh do )
+okabi \
+| while read abi
+do
+  cp -p "$top/cpuid/include"/* "$top/$abi/include/"
+done
+
+echo "=== `date` === building inttypes"
+rm -rf "$top/inttypes"
+mkdir -p "$top/inttypes"
+cp -pr inttypes/* "$top/inttypes"
+( cd "$top/inttypes" && sh do )
+okabi \
+| while read abi
+do
+  cp -p "$top/inttypes/include/$abi"/* "$top/$abi/include/"
+done
+
+echo "=== `date` === building cpucycles"
+rm -rf "$top/cpucycles"
+mkdir -p "$top/cpucycles"
+cp -pr cpucycles/* "$top/cpucycles"
+( cd "$top/cpucycles" && sh do )
+okabi \
+| while read abi
+do
+  cp -p "$top/cpucycles/include/$abi"/* "$top/$abi/include/"
+  cp -p "$top/cpucycles/lib/$abi"/* "$top/$abi/lib/"
+done
+
+
+echo "=== `date` === ending data-init"

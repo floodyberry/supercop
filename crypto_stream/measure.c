@@ -50,7 +50,7 @@ void measure(void)
   int loop;
   int mlen;
 
-  for (loop = 0;loop < 3;++loop) {
+  for (loop = 0;loop < LOOPS;++loop) {
     for (mlen = 0;mlen <= MAXTEST_BYTES;mlen += 1 + mlen / MGAP) {
       randombytes(k,crypto_stream_KEYBYTES);
       randombytes(n,crypto_stream_NONCEBYTES);

@@ -1,0 +1,469 @@
+#!/bin/sh -e
+
+# supercop/data-run
+# D. J. Bernstein
+# Public domain.
+
+. ./data-vars
+
+while read target
+do
+  mv "$top/$target/LOCK" "$top/$target/LOCKED" 2>/dev/null || continue
+
+  abi=`echo $target | sed 's_/.*__'`
+  target2=`echo $target | sed 's_^[^/]*/__'`
+  t1=`echo $target2 | sed 's_/.*__'`
+  target3=`echo $target2 | sed 's_^[^/]*/__'`
+  t2=`echo $target3 | sed 's_/.*__'`
+  target4=`echo $target3 | sed 's_^[^/]*/__'`
+  t3=`echo $target4 | sed 's_/.*__'`
+  target5=`echo $target4 | sed 's_^[^/]*/__'`
+  t4=`echo $target5 | sed 's_/.*__'`
+  target6=`echo $target5 | sed 's_^[^/]*/__'`
+  t5=`echo $target6 | sed 's_/.*__'`
+  t6=`echo $target6 | sed 's_^[^/]*/__'`
+
+  (
+    if [ "$t1" = try ]
+    then
+      grep "^$t4 " OPERATIONS \
+      | while read o macros prototypes
+      do
+        p=$t5
+        implementationdir="${o}/${p}/${t6}"
+
+	(
+	  find "$implementationdir" -follow -type f \
+	  | xargs cat
+	  cat "$o/try.c"
+	  cat "$o/measure.c"
+	  cat "try-anything.c"
+	  cat "measure-anything.c"
+        ) \
+	| grep '#include' \
+	| sed 's/#include[ 	]*//' \
+	| sed 's_/.*/__' \
+	| sed 's_//.*__' \
+	| sed 's_\.h$__' \
+	| tr -d '<>"\040\011\014' \
+	| while read incl
+	do
+	  case "$incl" in
+	    cryptopp*)
+	      while [ -e "$top/$abi/cryptopp/BUILD" ]
+	      do
+	        sleep 10
+              done
+	      ;;
+	    gmp*)
+	      while [ -e "$top/$abi/gmp/BUILD" ]
+	      do
+	        sleep 10
+              done
+	      ;;
+	    crypto_*_*)
+	      op=`echo "$incl" | sed 's/_\(.*\)_/_\1\//'`
+	      while [ -e "$top/$abi/integrate/$op/BUILD" ]
+	      do
+	        sleep 10
+              done
+	      ;;
+	  esac
+	done
+      done
+    fi
+
+    if [ "$t1" = measure1 -o "$t1" = measure2 -o "$t1" = measure3 -o "$t1" = integrate ]
+    then
+      grep "^$t2 " OPERATIONS \
+      | while read o macros prototypes
+      do
+        p=$t3
+        op="${o}_${p}"
+
+	for language in c cpp
+	do
+	  ok${language}-$abi \
+	  | while read compiler
+	  do
+	    find "$o/$p" -follow -name "api.h" \
+	    | sort \
+	    | while read doth
+	    do
+              implementationdir=`dirname $doth`
+              compilerword=`echo "$compiler" | tr ' ' ':'`
+	      source="try/$language/$compilerword/$implementationdir"
+	      if [ -d "$top/$abi/$source" ]
+	      then
+	        while [ -e "$top/$abi/$source/BUILD" ]
+	        do
+	          sleep 10
+	        done
+	      fi
+	    done
+	  done
+	done
+      done
+    fi
+  )
+
+  # XXX: check whether this update is actually necessary
+
+  exec >"$top/$target/log"
+  exec 2>&1
+  exec 5>"$top/$target/data"
+
+  echo "=== `date` === starting $target"
+  startdate=`date +%Y%m%d`
+
+  rm -rf "$top/$target/work"
+
+  (
+
+    if [ "$t1" = gmp ]
+    then
+      rm -f "$top/$abi/lib/libgmp.a"
+      rm -f "$top/$abi/lib/libgmpxx.a"
+      okc-$abi | head -1 \
+      | while read c copts
+      do
+        okcpp-$abi | head -1 \
+        | while read cpp cppopts
+        do
+          for gmpabi in 64 32 2.0w 2.0n 1.0 o32 n32 aix64 mode64 mode32
+          do
+	    [ -s "$top/$abi/lib/libgmp.a" ] && continue
+	    echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"
+	    rm -rf "$top/$target/work"
+	    mkdir -p "$top/$target/work"
+	    cp -pr gmp-5.0.1/* "$top/$target/work"
+	    ( cd "$top/$target/work" \
+	      && ./configure --enable-cxx \
+	         ABI="$gmpabi" \
+	         CC="$c" CXX="$cpp" CFLAGS="$copts" CXXFLAGS="$cppopts" LDFLAGS="$copts" \
+	      && make \
+	      && make check \
+	      && cp gmp.h gmpxx.h gmp-impl.h longlong.h \
+	      config.h gmp-mparam.h fib_table.h mp_bases.h \
+	      "$top/$abi/include" \
+	      && ( ranlib ".libs/libgmp.a" || : ) \
+	      && cp .libs/libgmp.a "$top/$abi/lib/libgmp.a" \
+	      && chmod 644 "$top/$abi/lib/libgmp.a" \
+	      && ( ranlib ".libs/libgmpxx.a" || : ) \
+	      && ( cp .libs/libgmpxx.a "$top/$abi/lib/libgmpxx.a" || : ) \
+	      && ( chmod 644 "$top/$abi/lib/libgmpxx.a" || : )
+	    ) && break
+          done
+        done
+      done
+    fi
+
+    if [ "$t1" = cryptopp ]
+    then
+      rm -f "$top/$abi/lib/libcryptopp.a"
+      rm -rf "$top/$abi/include/cryptopp"
+      mkdir -p "$top/$abi/include/cryptopp"
+      okcpp-$abi | head -1 \
+      | while read cpp cppopts
+      do
+        [ -s "$top/$abi/lib/libcryptopp.a" ] && continue
+        echo "=== `date` === trying CXX=$cpp CXXFLAGS=$cppopts"
+        rm -rf "$top/$target/work"
+        mkdir -p "$top/$target/work"
+        cp -pr cryptopp-20090310/* "$top/$target/work"
+        ( cd "$top/$target/work" \
+          && make CXX="$cpp" CXXFLAGS="-DNDEBUG $cppopts" LDFLAGS="$cppopts" \
+          && cp libcryptopp.a "$top/$abi/lib/libcryptopp.a" \
+          && cp *.h "$top/$abi/include/cryptopp/"
+        ) && break
+      done
+    fi
+  
+    if [ "$t1" = base ]
+    then
+      rm -rf "$top/$abi/lib/lib${project}.a"
+      rm -rf "$top/$target/work"
+      mkdir -p "$top/$target/work"
+      echo 'void crypto_'"$project"'_base(void) { ; }' > "$top/$target/work/${project}_base.c"
+      okc-$abi \
+      | while read compiler
+      do
+        ( cd "$top/$target/work" && $compiler -c ${project}_base.c ) && break
+      done
+      okar-$abi cr "$top/$abi/lib/lib${project}.a" "$top/$target/work/${project}_base.o"
+      ( ranlib "$top/$abi/lib/lib${project}.a" || exit 0 )
+    fi
+  
+    if [ "$t1" = try ]
+    then
+      grep "^$t4 " OPERATIONS \
+      | while read o macros prototypes
+      do
+        rm -rf "$top/$target/CYCLES"
+        rm -rf "$top/$target/errors"
+        rm -rf "$top/$target/work"
+        rm -rf "$top/$target/compiled"
+
+        language=$t2
+        compilerword=$t3
+        compiler=`echo "$compilerword" | tr ':' ' '`
+        compilerword=`echo "$compiler" | tr ' ' '_'`
+        p=$t5
+        op="${o}_${p}"
+        implementationdir="${o}/${p}/${t6}"
+        opi=`echo "$implementationdir" | tr ./- ___`
+  
+        expectedchecksum=''
+        [ -f "$o/$p/checksum" ] && expectedchecksum=`cat "$o/$p/checksum"`
+  
+        libs=`"oklibs-$abi"`
+        libs="$top/$abi/lib/cpucycles.o $libs"
+        [ -f "$top/$abi/lib/libgmp.a" ] && libs="$top/$abi/lib/libgmp.a $libs"
+        [ -f "$top/$abi/lib/libcryptopp.a" ] && libs="$top/$abi/lib/libcryptopp.a $libs"
+        [ -f "$top/$abi/lib/lib${project}.a" ] && libs="$top/$abi/lib/lib${project}.a $libs"
+  
+        mkdir -p "$top/$target/work"
+        cp -pr "$implementationdir"/* "$top/$target/work"
+  
+        cfiles=`ls "$top/$target/work" | grep '\.c$' || :`
+        sfiles=`ls "$top/$target/work" | grep '\.[sS]$' || :`
+        ccfiles=`ls "$top/$target/work" | grep '\.cc$' || :`
+        cppfiles=`ls "$top/$target/work" | grep '\.cpp$' || :`
+  
+        cp -p "$o/try.c" "$top/$target/work/try.$language"
+        cp -p "$o/measure.c" "$top/$target/work/measure.$language"
+        cp -p "try-anything.c" "$top/$target/work/try-anything.$language"
+        cp -p "measure-anything.c" "$top/$target/work/measure-anything.$language"
+
+        (
+          cd "$top/$target/work"
+          (
+            echo "#ifndef ${o}_H"
+            echo "#define ${o}_H"
+            echo ""
+            echo "#include \"${op}.h\""
+            echo ""
+            echo "$macros" | tr : '\012' | while read macro
+            do
+              echo "#define ${o}${macro} ${op}${macro}"
+            done
+            echo "#define ${o}_PRIMITIVE \"${p}\""
+            echo "#define ${o}_IMPLEMENTATION ${op}_IMPLEMENTATION"
+            echo "#define ${o}_VERSION ${op}_VERSION"
+            echo ""
+            echo "#endif"
+          ) > "$o.h"
+          (
+            echo "#ifndef ${op}_H"
+            echo "#define ${op}_H"
+            echo ""
+            sed 's/[         ]CRYPTO_/ '"${opi}"'_/g' < api.h
+            echo '#ifdef __cplusplus'
+            echo 'extern "C" {'
+            echo '#endif'
+            echo "$prototypes" | tr : '\012' | while read prototype
+            do
+              echo "extern int ${opi}${prototype};"
+            done
+            echo '#ifdef __cplusplus'
+            echo '}'
+            echo '#endif'
+            echo ""
+            echo "$macros" | tr : '\012' | while read macro
+            do
+              echo "#define ${op}${macro} ${opi}${macro}"
+            done
+            echo "#define ${op}_IMPLEMENTATION \"${implementationdir}\""
+            echo "#ifndef ${opi}_VERSION"
+            echo "#define ${opi}_VERSION \"-\""
+            echo "#endif"
+            echo "#define ${op}_VERSION ${opi}_VERSION"
+            echo ""
+            echo "#endif"
+          ) > "$op.h"
+  
+          ok=1
+          for f in $cfiles $sfiles $ccfiles $cppfiles
+          do
+            if [ "$ok" = 1 ]
+            then
+              $compiler \
+                -I. -I"$top/$abi/include" \
+                -c "$f" >../errors 2>&1 || ok=0
+              ( if [ `wc -l < ../errors` -lt 25 ]
+                then
+                  cat ../errors
+                else
+                  head ../errors
+                  echo ...
+                  tail ../errors
+                fi
+              ) \
+              | while read err
+              do
+                echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword $f $err" >&5
+              done
+            fi
+          done
+  
+          [ "$ok" = 1 ] || exit 1
+          okar-$abi cr "$op.a" *.o || exit 1
+          ranlib "$op.a"
+  
+          killafter 300 \
+          $compiler \
+            -I. -I"$top/$abi/include" \
+            -o try try.$language try-anything.$language \
+            "$op.a" $libs >../errors 2>&1 || ok=0
+          cat ../errors \
+          | while read err
+          do
+            echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword try.$language $err" >&5
+          done
+          [ "$ok" = 1 ] || exit 1
+  
+          if sh -c './try || exit $?' >../errors 2>&1
+          then
+            checksum=`awk '{print $1}' < ../errors`
+            cycles=`awk '{print $2}' < ../errors`
+            checksumcycles=`awk '{print $3}' < ../errors`
+            cyclespersecond=`awk '{print $4}' < ../errors`
+            impl=`awk '{print $5}' < ../errors`
+          else
+            echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword error $?" >&5
+            cat ../errors \
+            | while read err
+            do
+              echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword $err" >&5
+            done
+            exit 1
+          fi
+  
+          checksumok=fails
+          [ "x$expectedchecksum" = "x$checksum" ] && checksumok=ok
+          [ "x$expectedchecksum" = "x" ] && checksumok=unknown
+          echo "$version $shorthostname $abi $startdate $o $p try $checksum $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
+          [ "$checksumok" = fails ] && exit 1
+  
+          killafter 600 \
+          $compiler -D'COMPILER="'"$compiler"'"' \
+            -DSUPERCOP -DLOOPS=1 \
+            -I. -I"$top/$abi/include" \
+            -o measure measure.$language measure-anything.$language \
+            "$op.a" $libs >../errors 2>&1 || ok=0
+          cat ../errors \
+          | while read err
+          do
+            echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword measure.$language $err" >&5
+          done
+          [ "$ok" = 1 ] || exit 1
+
+	  rm -rf ../compiled || exit 1
+	  mkdir ../compiled || exit 1
+  
+	  echo "$cycles" > ../CYCLES
+          for f in *.o
+          do
+            cp -p "$f" "../compiled/${opi}-$f"
+          done
+          cp -p "$op.h" "../compiled/$op.h"
+          cp -p "$o.h" "../compiled/$o.h"
+          cp -p measure ../compiled/measure
+        )
+      done
+    fi
+
+    if [ "$t1" = measure ]
+    then
+      grep "^$t2 " OPERATIONS \
+      | while read o macros prototypes
+      do
+        p=$t3
+        op="${o}_${p}"
+
+	for language in c
+	do
+	  ok${language}-$abi \
+	  | while read compiler
+	  do
+	    find "$o/$p" -follow -name "api.h" \
+	    | sort \
+	    | while read doth
+	    do
+              implementationdir=`dirname $doth`
+              compilerword=`echo "$compiler" | tr ' ' ':'`
+	      source="try/$language/$compilerword/$implementationdir"
+	      if [ -s "$top/$abi/$source/CYCLES" ]
+	      then
+	        echo `cat "$top/$abi/$source/CYCLES"` "$source"
+	      fi
+	    done
+	  done
+	done \
+	| sort -n \
+	| head -1 \
+	| awk '{print $2}' \
+	| while read source
+	do
+          [ -f "$o/$p/used" ] \
+          && okar-$abi cr "$top/$abi/lib/lib${project}.a" "$top/$abi/$source/compiled"/*.o \
+          && ( ranlib "$top/$abi/lib/lib${project}.a" || exit 0 ) \
+          && cp -p "$top/$abi/$source/compiled/$op.h" "$top/$abi/include/$op.h" \
+          && [ -f "$o/$p/selected" ] \
+          && cp -p "$top/$abi/$source/compiled/$o.h" "$top/$abi/include/$o.h" \
+          || :
+	done
+
+      done
+    fi
+
+    if [ "$t1" = measure1 -o "$t1" = measure2 -o "$t1" = measure3 ]
+    then
+      grep "^$t2 " OPERATIONS \
+      | while read o macros prototypes
+      do
+        p=$t3
+        op="${o}_${p}"
+
+	for language in c cpp
+	do
+	  ok${language}-$abi \
+	  | while read compiler
+	  do
+	    find "$o/$p" -follow -name "api.h" \
+	    | sort \
+	    | while read doth
+	    do
+              implementationdir=`dirname $doth`
+              compilerword=`echo "$compiler" | tr ' ' ':'`
+	      source="try/$language/$compilerword/$implementationdir"
+	      if [ -s "$top/$abi/$source/CYCLES" ]
+	      then
+	        echo `cat "$top/$abi/$source/CYCLES"` "$source"
+	      fi
+	    done
+	  done
+	done \
+	| sort -n \
+	| head -1 \
+	| awk '{print $2}' \
+	| while read source
+	do
+	  "$top/$abi/$source/compiled/measure" \
+          | while read measurement
+          do
+            echo "$version $shorthostname $abi $startdate $o $p $measurement" >&5
+          done
+	done
+
+      done
+    fi
+
+  )
+
+  rm -rf "$top/$target/work"
+
+  echo "=== `date` === finishing $target"
+  rm "$top/$target/BUILD"
+  rm "$top/$target/LOCKED"
+done

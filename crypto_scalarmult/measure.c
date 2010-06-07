@@ -42,7 +42,7 @@ void measure(void)
   int i;
   int loop;
 
-  for (loop = 0;loop < 3;++loop) {
+  for (loop = 0;loop < LOOPS;++loop) {
     randombytes(m,crypto_scalarmult_SCALARBYTES);
     randombytes(n,crypto_scalarmult_SCALARBYTES);
     for (i = 0;i <= TIMINGS;++i) {

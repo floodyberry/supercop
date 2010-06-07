@@ -23,6 +23,10 @@ int main()
   int j;
   int i;
 
+  if (!cpucycles()) {
+    fprintf(stderr,"cpucycles() = %lld\n",cpucycles());
+    return 100;
+  }
   for (i = 0;i <= 1000;++i) t[i] = cpucycles();
   for (i = 0;i < 1000;++i) if (t[i] > t[i + 1]) {
     fprintf(stderr,"t[%d] = %lld\n",i,t[i]);

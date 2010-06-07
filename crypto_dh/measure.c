@@ -49,7 +49,7 @@ void measure(void)
   int i;
   int loop;
 
-  for (loop = 0;loop < 3;++loop) {
+  for (loop = 0;loop < LOOPS;++loop) {
     for (i = 0;i <= TIMINGS;++i) {
       cycles[i] = cpucycles();
       crypto_dh_keypair(pk1,sk1);

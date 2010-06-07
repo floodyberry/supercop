@@ -19,6 +19,8 @@ static long long microseconds(void)
   return t.tv_sec * (long long) 1000000 + t.tv_usec;
 }
 
+static int tbshift = 0;
+
 static long long timebase(void)
 {
   unsigned long high;
@@ -32,7 +34,7 @@ static long long timebase(void)
   result = high;
   result <<= 32;
   result |= low;
-  return result;
+  return result >> tbshift;
 }
 
 static double cpufrequency = 0;
@@ -77,15 +79,17 @@ static void init(void)
   if (!cpufrequency) return;
   cpufrequency *= 1000000.0;
 
-  for (loop = 0;loop < 100;++loop) {
-    guess1 = guesstbcycles();
-    guess2 = guesstbcycles();
-    tbcycles = myround(guess1);
-    if (guess1 - tbcycles > 0.1) continue;
-    if (tbcycles - guess1 > 0.1) continue;
-    if (guess2 - tbcycles > 0.1) continue;
-    if (tbcycles - guess2 > 0.1) continue;
-    return;
+  for (tbshift = 0;tbshift < 10;++tbshift) {
+    for (loop = 0;loop < 100;++loop) {
+      guess1 = guesstbcycles();
+      guess2 = guesstbcycles();
+      tbcycles = myround(guess1);
+      if (guess1 - tbcycles > 0.1) continue;
+      if (tbcycles - guess1 > 0.1) continue;
+      if (guess2 - tbcycles > 0.1) continue;
+      if (tbcycles - guess2 > 0.1) continue;
+      return;
+    }
   }
   tbcycles = 0;
 }

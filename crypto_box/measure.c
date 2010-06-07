@@ -55,7 +55,7 @@ void measure(void)
   int loop;
   int mlen;
 
-  for (loop = 0;loop < 3;++loop) {
+  for (loop = 0;loop < LOOPS;++loop) {
     for (i = 0;i <= TIMINGS;++i) {
       cycles[i] = cpucycles();
       crypto_box_keypair(pka,ska);
