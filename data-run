@@ -6,108 +6,157 @@
 
 . ./data-vars
 
+exec <"$top/todo"
+exec >/dev/null
+exec 2>/dev/null
+
 while read target
 do
   mv "$top/$target/LOCK" "$top/$target/LOCKED" 2>/dev/null || continue
 
+  if [ ! -e "$top/$target/BUILD" ]
+  then
+    rm "$top/$target/LOCKED"
+    continue
+  fi
+
   abi=`echo $target | sed 's_/.*__'`
-  target2=`echo $target | sed 's_^[^/]*/__'`
-  t1=`echo $target2 | sed 's_/.*__'`
-  target3=`echo $target2 | sed 's_^[^/]*/__'`
-  t2=`echo $target3 | sed 's_/.*__'`
-  target4=`echo $target3 | sed 's_^[^/]*/__'`
-  t3=`echo $target4 | sed 's_/.*__'`
-  target5=`echo $target4 | sed 's_^[^/]*/__'`
-  t4=`echo $target5 | sed 's_/.*__'`
-  target6=`echo $target5 | sed 's_^[^/]*/__'`
-  t5=`echo $target6 | sed 's_/.*__'`
-  t6=`echo $target6 | sed 's_^[^/]*/__'`
+  t1etc=`echo $target | sed 's_^[^/]*/__'`
+  t1=`echo $t1etc | sed 's_/.*__'`
+  t2etc=`echo $t1etc | sed 's_^[^/]*/__'`
+  t2=`echo $t2etc | sed 's_/.*__'`
+  t3etc=`echo $t2etc | sed 's_^[^/]*/__'`
+  t3=`echo $t3etc | sed 's_/.*__'`
+  t4etc=`echo $t3etc | sed 's_^[^/]*/__'`
+  t4=`echo $t4etc | sed 's_/.*__'`
+  t5etc=`echo $t4etc | sed 's_^[^/]*/__'`
+  t5=`echo $t5etc | sed 's_/.*__'`
+  t6=`echo $t5etc | sed 's_^[^/]*/__'`
+
+  while read source
+  do
+    while [ -e "$top/$abi/$source/BUILD" ]
+    do
+      sleep 10
+    done
+  done < "$top/$target/dep"
+
+
+  rm -rf "$top/$target/sources.new"
+  exec 8>"$top/$target/sources.new"
 
   (
-    if [ "$t1" = try ]
-    then
-      grep "^$t4 " OPERATIONS \
-      | while read o macros prototypes
-      do
-        p=$t5
-        implementationdir="${o}/${p}/${t6}"
-
-	(
-	  find "$implementationdir" -follow -type f \
-	  | xargs cat
-	  cat "$o/try.c"
-	  cat "$o/measure.c"
-	  cat "try-anything.c"
-	  cat "measure-anything.c"
-        ) \
-	| grep '#include' \
-	| sed 's/#include[ 	]*//' \
-	| sed 's_/.*/__' \
-	| sed 's_//.*__' \
-	| sed 's_\.h$__' \
-	| tr -d '<>"\040\011\014' \
-	| while read incl
-	do
-	  case "$incl" in
-	    cryptopp*)
-	      while [ -e "$top/$abi/cryptopp/BUILD" ]
-	      do
-	        sleep 10
-              done
-	      ;;
-	    gmp*)
-	      while [ -e "$top/$abi/gmp/BUILD" ]
-	      do
-	        sleep 10
-              done
-	      ;;
-	    crypto_*_*)
-	      op=`echo "$incl" | sed 's/_\(.*\)_/_\1\//'`
-	      while [ -e "$top/$abi/integrate/$op/BUILD" ]
-	      do
-	        sleep 10
-              done
-	      ;;
-	  esac
-	done
-      done
-    fi
-
     if [ "$t1" = measure1 -o "$t1" = measure2 -o "$t1" = measure3 -o "$t1" = integrate ]
     then
-      grep "^$t2 " OPERATIONS \
-      | while read o macros prototypes
+      grep '^try/' "$top/$target/dep" \
+      | while read source
       do
-        p=$t3
-        op="${o}_${p}"
-
-	for language in c cpp
-	do
-	  ok${language}-$abi \
-	  | while read compiler
-	  do
-	    find "$o/$p" -follow -name "api.h" \
-	    | sort \
-	    | while read doth
-	    do
-              implementationdir=`dirname $doth`
-              compilerword=`echo "$compiler" | tr ' ' ':'`
-	      source="try/$language/$compilerword/$implementationdir"
-	      if [ -d "$top/$abi/$source" ]
-	      then
-	        while [ -e "$top/$abi/$source/BUILD" ]
-	        do
-	          sleep 10
-	        done
-	      fi
-	    done
-	  done
-	done
+        if [ -s "$top/$abi/$source/CYCLES" ]
+        then
+          echo `cat "$top/$abi/$source/CYCLES"` "$source"
+        fi
+      done \
+      | sort -n \
+      | head -1 \
+      | awk '{print $2}' \
+      | while read source
+      do
+        echo "$source" > "$top/$target/best"
+	echo "$target/best $source" >&8
+	cat "$source/sources" >&8
       done
+
+    else
+      while read source
+      do
+        cat "$source/sources" >&8
+      done < "$top/$target/dep"
+
+      if [ "$t1" = gmp ]
+      then
+        echo "gmp 5.0.1" >&8
+      fi
+  
+      if [ "$t1" = cryptopp ]
+      then
+        echo "cryptopp 20090310" >&8
+      fi
+  
+      if [ "$t1" = openssl ]
+      then
+        rm -rf "$top/$target/v"
+        mkdir -p "$top/$target/v"
+	(
+	  cd "$top/$target/v"
+	  (
+	    /bin/echo '#include <openssl/opensslv.h>'
+	    /bin/echo 'main() { printf("openssl/version %s\n",OPENSSL_VERSION_TEXT); return 0; }'
+	  ) > v.c
+	  libs=`"oklibs-$abi"`
+          okc-$abi \
+          | while read compiler
+          do
+	    if $compiler -o v v.c $libs
+	    then
+	      break
+	    fi
+          done
+          ./v >&8
+        )
+      fi
+  
+      if [ "$t1" = compiler ]
+      then
+        language=$t2
+        compilerword=$t3
+        compiler=`echo "$compilerword" | tr ':' ' '`
+        compilerword=`echo "$compiler" | tr ' ' '_'`
+  
+        rm -rf "$top/$target/work"
+        mkdir -p "$top/$target/work"
+        cp -p "measure-anything.c" "$top/$target/work/measure-anything.$language"
+        (
+          echo 'const char *primitiveimplementation = "";'
+          echo 'const char *implementationversion = "";'
+          echo 'const char *sizenames[] = { 0 };'
+          echo 'const long long sizes[] = { 0 };'
+          echo 'void preallocate(void) { }'
+          echo 'void allocate(void) { }'
+          echo 'void measure(void) { }'
+        ) > "$top/$target/work/measure.$language"
+  
+        (
+          cd "$top/$target/work"
+          $compiler -D'COMPILER="'"$compiler"'"' \
+            -DLOOPS=1 \
+            -o measure measure.$language measure-anything.$language \
+	  && ./measure
+        ) \
+	| egrep '^cpuid|^cpucycles_implementation|^compiler' \
+	| sed "s_^_$target/_" >&8
+
+      fi
+
+      if [ "$t1" = implementation ]
+      then
+        implementationdir="$t2etc"
+	find "$implementationdir" -follow -type f \
+	| sort \
+	| xargs md5sum \
+	| sed "s_^_$target/_" >&8
+      fi
     fi
   )
 
-  # XXX: check whether this update is actually necessary
+
+  if cmp "$top/$target/sources.new" "$top/$target/sources" >/dev/null 2>/dev/null
+  then
+    # no change in sources; skip this update
+    rm "$top/$target/BUILD"
+    rm "$top/$target/LOCKED"
+    continue
+  fi
+
 
   exec >"$top/$target/log"
   exec 2>&1
@@ -218,8 +267,14 @@ do
   
         libs=`"oklibs-$abi"`
         libs="$top/$abi/lib/cpucycles.o $libs"
-        [ -f "$top/$abi/lib/libgmp.a" ] && libs="$top/$abi/lib/libgmp.a $libs"
-        [ -f "$top/$abi/lib/libcryptopp.a" ] && libs="$top/$abi/lib/libcryptopp.a $libs"
+	if grep '^gmp$' "$top/$target/dep" >/dev/null
+	then
+          [ -f "$top/$abi/lib/libgmp.a" ] && libs="$top/$abi/lib/libgmp.a $libs"
+	fi
+	if grep '^cryptopp$' "$top/$target/dep" >/dev/null
+	then
+          [ -f "$top/$abi/lib/libcryptopp.a" ] && libs="$top/$abi/lib/libcryptopp.a $libs"
+	fi
         [ -f "$top/$abi/lib/lib${project}.a" ] && libs="$top/$abi/lib/lib${project}.a $libs"
   
         mkdir -p "$top/$target/work"
@@ -373,7 +428,7 @@ do
       done
     fi
 
-    if [ "$t1" = measure ]
+    if [ "$t1" = integrate ]
     then
       grep "^$t2 " OPERATIONS \
       | while read o macros prototypes
@@ -381,28 +436,7 @@ do
         p=$t3
         op="${o}_${p}"
 
-	for language in c
-	do
-	  ok${language}-$abi \
-	  | while read compiler
-	  do
-	    find "$o/$p" -follow -name "api.h" \
-	    | sort \
-	    | while read doth
-	    do
-              implementationdir=`dirname $doth`
-              compilerword=`echo "$compiler" | tr ' ' ':'`
-	      source="try/$language/$compilerword/$implementationdir"
-	      if [ -s "$top/$abi/$source/CYCLES" ]
-	      then
-	        echo `cat "$top/$abi/$source/CYCLES"` "$source"
-	      fi
-	    done
-	  done
-	done \
-	| sort -n \
-	| head -1 \
-	| awk '{print $2}' \
+	cat "$top/$target/best" \
 	| while read source
 	do
           [ -f "$o/$p/used" ] \
@@ -425,28 +459,7 @@ do
         p=$t3
         op="${o}_${p}"
 
-	for language in c cpp
-	do
-	  ok${language}-$abi \
-	  | while read compiler
-	  do
-	    find "$o/$p" -follow -name "api.h" \
-	    | sort \
-	    | while read doth
-	    do
-              implementationdir=`dirname $doth`
-              compilerword=`echo "$compiler" | tr ' ' ':'`
-	      source="try/$language/$compilerword/$implementationdir"
-	      if [ -s "$top/$abi/$source/CYCLES" ]
-	      then
-	        echo `cat "$top/$abi/$source/CYCLES"` "$source"
-	      fi
-	    done
-	  done
-	done \
-	| sort -n \
-	| head -1 \
-	| awk '{print $2}' \
+	cat "$top/$target/best" \
 	| while read source
 	do
 	  "$top/$abi/$source/compiled/measure" \
@@ -462,6 +475,9 @@ do
   )
 
   rm -rf "$top/$target/work"
+
+  exec 8>&-
+  mv "$top/$target/sources.new" "$top/$target/sources"
 
   echo "=== `date` === finishing $target"
   rm "$top/$target/BUILD"

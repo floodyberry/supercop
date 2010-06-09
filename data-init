@@ -48,6 +48,7 @@ cp -pr killafter/* "$top/killafter"
 ( cd "$top/killafter" && sh do )
 
 
+echo "=== `date` === building basic dependencies"
 okabi \
 | while read abi
 do
@@ -62,17 +63,45 @@ do
   mkdir -p "$top/$abi/base"
   touch "$top/$abi/base/BUILD"
   touch "$top/$abi/base/LOCK"
+  : > "$top/$abi/base/dep"
   echo "$abi/base" >&6
 
   mkdir -p "$top/$abi/cryptopp"
   touch "$top/$abi/cryptopp/BUILD"
   touch "$top/$abi/cryptopp/LOCK"
+  : > "$top/$abi/cryptopp/dep"
   echo "$abi/cryptopp" >&6
+
+  mkdir -p "$top/$abi/openssl"
+  touch "$top/$abi/openssl/BUILD"
+  touch "$top/$abi/openssl/LOCK"
+  : > "$top/$abi/openssl/dep"
+  echo "$abi/openssl" >&6
 
   mkdir -p "$top/$abi/gmp"
   touch "$top/$abi/gmp/BUILD"
   touch "$top/$abi/gmp/LOCK"
+  : > "$top/$abi/gmp/dep"
   echo "$abi/gmp" >&6
+done
+
+
+okabi \
+| while read abi
+do
+  for language in c cpp
+  do
+    ok${language}-$abi \
+    | while read compiler
+    do
+      compilerword=`echo "$compiler" | tr ' ' ':'`
+      mkdir -p "$top/$abi/compiler/$language/$compilerword"
+      touch "$top/$abi/compiler/$language/$compilerword/BUILD"
+      touch "$top/$abi/compiler/$language/$compilerword/LOCK"
+      : > "$top/$abi/compiler/$language/$compilerword/dep"
+      echo "$abi/compiler/$language/$compilerword" >&6
+    done
+  done
 done
 
 
@@ -96,6 +125,12 @@ do
         echo "=== `date` === preparing try $abi $implementationdir"
 	opi=`echo "$implementationdir" | tr ./- !!!`
 
+        mkdir -p "$top/$abi/implementation/$implementationdir"
+        touch "$top/$abi/implementation/$implementationdir/BUILD"
+        touch "$top/$abi/implementation/$implementationdir/LOCK"
+        : > "$top/$abi/implementation/$implementationdir/dep"
+        echo "$abi/implementation/$implementationdir" >&6
+
 	cfiles=`ls "$implementationdir" | grep '\.c$' || :`
 	sfiles=`ls "$implementationdir" | grep '\.[sS]$' || :`
 	ccfiles=`ls "$implementationdir" | grep '\.cc$' || :`
@@ -112,8 +147,51 @@ do
           mkdir -p "$top/$abi/try/$language/$compilerword/$implementationdir"
           touch "$top/$abi/try/$language/$compilerword/$implementationdir/BUILD"
           touch "$top/$abi/try/$language/$compilerword/$implementationdir/LOCK"
+	  (
+            echo "compiler/$language/$compilerword"
+            echo "implementation/$implementationdir"
+	  ) > "$top/$abi/try/$language/$compilerword/$implementationdir/dep"
           echo "$abi/try/$language/$compilerword/$implementationdir" >&6
 	done
+
+        (
+          find "$implementationdir" -follow -type f \
+          | xargs cat
+          cat "$o/try.c"
+          cat "$o/measure.c"
+          cat "try-anything.c"
+          cat "measure-anything.c"
+        ) \
+        | grep '#include' \
+        | sed 's/#include[      ]*//' \
+        | sed 's_/.*/__' \
+        | sed 's_//.*__' \
+        | sed 's_\.h$__' \
+        | tr -d '<>"\040\011\014' \
+        | while read incl
+        do
+	  source=nonexistent
+          case "$incl" in
+            openssl*)
+	      source=openssl
+              ;;
+            cryptopp*)
+	      source=cryptopp
+              ;;
+            gmp*)
+              source=gmp
+              ;;
+            crypto_*_*)
+              op=`echo "$incl" | sed 's/_\(.*\)_/_\1\//'`
+	      source="integrate/$op"
+              ;;
+          esac
+	  if [ -d "$top/$abi/$source" ]
+	  then
+            echo "$source" >> "$top/$abi/implementation/$implementationdir/dep"
+	  fi
+        done
+
       done
     done
   done
@@ -131,6 +209,28 @@ do
       mkdir -p "$top/$abi/integrate/$o/$p"
       touch "$top/$abi/integrate/$o/$p/BUILD"
       touch "$top/$abi/integrate/$o/$p/LOCK"
+      (
+	echo base
+        find "$o/$p" -follow -name "api.h" \
+        | sort \
+        | while read doth
+        do
+          implementationdir=`dirname $doth`
+          for language in c
+          do
+            ok${language}-$abi \
+            | while read compiler
+            do
+              compilerword=`echo "$compiler" | tr ' ' ':'`
+              source="try/$language/$compilerword/$implementationdir"
+              if [ -d "$top/$abi/$source" ]
+              then
+                echo "$source"
+              fi
+            done
+          done
+        done
+      ) > "$top/$abi/integrate/$o/$p/dep"
       echo "$abi/integrate/$o/$p" >&6
     done
   done
@@ -154,6 +254,25 @@ do
         mkdir -p "$top/$abi/measure$m/$o/$p"
         touch "$top/$abi/measure$m/$o/$p/BUILD"
         touch "$top/$abi/measure$m/$o/$p/LOCK"
+        find "$o/$p" -follow -name "api.h" \
+        | sort \
+        | while read doth
+        do
+          implementationdir=`dirname $doth`
+          for language in c cpp
+          do
+            ok${language}-$abi \
+            | while read compiler
+            do
+              compilerword=`echo "$compiler" | tr ' ' ':'`
+              source="try/$language/$compilerword/$implementationdir"
+              if [ -d "$top/$abi/$source" ]
+              then
+                echo "$source"
+              fi
+            done
+          done
+        done > "$top/$abi/measure$m/$o/$p/dep"
         echo "$abi/measure$m/$o/$p" >&6
       done
     done
