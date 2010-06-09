@@ -14,8 +14,22 @@ while read target
 do
   mv "$top/$target/LOCK" "$top/$target/LOCKED" 2>/dev/null || continue
 
+  rm -rf "$top/$target/log.new"
+  rm -rf "$top/$target/data.new"
+  rm -rf "$top/$target/sources.new"
+
+  exec >"$top/$target/log.new"
+  exec 2>&1
+  exec 5>"$top/$target/data.new"
+  exec 8>"$top/$target/sources.new"
+
+  echo "=== `date` === starting $target"
+  startdate=`date +%Y%m%d`
+
+  rm -rf "$top/$target/work"
   if [ ! -e "$top/$target/BUILD" ]
   then
+    echo "=== `date` === $target already built"
     rm "$top/$target/LOCKED"
     continue
   fi
@@ -41,10 +55,6 @@ do
     done
   done < "$top/$target/dep"
 
-
-  rm -rf "$top/$target/sources.new"
-  exec 8>"$top/$target/sources.new"
-
   (
     if [ "$t1" = measure1 -o "$t1" = measure2 -o "$t1" = measure3 -o "$t1" = integrate ]
     then
@@ -63,13 +73,16 @@ do
       do
         echo "$source" > "$top/$target/best"
 	echo "$target/best $source" >&8
-	cat "$source/sources" >&8
+	cat "$top/$abi/$source/sources" >&8
       done
 
     else
       while read source
       do
-        cat "$source/sources" >&8
+	if [ -s "$top/$abi/$source/sources" ]
+	then
+          cat "$top/$abi/$source/sources" >&8
+        fi
       done < "$top/$target/dep"
 
       if [ "$t1" = gmp ]
@@ -84,11 +97,12 @@ do
   
       if [ "$t1" = openssl ]
       then
-        rm -rf "$top/$target/v"
-        mkdir -p "$top/$target/v"
+        rm -rf "$top/$target/work"
+        mkdir -p "$top/$target/work"
 	(
-	  cd "$top/$target/v"
+	  cd "$top/$target/work"
 	  (
+	    /bin/echo '#include <stdio.h>'
 	    /bin/echo '#include <openssl/opensslv.h>'
 	    /bin/echo 'main() { printf("openssl/version %s\n",OPENSSL_VERSION_TEXT); return 0; }'
 	  ) > v.c
@@ -102,6 +116,7 @@ do
 	    fi
           done
           ./v >&8
+	  exit 0
         )
       fi
   
@@ -109,8 +124,7 @@ do
       then
         language=$t2
         compilerword=$t3
-        compiler=`echo "$compilerword" | tr ':' ' '`
-        compilerword=`echo "$compiler" | tr ' ' '_'`
+        compiler=`echo "$compilerword" | tr '_' ' '`
   
         rm -rf "$top/$target/work"
         mkdir -p "$top/$target/work"
@@ -119,6 +133,7 @@ do
           echo 'const char *primitiveimplementation = "";'
           echo 'const char *implementationversion = "";'
           echo 'const char *sizenames[] = { 0 };'
+          echo 'extern const long long sizes[];'  # XXX: seems necessary for g++
           echo 'const long long sizes[] = { 0 };'
           echo 'void preallocate(void) { }'
           echo 'void allocate(void) { }'
@@ -127,13 +142,22 @@ do
   
         (
           cd "$top/$target/work"
-          $compiler -D'COMPILER="'"$compiler"'"' \
+          libs=`"oklibs-$abi"`
+          libs="$top/$abi/lib/cpucycles.o $libs"
+	  if $compiler -D'COMPILER="'"$compiler"'"' \
             -DLOOPS=1 \
+            -I. -I"$top/$abi/include" \
             -o measure measure.$language measure-anything.$language \
-	  && ./measure
+	    $libs
+	  then
+	    ./measure || :
+	  fi
         ) \
-	| egrep '^cpuid|^cpucycles_implementation|^compiler' \
-	| sed "s_^_$target/_" >&8
+	| ( egrep '^cpuid|^cpucycles_implementation|^compiler' || : ) \
+	| while read m
+	do
+	  /bin/echo "$target/$m"
+	done >&8
 
       fi
 
@@ -142,8 +166,10 @@ do
         implementationdir="$t2etc"
 	find "$implementationdir" -follow -type f \
 	| sort \
-	| xargs md5sum \
-	| sed "s_^_$target/_" >&8
+	| while read f
+	do
+	  /bin/echo "$f" `adequatechecksum < $f`
+	done >&8
       fi
     fi
   )
@@ -151,21 +177,12 @@ do
 
   if cmp "$top/$target/sources.new" "$top/$target/sources" >/dev/null 2>/dev/null
   then
-    # no change in sources; skip this update
+    echo "=== `date` === $target is up to date"
     rm "$top/$target/BUILD"
     rm "$top/$target/LOCKED"
     continue
   fi
 
-
-  exec >"$top/$target/log"
-  exec 2>&1
-  exec 5>"$top/$target/data"
-
-  echo "=== `date` === starting $target"
-  startdate=`date +%Y%m%d`
-
-  rm -rf "$top/$target/work"
 
   (
 
@@ -215,7 +232,10 @@ do
       okcpp-$abi | head -1 \
       | while read cpp cppopts
       do
-        [ -s "$top/$abi/lib/libcryptopp.a" ] && continue
+        if [ -s "$top/$abi/lib/libcryptopp.a" ]
+	then
+	  continue
+	fi
         echo "=== `date` === trying CXX=$cpp CXXFLAGS=$cppopts"
         rm -rf "$top/$target/work"
         mkdir -p "$top/$target/work"
@@ -255,8 +275,7 @@ do
 
         language=$t2
         compilerword=$t3
-        compiler=`echo "$compilerword" | tr ':' ' '`
-        compilerword=`echo "$compiler" | tr ' ' '_'`
+        compiler=`echo "$compilerword" | tr '_' ' '`
         p=$t5
         op="${o}_${p}"
         implementationdir="${o}/${p}/${t6}"
@@ -267,11 +286,11 @@ do
   
         libs=`"oklibs-$abi"`
         libs="$top/$abi/lib/cpucycles.o $libs"
-	if grep '^gmp$' "$top/$target/dep" >/dev/null
+	if grep '^gmp$' "$top/$abi/implementation/$implementationdir/dep" >/dev/null
 	then
           [ -f "$top/$abi/lib/libgmp.a" ] && libs="$top/$abi/lib/libgmp.a $libs"
 	fi
-	if grep '^cryptopp$' "$top/$target/dep" >/dev/null
+	if grep '^cryptopp$' "$top/$abi/implementation/$implementationdir/dep" >/dev/null
 	then
           [ -f "$top/$abi/lib/libcryptopp.a" ] && libs="$top/$abi/lib/libcryptopp.a $libs"
 	fi
@@ -361,9 +380,9 @@ do
             fi
           done
   
-          [ "$ok" = 1 ] || exit 1
-          okar-$abi cr "$op.a" *.o || exit 1
-          ranlib "$op.a"
+          [ "$ok" = 1 ] || exit 0
+          okar-$abi cr "$op.a" *.o || exit 0
+          ( ranlib "$op.a" || : )
   
           killafter 300 \
           $compiler \
@@ -375,7 +394,7 @@ do
           do
             echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword try.$language $err" >&5
           done
-          [ "$ok" = 1 ] || exit 1
+          [ "$ok" = 1 ] || exit 0
   
           if sh -c './try || exit $?' >../errors 2>&1
           then
@@ -391,14 +410,14 @@ do
             do
               echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword $err" >&5
             done
-            exit 1
+            exit 0
           fi
   
           checksumok=fails
           [ "x$expectedchecksum" = "x$checksum" ] && checksumok=ok
           [ "x$expectedchecksum" = "x" ] && checksumok=unknown
           echo "$version $shorthostname $abi $startdate $o $p try $checksum $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
-          [ "$checksumok" = fails ] && exit 1
+          [ "$checksumok" = fails ] && exit 0
   
           killafter 600 \
           $compiler -D'COMPILER="'"$compiler"'"' \
@@ -411,10 +430,10 @@ do
           do
             echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword measure.$language $err" >&5
           done
-          [ "$ok" = 1 ] || exit 1
+          [ "$ok" = 1 ] || exit 0
 
-	  rm -rf ../compiled || exit 1
-	  mkdir ../compiled || exit 1
+	  rm -rf ../compiled || exit 0
+	  mkdir ../compiled || exit 0
   
 	  echo "$cycles" > ../CYCLES
           for f in *.o
@@ -474,12 +493,19 @@ do
 
   )
 
+  exec 5>&-
+  exec 8>&-
+  echo "=== `date` === finishing $target"
+
   rm -rf "$top/$target/work"
 
-  exec 8>&-
   mv "$top/$target/sources.new" "$top/$target/sources"
+  mv "$top/$target/data.new" "$top/$target/data"
+  mv "$top/$target/log.new" "$top/$target/log"
 
-  echo "=== `date` === finishing $target"
+  cat "$top/$target/data" >> "$top/$target/data.archive"
+  cat "$top/$target/log" >> "$top/$target/log.archive"
+
   rm "$top/$target/BUILD"
   rm "$top/$target/LOCKED"
 done

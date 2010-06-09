@@ -15,6 +15,7 @@ PATH="/usr/local/bin:$PATH"
 PATH="/usr/sfw/bin:$PATH"
 PATH="$top/okcompilers/bin:$PATH"
 PATH="$top/killafter/bin:$PATH"
+PATH="$top/checksum/bin:$PATH"
 export PATH
 
 LD_LIBRARY_PATH="/usr/local/lib/sparcv9:/usr/local/lib:$LD_LIBRARY_PATH"
