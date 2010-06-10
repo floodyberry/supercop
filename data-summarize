@@ -37,7 +37,7 @@
 	  ok${language}-$abi \
 	  | while read compiler
 	  do
-	    compilerword=`echo "$compiler" | tr ' ' ':'`
+	    compilerword=`echo "$compiler" | tr ' ' '_'`
             if [ -e "$top/$abi/try/$language/$compilerword/$implementationdir/data" ]
 	    then
               grep . < "$top/$abi/try/$language/$compilerword/$implementationdir/data"

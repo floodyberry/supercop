@@ -1,0 +1,3 @@
+#define crypto_dh_ecfp256s_v01_var_SECRETKEYBYTES 32
+#define crypto_dh_ecfp256s_v01_var_PUBLICKEYBYTES 64
+#define crypto_dh_ecfp256s_v01_var_BYTES 32

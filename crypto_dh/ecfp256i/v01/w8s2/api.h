@@ -1,0 +1,3 @@
+#define crypto_dh_ecfp256i_v01_w8s2_SECRETKEYBYTES 32
+#define crypto_dh_ecfp256i_v01_w8s2_PUBLICKEYBYTES 64
+#define crypto_dh_ecfp256i_v01_w8s2_BYTES 32
