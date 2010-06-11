@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # supercop/data-init
 # D. J. Bernstein

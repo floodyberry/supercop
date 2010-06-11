@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # supercop/data-run
 # D. J. Bernstein
@@ -10,8 +10,20 @@ exec <"$top/todo"
 exec >/dev/null
 exec 2>/dev/null
 
+startseconds=`date +%s`
+timeout="${1-0}"
+
 while read target
 do
+  if [ "$timeout" -gt 0 ]
+  then
+    nowseconds=`date +%s`
+    if [ `expr $nowseconds - $startseconds` -gt "$timeout" ]
+    then
+      exit 111
+    fi
+  fi
+
   mv "$top/$target/LOCK" "$top/$target/LOCKED" 2>/dev/null || continue
 
   rm -rf "$top/$target/log.new"
@@ -51,7 +63,15 @@ do
   do
     while [ -e "$top/$abi/$source/BUILD" ]
     do
-      sleep 10
+      sleep 1
+      if [ "$timeout" -gt 0 ]
+      then
+        nowseconds=`date +%s`
+        if [ `expr $nowseconds - $startseconds` -gt "$timeout" ]
+        then
+          exit 111
+        fi
+      fi
     done
   done < "$top/$target/dep"
 
@@ -115,8 +135,7 @@ do
 	      break
 	    fi
           done
-          ./v >&8
-	  exit 0
+          ./v >&8 || :
         )
       fi
   
@@ -218,10 +237,11 @@ do
 	      && ( ranlib ".libs/libgmpxx.a" || : ) \
 	      && ( cp .libs/libgmpxx.a "$top/$abi/lib/libgmpxx.a" || : ) \
 	      && ( chmod 644 "$top/$abi/lib/libgmpxx.a" || : )
-	    ) && break
+	    ) && break || :
           done
         done
       done
+      exit 0
     fi
 
     if [ "$t1" = cryptopp ]

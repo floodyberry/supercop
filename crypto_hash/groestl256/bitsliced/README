@@ -1,0 +1,10 @@
+This package contains a bitsliced implementation of the Groestl-256
+hash function for AMD64/Intel 64. The author is Stefan Tillich.
+
+The author has financial connections to a copyright restricting
+distribution of this software.
+
+There are no known present or future claims by a patent holder that
+the use of this software infringes the patent. In particular, the
+author of the software is not making such claims and does not intend
+to make such claims.

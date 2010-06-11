@@ -17,6 +17,13 @@ mkdir bin
             rm -f adequatechecksum.c
 	    cp $n.c adequatechecksum.c || continue
             $c -o adequatechecksum adequatechecksum.c || continue
+	    case `echo hello | ./adequatechecksum || :` in
+	      5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03)
+	        ;;
+              *)
+	        continue
+		;;
+            esac
 	    cp adequatechecksum bin/adequatechecksum
             exit 0
           done
