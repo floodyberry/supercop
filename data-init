@@ -217,22 +217,6 @@ do
           esac
         done | sort -u > "$top/$abi/implementation/$implementationdir/dep"
 
-      done
-    done
-  done
-
-  ls "$o" \
-  | sort \
-  | while read p
-  do
-    [ -d "$o/$p" ] || continue
-    okabi \
-    | while read abi
-    do
-      find "$o/$p" -follow -name "api.h" \
-      | sort \
-      | while read doth
-      do
 	implementationdir=`dirname $doth`
         echo "=== `date` === todo $abi/try/.../$implementationdir"
 	opi=`echo "$implementationdir" | tr ./- !!!`
