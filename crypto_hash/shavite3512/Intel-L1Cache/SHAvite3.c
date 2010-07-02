@@ -2,8 +2,6 @@
 /*                                                                   */
 /*                           SHAvite-3                               */
 /*                                                                   */
-/*                 Tweaked version (21.Sep.2009)                     */
-/*                                                                   */
 /* Candidate submission to NIST SHA-3 competition                    */
 /*                                                                   */
 /* Written by Eli Biham and Orr Dunkelman                            */
@@ -16,7 +14,7 @@
 #include "SHAvite3-512.h"
 
 u32 IV_224[8] =  {0xC4C67795, 0xC0B1817F, 0xEAD88924, 0x1ABB1BB0,
-		  0xE0C29152, 0xBDE046BA, 0xAEEECF99, 0x58D509D8};
+                  0xE0C29152, 0xBDE046BA, 0xAEEECF99, 0x58D509D8};
 
 u32 IV_256[8] =  {0x3EECF551, 0xBF10819B, 0xE6DC8559, 0xF3E23FD5,
                   0x431AEC73, 0x79E3F731, 0x98325F05, 0xA92A31F1};
@@ -214,7 +212,7 @@ HashReturn Update (hashState *state, const BitSequence *data, DataLength
 
 /* Update the number of bits hashed so far (locally)                 */
 
-         local_bitcount+=8*BlockSizeB;
+         local_bitcount+=BlockSizeB;
 
 /* Call the respective compression function to process the current   */
 /* block                                                             */
@@ -318,10 +316,8 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 /* last message block and compress it				    */
            U64TO8_LITTLE(block+BlockSizeB-10, state->bitcount);
            U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
-	   if ((state->bitcount % state->BlockSize)==0)
-              Compress256(block,result, 0x0ULL);
-           else
-              Compress256(block,result, state->bitcount);
+           Compress256(block,result, state->bitcount);
+
         }
    }
 
@@ -342,14 +338,10 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 /* Generate the full padding block                                   */
                memset(block, 0, BlockSizeB);
                U64TO8_LITTLE(block+BlockSizeB-18, state->bitcount);
-
-/* The following line is due to the required API of 64-bit message   */
-/* length, while the hash function deals with 128-bit lengths        */
-               memset(block+BlockSizeB-10,0,8);
                U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
 
 /* Compress the full padding block                                   */
-               Compress512(block,result,0x0ULL);
+               Compress512(block,result,0x0UL);
             }
 
          else
@@ -358,15 +350,9 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 /* Pad the number of bits hashed so far and the digest size to the   */
 /* last message block and compress it				     */
                U64TO8_LITTLE(block+BlockSizeB-18, state->bitcount);
-
-/* The following line is due to the required API of 64-bit message   */
-/* length, while the hash function deals with 128-bit lengths        */
                memset(block+BlockSizeB-10,0,8);
                U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
-	       if ((state->bitcount % state->BlockSize)==0)
-                  Compress512(block,result, 0x0ULL);
-               else
-                  Compress512(block,result, state->bitcount);
+               Compress512(block,result, state->bitcount);
 
             }
       }
@@ -387,6 +373,7 @@ HashReturn Final (hashState *state, BitSequence *hashval)
    return SUCCESS;
 
 }
+
 
 /* Hashing a message, from initialization till the end               */
 

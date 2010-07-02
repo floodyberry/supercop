@@ -43,6 +43,7 @@
 }
 
 #define NonLinExpansionRegularSecond(rk,x0,x1,x2,x3,y0,y1,y2,y3)\
+{\
         x0 = rk[17];\
         x1 = rk[18];\
         x2 = rk[19];\
@@ -107,8 +108,8 @@
         x2 = rk[11];\
         x3 = rk[8];\
         roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
-        rk[8]  = y0^rk[4];\
-        rk[9]  = y1^rk[5];\
+        rk[8] = y0^rk[4];\
+        rk[9] = y1^rk[5];\
         rk[10] = y2^rk[6];\
         rk[11] = y3^rk[7];\
         x0 = rk[13];\
@@ -170,10 +171,10 @@
         x2 = rk[19];\
         x3 = rk[16];\
         roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
-        rk[16] = y0^rk[16];\
-        rk[17] = y1^rk[17];\
-        rk[18] = y2^rk[18];\
-        rk[19] = y3^rk[19];\
+        rk[16] = y0^rk[12];\
+        rk[17] = y1^rk[13];\
+        rk[18] = y2^rk[14];\
+        rk[19] = y3^rk[15];\
 	x0 = rk[21];\
         x1 = rk[22];\
         x2 = rk[23];\
@@ -210,10 +211,10 @@
         x2 = rk[19];\
         x3 = rk[16];\
         roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
-        rk[16] = y0^rk[16];\
-        rk[17] = y1^rk[17];\
-        rk[18] = y2^rk[18];\
-        rk[19] = y3^rk[19];\
+        rk[16] = y0^rk[12];\
+        rk[17] = y1^rk[13];\
+        rk[18] = y2^rk[14];\
+        rk[19] = y3^rk[15];\
 	x0 = rk[21];\
         x1 = rk[22];\
         x2 = rk[23];\
@@ -229,8 +230,8 @@
         x3 = rk[24];\
         roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
         rk[24] = y0^rk[20]^counter[1];\
-        rk[25] = y1^rk[21]^counter[3];\
-        rk[26] = y2^rk[22]^counter[0];\
+        rk[25] = y1^rk[21]^counter[0];\
+        rk[26] = y2^rk[22]^counter[3];\
         rk[27] = y3^rk[23]^~counter[2];\
         x0 = rk[29];\
         x1 = rk[30];\
@@ -283,7 +284,7 @@
 void E512(u32 pt[16], u32 ct[16], u32 message[32], u32 counter[4])
 {
    u32 state[16];
-   u32 x0,x1,x2,x3,y0,y1,y2,y3,i,j,k;
+   u32 x0,x1,x2,x3,y0,y1,y2,y3,i;
    u32 rk[32];
 
    state[0]=pt[0]; 
@@ -304,9 +305,11 @@ void E512(u32 pt[16], u32 ct[16], u32 message[32], u32 counter[4])
    state[15]=pt[15];
    
    for (i=0;i<32;i++) rk[i]=message[i];
+
    oneround(state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],x0,x1,x2,x3,y0,y1,y2,y3,rk);
+   
    NonLinExpansion32(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
-   NonLinExpansionRegularFirst(rk,x0,x1,x2,x3,y0,y1,y2,y3);
+   NonLinExpansionRegularSecond(rk,x0,x1,x2,x3,y0,y1,y2,y3);
 
    oneround(state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],x0,x1,x2,x3,y0,y1,y2,y3,rk);
    LinExpansion512(rk,i);
@@ -340,7 +343,6 @@ void E512(u32 pt[16], u32 ct[16], u32 message[32], u32 counter[4])
    NonLinExpansion432(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
    oneround(state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],x0,x1,x2,x3,y0,y1,y2,y3,rk);
    
-
    ct[0]=state[8]; 
    ct[1]=state[9]; 
    ct[2]=state[10]; 
@@ -374,6 +376,7 @@ void Compress512(const u8 *message_block, u8 *chaining_value, u64 counter)
 
    for (i=0;i<16;i++)
       pt[i]=U8TO32_LITTLE(chaining_value+4*i);
+   
 
    for (i=0;i<32;i++)
       msg_u32[i]=U8TO32_LITTLE(message_block+4*i);
