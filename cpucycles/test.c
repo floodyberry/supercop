@@ -16,6 +16,9 @@ long long todend;
 long long cpustart;
 long long cpuend;
 
+long long cyclespersecond;
+long long cyclespertod;
+
 long long t[1001];
 
 int main()
@@ -40,8 +43,11 @@ int main()
     fprintf(stderr,"cpucycles_persecond() = %lld\n",cpucycles_persecond());
     return 100;
   } 
-  if (cpucycles_persecond() <= 0) {
-    fprintf(stderr,"cpucycles_persecond() = %lld\n",cpucycles_persecond());
+
+  cyclespersecond = cpucycles_persecond();
+
+  if (cyclespersecond <= 0) {
+    fprintf(stderr,"cpucycles_persecond() = %lld\n",cyclespersecond);
     return 100;
   }
 
@@ -54,10 +60,17 @@ int main()
   todend -= todstart;
   cpuend -= cpustart;
 
+  cyclespertod = (long long) (((double) cpuend) * 1000000.0 / (double) todend);
+
+  if (cyclespertod > 10 * cyclespersecond) {
+    fprintf(stderr,"cyclespertod = %lld, cyclespersecond = %lld\n",cyclespertod,cyclespersecond);
+    return 100;
+  }
+
   for (i = 0;i <= 1000;++i) t[i] = cpucycles();
   printf("%s",cpucycles_implementation);
-  printf(" %lld",cpucycles_persecond());
-  printf(" %lld",(long long) (((double) cpuend) * 1000000.0 / (double) todend));
+  printf(" %lld",cyclespersecond);
+  printf(" %lld",cyclespertod);
   for (i = 0;i < 64;++i) printf(" %lld",t[i + 1] - t[i]);
   printf("\n");
   return 0;

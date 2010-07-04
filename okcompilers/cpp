@@ -669,12 +669,12 @@ xlC -q64 -O
 xlC -q64
 xlC -q64 -qtune=pwr3 -O2
 xlC -q64 -qtune=pwr3 -O
-/opt/SUNWspro/bin/CC -fast -xarch=v9
-/opt/SUNWspro/bin/CC -xarch=v9
-/opt/aCC/bin/aCC +DD64 -fast
-/opt/aCC/bin/aCC +DD64
-/opt/MIPSpro/bin/CC -64 -Ofast
-/opt/MIPSpro/bin/CC -64
+opt-SUNWspro-bin-CC -fast -xarch=v9
+opt-SUNWspro-bin-CC -xarch=v9
+opt-aCC-bin-aCC +DD64 -fast
+opt-aCC-bin-aCC +DD64
+opt-MIPSpro-bin-CC -64 -Ofast
+opt-MIPSpro-bin-CC -64
 icpc -m64 -xHost -vec-report0 -static
 icpc -m32 -xHost -vec-report0 -static
 icpc -O3 -static
@@ -719,14 +719,14 @@ xlC -qarch=pwr -O2
 xlC -qarch=pwr -O
 xlC -qarch=com -O2
 xlC -qarch=com -O
-/opt/SUNWspro/bin/CC -fast
-/opt/SUNWspro/bin/CC
-/opt/aCC/bin/aCC -fast
-/opt/aCC/bin/aCC 
-/opt/MIPSpro/bin/CC -n32 -Ofast
-/opt/MIPSpro/bin/CC -n32
-/opt/MIPSpro/bin/CC -Ofast
-/opt/MIPSpro/bin/CC
+opt-SUNWspro-bin-CC -fast
+opt-SUNWspro-bin-CC
+opt-aCC-bin-aCC -fast
+opt-aCC-bin-aCC 
+opt-MIPSpro-bin-CC -n32 -Ofast
+opt-MIPSpro-bin-CC -n32
+opt-MIPSpro-bin-CC -Ofast
+opt-MIPSpro-bin-CC
 pgCC -tp core2-64 -O2
 pgCC -tp core2-64 -O3
 pgCC -tp core2-64 -fast

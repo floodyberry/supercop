@@ -1360,18 +1360,18 @@ xlc -qarch=com -O
 xlc -O2
 xlc -O
 xlc
-/opt/SUNWspro/bin/cc -fast -xarch=v9
-/opt/SUNWspro/bin/cc -xarch=v9
-/opt/SUNWspro/bin/cc -fast
-/opt/SUNWspro/bin/cc
-/opt/ansic/bin/cc +DD64 -fast
-/opt/ansic/bin/cc +DD64
-/opt/ansic/bin/cc -fast
-/opt/ansic/bin/cc 
-/opt/MIPSpro/bin/cc -64 -Ofast
-/opt/MIPSpro/bin/cc -64
-/opt/MIPSpro/bin/cc -n32 -Ofast
-/opt/MIPSpro/bin/cc -n32
-/opt/MIPSpro/bin/cc -Ofast
-/opt/MIPSpro/bin/cc
+opt-SUNWspro-bin-cc -fast -xarch=v9
+opt-SUNWspro-bin-cc -xarch=v9
+opt-SUNWspro-bin-cc -fast
+opt-SUNWspro-bin-cc
+opt-ansic-bin-cc +DD64 -fast
+opt-ansic-bin-cc +DD64
+opt-ansic-bin-cc -fast
+opt-ansic-bin-cc 
+opt-MIPSpro-bin-cc -64 -Ofast
+opt-MIPSpro-bin-cc -64
+opt-MIPSpro-bin-cc -n32 -Ofast
+opt-MIPSpro-bin-cc -n32
+opt-MIPSpro-bin-cc -Ofast
+opt-MIPSpro-bin-cc
 cc

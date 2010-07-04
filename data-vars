@@ -9,12 +9,14 @@ version=`cat version`
 project=supercop
 shorthostname=`hostname | sed 's/\..*//' | tr -cd '[a-z][A-Z][0-9]'`
 
-top="`pwd`/data/$shorthostname"
+top="`pwd`/supercop-data/$shorthostname"
 
 PATH="/usr/local/bin:$PATH"
 PATH="/usr/sfw/bin:$PATH"
+PATH="$top/scripts:$PATH"
 PATH="$top/okcompilers/bin:$PATH"
 PATH="$top/killafter/bin:$PATH"
+PATH="$top/sinceepoch/bin:$PATH"
 PATH="$top/checksum/bin:$PATH"
 export PATH
 

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+cores=${1-1}
+cccc=`awk 'BEGIN{for(i=1;i<='$cores';++i)print i;exit}'`
+
+sh data-init
+
+for x in $cccc
+do
+  sh data-run &
+done
+wait
+
+sh data-summarize

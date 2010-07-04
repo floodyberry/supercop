@@ -66,6 +66,9 @@ sysctl hw.model || :
 echo "=== `date` === /usr/sbin/psrinfo -v"
 /usr/sbin/psrinfo -v || :
 
+echo "=== `date` === building scripts"
+cp -p scripts/* "$bin"
+
 echo "=== `date` === building okcompilers"
 rm -rf "$work"
 mkdir -p "$work"
@@ -91,6 +94,13 @@ echo "=== `date` === building killafter"
 rm -rf "$work"
 mkdir -p "$work"
 cp -pr killafter/* "$work"
+( cd "$work" && sh do )
+cp -p "$work"/bin/* "$bin"
+
+echo "=== `date` === building sinceepoch"
+rm -rf "$work"
+mkdir -p "$work"
+cp -pr sinceepoch/* "$work"
 ( cd "$work" && sh do )
 cp -p "$work"/bin/* "$bin"
 
@@ -331,16 +341,16 @@ do
 	    done
 	    [ "$ok" = 1 ] || continue
 
-	    if sh -c './try || exit $?' >../errors 2>&1
+	    if sh -c './try || exit $?' >../outputs 2>../errors
 	    then
-	      checksum=`awk '{print $1}' < ../errors`
-	      cycles=`awk '{print $2}' < ../errors`
-	      checksumcycles=`awk '{print $3}' < ../errors`
-	      cyclespersecond=`awk '{print $4}' < ../errors`
-	      impl=`awk '{print $5}' < ../errors`
+	      checksum=`awk '{print $1}' < ../outputs`
+	      cycles=`awk '{print $2}' < ../outputs`
+	      checksumcycles=`awk '{print $3}' < ../outputs`
+	      cyclespersecond=`awk '{print $4}' < ../outputs`
+	      impl=`awk '{print $5}' < ../outputs`
 	    else
 	      echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword error $?" >&5
-	      cat ../errors \
+	      cat ../outputs ../errors \
 	      | while read err
 	      do
 	        echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword $err" >&5

@@ -7,6 +7,41 @@ okabi | (
     rm -f cpucycles.o cpucycles.h
     
     (
+      case "$abi" in
+        ppc*)
+          echo powerpclinux
+          echo powerpcmacos
+          echo powerpcaix
+	  ;;
+        amd64*)
+          echo amd64tscfreq
+          echo amd64cpuinfo
+          echo amd64cpuspeed
+	  ;;
+        x86*)
+          echo x86tscfreq
+          echo x86cpuinfo
+          echo x86cpuspeed
+          echo x86estimate
+	  ;;
+	cell*)
+          echo celllinux
+	  ;;
+	sparc*)
+          echo sparcpsrinfo
+          echo sparc32psrinfo
+	  ;;
+	hppa*)
+          echo hppapstat
+	  ;;
+	alpha*)
+          echo alpha
+	  ;;
+	sgi*)
+          echo sgi
+	  ;;
+      esac
+
       echo amd64tscfreq
       echo amd64cpuinfo
       echo amd64cpuspeed
