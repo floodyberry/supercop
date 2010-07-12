@@ -40,6 +40,12 @@ echo "=== `date` === /usr/sbin/lsattr -El proc0"
 /usr/sbin/lsattr -El proc0 || :
 echo "=== `date` === cat /proc/cpuinfo"
 cat /proc/cpuinfo || :
+echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq || :
+echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq"
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq || :
+echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq || :
 echo "=== `date` === sysctl hw.model"
 sysctl hw.model || :
 echo "=== `date` === /usr/sbin/psrinfo -v"
@@ -65,9 +71,9 @@ do
   mkdir -p "$top/$abi/bin"
   mkdir -p "$top/$abi/lib"
   mkdir -p "$top/$abi/include"
-  find "$top/$abi" -name BUILD -exec rm '{}' ';'
-  find "$top/$abi" -name LOCKED -exec rm '{}' ';'
-  find "$top/$abi" -name LOCK -exec rm '{}' ';'
+  find "$top/$abi" -name BUILD | xargs rm
+  find "$top/$abi" -name LOCKED | xargs rm
+  find "$top/$abi" -name LOCK | xargs rm
 
   mkdir -p "$top/$abi/base"
   touch "$top/$abi/base/BUILD"

@@ -61,6 +61,12 @@ echo "=== `date` === /usr/sbin/lsattr -El proc0"
 /usr/sbin/lsattr -El proc0 || :
 echo "=== `date` === cat /proc/cpuinfo"
 cat /proc/cpuinfo || :
+echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq || :
+echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq"
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq || :
+echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"
+cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq || :
 echo "=== `date` === sysctl hw.model"
 sysctl hw.model || :
 echo "=== `date` === /usr/sbin/psrinfo -v"
@@ -124,7 +130,7 @@ do
     okcpp-$abi | head -1 \
     | while read cpp cppopts
     do
-      for gmpabi in 64 32 2.0w 2.0n 1.0 o32 n32 aix64 mode64 mode32
+      for gmpabi in 64 32 2.0w 2.0n 1.0 o32 n32 aix64 mode64 mode32 standard
       do
 	[ -s "$lib/$abi/libgmp.a" ] && continue
 	echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"

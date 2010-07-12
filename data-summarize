@@ -38,7 +38,7 @@
 	  | while read compiler
 	  do
 	    compilerword=`echo "$compiler" | tr ' ' '_'`
-            if [ -e "$top/$abi/try/$language/$compilerword/$implementationdir/data" ]
+            if [ -f "$top/$abi/try/$language/$compilerword/$implementationdir/data" ]
 	    then
               grep . < "$top/$abi/try/$language/$compilerword/$implementationdir/data"
 	    fi
@@ -47,7 +47,7 @@
 
         for m in 1 2 3
         do
-	  if [ -e "$top/$abi/measure$m/$o/$p/data" ]
+	  if [ -f "$top/$abi/measure$m/$o/$p/data" ]
 	  then
 	    grep . < "$top/$abi/measure$m/$o/$p/data"
 	  fi

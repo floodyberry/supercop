@@ -59,6 +59,9 @@ okabi | (
       echo hppapstat
       echo alpha
       echo sgi
+
+      echo dev4
+
       echo clockmonotonic
       echo gettimeofday
     ) | (

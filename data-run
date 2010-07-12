@@ -39,7 +39,7 @@ do
   startdate=`date +%Y%m%d`
 
   rm -rf "$top/$target/work"
-  if [ ! -e "$top/$target/BUILD" ]
+  if [ ! -f "$top/$target/BUILD" ]
   then
     echo "=== `date` === $target already built"
     rm "$top/$target/LOCKED"
@@ -61,7 +61,7 @@ do
 
   while read source
   do
-    while [ -e "$top/$abi/$source/BUILD" ]
+    while [ -f "$top/$abi/$source/BUILD" ]
     do
       sleep 1
       if [ "$timeout" -gt 0 ]
@@ -215,7 +215,7 @@ do
         okcpp-$abi | head -1 \
         | while read cpp cppopts
         do
-          for gmpabi in 64 32 2.0w 2.0n 1.0 o32 n32 aix64 mode64 mode32
+          for gmpabi in 64 32 2.0w 2.0n 1.0 o32 n32 aix64 mode64 mode32 standard
           do
 	    [ -s "$top/$abi/lib/libgmp.a" ] && continue
 	    echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"
