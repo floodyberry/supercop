@@ -347,7 +347,7 @@ do
 	    done
 	    [ "$ok" = 1 ] || continue
 
-	    if sh -c './try || exit $?' >../outputs 2>../errors
+	    if sh -c 'killafter 600 ./try || exit $?' >../outputs 2>../errors
 	    then
 	      checksum=`awk '{print $1}' < ../outputs`
 	      cycles=`awk '{print $2}' < ../outputs`

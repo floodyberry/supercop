@@ -2,7 +2,7 @@
 # Implementation of the double pipe ECHO hash function in its 512-bit outputs variant.#
 # Optimized for Intel AES-NI, 64-bit mode                                             #
 #                                                                                     #
-# Date:     2010-04-12                                                                #
+# Date:     2010-07-23                                                                #
 #                                                                                     #
 # Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 #
 #           Olivier Billet  <billet@eurecom.fr>                                       #
@@ -13,7 +13,7 @@
 .globl Compress
 	.type	Compress, @function
 Compress:
-.LFB539:
+.LFB565:
 	.cfi_startproc
 #APP
 # 518 "echo64.c" 1
@@ -1066,13 +1066,13 @@ Compress:
 #NO_APP
 	ret
 	.cfi_endproc
-.LFE539:
+.LFE565:
 	.size	Compress, .-Compress
 	.p2align 4,,15
 .globl Init
 	.type	Init, @function
 Init:
-.LFB540:
+.LFB566:
 	.cfi_startproc
 	movabsq	$-9187201950435737472, %rax
 	movabsq	$-9187201950435737472, %r11
@@ -1146,13 +1146,13 @@ Init:
 	rep
 	ret
 	.cfi_endproc
-.LFE540:
+.LFE566:
 	.size	Init, .-Init
 	.p2align 4,,15
 .globl Final
 	.type	Final, @function
 Final:
-.LFB542:
+.LFB568:
 	.cfi_startproc
 	pushq	%r14
 	.cfi_def_cfa_offset 16
@@ -1359,13 +1359,13 @@ Final:
 	popq	%r14
 	ret
 	.cfi_endproc
-.LFE542:
+.LFE568:
 	.size	Final, .-Final
 	.p2align 4,,15
 .globl Update
 	.type	Update, @function
 Update:
-.LFB541:
+.LFB567:
 	.cfi_startproc
 	pushq	%r15
 	.cfi_def_cfa_offset 16
@@ -1479,261 +1479,65 @@ Update:
 	popq	%r15
 	ret
 	.cfi_endproc
-.LFE541:
+.LFE567:
 	.size	Update, .-Update
 	.p2align 4,,15
-.globl Hash
-	.type	Hash, @function
-Hash:
-.LFB543:
+	.type	T.46, @function
+T.46:
+.LFB571:
 	.cfi_startproc
-	pushq	%r15
-	.cfi_def_cfa_offset 16
-	movabsq	$-9187201950435737472, %r11
-	movabsq	$-9187201950435737472, %r10
-	movabsq	$7599940337074203, %r9
-	movabsq	$7599940337074203, %r8
-	xorl	%eax, %eax
-	pushq	%r14
-	.cfi_def_cfa_offset 24
-	pushq	%r13
-	.cfi_def_cfa_offset 32
-	pushq	%r12
-	.cfi_def_cfa_offset 40
 	pushq	%rbp
-	.cfi_def_cfa_offset 48
-	movabsq	$72340172838076673, %rbp
-	.cfi_offset 6, -48
-	.cfi_offset 12, -40
-	.cfi_offset 13, -32
-	.cfi_offset 14, -24
-	.cfi_offset 15, -16
+	.cfi_def_cfa_offset 16
+	movabsq	$-9187201950435737472, %rax
+	movq	%rdx, %rbp
+	.cfi_offset 6, -16
+	movabsq	$-9187201950435737472, %r11
+	movabsq	$7599940337074203, %r10
+	movabsq	$7599940337074203, %r9
 	pushq	%rbx
-	.cfi_def_cfa_offset 56
-	movq	%rsi, %rbx
-	.cfi_offset 3, -56
-	movabsq	$72340172838076673, %rsi
-	subq	$328, %rsp
-	.cfi_def_cfa_offset 384
+	.cfi_def_cfa_offset 24
+	movabsq	$72340172838076673, %r8
+	movabsq	$72340172838076673, %rbx
+	.cfi_offset 3, -24
+	movabsq	$-72340172838076674, %rcx
+	movabsq	$-72340172838076674, %rdx
+	subq	$296, %rsp
+	.cfi_def_cfa_offset 320
+	movq	%rax, MEM_CST+16(%rip)
 	movq	$0, MEM_CST(%rip)
 	movq	$0, MEM_CST+8(%rip)
-	movq	%rdx, 16(%rsp)
-	movq	%rcx, 24(%rsp)
-	movabsq	$-72340172838076674, %rdx
-	movabsq	$-72340172838076674, %rcx
-	movq	%r11, MEM_CST+16(%rip)
-	movq	%r10, MEM_CST+24(%rip)
-	movq	%r9, MEM_CST+32(%rip)
-	movq	%r8, MEM_CST+40(%rip)
-	movq	%rbp, MEM_CST+48(%rip)
-	movq	%rsi, MEM_CST+56(%rip)
+	movq	%r11, MEM_CST+24(%rip)
+	xorl	%eax, %eax
+	movq	%r10, MEM_CST+32(%rip)
+	movq	%r9, MEM_CST+40(%rip)
+	movq	%r8, MEM_CST+48(%rip)
+	movq	%rbx, MEM_CST+56(%rip)
 	movq	%rcx, MEM_CST+64(%rip)
 	movq	%rdx, MEM_CST+72(%rip)
 	movq	$0, MEM_CST+80(%rip)
 	movq	$0, MEM_CST+88(%rip)
-	.p2align 4,,10
-	.p2align 3
 .L41:
 	movq	$0, SHA3_FULL_CNT+167(%rax)
 	subq	$1, %rax
 	cmpq	$-160, %rax
 	jne	.L41
-	leal	-160(%rdi), %edx
-	movl	$2, %eax
-	cmpl	$352, %edx
-	ja	.L43
-	xorl	%ecx, %ecx
-	cmpl	$257, %edi
-	leaq	32(%rsp), %r12
-	setge	%cl
-	movl	%edi, 300(%rsp)
-	xorl	%edx, %edx
-	leal	4(,%rcx,4), %ecx
-	movslq	%edi,%rdi
-	movq	%r12, %rax
-	movl	%ecx, 304(%rsp)
-	.p2align 4,,10
-	.p2align 3
-.L45:
-	addl	$1, %edx
-	movq	%rdi, (%rax)
-	movq	$0, 8(%rax)
-	addq	$16, %rax
-	cmpl	%ecx, %edx
-	jl	.L45
-	cmpl	$15, %ecx
-	jg	.L47
-	leal	(%rcx,%rcx), %eax
-	.p2align 4,,10
-	.p2align 3
-.L48:
-	movslq	%eax,%rdx
-	movq	$0, 32(%rsp,%rdx,8)
-	leal	1(%rax), %edx
-	addl	$2, %eax
-	cmpl	$32, %eax
-	movslq	%edx,%rdx
-	movq	$0, 32(%rsp,%rdx,8)
-	jne	.L48
-.L47:
-	movq	16(%rsp), %r13
-	sall	$4, %ecx
-	movq	$0, 288(%rsp)
-	movslq	%ecx,%rbp
-	movl	$0, 296(%rsp)
-	leaq	(%r12,%rbp), %rbp
-	shrq	$3, %r13
-	testq	%r13, %r13
-	jle	.L49
-	movl	$256, %eax
-	movq	%r13, %r15
-	subl	%ecx, %eax
-	movslq	%eax,%r14
-	sall	$3, %eax
-	movl	%eax, 12(%rsp)
-	movq	%r14, %rax
-	subq	%r14, %r15
-	negq	%rax
-	movq	%rax, (%rsp)
-.L51:
-	cmpq	%r14, %r13
-	jl	.L50
-	movq	%rbx, %rsi
-	movq	%r14, %rdx
-	movq	%rbp, %rdi
-	call	memcpy
-	movq	%r12, %rdi
-	movl	12(%rsp), %eax
-	addl	%eax, 296(%rsp)
-	call	Compress
-	addq	(%rsp), %r15
-	addq	%r14, %rbx
-	addq	(%rsp), %r13
-	leaq	(%r15,%r14), %rax
-	testq	%rax, %rax
-	jg	.L51
-.L49:
-	xorl	%eax, %eax
-	xorl	%edx, %edx
-	jmp	.L52
-	.p2align 4,,10
-	.p2align 3
-.L50:
-	movq	%r13, %rdx
-	movq	%rbx, %rsi
-	movq	%rbp, %rdi
-	call	memcpy
-	movl	%r13d, %edx
-	addq	%r13, %rbx
-	leal	0(,%rdx,8), %eax
-.L52:
-	movq	16(%rsp), %rcx
-	movl	%eax, 296(%rsp)
-	andl	$7, %ecx
-	je	.L53
-	addl	%ecx, %eax
-	movl	%eax, 296(%rsp)
-	xorl	%eax, %eax
-	testl	%ecx, %ecx
-	je	.L55
-	movl	$7, %esi
-	movl	$1, %edi
-	subl	%ecx, %esi
-	movl	$7, %ecx
-	.p2align 4,,10
-	.p2align 3
-.L56:
-	movl	%edi, %r8d
-	sall	%cl, %r8d
-	subl	$1, %ecx
-	orl	%r8d, %eax
-	cmpl	%esi, %ecx
-	jne	.L56
-	andb	(%rbx), %al
-.L55:
-	movslq	%edx,%rdx
-	movb	%al, (%rbp,%rdx)
-.L53:
-	movq	24(%rsp), %rsi
-	movq	%r12, %rdi
-	call	Final
-.L43:
-	addq	$328, %rsp
-	popq	%rbx
-	popq	%rbp
-	popq	%r12
-	popq	%r13
-	popq	%r14
-	popq	%r15
-	ret
-	.cfi_endproc
-.LFE543:
-	.size	Hash, .-Hash
-	.p2align 4,,15
-	.type	T.43, @function
-T.43:
-.LFB545:
-	.cfi_startproc
-	movq	%rbx, -48(%rsp)
-	movq	%r12, -32(%rsp)
-	movabsq	$72340172838076673, %rax
-	movq	%r13, -24(%rsp)
-	movq	%r14, -16(%rsp)
-	movq	%rdi, %rbx
-	.cfi_offset 14, -24
-	.cfi_offset 13, -32
-	.cfi_offset 12, -40
-	.cfi_offset 3, -56
-	movq	%r15, -8(%rsp)
-	movq	%rbp, -40(%rsp)
-	subq	$360, %rsp
-	.cfi_def_cfa_offset 368
-	movq	%rsi, 8(%rsp)
-	movq	%rdx, %r12
-	movabsq	$-9187201950435737472, %rdi
-	movabsq	$-9187201950435737472, %rsi
-	movabsq	$7599940337074203, %rcx
-	movabsq	$7599940337074203, %rdx
-	movabsq	$72340172838076673, %r15
-	.cfi_offset 6, -48
-	.cfi_offset 15, -16
-	movabsq	$-72340172838076674, %r14
-	movabsq	$-72340172838076674, %r13
-	movq	%rax, MEM_CST+48(%rip)
-	movq	$0, MEM_CST(%rip)
-	xorl	%eax, %eax
-	movq	$0, MEM_CST+8(%rip)
-	movq	%rdi, MEM_CST+16(%rip)
-	movq	%rsi, MEM_CST+24(%rip)
-	movq	%rcx, MEM_CST+32(%rip)
-	movq	%rdx, MEM_CST+40(%rip)
-	movq	%r15, MEM_CST+56(%rip)
-	movq	%r14, MEM_CST+64(%rip)
-	movq	%r13, MEM_CST+72(%rip)
-	movq	$0, MEM_CST+80(%rip)
-	movq	$0, MEM_CST+88(%rip)
-.L64:
-	movq	$0, SHA3_FULL_CNT+167(%rax)
-	subq	$1, %rax
-	cmpq	$-160, %rax
-	jne	.L64
 	movdqa	.LC0(%rip), %xmm0
-	leaq	16(%rsp), %rbp
-	movq	8(%rsp), %r13
-	movl	$256, 284(%rsp)
+	movq	%rsi, %rdx
+	movq	%rdi, %rsi
+	movq	%rsp, %rdi
+	movl	$512, 268(%rsp)
+	movdqa	%xmm0, (%rsp)
+	movl	$8, 272(%rsp)
+	movq	$0, 256(%rsp)
 	movdqa	%xmm0, 16(%rsp)
-	movl	$4, 288(%rsp)
-	leaq	64(%rbp), %r15
-	movl	$0, 280(%rsp)
 	movdqa	%xmm0, 32(%rsp)
-	shrq	$3, %r13
 	movdqa	%xmm0, 48(%rsp)
-	testq	%r13, %r13
-	movdqa	%xmm0, 48(%rbp)
-	pxor	%xmm0, %xmm0
+	movdqa	%xmm0, 64(%rsp)
 	movdqa	%xmm0, 80(%rsp)
 	movdqa	%xmm0, 96(%rsp)
 	movdqa	%xmm0, 112(%rsp)
+	pxor	%xmm0, %xmm0
+	movl	$0, 264(%rsp)
 	movdqa	%xmm0, 128(%rsp)
 	movdqa	%xmm0, 144(%rsp)
 	movdqa	%xmm0, 160(%rsp)
@@ -1742,91 +1546,31 @@ T.43:
 	movdqa	%xmm0, 208(%rsp)
 	movdqa	%xmm0, 224(%rsp)
 	movdqa	%xmm0, 240(%rsp)
-	movdqa	%xmm0, 240(%rbp)
-	movq	$0, 272(%rsp)
-	jle	.L65
-	movq	%r13, %r14
-	subq	$192, %r14
-	jmp	.L67
-	.p2align 4,,10
-	.p2align 3
-.L77:
-	movq	%rbx, %rsi
-	movl	$192, %edx
-	movq	%r15, %rdi
-	call	memcpy
-	subq	$192, %r14
-	movq	%rbp, %rdi
-	addl	$1536, 280(%rsp)
-	call	Compress
-	leaq	192(%r14), %rax
-	addq	$192, %rbx
-	subq	$192, %r13
-	testq	%rax, %rax
-	jle	.L65
-.L67:
-	cmpq	$192, %r13
-	jge	.L77
-	movq	%r13, %rdx
-	movq	%rbx, %rsi
-	movq	%r15, %rdi
-	call	memcpy
-	movl	%r13d, %edx
-	addq	%r13, %rbx
-	leal	0(,%rdx,8), %eax
-.L68:
-	movq	8(%rsp), %rcx
-	movl	%eax, 280(%rsp)
-	andl	$7, %ecx
-	je	.L69
-	addl	%ecx, %eax
-	movl	%eax, 280(%rsp)
-	xorl	%eax, %eax
-	testl	%ecx, %ecx
-	je	.L71
-	movl	$7, %esi
-	movl	$1, %edi
-	subl	%ecx, %esi
-	movl	$7, %ecx
-	.p2align 4,,10
-	.p2align 3
-.L72:
-	movl	%edi, %r8d
-	sall	%cl, %r8d
-	subl	$1, %ecx
-	orl	%r8d, %eax
-	cmpl	%esi, %ecx
-	jne	.L72
-	andb	(%rbx), %al
-.L71:
-	movslq	%edx,%rdx
-	movb	%al, 64(%rbp,%rdx)
-.L69:
-	movq	%r12, %rsi
-	movq	%rbp, %rdi
-	call	Final
-	movq	312(%rsp), %rbx
-	movq	320(%rsp), %rbp
-	movq	328(%rsp), %r12
-	movq	336(%rsp), %r13
-	movq	344(%rsp), %r14
-	movq	352(%rsp), %r15
-	addq	$360, %rsp
+	call	Update
+	testl	%eax, %eax
+	je	.L45
+	addq	$296, %rsp
+	popq	%rbx
+	popq	%rbp
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L65:
-	xorl	%eax, %eax
-	xorl	%edx, %edx
-	jmp	.L68
+.L45:
+	movq	%rbp, %rsi
+	movq	%rsp, %rdi
+	call	Final
+	addq	$296, %rsp
+	popq	%rbx
+	popq	%rbp
+	ret
 	.cfi_endproc
-.LFE545:
-	.size	T.43, .-T.43
+.LFE571:
+	.size	T.46, .-T.46
 	.p2align 4,,15
 .globl crypto_hash_echo512_aes_aes64
 	.type	crypto_hash_echo512_aes_aes64, @function
 crypto_hash_echo512_aes_aes64:
-.LFB544:
+.LFB570:
 	.cfi_startproc
 	movq	%rdi, %rax
 	movq	%rsi, %rdi
@@ -1834,15 +1578,117 @@ crypto_hash_echo512_aes_aes64:
 	subq	$8, %rsp
 	.cfi_def_cfa_offset 16
 	movq	%rax, %rdx
-	call	T.43
+	call	T.46
 	cmpl	$1, %eax
 	sbbl	%eax, %eax
 	addq	$8, %rsp
 	notl	%eax
 	ret
 	.cfi_endproc
-.LFE544:
+.LFE570:
 	.size	crypto_hash_echo512_aes_aes64, .-crypto_hash_echo512_aes_aes64
+	.p2align 4,,15
+.globl Hash
+	.type	Hash, @function
+Hash:
+.LFB569:
+	.cfi_startproc
+	pushq	%rbp
+	.cfi_def_cfa_offset 16
+	movq	%rcx, %rbp
+	.cfi_offset 6, -16
+	movabsq	$-9187201950435737472, %rcx
+	movabsq	$-9187201950435737472, %rax
+	movabsq	$7599940337074203, %r11
+	movabsq	$7599940337074203, %r10
+	pushq	%rbx
+	.cfi_def_cfa_offset 24
+	movabsq	$72340172838076673, %r9
+	movabsq	$72340172838076673, %r8
+	movabsq	$-72340172838076674, %rbx
+	.cfi_offset 3, -24
+	subq	$296, %rsp
+	.cfi_def_cfa_offset 320
+	movq	%rcx, MEM_CST+16(%rip)
+	movabsq	$-72340172838076674, %rcx
+	movq	%rax, MEM_CST+24(%rip)
+	movq	$0, MEM_CST(%rip)
+	xorl	%eax, %eax
+	movq	$0, MEM_CST+8(%rip)
+	movq	%r11, MEM_CST+32(%rip)
+	movq	%r10, MEM_CST+40(%rip)
+	movq	%r9, MEM_CST+48(%rip)
+	movq	%r8, MEM_CST+56(%rip)
+	movq	%rbx, MEM_CST+64(%rip)
+	movq	%rcx, MEM_CST+72(%rip)
+	movq	$0, MEM_CST+80(%rip)
+	movq	$0, MEM_CST+88(%rip)
+	.p2align 4,,10
+	.p2align 3
+.L51:
+	movq	$0, SHA3_FULL_CNT+167(%rax)
+	subq	$1, %rax
+	cmpq	$-160, %rax
+	jne	.L51
+	leal	-160(%rdi), %ecx
+	movl	$2, %eax
+	cmpl	$352, %ecx
+	ja	.L53
+	xorl	%eax, %eax
+	cmpl	$257, %edi
+	movl	%edi, 268(%rsp)
+	setge	%al
+	movslq	%edi,%rdi
+	movq	%rsp, %rcx
+	leal	4(,%rax,4), %eax
+	xorl	%r8d, %r8d
+	movl	%eax, 272(%rsp)
+	.p2align 4,,10
+	.p2align 3
+.L55:
+	addl	$1, %r8d
+	movq	%rdi, (%rcx)
+	movq	$0, 8(%rcx)
+	addq	$16, %rcx
+	cmpl	%eax, %r8d
+	jl	.L55
+	cmpl	$15, %eax
+	jg	.L57
+	addl	%eax, %eax
+	.p2align 4,,10
+	.p2align 3
+.L58:
+	movslq	%eax,%rcx
+	movq	$0, (%rsp,%rcx,8)
+	leal	1(%rax), %ecx
+	addl	$2, %eax
+	cmpl	$32, %eax
+	movslq	%ecx,%rcx
+	movq	$0, (%rsp,%rcx,8)
+	jne	.L58
+.L57:
+	movq	%rsp, %rdi
+	movq	$0, 256(%rsp)
+	movl	$0, 264(%rsp)
+	call	Update
+	testl	%eax, %eax
+	je	.L63
+.L53:
+	addq	$296, %rsp
+	popq	%rbx
+	popq	%rbp
+	ret
+.L63:
+	movq	%rbp, %rsi
+	movq	%rsp, %rdi
+	call	Final
+	addq	$296, %rsp
+	popq	%rbx
+	popq	%rbp
+	ret
+	.cfi_endproc
+.LFE569:
+	.size	Hash, .-Hash
 	.comm	OLDCV,128,16
 	.comm	MEM_CST,96,16
 	.comm	SHA3_CNT,16,16
@@ -1850,7 +1696,7 @@ crypto_hash_echo512_aes_aes64:
 	.section	.rodata.cst16,"aM",@progbits,16
 	.align 16
 .LC0:
-	.quad	256
+	.quad	512
 	.quad	0
-	.ident	"GCC: (Debian 4.4.3-7) 4.4.3"
+	.ident	"GCC: (Ubuntu 4.4.3-4ubuntu5) 4.4.3"
 	.section	.note.GNU-stack,"",@progbits

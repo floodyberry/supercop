@@ -2,7 +2,7 @@
 # Implementation of the simple pipe ECHO hash function in its 256-bit outputs variant.#
 # Optimized for Intel AES-NI, 32-bit mode                                             #
 #                                                                                     #
-# Date:     2010-04-12                                                                #
+# Date:     2010-07-23                                                                #
 #                                                                                     #
 # Authors:  Ryad Benadjila  <ryadbenadjila@gmail.com>                                 #
 #           Olivier Billet  <billet@eurecom.fr>                                       #
@@ -32,7 +32,7 @@ Compress:
 	movq   xmm1, [SHA3_S+16*2*8]
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd  xmm1, xmm0
+	paddq  xmm1, xmm0
 # 0 "" 2
 # 506 "echo32.c" 1
 	movq  [SHA3_S+16*2*8], xmm1
@@ -71,13 +71,13 @@ Compress:
 	movaps xmm3, xmm1
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd  xmm1, [ONE]
+	paddq  xmm1, [ONE]
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd  xmm2, [TWO]
+	paddq  xmm2, [TWO]
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd  xmm3, [THREE]
+	paddq  xmm3, [THREE]
 # 0 "" 2
 # 506 "echo32.c" 1
 	movaps xmm5, [FOUR]
@@ -92,10 +92,10 @@ Compress:
 	movq [SHA3_FULL_CNT+esi-2*16],  xmm1
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm0, xmm5
+	paddq xmm0, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm1, xmm5
+	paddq xmm1, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
 	movq [SHA3_FULL_CNT+esi-3*16],  xmm2
@@ -104,10 +104,10 @@ Compress:
 	movq [SHA3_FULL_CNT+esi-4*16],  xmm3
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm2, xmm5
+	paddq xmm2, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm3, xmm5
+	paddq xmm3, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
 	movq [SHA3_FULL_CNT+esi-5*16],  xmm0
@@ -116,10 +116,10 @@ Compress:
 	movq [SHA3_FULL_CNT+esi-6*16],  xmm1
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm0, xmm5
+	paddq xmm0, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm1, xmm5
+	paddq xmm1, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
 	movq [SHA3_FULL_CNT+esi-7*16],  xmm2
@@ -128,10 +128,10 @@ Compress:
 	movq [SHA3_FULL_CNT+esi-8*16],  xmm3
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm2, xmm5
+	paddq xmm2, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm3, xmm5
+	paddq xmm3, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
 	movq [SHA3_FULL_CNT+esi-9*16],  xmm0
@@ -140,10 +140,10 @@ Compress:
 	movq [SHA3_FULL_CNT+esi-10*16], xmm1
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm0, xmm5
+	paddq xmm0, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm1, xmm5
+	paddq xmm1, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
 	movq [SHA3_FULL_CNT+esi-11*16], xmm2
@@ -152,10 +152,10 @@ Compress:
 	movq [SHA3_FULL_CNT+esi-12*16], xmm3
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm2, xmm5
+	paddq xmm2, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm3, xmm5
+	paddq xmm3, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
 	movq [SHA3_FULL_CNT+esi-13*16], xmm0
@@ -164,10 +164,10 @@ Compress:
 	movq [SHA3_FULL_CNT+esi-14*16], xmm1
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm0, xmm5
+	paddq xmm0, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm1, xmm5
+	paddq xmm1, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
 	movq [SHA3_FULL_CNT+esi-15*16], xmm2
@@ -176,10 +176,10 @@ Compress:
 	movq [SHA3_FULL_CNT+esi-16*16], xmm3
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm2, xmm5
+	paddq xmm2, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
-	addpd xmm3, xmm5
+	paddq xmm3, xmm5
 # 0 "" 2
 # 506 "echo32.c" 1
 	sub esi, 16*16
@@ -2135,8 +2135,8 @@ Init:
 	jmp	.L99
 	.size	Init, .-Init
 	.p2align 4,,15
-	.type	T.55, @function
-T.55:
+	.type	T.57, @function
+T.57:
 	pushl	%ebp
 	movl	%esp, %ebp
 	pushl	%edi
@@ -2296,7 +2296,7 @@ T.55:
 	popl	%edi
 	popl	%ebp
 	ret
-	.size	T.55, .-T.55
+	.size	T.57, .-T.57
 	.p2align 4,,15
 .globl crypto_hash_echosp256_aes_aes32
 	.type	crypto_hash_echosp256_aes_aes32, @function
@@ -2311,7 +2311,7 @@ crypto_hash_echosp256_aes_aes32:
 	movl	12(%ebp), %eax
 	shldl	$3, %edx, %ecx
 	sall	$3, %edx
-	call	T.55
+	call	T.57
 	leave
 	cmpl	$1, %eax
 	sbbl	%eax, %eax
@@ -2548,5 +2548,5 @@ Hash:
 	.long	0
 	.long	0
 	.long	0
-	.ident	"GCC: (Debian 4.4.3-7) 4.4.3"
+	.ident	"GCC: (Ubuntu 4.4.3-4ubuntu5) 4.4.3"
 	.section	.note.GNU-stack,"",@progbits

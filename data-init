@@ -71,9 +71,12 @@ do
   mkdir -p "$top/$abi/bin"
   mkdir -p "$top/$abi/lib"
   mkdir -p "$top/$abi/include"
-  find "$top/$abi" -name BUILD | xargs rm
-  find "$top/$abi" -name LOCKED | xargs rm
-  find "$top/$abi" -name LOCK | xargs rm
+  echo "=== `date` === cleaning up BUILD in $abi"
+  find "$top/$abi" -name BUILD | xargs rm -f
+  echo "=== `date` === cleaning up LOCKED in $abi"
+  find "$top/$abi" -name LOCKED | xargs rm -f
+  echo "=== `date` === cleaning up LOCK in $abi"
+  find "$top/$abi" -name LOCK | xargs rm -f
 
   mkdir -p "$top/$abi/base"
   touch "$top/$abi/base/BUILD"
