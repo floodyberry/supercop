@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <string.h>
 #include "crypto_hash.h"
 #include "SHA3api_ref.h"
 
