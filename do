@@ -347,7 +347,7 @@ do
 	    done
 	    [ "$ok" = 1 ] || continue
 
-	    if sh -c 'killafter 600 ./try || exit $?' >../outputs 2>../errors
+	    if sh -c 'killafter 3600 ./try || exit $?' >../outputs 2>../errors
 	    then
 	      checksum=`awk '{print $1}' < ../outputs`
 	      cycles=`awk '{print $2}' < ../outputs`
@@ -372,7 +372,7 @@ do
 
 	    [ -s ../bestc/median ] && [ `cat ../bestc/median` -le $cycles ] && continue
 
-	    killafter 600 \
+	    killafter 3600 \
 	    $compiler -D'COMPILER="'"$compiler"'"' \
 	      -DSUPERCOP -DLOOPS=3 \
 	      -I. -I"$include" -I"$include/$abi" \

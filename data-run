@@ -416,7 +416,7 @@ do
           done
           [ "$ok" = 1 ] || exit 0
   
-          if sh -c 'killafter 600 ./try || exit $?' >../errors 2>&1
+          if sh -c 'killafter 3600 ./try || exit $?' >../errors 2>&1
           then
             checksum=`awk '{print $1}' < ../errors`
             cycles=`awk '{print $2}' < ../errors`
@@ -439,7 +439,7 @@ do
           echo "$version $shorthostname $abi $startdate $o $p try $checksum $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
           [ "$checksumok" = fails ] && exit 0
   
-          killafter 600 \
+          killafter 3600 \
           $compiler -D'COMPILER="'"$compiler"'"' \
             -DSUPERCOP -DLOOPS=1 \
             -I. -I"$top/$abi/include" \
