@@ -9,6 +9,38 @@
  * This code is placed in the public domain
  */
 
+#define SET_CONSTANTS_512(){\
+  ((u64*)TRANSP_MASK)[0] = 0x0d0509010c040800ULL;\
+  ((u64*)TRANSP_MASK)[1] = 0x0f070b030e060a02ULL;\
+  ((u64*)ALL_7F)[0] = 0x7f7f7f7f7f7f7f7fULL;\
+  ((u64*)ALL_7F)[1] = 0x7f7f7f7f7f7f7f7fULL;\
+  ((u64*)ALL_1B)[0] = 0x1b1b1b1b1b1b1b1bULL;\
+  ((u64*)ALL_1B)[1] = 0x1b1b1b1b1b1b1b1bULL;\
+	((u64*)SUBSH_MASK)[0] =  0x0b0e0104070a0d00ULL;\
+	((u64*)SUBSH_MASK)[1] =  0x0306090c0f020508ULL;\
+	((u64*)SUBSH_MASK)[2] =  0x0c0f0205000b0e01ULL;\
+	((u64*)SUBSH_MASK)[3] =  0x04070a0d08030609ULL;\
+	((u64*)SUBSH_MASK)[4] =  0x0d080306010c0f02ULL;\
+	((u64*)SUBSH_MASK)[5] =  0x05000b0e0904070aULL;\
+	((u64*)SUBSH_MASK)[6] =  0x0e090407020d0803ULL;\
+	((u64*)SUBSH_MASK)[7] =  0x06010c0f0a05000bULL;\
+	((u64*)SUBSH_MASK)[8] =  0x0f0a0500030e0904ULL;\
+	((u64*)SUBSH_MASK)[9] =  0x07020d080b06010cULL;\
+	((u64*)SUBSH_MASK)[10] = 0x080b0601040f0a05ULL;\
+	((u64*)SUBSH_MASK)[11] = 0x00030e090c07020dULL;\
+	((u64*)SUBSH_MASK)[12] = 0x090c070205080b06ULL;\
+	((u64*)SUBSH_MASK)[13] = 0x01040f0a0d00030eULL;\
+	((u64*)SUBSH_MASK)[14] = 0x0a0d000306090c07ULL;\
+	((u64*)SUBSH_MASK)[15] = 0x0205080b0e01040fULL;\
+	for(i = 0; i < ROUNDS; i++)\
+	{\
+		((u64*)ROUND_P)[2*i+1] = 0x0000000000000000ULL;\
+		((u64*)ROUND_P)[2*i+0] = (u64) i;\
+		((u64*)ROUND_Q)[2*i+1] = 0x00000000000000ffULL ^ (u64) i;\
+		((u64*)ROUND_Q)[2*i+0] = 0x0000000000000000ULL;\
+	}\
+}while(0);
+
 #define tos(a)    #a
 #define tostr(a)  tos(a)
 
@@ -16,13 +48,11 @@
  * xmm[k] has to be all 0x1b
  * xmm[l] has to be all 0x7f
  * xmm[0] & [j] will be lost */
-/* my variant */
 #define MUL2(i, j, k, l){\
     asm ("movdqa xmm0, xmm"tostr(i)"");\
     asm ("pand  xmm"tostr(i)", xmm"tostr(l)"");\
     asm ("pxor xmm"tostr(j)", xmm"tostr(j)"");\
     asm ("paddb xmm"tostr(i)", xmm"tostr(i)"");\
-    /*asm ("psllq xmm"tostr(i)", 1");*/\
     asm ("pblendvb xmm"tostr(j)", xmm"tostr(k)"");\
     asm ("pxor  xmm"tostr(i)", xmm"tostr(j)"");\
 }/**/
@@ -32,9 +62,9 @@
     asm ("pand  xmm"tostr(i)", xmm"tostr(l)"");\
     asm ("pblendvb xmm"tostr(j)", xmm"tostr(k)"");\
     asm ("paddb xmm"tostr(i)", xmm"tostr(i)"");\
-    /*asm ("psllq xmm"tostr(i)", 1");*/\
     asm ("pxor  xmm"tostr(i)", xmm"tostr(j)"");\
 }
+
 
 /* Round function for round 1,3,... */
 #define ROUND_A(i){\
@@ -393,14 +423,14 @@ void INIT_CV()
   asm volatile ("emms");
 
   /* load CV (IV) into registers xmm12 - xmm15 */
-  asm ("movdqa xmm12, [GLOBAL_CV_PTR+0*16]");
-  asm ("movdqa xmm13, [GLOBAL_CV_PTR+1*16]");
-  asm ("movdqa xmm14, [GLOBAL_CV_PTR+2*16]");
-  asm ("movdqa xmm15, [GLOBAL_CV_PTR+3*16]");
+  asm ("movaps xmm12, [GLOBAL_CV_PTR+0*16]");
+  asm ("movaps xmm13, [GLOBAL_CV_PTR+1*16]");
+  asm ("movaps xmm14, [GLOBAL_CV_PTR+2*16]");
+  asm ("movaps xmm15, [GLOBAL_CV_PTR+3*16]");
 
   /* transpose matrix to get one line of P AND Q in each xmm */
   /* load transpose mask into a register, because it will be used 8 times */
-  asm ("movdqa xmm0, [TRANSP_MASK]");
+  asm ("movaps xmm0, [TRANSP_MASK]");
   asm ("pshufb xmm12, xmm0");
   asm ("pshufb xmm13, xmm0");
   asm ("pshufb xmm14, xmm0");
@@ -426,10 +456,10 @@ void INIT_CV()
   asm ("punpckldq xmm2,  xmm3");  //5
 
   /* store transposed CV */
-  asm ("movdqa [GLOBAL_CV_PTR+0*16], xmm12");
-  asm ("movdqa [GLOBAL_CV_PTR+1*16], xmm2");
-  asm ("movdqa [GLOBAL_CV_PTR+2*16], xmm6");
-  asm ("movdqa [GLOBAL_CV_PTR+3*16], xmm7");
+  asm ("movaps [GLOBAL_CV_PTR+0*16], xmm12");
+  asm ("movaps [GLOBAL_CV_PTR+1*16], xmm2");
+  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm6");
+  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm7");
 
 
   asm volatile ("emms");
@@ -443,11 +473,11 @@ void TF512AES(u64* message)
   asm (".intel_syntax noprefix");
 
   /* load message into registers xmm12 - xmm15 (Q = message) */
-  asm ("movdqa xmm0,  [TRANSP_MASK]");
-  asm ("movdqa xmm12, [rdi+0*16]");
-  asm ("movdqa xmm13, [rdi+1*16]");
-  asm ("movdqa xmm14, [rdi+2*16]");
-  asm ("movdqa xmm15, [rdi+3*16]");
+  asm ("movaps xmm0,  [TRANSP_MASK]");
+  asm ("movaps xmm12, [rdi+0*16]");
+  asm ("movaps xmm13, [rdi+1*16]");
+  asm ("movaps xmm14, [rdi+2*16]");
+  asm ("movaps xmm15, [rdi+3*16]");
 
   /* transpose matrix to get one line of P AND Q in each xmm */
   /* load transpose mask into a register, because it will be used 8 times */
@@ -473,13 +503,13 @@ void TF512AES(u64* message)
 
   /* continue with unpack */
   asm ("punpckhdq xmm7,  xmm3");  //7
-  asm ("movdqa xmm8, [GLOBAL_CV_PTR+0*16]"); //0
+  asm ("movaps xmm8, [GLOBAL_CV_PTR+0*16]"); //0
   asm ("punpckldq xmm2,  xmm3");  //5
-  asm ("movdqa xmm0, [GLOBAL_CV_PTR+1*16]"); //1
+  asm ("movaps xmm0, [GLOBAL_CV_PTR+1*16]"); //1
   asm ("punpckhdq xmm6,  xmm14"); //6
-  asm ("movdqa xmm4, [GLOBAL_CV_PTR+2*16]"); //2
+  asm ("movaps xmm4, [GLOBAL_CV_PTR+2*16]"); //2
   asm ("punpckldq xmm12, xmm14"); //4
-  asm ("movdqa xmm5, [GLOBAL_CV_PTR+3*16]"); //3
+  asm ("movaps xmm5, [GLOBAL_CV_PTR+3*16]"); //3
 
   /* load CV into registers xmm8 - xmm11 (P = CV)*/
   /* xor Q to P to get P = h ^ m */
@@ -549,10 +579,10 @@ void TF512AES(u64* message)
   asm ("pxor xmm3, [GLOBAL_CV_PTR+3*16]");
 
   /* store finished CV */
-  asm ("movdqa [GLOBAL_CV_PTR+0*16], xmm0");
-  asm ("movdqa [GLOBAL_CV_PTR+1*16], xmm1");
-  asm ("movdqa [GLOBAL_CV_PTR+2*16], xmm2");
-  asm ("movdqa [GLOBAL_CV_PTR+3*16], xmm3");
+  asm ("movaps [GLOBAL_CV_PTR+0*16], xmm0");
+  asm ("movaps [GLOBAL_CV_PTR+1*16], xmm1");
+  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm2");
+  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm3");
 
   asm (".att_syntax noprefix");
   return;
@@ -564,10 +594,10 @@ void OF512AES () {
   asm ("pxor xmm0, xmm0");
 
   /* load CV into registers xmm8 - xmm11 (P = CV)*/
-  asm ("movdqa xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("movdqa xmm10, [GLOBAL_CV_PTR+1*16]");
-  asm ("movdqa xmm12, [GLOBAL_CV_PTR+2*16]");
-  asm ("movdqa xmm14, [GLOBAL_CV_PTR+3*16]");
+  asm ("movaps xmm8,  [GLOBAL_CV_PTR+0*16]");
+  asm ("movaps xmm10, [GLOBAL_CV_PTR+1*16]");
+  asm ("movaps xmm12, [GLOBAL_CV_PTR+2*16]");
+  asm ("movaps xmm14, [GLOBAL_CV_PTR+3*16]");
 
   /* there are now 2 rows in each xmm
    * unpack to get 1 row of P and Q in each xmm */
@@ -602,7 +632,7 @@ void OF512AES () {
 
 
   /* transpose matrix to get back input format */
-  asm ("movdqa xmm4, [TRANSP_MASK]");
+  asm ("movaps xmm4, [TRANSP_MASK]");
   asm ("punpcklqdq xmm8,  xmm9");  // = [(1), (0)]
   asm ("punpcklqdq xmm10, xmm11"); // = [(3), (2)]
   asm ("punpcklqdq xmm12, xmm13"); // = [(5), (4)]
@@ -641,10 +671,10 @@ void OF512AES () {
   /* transpose done */
 
   /* store finished CV */
-  asm ("movdqa [GLOBAL_CV_PTR+0*16], xmm8");
-  asm ("movdqa [GLOBAL_CV_PTR+1*16], xmm4");
-  asm ("movdqa [GLOBAL_CV_PTR+2*16], xmm9");
-  asm ("movdqa [GLOBAL_CV_PTR+3*16], xmm11");
+  asm ("movaps [GLOBAL_CV_PTR+0*16], xmm8");
+  asm ("movaps [GLOBAL_CV_PTR+1*16], xmm4");
+  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm9");
+  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm11");
 
   asm (".att_syntax noprefix");
 

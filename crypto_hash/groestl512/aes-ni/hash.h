@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <wmmintrin.h>
-#include <smmintrin.h>
-
 #include "brg_endian.h"
 
 #include <crypto_uint8.h>
@@ -40,6 +37,17 @@ typedef crypto_uint64 u64;
    (ROTL64(a,40) & ((u64)0x00ff000000ff0000ULL)) |	\
    (ROTL64(a,56) & ((u64)0xff000000ff000000ULL)))
 #endif /* IS_LITTLE_ENDIAN */
+
+/* global variables  */
+__attribute__ ((aligned (16))) unsigned char GLOBAL_CV_PTR[8*16];
+__attribute__ ((aligned (16))) unsigned char ROUND_P[ROUNDS*16];
+__attribute__ ((aligned (16))) unsigned char ROUND_Q[ROUNDS*16];
+__attribute__ ((aligned (16))) unsigned char TRANSP_MASK[16];
+__attribute__ ((aligned (16))) unsigned char ALL_7F[16];
+__attribute__ ((aligned (16))) unsigned char ALL_1B[16];
+__attribute__ ((aligned (16))) unsigned char SUBSH_MASK[8*16];
+__attribute__ ((aligned (16))) unsigned char TEMP[8*16];
+__attribute__ ((aligned (16))) unsigned char QTEMP[8*16];
 
 typedef struct {
   u64 *state;                  /* actual state */

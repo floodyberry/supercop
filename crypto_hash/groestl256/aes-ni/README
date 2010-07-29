@@ -1,5 +1,5 @@
 This package contains an implementation of the Groestl-256 hash
-function optimised for the Intel AES-NI instructions.
+function optimized for the Intel AES-NI instructions.
 
 The author is Günther A. Roland.
 

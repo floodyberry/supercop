@@ -40,8 +40,8 @@ typedef crypto_uint64 u64;
 
 /* global variables  */
 __attribute__ ((aligned (16))) unsigned char GLOBAL_CV_PTR[4*16];
-__attribute__ ((aligned (16))) unsigned char ROUND_P[10*16];
-__attribute__ ((aligned (16))) unsigned char ROUND_Q[10*16];
+__attribute__ ((aligned (16))) unsigned char ROUND_P[ROUNDS*16];
+__attribute__ ((aligned (16))) unsigned char ROUND_Q[ROUNDS*16];
 __attribute__ ((aligned (16))) unsigned char TRANSP_MASK[16];
 __attribute__ ((aligned (16))) unsigned char ALL_7F[16];
 __attribute__ ((aligned (16))) unsigned char ALL_1B[16];
