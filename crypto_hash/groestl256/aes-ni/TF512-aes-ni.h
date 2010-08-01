@@ -93,153 +93,150 @@
     asm ("movdqa xmm3, xmm9");\
     asm ("aesenclast xmm15, xmm0");\
 \
-    /* 8-bit AVR Algorithm ("Byte-sliced") */\
-    /* Part 1: *1 */\
-		asm ("movdqa xmm0, xmm10");\
-		asm ("pxor xmm1, xmm11");\
-		asm ("pxor xmm0, xmm13");\
-		asm ("pxor xmm2, xmm14");\
-		asm ("pxor xmm3, xmm15");\
-		asm ("movdqa xmm6, xmm12");\
-		asm ("pxor xmm6, xmm1");\
-		asm ("pxor xmm6, xmm0");\
-		asm ("pxor xmm1, xmm14");\
-		asm ("movdqa xmm4, xmm10");\
-		asm ("movaps [TEMP+6*16], xmm6");\
-		asm ("pxor xmm4, xmm9");\
-		asm ("pxor xmm4, xmm1");\
-		asm ("pxor xmm1, xmm13");\
-		asm ("movaps [TEMP+4*16], xmm4");\
-		asm ("pxor xmm1, xmm15");\
-		asm ("movdqa xmm5, xmm11");\
-		asm ("movaps [TEMP+1*16], xmm1");\
-		asm ("pxor xmm5, xmm10");\
-		asm ("pxor xmm5, xmm3");\
-		asm ("pxor xmm5, xmm12");\
-		asm ("movdqa xmm7, xmm2");\
-		asm ("movaps [TEMP+5*16], xmm5");\
-		asm ("pxor xmm7, xmm9");\
-		asm ("pxor xmm7, xmm11");\
-		asm ("pxor xmm7, xmm13");\
-		asm ("pxor xmm0, xmm2");\
-		asm ("movaps [TEMP+7*16], xmm7");\
-		asm ("pxor xmm0, xmm15");\
-		asm ("pxor xmm3, xmm8");\
-		asm ("movaps [TEMP+0*16], xmm0");\
-		asm ("pxor xmm2, xmm3");\
-		asm ("pxor xmm3, xmm10");\
-		asm ("movaps [TEMP+2*16], xmm2");\
-		asm ("pxor xmm3, xmm13");\
+		/* MixBytes Version 2 */\
+		/* save *1 values */\
+		asm ("movaps [TMP_MUL1+0*16], xmm8");\
+		asm ("movaps [TMP_MUL1+1*16], xmm9");\
+		asm ("movaps [TMP_MUL1+2*16], xmm10");\
+		asm ("movaps [TMP_MUL1+3*16], xmm11");\
+		asm ("movaps [TMP_MUL1+4*16], xmm12");\
+		asm ("movaps [TMP_MUL1+5*16], xmm13");\
+		asm ("movaps [TMP_MUL1+6*16], xmm14");\
+		asm ("movaps [TMP_MUL1+7*16], xmm15");\
+		\
+		/* multiply by 2 */\
 		asm ("movaps xmm2, [ALL_1B]");\
-		asm ("movaps [TEMP+3*16], xmm3");\
 		asm ("movaps xmm3, [ALL_7F]");\
-\
-    /* store tmp[0-7] in memory */\
-\
-    /* multiply by 2 */\
-    MUL2(8,  1, 2, 3);\
-    MUL2(9,  1, 2, 3);\
-    MUL2(10, 1, 2, 3);\
-    MUL2(11, 1, 2, 3);\
-    MUL2(12, 1, 2, 3);\
-    MUL2(13, 1, 2, 3);\
-    MUL2(14, 1, 2, 3);\
-    MUL2(15, 1, 2, 3);\
-\
-    /* Part 2: *2 */\
-    asm ("movdqa xmm5, xmm10");\
-    asm ("movdqa xmm6, xmm8");\
-    asm ("movdqa xmm7, xmm12");\
-    asm ("movdqa xmm0, xmm9");\
-    asm ("pxor xmm5, xmm13");\
-    asm ("pxor xmm6, xmm11");\
-    asm ("pxor xmm7, xmm14");\
-    asm ("pxor xmm0, xmm15");\
-    asm ("movdqa xmm3, xmm5");\
-    asm ("pxor xmm3, xmm12");\
-    asm ("pxor xmm3, xmm6");\
-    asm ("pxor xmm6, xmm14");\
-    asm ("movdqa xmm1, xmm6");\
-    asm ("pxor xmm6, xmm13");\
-    asm ("pxor xmm1, xmm9");\
-    asm ("pxor xmm6, xmm15");\
-    asm ("pxor xmm1, xmm10");\
-    asm ("movdqa xmm2, xmm0");\
-    asm ("pxor xmm2, xmm10");\
-    asm ("pxor xmm2, xmm11");\
-    asm ("pxor xmm2, xmm12");\
-    asm ("movdqa xmm4, xmm7");\
-    asm ("pxor xmm5, xmm7");\
-    asm ("pxor xmm4, xmm9");\
-    asm ("pxor xmm5, [TEMP+5*16]");\
-    asm ("pxor xmm4, xmm11");\
-    asm ("pxor xmm5, xmm15");\
-    asm ("pxor xmm4, xmm13");\
-    asm ("pxor xmm6, [TEMP+6*16]");\
-    asm ("pxor xmm0, xmm8");\
-    asm ("pxor xmm4, [TEMP+4*16]");\
-    asm ("pxor xmm7, xmm0");\
-    asm ("pxor xmm7, [TEMP+7*16]");\
-    asm ("pxor xmm0, xmm10");\
-    asm ("pxor xmm0, [TEMP+0*16]");\
-\
-    asm ("pxor xmm1, [TEMP+1*16]");\
-    asm ("pxor xmm0, xmm13");\
-    asm ("movaps [TEMP+1*16], xmm1");\
-    asm ("pxor xmm2, [TEMP+2*16]");\
-    asm ("movaps [TEMP+2*16], xmm2");\
-    asm ("pxor xmm3, [TEMP+3*16]");\
-    asm ("movaps [TEMP+3*16], xmm3");\
-\
-    /* XOR part 1 and 2  and write back xmm0-3 for part 3*/\
-    asm ("movaps xmm2, [ALL_1B]");\
-    asm ("movaps [TEMP+0*16], xmm0");\
-    asm ("movaps xmm3, [ALL_7F]");\
-\
-    /* multiply by 2 */\
-    MUL2(8,  1, 2, 3);\
-    MUL2(9,  1, 2, 3);\
-    MUL2(10, 1, 2, 3);\
-    MUL2(11, 1, 2, 3);\
-    MUL2(12, 1, 2, 3);\
-    MUL2(13, 1, 2, 3);\
-    MUL2(14, 1, 2, 3);\
-    MUL2(15, 1, 2, 3);\
-\
-    /* Part 3: *4 */\
-    /* optimized *4 addition */\
-    asm ("movdqa xmm0, xmm8");\
-    asm ("pxor xmm0, xmm11");\
-    asm ("pxor xmm4, xmm0");\
-    asm ("pxor xmm5, xmm0");\
-    asm ("movdqa xmm1, xmm9");\
-    asm ("pxor xmm1, xmm12");\
-    asm ("pxor xmm5, xmm1");\
-    asm ("pxor xmm6, xmm1");\
-    asm ("movdqa xmm2, xmm10");\
-    asm ("pxor xmm2, xmm13");\
-    asm ("pxor xmm6, xmm2");\
-    asm ("pxor xmm7, xmm2");\
-    asm ("movdqa xmm3, xmm10");\
-    asm ("pxor xmm3, xmm15");\
-    asm ("pxor xmm4, xmm3");\
-    asm ("pxor xmm3, [TEMP+3*16]");\
-    asm ("movdqa xmm2, xmm9");\
-    asm ("pxor xmm2, xmm14");\
-    asm ("pxor xmm3, xmm2");\
-    asm ("pxor xmm2, [TEMP+2*16]");\
-    asm ("movdqa xmm1, xmm8");\
-    asm ("pxor xmm1, xmm13");\
-    asm ("pxor xmm2, xmm1");\
-    asm ("pxor xmm1, [TEMP+1*16]");\
-    asm ("movdqa xmm0, xmm12");\
-    asm ("pxor xmm0, xmm15");\
-    asm ("pxor xmm1, xmm0");\
-    asm ("pxor xmm0, [TEMP+0*16]");\
-    asm ("movdqa xmm8, xmm11");\
-    asm ("pxor xmm8, xmm14");\
-    asm ("pxor xmm0, xmm8");\
-    asm ("pxor xmm7, xmm8");\
+		MUL2(8,  1, 2, 3);\
+		MUL2(9,  1, 2, 3);\
+		MUL2(10, 1, 2, 3);\
+		MUL2(11, 1, 2, 3);\
+		MUL2(12, 1, 2, 3);\
+		MUL2(13, 1, 2, 3);\
+		MUL2(14, 1, 2, 3);\
+		MUL2(15, 1, 2, 3);\
+		\
+		/* save *2 values */\
+		asm ("movaps [TMP_MUL2+0*16], xmm8");\
+		asm ("movaps [TMP_MUL2+1*16], xmm9");\
+		asm ("movaps [TMP_MUL2+2*16], xmm10");\
+		asm ("movaps [TMP_MUL2+3*16], xmm11");\
+		asm ("movaps [TMP_MUL2+4*16], xmm12");\
+		asm ("movaps [TMP_MUL2+5*16], xmm13");\
+		asm ("movaps [TMP_MUL2+6*16], xmm14");\
+		asm ("movaps [TMP_MUL2+7*16], xmm15");\
+		asm ("movdqa xmm7, xmm8");\
+		asm ("movdqa xmm4, xmm11");\
+		asm ("movdqa xmm5, xmm15");\
+		\
+		/* multiply by 2 */\
+		MUL2(8,  1, 2, 3);\
+		MUL2(9,  1, 2, 3);\
+		MUL2(10, 1, 2, 3);\
+		MUL2(11, 1, 2, 3);\
+		MUL2(12, 1, 2, 3);\
+		MUL2(13, 1, 2, 3);\
+		MUL2(14, 1, 2, 3);\
+		MUL2(15, 1, 2, 3);\
+		\
+		/* save *4 values */\
+		asm ("movaps [TMP_MUL4], xmm11");\
+		\
+		/* 1 */\
+		asm ("movdqa xmm1, xmm8");\
+		asm ("pxor xmm1, xmm13");\
+		asm ("pxor xmm1, xmm4");\
+		asm ("pxor xmm1, [TMP_MUL1+0*16]");\
+		asm ("movdqa xmm2, xmm1");\
+		\
+		/* 2 */\
+		asm ("pxor xmm5, xmm9");\
+		asm ("pxor xmm5, xmm12");\
+		asm ("pxor xmm5, [TMP_MUL1+4*16]");\
+		asm ("movdqa xmm6, xmm5");\
+		\
+		/* 3 */\
+		asm ("movdqa xmm0, xmm7");\
+		asm ("pxor xmm0, [TMP_MUL1+5*16]");\
+		asm ("pxor xmm0, [TMP_MUL1+7*16]");\
+		asm ("pxor xmm0, xmm15");\
+		asm ("pxor xmm0, [TMP_MUL2+2*16]");\
+		asm ("movdqa xmm3, xmm0");\
+		asm ("pxor xmm1, xmm0");\
+		\
+		/* 4 */\
+		asm ("movdqa xmm7, xmm14");\
+		asm ("pxor xmm7, [TMP_MUL1+4*16]");\
+		asm ("pxor xmm7, [TMP_MUL1+6*16]");\
+		asm ("pxor xmm7, [TMP_MUL2+1*16]");\
+		asm ("pxor xmm7, [TMP_MUL2+7*16]");\
+		asm ("pxor xmm0, xmm7");\
+		asm ("pxor xmm2, xmm7");\
+		\
+		/* 5 */\
+		asm ("movdqa xmm4, xmm10");\
+		asm ("pxor xmm4, [TMP_MUL1+0*16]");\
+		asm ("pxor xmm4, [TMP_MUL1+2*16]");\
+		asm ("pxor xmm4, [TMP_MUL2+3*16]");\
+		asm ("pxor xmm4, [TMP_MUL2+5*16]");\
+		asm ("pxor xmm3, xmm4");\
+		asm ("pxor xmm6, xmm4");\
+		\
+		/* 6 */\
+		asm ("pxor xmm11, [TMP_MUL1+1*16]");\
+		asm ("pxor xmm11, [TMP_MUL1+3*16]");\
+		asm ("pxor xmm11, [TMP_MUL2+4*16]");\
+		asm ("pxor xmm11, [TMP_MUL2+6*16]");\
+		asm ("pxor xmm4, xmm11");\
+		asm ("pxor xmm5, xmm11");\
+		asm ("pxor xmm7, xmm11");\
+		\
+		/* 7 */\
+		asm ("pxor xmm9, [TMP_MUL1+1*16]");\
+		asm ("pxor xmm9, [TMP_MUL2+4*16]");\
+		asm ("pxor xmm2, xmm9");\
+		asm ("pxor xmm3, xmm9");\
+		\
+		/* 8 */\
+		asm ("pxor xmm13, [TMP_MUL1+5*16]");\
+		asm ("pxor xmm13, [TMP_MUL2+0*16]");\
+		asm ("pxor xmm6, xmm13");\
+		asm ("pxor xmm7, xmm13");\
+		\
+		/* 9 */\
+		asm ("movaps xmm11, [TMP_MUL1+2*16]");\
+		asm ("pxor xmm11,   [TMP_MUL2+5*16]");\
+		asm ("pxor xmm0, xmm11");\
+		asm ("pxor xmm5, xmm11");\
+		\
+		/* 10 */\
+		asm ("movaps xmm9, [TMP_MUL1+6*16]");\
+		asm ("pxor xmm9,   [TMP_MUL2+1*16]");\
+		asm ("pxor xmm1, xmm9");\
+		asm ("pxor xmm4, xmm9");\
+		\
+		/* 11 */\
+		asm ("movaps xmm13, [TMP_MUL1+3*16]");\
+		asm ("pxor xmm13,   [TMP_MUL2+6*16]");\
+		asm ("pxor xmm1, xmm13");\
+		asm ("pxor xmm6, xmm13");\
+		\
+		/* 12 */\
+		asm ("movaps xmm11, [TMP_MUL1+7*16]");\
+		asm ("pxor xmm11,   [TMP_MUL2+2*16]");\
+		asm ("pxor xmm2, xmm11");\
+		asm ("pxor xmm5, xmm11");\
+		\
+		/* 13 */\
+		asm ("pxor xmm0, [TMP_MUL4]");\
+		asm ("pxor xmm0, xmm12");\
+		asm ("pxor xmm1, xmm12");\
+		asm ("pxor xmm3, xmm14");\
+		asm ("pxor xmm4, xmm8");\
+		asm ("pxor xmm4, xmm15");\
+		asm ("pxor xmm5, xmm8");\
+		asm ("pxor xmm7, xmm10");\
+		\
 }
 
 /* Round function for round 2,4,... */
@@ -270,151 +267,151 @@
     asm ("movdqa xmm11, xmm1");\
     asm ("aesenclast xmm7, xmm8");\
 \
-    /* 8-bit AVR Algorithm ("Byte-sliced") */\
-    /* Part 1: *1 */\
-    asm ("movdqa xmm8, xmm2");\
-    asm ("pxor xmm9, xmm3");\
-    asm ("pxor xmm8, xmm5");\
-    asm ("movdqa xmm14, xmm4");\
-    asm ("pxor xmm10, xmm6");\
-    asm ("pxor xmm14, xmm9");\
-    asm ("pxor xmm11, xmm7");\
-    asm ("pxor xmm14, xmm8");\
-    asm ("movdqa xmm12, xmm1");\
-    asm ("movaps [TEMP+6*16], xmm14");\
-    asm ("pxor xmm12, xmm2");\
-    asm ("pxor xmm9, xmm6");\
-    asm ("movdqa xmm15, xmm10");\
-    asm ("pxor xmm12, xmm9");\
-    asm ("movdqa xmm13, xmm2");\
-    asm ("movaps [TEMP+4*16], xmm12");\
-    asm ("pxor xmm9, xmm5");\
-    asm ("pxor xmm13, xmm11");\
-    asm ("pxor xmm15, xmm1");\
-    asm ("pxor xmm9, xmm7");\
-    asm ("pxor xmm13, xmm3");\
-    asm ("pxor xmm15, xmm3");\
-    asm ("movaps [TEMP+1*16], xmm9");\
-    asm ("pxor xmm13, xmm4");\
-    asm ("movaps [TEMP+5*16], xmm13");\
-    asm ("pxor xmm15, xmm5");\
-    asm ("movaps [TEMP+7*16], xmm15");\
-    asm ("pxor xmm8, xmm10");\
-    asm ("pxor xmm8, xmm7");\
-    asm ("movaps [TEMP+0*16], xmm8");\
-    asm ("pxor xmm11, xmm0");\
-    asm ("pxor xmm10, xmm11");\
-    asm ("movaps [TEMP+2*16], xmm10");\
-    asm ("pxor xmm11, xmm2");\
-    asm ("movaps xmm10, [ALL_1B]");\
-    asm ("pxor xmm11, xmm5");\
-    asm ("movaps [TEMP+3*16], xmm11");\
-    asm ("movaps xmm11, [ALL_7F]");\
-\
-    /* multiply by 2 */\
-    MUL2_B(8, 9, 10, 11);\
-    MUL2(1, 9, 10, 11);\
-    MUL2(2, 9, 10, 11);\
-    MUL2(3, 9, 10, 11);\
-    MUL2(4, 9, 10, 11);\
-    MUL2(5, 9, 10, 11);\
-    MUL2(6, 9, 10, 11);\
-    MUL2(7, 9, 10, 11);\
-    asm ("movdqa xmm0, xmm8");\
-\
-    /* Part 2: *2 */\
-    asm ("movdqa xmm13, xmm2");\
-    asm ("movdqa xmm14, xmm8");\
-    asm ("movdqa xmm15, xmm4");\
-    asm ("movdqa xmm8, xmm1");\
-    asm ("pxor xmm13, xmm5");\
-    asm ("pxor xmm14, xmm3");\
-    asm ("pxor xmm15, xmm6");\
-    asm ("pxor xmm8, xmm7");\
-    asm ("movdqa xmm11, xmm13");\
-    asm ("pxor xmm11, xmm4");\
-    asm ("pxor xmm11, xmm14");\
-    asm ("pxor xmm14, xmm6");\
-    asm ("movdqa xmm9, xmm14");\
-    asm ("pxor xmm9, xmm1");\
-    asm ("pxor xmm9, xmm2");\
-    asm ("pxor xmm14, xmm5");\
-    asm ("pxor xmm14, xmm7");\
-    asm ("movdqa xmm10, xmm8");\
-    asm ("pxor xmm10, xmm2");\
-    asm ("pxor xmm10, xmm3");\
-    asm ("pxor xmm10, xmm4");\
-    asm ("movdqa xmm12, xmm15");\
-    asm ("pxor xmm12, xmm1");\
-    asm ("pxor xmm12, xmm3");\
-    asm ("pxor xmm12, xmm5");\
-    asm ("pxor xmm13, xmm15");\
-    asm ("pxor xmm13, [TEMP+5*16]");\
-    asm ("pxor xmm13, xmm7");\
-    asm ("pxor xmm14, [TEMP+6*16]");\
-    asm ("pxor xmm8, xmm0");\
-    asm ("pxor xmm15, [TEMP+7*16]");\
-    asm ("pxor xmm15, xmm8");\
-    asm ("pxor xmm12, [TEMP+4*16]");\
-    asm ("pxor xmm8, xmm2");\
-    asm ("pxor xmm8, [TEMP+0*16]");\
-\
-    /* XOR part 1 and 2  and write back xmm8-3 for part 3*/\
-    asm ("pxor xmm9, [TEMP+1*16]");\
-    asm ("pxor xmm8, xmm5");\
-    asm ("movaps [TEMP+1*16], xmm9");\
-    asm ("pxor xmm10, [TEMP+2*16]");\
-    asm ("movaps [TEMP+2*16], xmm10");\
-    asm ("pxor xmm11, [TEMP+3*16]");\
-    asm ("movaps [TEMP+3*16], xmm11");\
-    asm ("movaps xmm10, [ALL_1B]");\
-    asm ("movaps [TEMP+0*16], xmm8");\
-    asm ("movaps xmm11, [ALL_7F]");\
-\
-    /* multiply by 2 */\
-    MUL2_B(8, 9, 10, 11);\
-    MUL2(1, 9, 10, 11);\
-    MUL2(2, 9, 10, 11);\
-    MUL2(3, 9, 10, 11);\
-    MUL2(4, 9, 10, 11);\
-    MUL2(5, 9, 10, 11);\
-    MUL2(6, 9, 10, 11);\
-    MUL2(7, 9, 10, 11);\
-    asm ("movdqa xmm0, xmm8");\
-\
-    /* Part 3: *4 */\
-    /* optimized *4 addition */\
-    asm ("pxor xmm8, xmm3");\
-    asm ("pxor xmm12, xmm8");\
-    asm ("pxor xmm13, xmm8");\
-    asm ("movdqa xmm9, xmm1");\
-    asm ("pxor xmm9, xmm4");\
-    asm ("pxor xmm13, xmm9");\
-    asm ("pxor xmm14, xmm9");\
-    asm ("movdqa xmm10, xmm2");\
-    asm ("pxor xmm10, xmm5");\
-    asm ("pxor xmm14, xmm10");\
-    asm ("pxor xmm15, xmm10");\
-    asm ("movdqa xmm11, xmm2");\
-    asm ("pxor xmm11, xmm7");\
-    asm ("pxor xmm12, xmm11");\
-    asm ("pxor xmm11, [TEMP+3*16]");\
-    asm ("movdqa xmm10, xmm1");\
-    asm ("pxor xmm10, xmm6");\
-    asm ("pxor xmm11, xmm10");\
-    asm ("pxor xmm10, [TEMP+2*16]");\
-    asm ("movdqa xmm9, xmm0");\
-    asm ("pxor xmm9, xmm5");\
-    asm ("pxor xmm10, xmm9");\
-    asm ("pxor xmm9, [TEMP+1*16]");\
-    asm ("movdqa xmm8, xmm4");\
-    asm ("pxor xmm8, xmm7");\
-    asm ("pxor xmm9, xmm8");\
-    asm ("pxor xmm8, [TEMP+0*16]");\
-    asm ("movdqa xmm0, xmm3");\
-    asm ("pxor xmm0, xmm6");\
-    asm ("pxor xmm8, xmm0");\
-    asm ("pxor xmm15, xmm0");\
+		/* MixBytes Version 2 */\
+		/* save *1 values */\
+		asm ("movaps [TMP_MUL1+0*16], xmm0");\
+		asm ("movaps [TMP_MUL1+1*16], xmm1");\
+		asm ("movaps [TMP_MUL1+2*16], xmm2");\
+		asm ("movaps [TMP_MUL1+3*16], xmm3");\
+		asm ("movaps [TMP_MUL1+4*16], xmm4");\
+		asm ("movaps [TMP_MUL1+5*16], xmm5");\
+		asm ("movaps [TMP_MUL1+6*16], xmm6");\
+		asm ("movaps [TMP_MUL1+7*16], xmm7");\
+		\
+		/* multiply by 2 */\
+		asm ("movaps xmm10, [ALL_1B]");\
+		asm ("movaps xmm11, [ALL_7F]");\
+		MUL2_B(8, 9, 10, 11);\
+		MUL2(1, 9, 10, 11);\
+		MUL2(2, 9, 10, 11);\
+		MUL2(3, 9, 10, 11);\
+		MUL2(4, 9, 10, 11);\
+		MUL2(5, 9, 10, 11);\
+		MUL2(6, 9, 10, 11);\
+		MUL2(7, 9, 10, 11);\
+		\
+		/* save *2 values */\
+		asm ("movaps [TMP_MUL2+0*16], xmm8");\
+		asm ("movaps [TMP_MUL2+1*16], xmm1");\
+		asm ("movaps [TMP_MUL2+2*16], xmm2");\
+		asm ("movaps [TMP_MUL2+3*16], xmm3");\
+		asm ("movaps [TMP_MUL2+4*16], xmm4");\
+		asm ("movaps [TMP_MUL2+5*16], xmm5");\
+		asm ("movaps [TMP_MUL2+6*16], xmm6");\
+		asm ("movaps [TMP_MUL2+7*16], xmm7");\
+		asm ("movdqa xmm15, xmm8");\
+		asm ("movdqa xmm12, xmm3");\
+		asm ("movdqa xmm13, xmm7");\
+		\
+		/* multiply by 2 */\
+		MUL2(8, 9, 10, 11);\
+		MUL2(1, 9, 10, 11);\
+		MUL2(2, 9, 10, 11);\
+		MUL2(3, 9, 10, 11);\
+		MUL2(4, 9, 10, 11);\
+		MUL2(5, 9, 10, 11);\
+		MUL2(6, 9, 10, 11);\
+		MUL2(7, 9, 10, 11);\
+		asm ("movdqa xmm0, xmm8");\
+		\
+		/* save *4 values */\
+		asm ("movaps [TMP_MUL4], xmm3");\
+		\
+		/* 1 */\
+		asm ("movdqa xmm9, xmm0");\
+		asm ("pxor xmm9, xmm5");\
+		asm ("pxor xmm9, xmm12");\
+		asm ("pxor xmm9, [TMP_MUL1+0*16]");\
+		asm ("movdqa xmm10, xmm9");\
+		\
+		/* 2 */\
+		asm ("pxor xmm13, xmm1");\
+		asm ("pxor xmm13, xmm4");\
+		asm ("pxor xmm13, [TMP_MUL1+4*16]");\
+		asm ("movdqa xmm14, xmm13");\
+		\
+		/* 3 */\
+		asm ("movdqa xmm8, xmm15");\
+		asm ("pxor xmm8, [TMP_MUL1+5*16]");\
+		asm ("pxor xmm8, [TMP_MUL1+7*16]");\
+		asm ("pxor xmm8, xmm7");\
+		asm ("pxor xmm8, [TMP_MUL2+2*16]");\
+		asm ("movdqa xmm11, xmm8");\
+		asm ("pxor xmm9, xmm8");\
+		\
+		/* 4 */\
+		asm ("movdqa xmm15, xmm6");\
+		asm ("pxor xmm15, [TMP_MUL1+4*16]");\
+		asm ("pxor xmm15, [TMP_MUL1+6*16]");\
+		asm ("pxor xmm15, [TMP_MUL2+1*16]");\
+		asm ("pxor xmm15, [TMP_MUL2+7*16]");\
+		asm ("pxor xmm8, xmm15");\
+		asm ("pxor xmm10, xmm15");\
+		\
+		/* 5 */\
+		asm ("movdqa xmm12, xmm2");\
+		asm ("pxor xmm12, [TMP_MUL1+0*16]");\
+		asm ("pxor xmm12, [TMP_MUL1+2*16]");\
+		asm ("pxor xmm12, [TMP_MUL2+3*16]");\
+		asm ("pxor xmm12, [TMP_MUL2+5*16]");\
+		asm ("pxor xmm11, xmm12");\
+		asm ("pxor xmm14, xmm12");\
+		\
+		/* 6 */\
+		asm ("pxor xmm3, [TMP_MUL1+1*16]");\
+		asm ("pxor xmm3, [TMP_MUL1+3*16]");\
+		asm ("pxor xmm3, [TMP_MUL2+4*16]");\
+		asm ("pxor xmm3, [TMP_MUL2+6*16]");\
+		asm ("pxor xmm12, xmm3");\
+		asm ("pxor xmm13, xmm3");\
+		asm ("pxor xmm15, xmm3");\
+		\
+		/* 7 */\
+		asm ("pxor xmm1, [TMP_MUL1+1*16]");\
+		asm ("pxor xmm1, [TMP_MUL2+4*16]");\
+		asm ("pxor xmm10, xmm1");\
+		asm ("pxor xmm11, xmm1");\
+		\
+		/* 8 */\
+		asm ("pxor xmm5, [TMP_MUL1+5*16]");\
+		asm ("pxor xmm5, [TMP_MUL2+0*16]");\
+		asm ("pxor xmm14, xmm5");\
+		asm ("pxor xmm15, xmm5");\
+		\
+		/* 9 */\
+		asm ("movaps xmm3, [TMP_MUL1+2*16]");\
+		asm ("pxor xmm3,   [TMP_MUL2+5*16]");\
+		asm ("pxor xmm8, xmm3");\
+		asm ("pxor xmm13, xmm3");\
+		\
+		/* 10 */\
+		asm ("movaps xmm1, [TMP_MUL1+6*16]");\
+		asm ("pxor xmm1,   [TMP_MUL2+1*16]");\
+		asm ("pxor xmm9, xmm1");\
+		asm ("pxor xmm12, xmm1");\
+		\
+		/* 11 */\
+		asm ("movaps xmm5, [TMP_MUL1+3*16]");\
+		asm ("pxor xmm5,   [TMP_MUL2+6*16]");\
+		asm ("pxor xmm9, xmm5");\
+		asm ("pxor xmm14, xmm5");\
+		\
+		/* 12 */\
+		asm ("movaps xmm3, [TMP_MUL1+7*16]");\
+		asm ("pxor xmm3,   [TMP_MUL2+2*16]");\
+		asm ("pxor xmm10, xmm3");\
+		asm ("pxor xmm13, xmm3");\
+		\
+		/* 13 */\
+		asm ("pxor xmm8, [TMP_MUL4]");\
+		asm ("pxor xmm8, xmm4");\
+		asm ("pxor xmm9, xmm4");\
+		asm ("pxor xmm11, xmm6");\
+		asm ("pxor xmm12, xmm0");\
+		asm ("pxor xmm12, xmm7");\
+		asm ("pxor xmm13, xmm0");\
+		asm ("pxor xmm15, xmm2");\
+		\
 }
 
 void INIT_CV()

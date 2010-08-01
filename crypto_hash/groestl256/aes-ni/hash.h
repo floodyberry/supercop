@@ -47,6 +47,9 @@ __attribute__ ((aligned (16))) unsigned char ALL_7F[16];
 __attribute__ ((aligned (16))) unsigned char ALL_1B[16];
 __attribute__ ((aligned (16))) unsigned char SUBSH_MASK[8*16];
 __attribute__ ((aligned (16))) unsigned char TEMP[8*16];
+__attribute__ ((aligned (16))) unsigned char TMP_MUL1[8*16];
+__attribute__ ((aligned (16))) unsigned char TMP_MUL2[8*16];
+__attribute__ ((aligned (16))) unsigned char TMP_MUL4[16];
 
 typedef struct {
   u64 *state;                  /* actual state */

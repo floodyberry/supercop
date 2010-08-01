@@ -77,14 +77,14 @@ mainloop:
 
 morerounds:
 
-  uint32323232 x4 += x0
-  uint32323232 x5 += x1
-  uint32323232 x6 += x2
-  uint32323232 x7 += x3
   y0 = x2
   y1 = x3
   y2 = x0
   y3 = x1
+  uint32323232 x4 += x0
+  uint32323232 x5 += x1
+  uint32323232 x6 += x2
+  uint32323232 x7 += x3
   uint32323232 y0 <<= 7
   uint32323232 y1 <<= 7
   uint32323232 y2 <<= 7
@@ -97,23 +97,23 @@ morerounds:
   y1 ^= x5
   y2 ^= x6
   y3 ^= x7
+  x4 <<<= 64
+  x5 <<<= 64
+  x6 <<<= 64
+  x7 <<<= 64
   y0 ^= x2
   y1 ^= x3
   y2 ^= x0
   y3 ^= x1
                    unsigned>? r -= 1
-  x4 <<<= 64
-  x5 <<<= 64
-  x6 <<<= 64
-  x7 <<<= 64
-  uint32323232 x4 += y0
-  uint32323232 x5 += y1
-  uint32323232 x6 += y2
-  uint32323232 x7 += y3
   x0 = y1
   x1 = y0
   x2 = y3
   x3 = y2
+  uint32323232 x4 += y0
+  uint32323232 x5 += y1
+  uint32323232 x6 += y2
+  uint32323232 x7 += y3
   uint32323232 x0 <<= 11
   uint32323232 x1 <<= 11
   uint32323232 x2 <<= 11
@@ -126,14 +126,14 @@ morerounds:
   x1 ^= x5
   x2 ^= x6
   x3 ^= x7
-  x0 ^= y1
-  x1 ^= y0
-  x2 ^= y3
-  x3 ^= y2
   x4 = x4[1,0,3,2]
   x5 = x5[1,0,3,2]
   x6 = x6[1,0,3,2]
   x7 = x7[1,0,3,2]
+  x0 ^= y1
+  x1 ^= y0
+  x2 ^= y3
+  x3 ^= y2
 
 goto morerounds if unsigned>
                   signed<? inlen - 32

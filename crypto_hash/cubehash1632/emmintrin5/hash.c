@@ -2,7 +2,7 @@
 #include <emmintrin.h>
 #include "crypto_hash.h"
 
-int crypto_hash(unsigned char *out,const unsigned char *in,long long inlen)
+int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long originlen)
 {
   __m128i x0;
   __m128i x1;
@@ -18,6 +18,7 @@ int crypto_hash(unsigned char *out,const unsigned char *in,long long inlen)
   __m128i y3;
   int i;
   int r;
+  long long inlen = originlen;
 
   x0 = _mm_set_epi32(0x4167d83e,0x2d538b8b,0x50f494d4,0x2aea2a61);
   x1 = _mm_set_epi32(0x50ac5695,0xcc39968e,0xc701cf8c,0x3fee2313);

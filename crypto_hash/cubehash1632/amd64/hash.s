@@ -208,26 +208,6 @@ mov  $16,%rdi
 # qhasm: morerounds:
 ._morerounds:
 
-# qhasm:   uint32323232 x4 += x0
-# asm 1: paddd <x0=int6464#1,<x4=int6464#5
-# asm 2: paddd <x0=%xmm0,<x4=%xmm4
-paddd %xmm0,%xmm4
-
-# qhasm:   uint32323232 x5 += x1
-# asm 1: paddd <x1=int6464#2,<x5=int6464#6
-# asm 2: paddd <x1=%xmm1,<x5=%xmm5
-paddd %xmm1,%xmm5
-
-# qhasm:   uint32323232 x6 += x2
-# asm 1: paddd <x2=int6464#3,<x6=int6464#7
-# asm 2: paddd <x2=%xmm2,<x6=%xmm6
-paddd %xmm2,%xmm6
-
-# qhasm:   uint32323232 x7 += x3
-# asm 1: paddd <x3=int6464#4,<x7=int6464#8
-# asm 2: paddd <x3=%xmm3,<x7=%xmm7
-paddd %xmm3,%xmm7
-
 # qhasm:   y0 = x2
 # asm 1: movdqa <x2=int6464#3,>y0=int6464#9
 # asm 2: movdqa <x2=%xmm2,>y0=%xmm8
@@ -247,6 +227,26 @@ movdqa %xmm0,%xmm10
 # asm 1: movdqa <x1=int6464#2,>y3=int6464#12
 # asm 2: movdqa <x1=%xmm1,>y3=%xmm11
 movdqa %xmm1,%xmm11
+
+# qhasm:   uint32323232 x4 += x0
+# asm 1: paddd <x0=int6464#1,<x4=int6464#5
+# asm 2: paddd <x0=%xmm0,<x4=%xmm4
+paddd %xmm0,%xmm4
+
+# qhasm:   uint32323232 x5 += x1
+# asm 1: paddd <x1=int6464#2,<x5=int6464#6
+# asm 2: paddd <x1=%xmm1,<x5=%xmm5
+paddd %xmm1,%xmm5
+
+# qhasm:   uint32323232 x6 += x2
+# asm 1: paddd <x2=int6464#3,<x6=int6464#7
+# asm 2: paddd <x2=%xmm2,<x6=%xmm6
+paddd %xmm2,%xmm6
+
+# qhasm:   uint32323232 x7 += x3
+# asm 1: paddd <x3=int6464#4,<x7=int6464#8
+# asm 2: paddd <x3=%xmm3,<x7=%xmm7
+paddd %xmm3,%xmm7
 
 # qhasm:   uint32323232 y0 <<= 7
 # asm 1: pslld $7,<y0=int6464#9
@@ -308,6 +308,26 @@ pxor  %xmm6,%xmm10
 # asm 2: pxor  <x7=%xmm7,<y3=%xmm11
 pxor  %xmm7,%xmm11
 
+# qhasm:   x4 <<<= 64
+# asm 1: pshufd $0x4e,<x4=int6464#5,<x4=int6464#5
+# asm 2: pshufd $0x4e,<x4=%xmm4,<x4=%xmm4
+pshufd $0x4e,%xmm4,%xmm4
+
+# qhasm:   x5 <<<= 64
+# asm 1: pshufd $0x4e,<x5=int6464#6,<x5=int6464#6
+# asm 2: pshufd $0x4e,<x5=%xmm5,<x5=%xmm5
+pshufd $0x4e,%xmm5,%xmm5
+
+# qhasm:   x6 <<<= 64
+# asm 1: pshufd $0x4e,<x6=int6464#7,<x6=int6464#7
+# asm 2: pshufd $0x4e,<x6=%xmm6,<x6=%xmm6
+pshufd $0x4e,%xmm6,%xmm6
+
+# qhasm:   x7 <<<= 64
+# asm 1: pshufd $0x4e,<x7=int6464#8,<x7=int6464#8
+# asm 2: pshufd $0x4e,<x7=%xmm7,<x7=%xmm7
+pshufd $0x4e,%xmm7,%xmm7
+
 # qhasm:   y0 ^= x2
 # asm 1: pxor  <x2=int6464#3,<y0=int6464#9
 # asm 2: pxor  <x2=%xmm2,<y0=%xmm8
@@ -333,25 +353,25 @@ pxor  %xmm1,%xmm11
 # asm 2: sub  $1,<r=%rdi
 sub  $1,%rdi
 
-# qhasm:   x4 <<<= 64
-# asm 1: pshufd $0x4e,<x4=int6464#5,<x4=int6464#5
-# asm 2: pshufd $0x4e,<x4=%xmm4,<x4=%xmm4
-pshufd $0x4e,%xmm4,%xmm4
+# qhasm:   x0 = y1
+# asm 1: movdqa <y1=int6464#10,>x0=int6464#1
+# asm 2: movdqa <y1=%xmm9,>x0=%xmm0
+movdqa %xmm9,%xmm0
 
-# qhasm:   x5 <<<= 64
-# asm 1: pshufd $0x4e,<x5=int6464#6,<x5=int6464#6
-# asm 2: pshufd $0x4e,<x5=%xmm5,<x5=%xmm5
-pshufd $0x4e,%xmm5,%xmm5
+# qhasm:   x1 = y0
+# asm 1: movdqa <y0=int6464#9,>x1=int6464#2
+# asm 2: movdqa <y0=%xmm8,>x1=%xmm1
+movdqa %xmm8,%xmm1
 
-# qhasm:   x6 <<<= 64
-# asm 1: pshufd $0x4e,<x6=int6464#7,<x6=int6464#7
-# asm 2: pshufd $0x4e,<x6=%xmm6,<x6=%xmm6
-pshufd $0x4e,%xmm6,%xmm6
+# qhasm:   x2 = y3
+# asm 1: movdqa <y3=int6464#12,>x2=int6464#3
+# asm 2: movdqa <y3=%xmm11,>x2=%xmm2
+movdqa %xmm11,%xmm2
 
-# qhasm:   x7 <<<= 64
-# asm 1: pshufd $0x4e,<x7=int6464#8,<x7=int6464#8
-# asm 2: pshufd $0x4e,<x7=%xmm7,<x7=%xmm7
-pshufd $0x4e,%xmm7,%xmm7
+# qhasm:   x3 = y2
+# asm 1: movdqa <y2=int6464#11,>x3=int6464#4
+# asm 2: movdqa <y2=%xmm10,>x3=%xmm3
+movdqa %xmm10,%xmm3
 
 # qhasm:   uint32323232 x4 += y0
 # asm 1: paddd <y0=int6464#9,<x4=int6464#5
@@ -372,26 +392,6 @@ paddd %xmm10,%xmm6
 # asm 1: paddd <y3=int6464#12,<x7=int6464#8
 # asm 2: paddd <y3=%xmm11,<x7=%xmm7
 paddd %xmm11,%xmm7
-
-# qhasm:   x0 = y1
-# asm 1: movdqa <y1=int6464#10,>x0=int6464#1
-# asm 2: movdqa <y1=%xmm9,>x0=%xmm0
-movdqa %xmm9,%xmm0
-
-# qhasm:   x1 = y0
-# asm 1: movdqa <y0=int6464#9,>x1=int6464#2
-# asm 2: movdqa <y0=%xmm8,>x1=%xmm1
-movdqa %xmm8,%xmm1
-
-# qhasm:   x2 = y3
-# asm 1: movdqa <y3=int6464#12,>x2=int6464#3
-# asm 2: movdqa <y3=%xmm11,>x2=%xmm2
-movdqa %xmm11,%xmm2
-
-# qhasm:   x3 = y2
-# asm 1: movdqa <y2=int6464#11,>x3=int6464#4
-# asm 2: movdqa <y2=%xmm10,>x3=%xmm3
-movdqa %xmm10,%xmm3
 
 # qhasm:   uint32323232 x0 <<= 11
 # asm 1: pslld $11,<x0=int6464#1
@@ -453,26 +453,6 @@ pxor  %xmm6,%xmm2
 # asm 2: pxor  <x7=%xmm7,<x3=%xmm3
 pxor  %xmm7,%xmm3
 
-# qhasm:   x0 ^= y1
-# asm 1: pxor  <y1=int6464#10,<x0=int6464#1
-# asm 2: pxor  <y1=%xmm9,<x0=%xmm0
-pxor  %xmm9,%xmm0
-
-# qhasm:   x1 ^= y0
-# asm 1: pxor  <y0=int6464#9,<x1=int6464#2
-# asm 2: pxor  <y0=%xmm8,<x1=%xmm1
-pxor  %xmm8,%xmm1
-
-# qhasm:   x2 ^= y3
-# asm 1: pxor  <y3=int6464#12,<x2=int6464#3
-# asm 2: pxor  <y3=%xmm11,<x2=%xmm2
-pxor  %xmm11,%xmm2
-
-# qhasm:   x3 ^= y2
-# asm 1: pxor  <y2=int6464#11,<x3=int6464#4
-# asm 2: pxor  <y2=%xmm10,<x3=%xmm3
-pxor  %xmm10,%xmm3
-
 # qhasm:   x4 = x4[1,0,3,2]
 # asm 1: pshufd $0xb1,<x4=int6464#5,>x4=int6464#5
 # asm 2: pshufd $0xb1,<x4=%xmm4,>x4=%xmm4
@@ -492,6 +472,26 @@ pshufd $0xb1,%xmm6,%xmm6
 # asm 1: pshufd $0xb1,<x7=int6464#8,>x7=int6464#8
 # asm 2: pshufd $0xb1,<x7=%xmm7,>x7=%xmm7
 pshufd $0xb1,%xmm7,%xmm7
+
+# qhasm:   x0 ^= y1
+# asm 1: pxor  <y1=int6464#10,<x0=int6464#1
+# asm 2: pxor  <y1=%xmm9,<x0=%xmm0
+pxor  %xmm9,%xmm0
+
+# qhasm:   x1 ^= y0
+# asm 1: pxor  <y0=int6464#9,<x1=int6464#2
+# asm 2: pxor  <y0=%xmm8,<x1=%xmm1
+pxor  %xmm8,%xmm1
+
+# qhasm:   x2 ^= y3
+# asm 1: pxor  <y3=int6464#12,<x2=int6464#3
+# asm 2: pxor  <y3=%xmm11,<x2=%xmm2
+pxor  %xmm11,%xmm2
+
+# qhasm:   x3 ^= y2
+# asm 1: pxor  <y2=int6464#11,<x3=int6464#4
+# asm 2: pxor  <y2=%xmm10,<x3=%xmm3
+pxor  %xmm10,%xmm3
 # comment:fp stack unchanged by jump
 
 # qhasm: goto morerounds if unsigned>
