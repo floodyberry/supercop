@@ -10,14 +10,30 @@ gcc -m64 -maltivec -O3 -fomit-frame-pointer
 gcc -m64 -maltivec -Os -fomit-frame-pointer
 gcc -m64 -maltivec -O2 -fomit-frame-pointer
 gcc -m64 -maltivec -O -fomit-frame-pointer
-gcc -maix64 -mpowerpc64 -O3 -fomit-frame-pointer
-gcc -maix64 -mpowerpc64 -Os -fomit-frame-pointer
-gcc -maix64 -mpowerpc64 -O2 -fomit-frame-pointer
-gcc -maix64 -mpowerpc64 -O -fomit-frame-pointer
+gcc -mabi=32 -O3 -fomit-frame-pointer
+gcc -mabi=32 -Os -fomit-frame-pointer
+gcc -mabi=32 -O2 -fomit-frame-pointer
+gcc -mabi=32 -O -fomit-frame-pointer
+gcc -mabi=n32 -O3 -fomit-frame-pointer
+gcc -mabi=n32 -Os -fomit-frame-pointer
+gcc -mabi=n32 -O2 -fomit-frame-pointer
+gcc -mabi=n32 -O -fomit-frame-pointer
+gcc -mabi=o64 -O3 -fomit-frame-pointer
+gcc -mabi=o64 -Os -fomit-frame-pointer
+gcc -mabi=o64 -O2 -fomit-frame-pointer
+gcc -mabi=o64 -O -fomit-frame-pointer
 gcc -mabi=64 -O3 -fomit-frame-pointer
 gcc -mabi=64 -Os -fomit-frame-pointer
 gcc -mabi=64 -O2 -fomit-frame-pointer
 gcc -mabi=64 -O -fomit-frame-pointer
+gcc -mabi=eabi -O3 -fomit-frame-pointer
+gcc -mabi=eabi -Os -fomit-frame-pointer
+gcc -mabi=eabi -O2 -fomit-frame-pointer
+gcc -mabi=eabi -O -fomit-frame-pointer
+gcc -maix64 -mpowerpc64 -O3 -fomit-frame-pointer
+gcc -maix64 -mpowerpc64 -Os -fomit-frame-pointer
+gcc -maix64 -mpowerpc64 -O2 -fomit-frame-pointer
+gcc -maix64 -mpowerpc64 -O -fomit-frame-pointer
 gcc -mpa-risc-2-0 -O3 -fomit-frame-pointer
 gcc -mpa-risc-2-0 -Os -fomit-frame-pointer
 gcc -mpa-risc-2-0 -O2 -fomit-frame-pointer
@@ -815,10 +831,26 @@ gcc -funroll-loops -maix64 -mpowerpc64 -O3 -fomit-frame-pointer
 gcc -funroll-loops -maix64 -mpowerpc64 -Os -fomit-frame-pointer
 gcc -funroll-loops -maix64 -mpowerpc64 -O2 -fomit-frame-pointer
 gcc -funroll-loops -maix64 -mpowerpc64 -O -fomit-frame-pointer
+gcc -funroll-loops -mabi=32 -O3 -fomit-frame-pointer
+gcc -funroll-loops -mabi=32 -Os -fomit-frame-pointer
+gcc -funroll-loops -mabi=32 -O2 -fomit-frame-pointer
+gcc -funroll-loops -mabi=32 -O -fomit-frame-pointer
+gcc -funroll-loops -mabi=n32 -O3 -fomit-frame-pointer
+gcc -funroll-loops -mabi=n32 -Os -fomit-frame-pointer
+gcc -funroll-loops -mabi=n32 -O2 -fomit-frame-pointer
+gcc -funroll-loops -mabi=n32 -O -fomit-frame-pointer
+gcc -funroll-loops -mabi=o64 -O3 -fomit-frame-pointer
+gcc -funroll-loops -mabi=o64 -Os -fomit-frame-pointer
+gcc -funroll-loops -mabi=o64 -O2 -fomit-frame-pointer
+gcc -funroll-loops -mabi=o64 -O -fomit-frame-pointer
 gcc -funroll-loops -mabi=64 -O3 -fomit-frame-pointer
 gcc -funroll-loops -mabi=64 -Os -fomit-frame-pointer
 gcc -funroll-loops -mabi=64 -O2 -fomit-frame-pointer
 gcc -funroll-loops -mabi=64 -O -fomit-frame-pointer
+gcc -funroll-loops -mabi=eabi -O3 -fomit-frame-pointer
+gcc -funroll-loops -mabi=eabi -Os -fomit-frame-pointer
+gcc -funroll-loops -mabi=eabi -O2 -fomit-frame-pointer
+gcc -funroll-loops -mabi=eabi -O -fomit-frame-pointer
 gcc -funroll-loops -mpa-risc-2-0 -O3 -fomit-frame-pointer
 gcc -funroll-loops -mpa-risc-2-0 -Os -fomit-frame-pointer
 gcc -funroll-loops -mpa-risc-2-0 -O2 -fomit-frame-pointer

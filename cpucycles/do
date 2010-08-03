@@ -40,6 +40,9 @@ okabi | (
 	sgi*)
           echo sgi
 	  ;;
+	mips*)
+          echo mips
+	  ;;
       esac
 
       echo amd64tscfreq
@@ -56,10 +59,12 @@ okabi | (
       echo celllinux
       echo sparcpsrinfo
       echo sparc32psrinfo
+      echo mips
       echo hppapstat
       echo alpha
       echo sgi
 
+      echo dev8
       echo dev4
 
       echo clockmonotonic

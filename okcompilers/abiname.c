@@ -22,6 +22,10 @@ int main(int argc,char **argv)
   printf("%s armeabi\n",argv[1]); return 0;
 #elif defined(__arm__)
   printf("%s arm\n",argv[1]); return 0;
+#elif defined(__mips64__) || defined(__mips64)
+  printf("%s mips64\n",argv[1]); return 0;
+#elif defined(__mips__) || defined(__mips) || defined(__MIPS__)
+  printf("%s mips32\n",argv[1]); return 0;
 #else
   printf("%s default\n",argv[1]); return 0;
 #endif
