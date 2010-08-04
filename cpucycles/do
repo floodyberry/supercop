@@ -9,9 +9,8 @@ okabi | (
     (
       case "$abi" in
         ppc*)
-          echo powerpclinux
+          echo powerpccpuinfo
           echo powerpcmacos
-          echo powerpcaix
 	  ;;
         amd64*)
           echo amd64tscfreq
@@ -28,8 +27,11 @@ okabi | (
           echo celllinux
 	  ;;
 	sparc*)
-          echo sparcpsrinfo
-          echo sparc32psrinfo
+          echo sparccpuinfo
+          echo sparc32
+	  ;;
+	mips*)
+          echo mips
 	  ;;
 	hppa*)
           echo hppapstat
@@ -40,8 +42,8 @@ okabi | (
 	sgi*)
           echo sgi
 	  ;;
-	mips*)
-          echo mips
+	arm*)
+          echo dev4ns
 	  ;;
       esac
 
@@ -53,21 +55,18 @@ okabi | (
       echo x86cpuspeed
       echo x86estimate
       echo ia64cpuinfo
-      echo powerpclinux
+      echo powerpccpuinfo
       echo powerpcmacos
-      echo powerpcaix
       echo celllinux
-      echo sparcpsrinfo
-      echo sparc32psrinfo
+      echo sparccpuinfo
+      echo sparc32
       echo mips
       echo hppapstat
       echo alpha
       echo sgi
-
-      echo dev8
-      echo dev4
-
-      echo clockmonotonic
+      echo dev4ns
+      echo monotoniccpuinfo
+      echo monotonic
       echo gettimeofday
     ) | (
       while read n

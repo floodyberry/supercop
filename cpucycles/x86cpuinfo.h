@@ -1,5 +1,5 @@
 /*
-cpucycles x86cpuinfo.h version 20060318
+cpucycles x86cpuinfo.h version 20100803
 D. J. Bernstein
 Public domain.
 */

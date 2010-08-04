@@ -273,20 +273,17 @@ r_stack = r
   x02 ^= x1a
   x08 ^= x10
   x0a ^= x12
+          x02_stack = x02
   x1a += x00
+          x0a_stack = x0a
   x18 += x02
+          x14 = x14_stack
   x12 += x08
+          x16 = x16_stack
   x10 += x0a
-
-  x02_stack = x02
-  x0a_stack = x0a
-
-  x14 = x14_stack
-  x16 = x16_stack
-  x1c = x1c_stack
-  x1e = x1e_stack
-
+          x1c = x1c_stack
   x14 += x04
+          x1e = x1e_stack
   x16 += x06
   x1c += x0c
   x1e += x0e
@@ -298,21 +295,18 @@ r_stack = r
   x06 ^= x1e
   x0c ^= x14
   x0e ^= x16
+          x0b = x0b_stack
   x1e += x04
   x1c += x06
   x16 += x0c
   x14 += x0e
-
-  x14_stack = x14
-  x16_stack = x16
-  x1c_stack = x1c
-  x1e_stack = x1e
-
-  x0b = x0b_stack
-  
+          x1e_stack = x1e
   x11 += x01
+          x1c_stack = x1c
   x13 += x03
+          x16_stack = x16
   x19 += x09
+          x14_stack = x14
   x1b += x0b
   x01 <<<= 7
   x03 <<<= 7
@@ -322,18 +316,15 @@ r_stack = r
   x03 ^= x1b
   x09 ^= x11
   x0b ^= x13
+          x15 = x15_stack
   x1b += x01
+          x17 = x17_stack
   x19 += x03
+          x1d = x1d_stack
   x13 += x09
+          x1f = x1f_stack
   x11 += x0b
-  
-  x0b_stack = x0b
-
-  x15 = x15_stack
-  x17 = x17_stack
-  x1d = x1d_stack
-  x1f = x1f_stack
-
+          x0b_stack = x0b
   x15 += x05
   x17 += x07
   x1d += x0d
@@ -350,16 +341,13 @@ r_stack = r
   x1d += x07
   x17 += x0d
   x15 += x0f
-  
-  x1e = x1e_stack
-  x16 = x16_stack
-
-  x15_stack = x15
-  x1d_stack = x1d
-
+          x1e = x1e_stack
   x00 <<<= 11
+          x16 = x16_stack
   x01 <<<= 11
+          x15_stack = x15
   x08 <<<= 11
+          x1d_stack = x1d
   x09 <<<= 11
   x00 ^= x1e
   x01 ^= x1f
@@ -370,30 +358,27 @@ r_stack = r
   x17 += x08
   x16 += x09
   x00 <<<= 7
+          x1f_stack = x1f
   x01 <<<= 7
+          x1e_stack = x1e
   x08 <<<= 7
+          x17_stack = x17
   x09 <<<= 7
+          x16_stack = x16
   x00 ^= x17
+          x02 = x02_stack
   x01 ^= x16
+          x0a = x0a_stack
   x08 ^= x1f
+          x0b = x0b_stack
   x09 ^= x1e
-
-  x1e_stack = x1e
-  x1f_stack = x1f
-  x16_stack = x16
-  x17_stack = x17
-
-  x02 = x02_stack
-  x0a = x0a_stack
-  x0b = x0b_stack
-  x1c = x1c_stack
-  x1d = x1d_stack
-  x14 = x14_stack
-  x15 = x15_stack
-  
+          x1c = x1c_stack
   x02 <<<= 11
+          x1d = x1d_stack
   x03 <<<= 11
+          x14 = x14_stack
   x0a <<<= 11
+          x15 = x15_stack
   x0b <<<= 11
   x02 ^= x1c
   x03 ^= x1d
@@ -403,25 +388,23 @@ r_stack = r
   x1c += x03
   x15 += x0a
   x14 += x0b
+          x1d_stack = x1d
   x02 <<<= 7
+          x1c_stack = x1c
   x03 <<<= 7
+          x15_stack = x15
   x0a <<<= 7
+          x14_stack = x14
   x0b <<<= 7
   x02 ^= x15
   x03 ^= x14
   x0a ^= x1d
   x0b ^= x1c
-
-  x02_stack = x02
-  x0a_stack = x0a
-  x0b_stack = x0b
-  x1d_stack = x1d
-  x1c_stack = x1c
-  x15_stack = x15
-  x14_stack = x14
-  
+          x02_stack = x02
   x04 <<<= 11
+          x0a_stack = x0a
   x05 <<<= 11
+          x0b_stack = x0b
   x0c <<<= 11
   x0d <<<= 11
   x04 ^= x1a
@@ -458,19 +441,19 @@ r_stack = r
   x0e <<<= 7
   x0f <<<= 7
   x06 ^= x11
+          x15 = x15_stack
   x07 ^= x10
+          x14 = x14_stack
   x0e ^= x19
+          x1d = x1d_stack
   x0f ^= x18
+          x1c = x1c_stack
   
   x11 += x04
   x10 += x05
   x19 += x0c
   x18 += x0d
   
-  x15 = x15_stack
-  x14 = x14_stack
-  x1d = x1d_stack
-  x1c = x1c_stack
   
   x15 += x00
   x14 += x01
@@ -478,73 +461,64 @@ r_stack = r
   x1c += x09
 
   x04 <<<= 11
+          x15_stack = x15
   x05 <<<= 11
+          x14_stack = x14
   x0c <<<= 11
+          x1d_stack = x1d
   x0d <<<= 11
+          x1c_stack = x1c
   x04 ^= x15
   x05 ^= x14
   x0c ^= x1d
   x0d ^= x1c
-
-  x15_stack = x15
-  x14_stack = x14
-  x1d_stack = x1d
-  x1c_stack = x1c
-
   x00 <<<= 11
   x01 <<<= 11
   x08 <<<= 11
   x09 <<<= 11
   x00 ^= x11
   x01 ^= x10
+          x17 = x17_stack
   x08 ^= x19
+          x02 = x02_stack
   x09 ^= x18
-
+          x16 = x16_stack
   x13 += x06
+          x1f = x1f_stack
   x12 += x07
+          x0a = x0a_stack
   x1b += x0e
+          x1e = x1e_stack
   x1a += x0f
-
-  x02 = x02_stack
-  x0a = x0a_stack
-  x0b = x0b_stack
-  x17 = x17_stack
-  x16 = x16_stack
-  x1f = x1f_stack
-  x1e = x1e_stack
-
+          x0b = x0b_stack
   x17 += x02
   x16 += x03
   x1f += x0a
   x1e += x0b
-
+        r = r_stack
   x06 <<<= 11
+          x17_stack = x17
   x07 <<<= 11
+          x16_stack = x16
   x0e <<<= 11
+          x1f_stack = x1f
   x0f <<<= 11
+          x1e_stack = x1e
+                   >? r -= 2
   x06 ^= x17
   x07 ^= x16
   x0e ^= x1f
   x0f ^= x1e
-
-  x17_stack = x17
-  x16_stack = x16
-  x1f_stack = x1f
-  x1e_stack = x1e
   
-r = r_stack
-
-  x02 <<<= 11
-  x03 <<<= 11
-  x0a <<<= 11
   x0b <<<= 11
-                   >? r -= 2
-  x02 ^= x13
-  x03 ^= x12
-  x0a ^= x1b
+  x0a <<<= 11
+  x03 <<<= 11
+  x02 <<<= 11
   x0b ^= x1a
-
-  x0b_stack = x0b
+  x0a ^= x1b
+  x03 ^= x12
+  x02 ^= x13
+          x0b_stack = x0b
 
 goto morerounds if >
 

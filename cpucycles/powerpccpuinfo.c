@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include "osfreq.c"
 
 static long myround(double u)
 {
@@ -19,6 +20,8 @@ static long long microseconds(void)
   return t.tv_sec * (long long) 1000000 + t.tv_usec;
 }
 
+static int tbshift = 0;
+
 static long long timebase(void)
 {
   unsigned long high;
@@ -32,7 +35,7 @@ static long long timebase(void)
   result = high;
   result <<= 32;
   result |= low;
-  return result;
+  return result >> tbshift;
 }
 
 static double cpufrequency = 0;
@@ -57,37 +60,35 @@ static double guesstbcycles(void)
 
 static void init(void)
 {
-  FILE *f;
   int loop;
   double guess1;
   double guess2;
 
-  f = popen("/usr/sbin/lsattr -E -l proc0 -a frequency","r");
-  if (!f) return;
-  if (fscanf(f,"frequency %lf",&cpufrequency) < 1) cpufrequency = 0;
-  pclose(f);
+  cpufrequency = osfreq();
   if (!cpufrequency) return;
 
-  for (loop = 0;loop < 100;++loop) {
-    guess1 = guesstbcycles();
-    guess2 = guesstbcycles();
-    tbcycles = myround(guess1);
-    if (guess1 - tbcycles > 0.1) continue;
-    if (tbcycles - guess1 > 0.1) continue;
-    if (guess2 - tbcycles > 0.1) continue;
-    if (tbcycles - guess2 > 0.1) continue;
-    return;
+  for (tbshift = 0;tbshift < 10;++tbshift) {
+    for (loop = 0;loop < 100;++loop) {
+      guess1 = guesstbcycles();
+      guess2 = guesstbcycles();
+      tbcycles = myround(guess1);
+      if (guess1 - tbcycles > 0.1) continue;
+      if (tbcycles - guess1 > 0.1) continue;
+      if (guess2 - tbcycles > 0.1) continue;
+      if (tbcycles - guess2 > 0.1) continue;
+      return;
+    }
   }
   tbcycles = 0;
 }
 
-long long cpucycles_powerpcaix(void)
+long long cpucycles_powerpccpuinfo(void)
 {
   if (!tbcycles) init();
   return timebase() * tbcycles;
 }
 
-long long cpucycles_powerpcaix_persecond(void)
+long long cpucycles_powerpccpuinfo_persecond(void)
 {
   if (!tbcycles) init();
   return cpufrequency;

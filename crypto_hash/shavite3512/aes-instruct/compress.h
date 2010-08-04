@@ -1,7 +1,5 @@
-/* 2010.07.28 djb: convert from intel syntax to asm syntax */
-/* 2010.07.28 djb: define WESTMERE and BAD */
-
-/* Modified (July 2010) by Orr Dunkelman (applying SHAvite-3 tweak) from: */
+/* Modified (July 2010) by Eli Biham and Orr Dunkelman       * 
+ * (applying the SHAvite-3 tweak) from:                      */
 
 /*                     compress.h                            */
 
@@ -15,64 +13,32 @@
  * June, 2009                                                *
  *************************************************************/
 
-
 #define tos(a)    #a
 #define tostr(a)  tos(a)
 
 #define T8(x) ((x) & 0xff)
 
-#define WESTMERE
-#define BAD
+#define replace_aes(i, j, k){\
+        asm ("pshufb xmm"tostr(i)", [SHAVITE_ENDI]");\
+        asm ("pshufb xmm"tostr(j)", [SHAVITE_ENDI]");\
+        asm ("aesenc xmm"tostr(i)", xmm"tostr(j)"");\
+        asm ("pshufb xmm"tostr(i)", [SHAVITE_ENDI]");\
+        asm ("pshufb xmm"tostr(j)", [SHAVITE_ENDI]");\
+}
 
-#ifdef WESTMERE
-#ifdef BAD
-#define replace_aes(i, j, k){\
-        asm("pshufb SHAVITE_ENDI, %xmm"tostr(i)"");\
-        asm("pshufb SHAVITE_ENDI, %xmm"tostr(j)"");\
-        asm("aesenc %xmm"tostr(j)", %xmm"tostr(i)"");\
-        asm("pshufb SHAVITE_ENDI, %xmm"tostr(i)"");\
-        asm("pshufb SHAVITE_ENDI, %xmm"tostr(j)"");\
+#define swap_reg(j){\
+        asm ("pshufb xmm"tostr(j)", [SHAVITE_ENDI]");\
 }
-#else
-#define replace_aes(i, j, k){\
-        asm("aesenc %xmm"tostr(j)", %xmm"tostr(i)"");\
+#define swap_reg_and_reverse_0321(j){\
+        asm ("pshufb xmm"tostr(j)", [SHAVITE_ENDIandREVERSE]");\
 }
-#endif
+#define replace_aes_no_swaps(i, j){\
+        asm ("aesenc xmm"tostr(i)", xmm"tostr(j)"");\
+}
 
 #define replace_aes_mem(i, MEM, j, k){\
-        asm("aesenc %"tostr(MEM)", %xmm"tostr(i)"");\
+        asm("aesenc  xmm"tostr(i)", "tostr(MEM)"");\
 }
-#endif
-
-#ifdef NEHALEM
-#ifdef BAD
-#define replace_aes(i, j, k){\
-        asm("movdqu %xmm"tostr(i)", %xmm"tostr(k)"");\
-        asm("mulps %xmm"tostr(j)", %xmm"tostr(i)"");\
-        asm("mulps %xmm"tostr(j)", %xmm"tostr(k)"");\
-        asm("xorps %xmm"tostr(k)", %xmm"tostr(i)"");\
-}
-#else
-#define replace_aes(i, j, k){\
-        asm("pshufb SHAVITE_ENDI, %xmm"tostr(i)"");\
-        asm("pshufb SHAVITE_ENDI, %xmm"tostr(j)"");\
-        asm("movdqu %xmm"tostr(i)", %xmm"tostr(k)"");\
-        asm("mulps %xmm"tostr(j)", %xmm"tostr(i)"");\
-        asm("mulps %xmm"tostr(j)", %xmm"tostr(k)"");\
-        asm("xorps %xmm"tostr(k)", %xmm"tostr(i)"");\
-        asm("pshufb SHAVITE_ENDI, %xmm"tostr(i)"");\
-        asm("pshufb SHAVITE_ENDI, %xmm"tostr(j)"");\
-}
-
-#endif
-
-#define replace_aes_mem(i, MEM, j, k){\
-        asm("movdqu %xmm"tostr(i)", %xmm"tostr(k)"");\
-        asm("mulps %"tostr(MEM)", %xmm"tostr(i)"");\
-        asm("mulps %xmm"tostr(j)", %xmm"tostr(k)"");\
-        asm("xorps %xmm"tostr(k)", %xmm"tostr(i)"");\
-}
-#endif
 
 /* SHAvite-3 definition */
 
@@ -97,19 +63,17 @@ __attribute__ ((aligned (16))) unsigned int SHAVITE512_MESS[8*14];
 __attribute__ ((aligned (16))) unsigned char  SHAVITE512_PTXT[8*16];
 __attribute__ ((aligned (16))) unsigned int SHAVITE512_CNTS[8] = {0,0,0,0,0,0,0,0}; 
 __attribute__ ((aligned (16))) unsigned int SHAVITE_ENDI[4] = {0x00010203, 0x04050607, 0x08090a0b, 0x0c0d0e0f };
-__attribute__ ((aligned (16))) unsigned int SHAVITE512_XOR1[4] = {0xFFFFFFFF, 0x0, 0x0, 0x0};
-__attribute__ ((aligned (16))) unsigned int SHAVITE512_XOR2[4] = {0x0, 0xFFFFFFFF, 0x0, 0x0};
-__attribute__ ((aligned (16))) unsigned int SHAVITE512_XOR3[4] = {0x0, 0x0, 0xFFFFFFFF, 0x0};
+__attribute__ ((aligned (16))) unsigned int SHAVITE_ENDIandREVERSE[4] = {0x04050607, 0x08090a0b, 0x0c0d0e0f, 0x00010203 };
 __attribute__ ((aligned (16))) unsigned int SHAVITE512_XOR4[4] = {0x0, 0x0, 0x0, 0xFFFFFFFF};
 
 
 #define seven_plus(a,b,c) do {\
-   asm("movdqu %xmm"tostr(a)", %xmm5");\
-   asm("movdqu %xmm"tostr(b)", %xmm6");\
-   asm("psrldq $4, %xmm5");\
-   asm("pslldq $12, %xmm6");\
-   asm("pxor %xmm5, %xmm"tostr(c)"");\
-   asm("pxor %xmm6, %xmm"tostr(c)"");\
+   asm("movdqu  xmm5,  xmm"tostr(a)"");\
+   asm("movdqu  xmm6,  xmm"tostr(b)"");\
+   asm("psrldq  xmm5,  4");\
+   asm("pslldq  xmm6,  12");\
+   asm("pxor    xmm"tostr(c)",  xmm5");\
+   asm("pxor    xmm"tostr(c)",  xmm6");\
 \
 } while(0);
 
@@ -126,145 +90,189 @@ __attribute__ ((aligned (16))) unsigned int SHAVITE512_XOR4[4] = {0x0, 0x0, 0x0,
 } while(0);
 
 #define key_nonlin_pre() do {\
-   asm("pshufd $57, %xmm8, %xmm8");\
-   asm("pshufd $57, %xmm9, %xmm9");\
-   asm("pshufd $57, %xmm10, %xmm10");\
-   asm("pshufd $57, %xmm11, %xmm11");\
-   asm("pshufd $57, %xmm12, %xmm12");\
-   asm("pshufd $57, %xmm13, %xmm13");\
-   asm("pshufd $57, %xmm14, %xmm14");\
-   asm("pshufd $57, %xmm15, %xmm15");\
+   swap_reg_and_reverse_0321(8);\
+   swap_reg_and_reverse_0321(9);\
+   swap_reg_and_reverse_0321(10);\
+   swap_reg_and_reverse_0321(11);\
+   swap_reg_and_reverse_0321(12);\
+   swap_reg_and_reverse_0321(13);\
+   swap_reg_and_reverse_0321(14);\
+   swap_reg_and_reverse_0321(15);\
 \
-   replace_aes(8, 4,6);\
-   replace_aes(9, 4,7);\
-   replace_aes(10,4,6);\
-   replace_aes(11,4,7);\
-   replace_aes(12,4,6);\
-   replace_aes(13,4,7);\
-   replace_aes(14,4,6);\
-   replace_aes(15,4,7);\
+   replace_aes_no_swaps(8, 4);\
+   swap_reg(8);\
+\
+   replace_aes_no_swaps(9, 4);\
+   swap_reg(9);\
+\
+   replace_aes_no_swaps(10,4);\
+   swap_reg(10);\
+\
+   replace_aes_no_swaps(11,4);\
+   swap_reg(11);\
+\
+   replace_aes_no_swaps(12,4);\
+   swap_reg(12);\
+\
+   replace_aes_no_swaps(13,4);\
+   swap_reg(13);\
+\
+   replace_aes_no_swaps(14,4);\
+   swap_reg(14);\
+\
+   replace_aes_no_swaps(15,4);\
+   swap_reg(15);\
 } while(0);
 
 #define key_nonlin_post() do {\
-   asm("pxor %xmm7, %xmm8"); \
-   asm("pxor %xmm8, %xmm9");\
-   asm("pxor %xmm9, %xmm10");\
-   asm("pxor %xmm10, %xmm11");\
-   asm("pxor %xmm11, %xmm12");\
-   asm("pxor %xmm12, %xmm13");\
-   asm("pxor %xmm13, %xmm14");\
-   asm("pxor %xmm14, %xmm15");\
+   asm ("pxor   xmm8,  xmm7"); \
+   asm ("pxor   xmm9,  xmm8");\
+   asm ("pxor   xmm10, xmm9");\
+   asm ("pxor   xmm11, xmm10");\
+   asm ("pxor   xmm12, xmm11");\
+   asm ("pxor   xmm13, xmm12");\
+   asm ("pxor   xmm14, xmm13");\
+   asm ("pxor   xmm15, xmm14");\
 } while(0);
 
 #define round(L,A,B,R) do {\
-   asm("movdqu %xmm"tostr(A)", %xmm5"); \
-   asm("movdqu %xmm"tostr(R)", %xmm6"); \
-   asm("pxor %xmm8, %xmm"tostr(A)""); \
-   asm("pxor %xmm12, %xmm"tostr(R)""); \
-   replace_aes(A,9, 6); \
-   replace_aes(R,13,7); \
-   replace_aes(A,10,6); \
-   replace_aes(R,14,7); \
-   replace_aes(A,11,6); \
-   replace_aes(R,15,7); \
-   replace_aes(A,4, 6); \
-   replace_aes(R,4, 7); \
-   asm("pxor %xmm"tostr(L)", %xmm"tostr(A)""); \
-   asm("pxor %xmm"tostr(B)", %xmm"tostr(R)""); \
-   asm("movdqu %xmm6, %xmm"tostr(L)""); \
-   asm("movdqu %xmm5, %xmm"tostr(B)""); \
+   asm ("movdqu xmm5, xmm"tostr(A)""); \
+   asm ("movdqu xmm6, xmm"tostr(R)""); \
+   asm ("pxor xmm"tostr(A)",  xmm8"); \
+   asm ("pxor xmm"tostr(R)",  xmm12"); \
+   swap_reg(R); \
+   swap_reg(A); \
+\
+   swap_reg(9); \
+   replace_aes_no_swaps(A,9); \
+   swap_reg(9); \
+\
+   swap_reg(13); \
+   replace_aes_no_swaps(R,13); \
+   swap_reg(13); \
+\
+   swap_reg(10); \
+   replace_aes_no_swaps(A,10);  \
+   swap_reg(10); \
+\
+   swap_reg(14); \
+   replace_aes_no_swaps(R,14); \
+   swap_reg(14); \
+\
+   swap_reg(11); \
+   replace_aes_no_swaps(A,11);  \
+   swap_reg(11); \
+\
+   swap_reg(15); \
+   replace_aes_no_swaps(R,15);  \
+   swap_reg(15); \
+\
+   replace_aes_no_swaps(A,4); 	\
+\
+   replace_aes_no_swaps(R,4); 	\
+\
+   swap_reg(A); \
+   swap_reg(R); \
+\
+   asm ("pxor   xmm"tostr(A)",  xmm"tostr(L)""); \
+   asm ("pxor   xmm"tostr(R)",  xmm"tostr(B)""); \
+   asm ("movdqu xmm"tostr(L)",  xmm6"); \
+   asm ("movdqu xmm"tostr(B)",  xmm5"); \
 } while(0);
 
 
 void E512()
 {
+   asm (".intel_syntax noprefix");
+
    /* (L,A,B,R) = (xmm0,xmm1,xmm2,xmm3) */
-   asm("movaps SHAVITE512_PTXT, %xmm0");
-   asm("movaps SHAVITE512_PTXT+16, %xmm1");
-   asm("movaps SHAVITE512_PTXT+32, %xmm2");
-   asm("movaps SHAVITE512_PTXT+48, %xmm3");
+   asm ("movaps xmm0, [SHAVITE512_PTXT]");
+   asm ("movaps xmm1, [SHAVITE512_PTXT+16]");
+   asm ("movaps xmm2, [SHAVITE512_PTXT+32]");
+   asm ("movaps xmm3, [SHAVITE512_PTXT+48]");
 
    /* init key schedule */
-   asm("movaps SHAVITE512_MESS, %xmm8");
-   asm("movaps SHAVITE512_MESS+16, %xmm9");
-   asm("movaps SHAVITE512_MESS+32, %xmm10");
-   asm("movaps SHAVITE512_MESS+48, %xmm11");
-   asm("movaps SHAVITE512_MESS+64, %xmm12");
-   asm("movaps SHAVITE512_MESS+80, %xmm13");
-   asm("movaps SHAVITE512_MESS+96, %xmm14");
-   asm("movaps SHAVITE512_MESS+112, %xmm15");
-   asm("movaps SHAVITE512_MESS+112, %xmm7");
+   asm ("movaps xmm8,  [SHAVITE512_MESS]");
+   asm ("movaps xmm9,  [SHAVITE512_MESS+16]");
+   asm ("movaps xmm10, [SHAVITE512_MESS+32]");
+   asm ("movaps xmm11, [SHAVITE512_MESS+48]");
+   asm ("movaps xmm12, [SHAVITE512_MESS+64]");
+   asm ("movaps xmm13, [SHAVITE512_MESS+80]");
+   asm ("movaps xmm14, [SHAVITE512_MESS+96]");
+   asm ("movaps xmm15, [SHAVITE512_MESS+112]");
+   asm ("movaps xmm7,  [SHAVITE512_MESS+112]");
 
    /* load counter and zero key for AES */
-   asm("pxor %xmm4, %xmm4");
+   asm ("pxor   xmm4,  xmm4");
 
    round(0,1,2,3); // 1
    key_nonlin_pre();
-   asm("pxor SHAVITE512_CNTS, %xmm8");
-   asm("pxor SHAVITE512_XOR4, %xmm8");
+   asm ("pxor   xmm8,  [SHAVITE512_CNTS]");
+   asm ("pxor   xmm8,  [SHAVITE512_XOR4]");
    key_nonlin_post();
    round(0,1,2,3); // 2
    key_mixing();
 
-   asm("movdqu %xmm15, %xmm7");
+   asm ("movdqu xmm7,  xmm15");
    round(0,1,2,3); // 3
    key_nonlin_pre();
    key_nonlin_post();
    round(0,1,2,3); // 4
    key_mixing();
 
-   asm("movdqu %xmm15, %xmm7");
+   asm ("movdqu xmm7,  xmm15");
    round(0,1,2,3); // 5
    key_nonlin_pre();
-   asm("pshufd $27, SHAVITE512_CNTS, %xmm5");
-   asm("pxor SHAVITE512_XOR4, %xmm9");
-   asm("pxor %xmm5, %xmm9");
+   asm ("pshufd xmm5,  [SHAVITE512_CNTS], 27");
+   asm ("pxor   xmm9,  [SHAVITE512_XOR4]");
+   asm ("pxor   xmm9,  xmm5");
    key_nonlin_post();
    round(0,1,2,3); // 6
    key_mixing();
 
-   asm("movdqu %xmm15, %xmm7");
+   asm ("movdqu xmm7,  xmm15");
    round(0,1,2,3); // 7
    key_nonlin_pre();
    key_nonlin_post();
    round(0,1,2,3); // 8
    key_mixing();
 
-   asm("movdqu %xmm15, %xmm7");
+   asm ("movdqu xmm7,  xmm15");
    round(0,1,2,3); // 9
    key_nonlin_pre();
-   asm("pshufd $78, SHAVITE512_CNTS, %xmm5");
-   asm("pxor SHAVITE512_XOR4, %xmm15");
-   asm("pxor %xmm5, %xmm15");
+   asm ("pshufd xmm5,  [SHAVITE512_CNTS], 78");
+   asm ("pxor   xmm15,  [SHAVITE512_XOR4]");
+   asm ("pxor   xmm15,  xmm5");
    key_nonlin_post();
    round(0,1,2,3); // a
    key_mixing();
 
-   asm("movdqu %xmm15, %xmm7");
+   asm ("movdqu xmm7,  xmm15");
    round(0,1,2,3); // b
    key_nonlin_pre();
    key_nonlin_post();
    round(0,1,2,3); // c
    key_mixing();
 
-   asm("movdqu %xmm15, %xmm7");
+   asm ("movdqu xmm7,  xmm15");
    round(0,1,2,3); // d
    key_nonlin_pre();
-   asm("pshufd $113, SHAVITE512_CNTS, %xmm5");
-   asm("pxor SHAVITE512_XOR4, %xmm14");
-   asm("pxor %xmm5, %xmm14");
+   asm ("pshufd xmm5,  [SHAVITE512_CNTS], 177");
+   asm ("pxor   xmm14,  [SHAVITE512_XOR4]");
+   asm ("pxor   xmm14, xmm5");
    key_nonlin_post();
    round(0,1,2,3); // e
 
    /* feedforward */
-   asm("pxor SHAVITE512_PTXT, %xmm0");
-   asm("pxor SHAVITE512_PTXT+16, %xmm1");
-   asm("pxor SHAVITE512_PTXT+32, %xmm2");
-   asm("pxor SHAVITE512_PTXT+48, %xmm3");
-   asm("movaps %xmm0, SHAVITE512_PTXT");
-   asm("movaps %xmm1, SHAVITE512_PTXT+16");
-   asm("movaps %xmm2, SHAVITE512_PTXT+32");
-   asm("movaps %xmm3, SHAVITE512_PTXT+48");
+   asm ("pxor   xmm0,  [SHAVITE512_PTXT]");
+   asm ("pxor   xmm1,  [SHAVITE512_PTXT+16]");
+   asm ("pxor   xmm2,  [SHAVITE512_PTXT+32]");
+   asm ("pxor   xmm3,  [SHAVITE512_PTXT+48]");
+   asm ("movaps [SHAVITE512_PTXT],    xmm0");
+   asm ("movaps [SHAVITE512_PTXT+16], xmm1");
+   asm ("movaps [SHAVITE512_PTXT+32], xmm2");
+   asm ("movaps [SHAVITE512_PTXT+48], xmm3");
+   asm (".att_syntax noprefix");
 
    return;
 }

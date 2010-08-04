@@ -1,10 +1,9 @@
 /*
-cpucycles/mips.c version 20100803
+cpucycles/sparc32.c version 20100803
 D. J. Bernstein
 Public domain.
 */
 
-#define SCALE 2
 #include <time.h>
 #include <unistd.h>
 #include <sys/time.h>
@@ -18,14 +17,14 @@ static void readticks(unsigned int *result)
 {
   struct timeval t;
   unsigned int cc;
-  asm volatile(".byte 59; .byte 16; .byte 2; .byte 124; move %0,$2" : "=r"(cc) : : "$2");
+  asm volatile(".word 0x93410000;.word 0x91327020;mov %%g0,%0" : "=r" (cc) : : "%g0");
   gettimeofday(&t,(struct timezone *) 0);
   result[0] = cc;
   result[1] = t.tv_usec;
   result[2] = t.tv_sec;
 }
 
-long long cpucycles_mips(void)
+long long cpucycles_sparc32(void)
 {
   unsigned long long delta4;
   int deltan;
@@ -37,7 +36,7 @@ long long cpucycles_mips(void)
   deltan = now[1] - prev[1]; /* signed change in number of nanoseconds mod 10^9 */
   deltas = now[2] - prev[2]; /* signed change in number of seconds */
   if ((deltas == 0 && deltan < 200000) || (deltas == 1 && deltan < -800000))
-    return (prevcycles + delta4) * SCALE;
+    return prevcycles + delta4;
 
   prev[0] = now[0];
   prev[1] = now[1];
@@ -55,11 +54,11 @@ long long cpucycles_mips(void)
   }
 
   prevcycles += delta4;
-  return prevcycles * SCALE;
+  return prevcycles;
 }
 
-long long cpucycles_mips_persecond(void)
+long long cpucycles_sparc32_persecond(void)
 {
-  while (!cyclespersec) cpucycles_mips();
-  return cyclespersec * SCALE;
+  while (!cyclespersec) cpucycles_sparc32();
+  return cyclespersec;
 }

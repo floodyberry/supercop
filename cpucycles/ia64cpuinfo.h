@@ -1,5 +1,5 @@
 /*
-cpucycles ia64cpuinfo.h version 20070118
+cpucycles ia64cpuinfo.h version 20100803
 D. J. Bernstein
 Public domain.
 */

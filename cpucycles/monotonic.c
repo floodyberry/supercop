@@ -14,7 +14,7 @@ static void init(void)
   cpufrequency = result;
 }
 
-long long cpucycles_clockmonotonic(void)
+long long cpucycles_monotonic(void)
 {
   double result;
   struct timespec t;
@@ -27,7 +27,7 @@ long long cpucycles_clockmonotonic(void)
   return result;
 }
 
-long long cpucycles_clockmonotonic_persecond(void)
+long long cpucycles_monotonic_persecond(void)
 {
   if (!cpufrequency) init();
   return cpufrequency;

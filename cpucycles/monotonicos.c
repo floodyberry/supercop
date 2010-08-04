@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <sys/sysctl.h>
 #include "osfreq.c"
 
 static double cpufrequency = 0;
@@ -12,20 +13,20 @@ static void init(void)
   cpufrequency = osfreq();
 }
 
-long long cpucycles_gettimeofday(void)
+long long cpucycles_monotonicos(void)
 {
   double result;
-  struct timeval t;
+  struct timespec t;
   if (!cpufrequency) init();
-  gettimeofday(&t,(struct timezone *) 0);
-  result = t.tv_usec;
-  result *= 0.000001;
+  clock_gettime(CLOCK_MONOTONIC,&t);
+  result = t.tv_nsec;
+  result *= 0.000000001;
   result += (double) t.tv_sec;
   result *= cpufrequency;
   return result;
 }
 
-long long cpucycles_gettimeofday_persecond(void)
+long long cpucycles_monotonicos_persecond(void)
 {
   if (!cpufrequency) init();
   return cpufrequency;

@@ -1,32 +1,48 @@
 #include <stdio.h>
 
-int main(int argc,char **argv)
+const char *abi(void)
 {
 #if defined(__amd64__) || defined(__x86_64__) || defined(__AMD64__) || defined(_M_X64) || defined(__amd64)
-  printf("%s amd64\n",argv[1]); return 0;
+   return "amd64";
 #elif defined(__i386__) || defined(__x86__) || defined(__X86__) || defined(_M_IX86) || defined(__i386)
-  printf("%s x86\n",argv[1]); return 0;
+   return "x86";
 #elif defined(__ia64__) || defined(__IA64__) || defined(__M_IA64)
-  printf("%s ia64\n",argv[1]); return 0;
+   return "ia64";
 #elif defined(__SPU__)
-  printf("%s cellspu\n",argv[1]); return 0;
+   return "cellspu";
 #elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(_ARCH_PPC64)
-  printf("%s ppc64\n",argv[1]); return 0;
+   return "ppc64";
 #elif defined(__powerpc__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)
-  printf("%s ppc32\n",argv[1]); return 0;
+   return "ppc32";
 #elif defined(__sparcv9__) || defined(__sparcv9)
-  printf("%s sparcv9\n",argv[1]); return 0;
+   return "sparcv9";
+#elif defined(__sparc_v8__)
+   return "sparcv8";
 #elif defined(__sparc__) || defined(__sparc)
-  printf("%s sparcv8\n",argv[1]); return 0;
+#  if __SIZEOF_LONG__ == 4
+     return "sparcv8";
+#  else
+     return "sparcv9";
+#  endif
 #elif defined(__ARM_EABI__)
-  printf("%s armeabi\n",argv[1]); return 0;
+   return "armeabi";
 #elif defined(__arm__)
-  printf("%s arm\n",argv[1]); return 0;
-#elif defined(__mips64__) || defined(__mips64)
-  printf("%s mips64\n",argv[1]); return 0;
+   return "arm";
 #elif defined(__mips__) || defined(__mips) || defined(__MIPS__)
-  printf("%s mips32\n",argv[1]); return 0;
+#  if defined(_ABIO32)
+     return "mipso32";
+#  elif defined(_ABIN32)
+     return "mips32";
+#  else
+     return "mips64";
+#  endif
 #else
-  printf("%s default\n",argv[1]); return 0;
+   return "default";
 #endif
+}
+
+int main(int argc,char **argv)
+{
+  printf("%s %s\n",argv[1],abi());
+  return 0;
 }

@@ -1,5 +1,5 @@
 /*
-cpucycles amd64cpuinfo.h version 20060318
+cpucycles amd64cpuinfo.h version 20100803
 D. J. Bernstein
 Public domain.
 */
