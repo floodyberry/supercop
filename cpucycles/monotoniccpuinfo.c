@@ -13,7 +13,7 @@ static void init(void)
   cpufrequency = osfreq();
 }
 
-long long cpucycles_monotonicos(void)
+long long cpucycles_monotoniccpuinfo(void)
 {
   double result;
   struct timespec t;
@@ -26,7 +26,7 @@ long long cpucycles_monotonicos(void)
   return result;
 }
 
-long long cpucycles_monotonicos_persecond(void)
+long long cpucycles_monotoniccpuinfo_persecond(void)
 {
   if (!cpufrequency) init();
   return cpufrequency;

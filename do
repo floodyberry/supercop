@@ -67,8 +67,12 @@ echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq"
 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq || :
 echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"
 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq || :
+echo "=== `date` === cat /sys/devices/system/cpu/cpu0/clock_tick"
+cat /sys/devices/system/cpu/cpu0/clock_tick || :
 echo "=== `date` === sysctl hw.model"
 sysctl hw.model || :
+echo "=== `date` === sysctl machdep.tsc_freq"
+sysctl machdep.tsc_freq || :
 echo "=== `date` === /usr/sbin/psrinfo -v"
 /usr/sbin/psrinfo -v || :
 

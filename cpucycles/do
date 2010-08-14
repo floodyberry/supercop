@@ -28,7 +28,7 @@ okabi | (
 	  ;;
 	sparc*)
           echo sparccpuinfo
-          echo sparc32
+          echo sparc32cpuinfo
 	  ;;
 	mips*)
           echo mips
@@ -59,7 +59,7 @@ okabi | (
       echo powerpcmacos
       echo celllinux
       echo sparccpuinfo
-      echo sparc32
+      echo sparc32cpuinfo
       echo mips
       echo hppapstat
       echo alpha
