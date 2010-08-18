@@ -19,11 +19,8 @@ const char *abi(void)
 #elif defined(__sparc_v8__)
    return "sparcv8";
 #elif defined(__sparc__) || defined(__sparc)
-#  if __SIZEOF_LONG__ == 4
-     return "sparcv8";
-#  else
-     return "sparcv9";
-#  endif
+   if (sizeof(long) == 4) return "sparcv8";
+   return "sparcv9";
 #elif defined(__ARM_EABI__)
    return "armeabi";
 #elif defined(__arm__)
