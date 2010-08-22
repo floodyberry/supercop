@@ -1,4 +1,5 @@
-/* Modified (July 2010) from: */
+/* Modified (July 2010) by Eli Biham and Orr Dunkelman (applying the
+SHAvite-3 tweak) from:                                       */
 
 /* Modified (June 2009) from: */
 
@@ -76,7 +77,7 @@ HashReturn Init(hashState *state, int hashbitlen)
 /* Check that the requested digest length is not negative, not zero, */
 /* and not more than 512 bits                                        */
 
-   if (hashbitlen>512) return BAD_HASHBITLEN;
+   if (hashbitlen>256) return BAD_HASHBITLEN;
    if (hashbitlen<1) return BAD_HASHBITLEN;
 
 
@@ -84,7 +85,7 @@ HashReturn Init(hashState *state, int hashbitlen)
 /* different salt should initialize it after (!) the derivation of   */
 /* the IVs                                                           */
 
-   memset(state->salt,0,64);
+   memset(state->salt,0,32);
 
 
 /* Initialization of the counter of number of bits that were hashed  */
@@ -100,42 +101,33 @@ HashReturn Init(hashState *state, int hashbitlen)
 
 /* Initialize the message block to empty                             */
 
-   memset(state->buffer,0,128);
+   memset(state->buffer,0,64);
 
 
 /* Set the input to the compression function to all zero             */
 
-   memset(state->chaining_value,0,64); 
+   memset(state->chaining_value,0,32); 
 
    
-/* Compute the respective MIV and the respective IV. These values    */
-/* depend on the used compression function.                          */
-
-   if (hashbitlen<257)
-      {
-
 /* Compute MIV_{256}                                                 */
 
-         Compress256(state->buffer,state->chaining_value,0x0ULL,state->salt);
-         
+   Compress256(state->buffer,state->chaining_value,0x0ULL,state->salt);
+
 /* Set the message block to the size of the requested digest size    */
          
-         U16TO8_LITTLE(state->buffer,hashbitlen);
-
+   U16TO8_LITTLE(state->buffer,hashbitlen);
 
 /* Compute IV_m                                                      */
 
-         Compress256(state->buffer,state->chaining_value,0x0ULL,state->salt);
+   Compress256(state->buffer,state->chaining_value,0x0ULL,state->salt);
 
 /* Set the block size to be 512 bits (as required for C_{256})       */
-        
-         state->BlockSize = 512;
-      }
+ 
+   state->BlockSize=512; 
 
 /* Set the message block to zero				     */
 
-   memset(state->buffer,0,128);
-
+   memset(state->buffer,0,64);
 
    return SUCCESS;
 }
@@ -230,11 +222,9 @@ HashReturn Update (hashState *state, const BitSequence *data, DataLength
 
          SHAVITE_CNT+=8*(BlockSizeB-bufcnt);
 
-/* Call the respective compression function to process the current   */
-/* block                                                             */
+/* Call the compression function to process the current block        */
 
-         if (state->DigestSize<257)
-            Compress256(state->buffer, state->chaining_value, SHAVITE_CNT, state->salt);
+	 Compress256(state->buffer, state->chaining_value, SHAVITE_CNT, state->salt);
     }
 
 
@@ -249,13 +239,11 @@ HashReturn Update (hashState *state, const BitSequence *data, DataLength
 
 /* Update the number of bits hashed so far (locally)                 */
 
-         SHAVITE_CNT+=BlockSizeB;
+         SHAVITE_CNT+=8*BlockSizeB;
 
-/* Call the respective compression function to process the current   */
-/* block                                                             */
+/* Call the compression function to process the current   block      */
 
-         if (state->DigestSize<257)
-            Compress256(p, state->chaining_value, SHAVITE_CNT, state->salt);
+	 Compress256(p, state->chaining_value, SHAVITE_CNT, state->salt);
       }
 
 
@@ -277,11 +265,11 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 
 /* Stores inputs (message blocks) to the compression function        */
 
-   u8 block[128];
+   u8 block[64];
 
 /* Stores results (chaining value) of the compression function       */
 
-   u8 result[64];
+   u8 result[32];
 
 /* BlockSizeB is the size of the message block of the compression    */
 /* function                                                          */
@@ -298,10 +286,7 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 
 /* Copy the current chaining value into result (as a temporary step) */
 
-   if (state->DigestSize < 257)
-      memcpy(result, state->chaining_value, 32);
-   else
-      memcpy(result, state->chaining_value, 64);
+   memcpy(result, state->chaining_value, 32);
 
 
 /* Initialize block as the message block to compress with the bytes  */
@@ -320,41 +305,38 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 
 /* Compress the last block (according to the digest size)            */
 
-  if (state->DigestSize<257) {
-
-
 /* An additional message block is required if there are less than 10 */
 /* more bytes for message length and digest length encoding          */
 
-     if (bufcnt>=BlockSizeB-10)
-        {
+    if (bufcnt>=BlockSizeB-10)
+       {
 
 /* Compress the current block                                        */
-           Compress256(block,result,state->bitcount,state->salt);
+          Compress256(block,result,state->bitcount,state->salt);
 
 /* Generate the full padding block                                   */
-           memset(block, 0, BlockSizeB);
-           U64TO8_LITTLE(block+BlockSizeB-10, state->bitcount);
-           U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
+          memset(block, 0, BlockSizeB);
+          U64TO8_LITTLE(block+BlockSizeB-10, state->bitcount);
+          U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
 
 /* Compress the full padding block                                   */
-           Compress256(block,result,0x0ULL,state->salt);
+          Compress256(block,result,0x0UL,state->salt);
+       }
 
-        }
+    else
 
-     else
-
-        {
-
-/* Pad the number of bits hashed so far and the digest size to the  */
-/* last message block and compress it				    */
+       {
+/* Pad the number of bits hashed so far and the digest size to the   */
+/* last message block and compress it
+*/
            U64TO8_LITTLE(block+BlockSizeB-10, state->bitcount);
            U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
-           Compress256(block,result, state->bitcount, state->salt);
+	   if ((state->bitcount&(state->BlockSize-1))==0)
+	      Compress256(block,result, 0ULL, state->salt);
+	   else
+	      Compress256(block,result, state->bitcount, state->salt);
 
         }
-   }
-
 /* Copy the result into the supplied array of bytes.                 */
 
    for (i=0;i<(state->DigestSize+7)/8;i++)

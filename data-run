@@ -112,7 +112,7 @@ do
   
       if [ "$t1" = cryptopp ]
       then
-        echo "cryptopp 20090310" >&8
+        echo "cryptopp 561" >&8
       fi
   
       if [ "$t1" = openssl ]
@@ -259,7 +259,7 @@ do
         echo "=== `date` === trying CXX=$cpp CXXFLAGS=$cppopts"
         rm -rf "$top/$target/work"
         mkdir -p "$top/$target/work"
-        cp -pr cryptopp-20090310/* "$top/$target/work"
+        cp -pr cryptopp-561/* "$top/$target/work"
         ( cd "$top/$target/work" \
           && make CXX="$cpp" CXXFLAGS="-DNDEBUG $cppopts" LDFLAGS="$cppopts" \
           && cp libcryptopp.a "$top/$abi/lib/libcryptopp.a" \

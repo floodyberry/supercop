@@ -212,7 +212,7 @@ HashReturn Update (hashState *state, const BitSequence *data, DataLength
 
 /* Update the number of bits hashed so far (locally)                 */
 
-         local_bitcount+=BlockSizeB;
+         local_bitcount+=BlockSizeB*8;
 
 /* Call the respective compression function to process the current   */
 /* block                                                             */
@@ -316,7 +316,10 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 /* last message block and compress it				    */
            U64TO8_LITTLE(block+BlockSizeB-10, state->bitcount);
            U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
-           Compress256(block,result, state->bitcount);
+           if ((state->bitcount % state->BlockSize)==0)
+              Compress256(block,result, 0x0ULL);
+           else
+              Compress256(block,result, state->bitcount);
 
         }
    }
@@ -352,8 +355,10 @@ HashReturn Final (hashState *state, BitSequence *hashval)
                U64TO8_LITTLE(block+BlockSizeB-18, state->bitcount);
                memset(block+BlockSizeB-10,0,8);
                U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
-               Compress512(block,result, state->bitcount);
-
+               if ((state->bitcount % state->BlockSize)==0)
+                  Compress512(block,result, 0x0ULL);
+               else
+                  Compress512(block,result, state->bitcount);
             }
       }
 
