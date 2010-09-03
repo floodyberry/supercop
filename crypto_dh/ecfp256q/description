@@ -1,0 +1,1 @@
+Elliptic-curve Diffie--Hellman secret sharing using the twisted Jacobi quartic curve y^2=11x^4-x^2+1 modulo 2^256-587

@@ -1,2 +1,2 @@
-#define crypto_stream_salsa2012_x86_xmm5_KEYBYTES 32
-#define crypto_stream_salsa2012_x86_xmm5_NONCEBYTES 8
+#define CRYPTO_KEYBYTES 32
+#define CRYPTO_NONCEBYTES 8

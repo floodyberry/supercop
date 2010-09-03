@@ -30,6 +30,8 @@ int64 copy
 
 stack128 tmp
 
+int64 constants
+
 int64 r11_caller
 int64 r12_caller
 int64 r13_caller
@@ -51,14 +53,16 @@ enter crypto_hash_cubehash1632_amd64
   in = arg2
   inlen = arg3
 
-  x0 = *(int128 *) crypto_hash_cubehash1632_amd64_init0
-  x1 = *(int128 *) crypto_hash_cubehash1632_amd64_init1
-  x2 = *(int128 *) crypto_hash_cubehash1632_amd64_init2
-  x3 = *(int128 *) crypto_hash_cubehash1632_amd64_init3
-  x4 = *(int128 *) crypto_hash_cubehash1632_amd64_init4
-  x5 = *(int128 *) crypto_hash_cubehash1632_amd64_init5
-  x6 = *(int128 *) crypto_hash_cubehash1632_amd64_init6
-  x7 = *(int128 *) crypto_hash_cubehash1632_amd64_init7
+  constants = &crypto_hash_cubehash1632_amd64_constants
+
+  x0 = *(int128 *) (constants + 0)
+  x1 = *(int128 *) (constants + 16)
+  x2 = *(int128 *) (constants + 32)
+  x3 = *(int128 *) (constants + 48)
+  x4 = *(int128 *) (constants + 64)
+  x5 = *(int128 *) (constants + 80)
+  x6 = *(int128 *) (constants + 96)
+  x7 = *(int128 *) (constants + 112)
 
   y0 ^= y0
   tmp = y0
@@ -177,7 +181,7 @@ inlenbelow0:
                 =? inlen + 1
 goto finish if !=
 
-  x7 ^= *(int128 *) crypto_hash_cubehash1632_amd64_final
+  x7 ^= *(int128 *) (constants + 128)
   r = 160
   inlen = -2
 

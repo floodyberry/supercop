@@ -1,0 +1,1 @@
+ECDSA signatures using the standard SECP160R1 elliptic curve, a curve modulo the prime 2^160-2^31-1

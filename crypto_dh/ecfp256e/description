@@ -1,0 +1,1 @@
+Elliptic-curve Diffie--Hellman secret sharing using the twisted Edwards curve -x^2+y^2=1+dx^2y^2 modulo 2^256-587, where d= 59702978421801250797625733354188749104239349061620892363256064453045589344976

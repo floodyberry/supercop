@@ -53,6 +53,8 @@ stack128 x5_stack
 stack128 x6_stack
 stack128 x7_stack
 
+int32 constants
+
 enter crypto_hash_cubehash1632_x86xmm
 
   eax_stack = eax
@@ -67,14 +69,15 @@ enter crypto_hash_cubehash1632_x86xmm
   y0 = 0
   tmp = y0
 
-  x5 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init5
-  x7 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init7
-  x4 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init4
-  x6 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init6
-  x0 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init0
-  x1 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init1
-  x2 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init2
-  x3 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init3
+  constants = &crypto_hash_cubehash1632_x86xmm_constants
+  x5 = *(int128 *) (constants + 80)
+  x7 = *(int128 *) (constants + 112)
+  x4 = *(int128 *) (constants + 64)
+  x6 = *(int128 *) (constants + 96)
+  x0 = *(int128 *) (constants + 0)
+  x1 = *(int128 *) (constants + 16)
+  x2 = *(int128 *) (constants + 32)
+  x3 = *(int128 *) (constants + 48)
 
   x5_stack = x5
   x7_stack = x7
@@ -292,7 +295,7 @@ inlenbelow0:
 goto finish if !=
 
   x7 = x7_stack
-  x7 ^= *(int128 *) crypto_hash_cubehash1632_x86xmm_final
+  x7 ^= *(int128 *) (constants + 128)
   x7_stack = x7
   r = 160
   inlen = -2

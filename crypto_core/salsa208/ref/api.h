@@ -1,4 +1,4 @@
-#define crypto_core_salsa208_ref_OUTPUTBYTES 64
-#define crypto_core_salsa208_ref_INPUTBYTES 16
-#define crypto_core_salsa208_ref_KEYBYTES 32
-#define crypto_core_salsa208_ref_CONSTBYTES 16
+#define CRYPTO_OUTPUTBYTES 64
+#define CRYPTO_INPUTBYTES 16
+#define CRYPTO_KEYBYTES 32
+#define CRYPTO_CONSTBYTES 16

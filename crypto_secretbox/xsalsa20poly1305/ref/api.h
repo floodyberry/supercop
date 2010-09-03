@@ -1,4 +1,4 @@
-#define crypto_secretbox_xsalsa20poly1305_ref_KEYBYTES 32
-#define crypto_secretbox_xsalsa20poly1305_ref_NONCEBYTES 24
-#define crypto_secretbox_xsalsa20poly1305_ref_ZEROBYTES 32
-#define crypto_secretbox_xsalsa20poly1305_ref_BOXZEROBYTES 16
+#define CRYPTO_KEYBYTES 32
+#define CRYPTO_NONCEBYTES 24
+#define CRYPTO_ZEROBYTES 32
+#define CRYPTO_BOXZEROBYTES 16

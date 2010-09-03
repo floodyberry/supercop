@@ -1,2 +1,2 @@
-#define crypto_stream_xsalsa20_ref_KEYBYTES 32
-#define crypto_stream_xsalsa20_ref_NONCEBYTES 24
+#define CRYPTO_KEYBYTES 32
+#define CRYPTO_NONCEBYTES 24

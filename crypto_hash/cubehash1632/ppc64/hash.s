@@ -252,9 +252,11 @@
 # qhasm: enter crypto_hash_cubehash1632_ppc64
 .text
 .align 3
+.globl .crypto_hash_cubehash1632_ppc64
 .globl _crypto_hash_cubehash1632_ppc64
 .globl crypto_hash_cubehash1632_ppc64
 _crypto_hash_cubehash1632_ppc64:
+.crypto_hash_cubehash1632_ppc64:
 crypto_hash_cubehash1632_ppc64:
 stwu 1,-400(1)
 

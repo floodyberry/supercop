@@ -1,0 +1,1 @@
+ECDSA signatures using the standard NIST P-256 elliptic curve, a curve modulo the prime 2^256-2^224+2^192+2^96-1

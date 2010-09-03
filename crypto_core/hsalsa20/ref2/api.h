@@ -1,4 +1,4 @@
-#define crypto_core_hsalsa20_ref2_OUTPUTBYTES 32
-#define crypto_core_hsalsa20_ref2_INPUTBYTES 16
-#define crypto_core_hsalsa20_ref2_KEYBYTES 32
-#define crypto_core_hsalsa20_ref2_CONSTBYTES 16
+#define CRYPTO_OUTPUTBYTES 32
+#define CRYPTO_INPUTBYTES 16
+#define CRYPTO_KEYBYTES 32
+#define CRYPTO_CONSTBYTES 16

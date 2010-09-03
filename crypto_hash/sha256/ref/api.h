@@ -1,1 +1,1 @@
-#define crypto_hash_sha256_ref_BYTES 32
+#define CRYPTO_BYTES 32

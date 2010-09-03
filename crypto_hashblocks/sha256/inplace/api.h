@@ -1,2 +1,2 @@
-#define crypto_hashblocks_sha256_inplace_STATEBYTES 32
-#define crypto_hashblocks_sha256_inplace_BLOCKBYTES 64
+#define CRYPTO_STATEBYTES 32
+#define CRYPTO_BLOCKBYTES 64

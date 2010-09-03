@@ -1,0 +1,1 @@
+ECDSA signatures using the standard NIST P-521 elliptic curve, a curve modulo the prime 2^521-1

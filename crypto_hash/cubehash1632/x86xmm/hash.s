@@ -89,6 +89,8 @@
 
 # qhasm: stack128 x7_stack
 
+# qhasm: int32 constants
+
 # qhasm: enter crypto_hash_cubehash1632_x86xmm
 .text
 .p2align 5
@@ -146,45 +148,50 @@ pxor   %xmm0,%xmm0
 # asm 2: movdqa <y0=%xmm0,>tmp=32(%esp)
 movdqa %xmm0,32(%esp)
 
-# qhasm:   x5 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init5
-# asm 1: movdqa crypto_hash_cubehash1632_x86xmm_init5,>x5=int6464#1
-# asm 2: movdqa crypto_hash_cubehash1632_x86xmm_init5,>x5=%xmm0
-movdqa crypto_hash_cubehash1632_x86xmm_init5,%xmm0
+# qhasm:   constants = &crypto_hash_cubehash1632_x86xmm_constants
+# asm 1: lea  crypto_hash_cubehash1632_x86xmm_constants,>constants=int32#3
+# asm 2: lea  crypto_hash_cubehash1632_x86xmm_constants,>constants=%edx
+lea  crypto_hash_cubehash1632_x86xmm_constants,%edx
 
-# qhasm:   x7 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init7
-# asm 1: movdqa crypto_hash_cubehash1632_x86xmm_init7,>x7=int6464#2
-# asm 2: movdqa crypto_hash_cubehash1632_x86xmm_init7,>x7=%xmm1
-movdqa crypto_hash_cubehash1632_x86xmm_init7,%xmm1
+# qhasm:   x5 = *(int128 *) (constants + 80)
+# asm 1: movdqa 80(<constants=int32#3),>x5=int6464#1
+# asm 2: movdqa 80(<constants=%edx),>x5=%xmm0
+movdqa 80(%edx),%xmm0
 
-# qhasm:   x4 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init4
-# asm 1: movdqa crypto_hash_cubehash1632_x86xmm_init4,>x4=int6464#3
-# asm 2: movdqa crypto_hash_cubehash1632_x86xmm_init4,>x4=%xmm2
-movdqa crypto_hash_cubehash1632_x86xmm_init4,%xmm2
+# qhasm:   x7 = *(int128 *) (constants + 112)
+# asm 1: movdqa 112(<constants=int32#3),>x7=int6464#2
+# asm 2: movdqa 112(<constants=%edx),>x7=%xmm1
+movdqa 112(%edx),%xmm1
 
-# qhasm:   x6 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init6
-# asm 1: movdqa crypto_hash_cubehash1632_x86xmm_init6,>x6=int6464#4
-# asm 2: movdqa crypto_hash_cubehash1632_x86xmm_init6,>x6=%xmm3
-movdqa crypto_hash_cubehash1632_x86xmm_init6,%xmm3
+# qhasm:   x4 = *(int128 *) (constants + 64)
+# asm 1: movdqa 64(<constants=int32#3),>x4=int6464#3
+# asm 2: movdqa 64(<constants=%edx),>x4=%xmm2
+movdqa 64(%edx),%xmm2
 
-# qhasm:   x0 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init0
-# asm 1: movdqa crypto_hash_cubehash1632_x86xmm_init0,>x0=int6464#5
-# asm 2: movdqa crypto_hash_cubehash1632_x86xmm_init0,>x0=%xmm4
-movdqa crypto_hash_cubehash1632_x86xmm_init0,%xmm4
+# qhasm:   x6 = *(int128 *) (constants + 96)
+# asm 1: movdqa 96(<constants=int32#3),>x6=int6464#4
+# asm 2: movdqa 96(<constants=%edx),>x6=%xmm3
+movdqa 96(%edx),%xmm3
 
-# qhasm:   x1 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init1
-# asm 1: movdqa crypto_hash_cubehash1632_x86xmm_init1,>x1=int6464#6
-# asm 2: movdqa crypto_hash_cubehash1632_x86xmm_init1,>x1=%xmm5
-movdqa crypto_hash_cubehash1632_x86xmm_init1,%xmm5
+# qhasm:   x0 = *(int128 *) (constants + 0)
+# asm 1: movdqa 0(<constants=int32#3),>x0=int6464#5
+# asm 2: movdqa 0(<constants=%edx),>x0=%xmm4
+movdqa 0(%edx),%xmm4
 
-# qhasm:   x2 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init2
-# asm 1: movdqa crypto_hash_cubehash1632_x86xmm_init2,>x2=int6464#7
-# asm 2: movdqa crypto_hash_cubehash1632_x86xmm_init2,>x2=%xmm6
-movdqa crypto_hash_cubehash1632_x86xmm_init2,%xmm6
+# qhasm:   x1 = *(int128 *) (constants + 16)
+# asm 1: movdqa 16(<constants=int32#3),>x1=int6464#6
+# asm 2: movdqa 16(<constants=%edx),>x1=%xmm5
+movdqa 16(%edx),%xmm5
 
-# qhasm:   x3 = *(int128 *) crypto_hash_cubehash1632_x86xmm_init3
-# asm 1: movdqa crypto_hash_cubehash1632_x86xmm_init3,>x3=int6464#8
-# asm 2: movdqa crypto_hash_cubehash1632_x86xmm_init3,>x3=%xmm7
-movdqa crypto_hash_cubehash1632_x86xmm_init3,%xmm7
+# qhasm:   x2 = *(int128 *) (constants + 32)
+# asm 1: movdqa 32(<constants=int32#3),>x2=int6464#7
+# asm 2: movdqa 32(<constants=%edx),>x2=%xmm6
+movdqa 32(%edx),%xmm6
+
+# qhasm:   x3 = *(int128 *) (constants + 48)
+# asm 1: movdqa 48(<constants=int32#3),>x3=int6464#8
+# asm 2: movdqa 48(<constants=%edx),>x3=%xmm7
+movdqa 48(%edx),%xmm7
 
 # qhasm:   x5_stack = x5
 # asm 1: movdqa <x5=int6464#1,>x5_stack=stack128#2
@@ -240,9 +247,9 @@ add  $32,%esi
 sub  $32,%ecx
 
 # qhasm:   r = 16
-# asm 1: mov  $16,>r=int32#3
-# asm 2: mov  $16,>r=%edx
-mov  $16,%edx
+# asm 1: mov  $16,>r=int32#4
+# asm 2: mov  $16,>r=%ebx
+mov  $16,%ebx
 # comment:fp stack unchanged by fallthrough
 
 # qhasm: morerounds:
@@ -589,9 +596,9 @@ movdqa %xmm1,48(%esp)
 movdqa 64(%esp),%xmm1
 
 # qhasm:                    unsigned>? r -= 2
-# asm 1: sub  $2,<r=int32#3
-# asm 2: sub  $2,<r=%edx
-sub  $2,%edx
+# asm 1: sub  $2,<r=int32#4
+# asm 2: sub  $2,<r=%ebx
+sub  $2,%ebx
 
 # qhasm:   uint32323232 x4 += x0
 # asm 1: paddd <x0=int6464#4,<x4=int6464#1
@@ -1008,9 +1015,9 @@ movdqa 32(%esp),%xmm0
 pxor  %xmm0,%xmm5
 
 # qhasm:   r = 16
-# asm 1: mov  $16,>r=int32#3
-# asm 2: mov  $16,>r=%edx
-mov  $16,%edx
+# asm 1: mov  $16,>r=int32#4
+# asm 2: mov  $16,>r=%ebx
+mov  $16,%ebx
 
 # qhasm:   inlen = -1
 # asm 1: mov  $-1,>inlen=int32#2
@@ -1062,9 +1069,9 @@ movdqa 32(%esp),%xmm0
 pxor  %xmm0,%xmm4
 
 # qhasm:   r = 16
-# asm 1: mov  $16,>r=int32#3
-# asm 2: mov  $16,>r=%edx
-mov  $16,%edx
+# asm 1: mov  $16,>r=int32#4
+# asm 2: mov  $16,>r=%ebx
+mov  $16,%ebx
 
 # qhasm:   inlen = -1
 # asm 1: mov  $-1,>inlen=int32#2
@@ -1092,10 +1099,10 @@ jne ._finish
 # asm 2: movdqa <x7_stack=64(%esp),>x7=%xmm0
 movdqa 64(%esp),%xmm0
 
-# qhasm:   x7 ^= *(int128 *) crypto_hash_cubehash1632_x86xmm_final
-# asm 1: pxor crypto_hash_cubehash1632_x86xmm_final,<x7=int6464#1
-# asm 2: pxor crypto_hash_cubehash1632_x86xmm_final,<x7=%xmm0
-pxor crypto_hash_cubehash1632_x86xmm_final,%xmm0
+# qhasm:   x7 ^= *(int128 *) (constants + 128)
+# asm 1: pxor 128(<constants=int32#3),<x7=int6464#1
+# asm 2: pxor 128(<constants=%edx),<x7=%xmm0
+pxor 128(%edx),%xmm0
 
 # qhasm:   x7_stack = x7
 # asm 1: movdqa <x7=int6464#1,>x7_stack=stack128#3
@@ -1103,9 +1110,9 @@ pxor crypto_hash_cubehash1632_x86xmm_final,%xmm0
 movdqa %xmm0,64(%esp)
 
 # qhasm:   r = 160
-# asm 1: mov  $160,>r=int32#3
-# asm 2: mov  $160,>r=%edx
-mov  $160,%edx
+# asm 1: mov  $160,>r=int32#4
+# asm 2: mov  $160,>r=%ebx
+mov  $160,%ebx
 
 # qhasm:   inlen = -2
 # asm 1: mov  $-2,>inlen=int32#2
