@@ -3,9 +3,9 @@
 #include <string.h>
 
 #include "nist.h"
-#include "tables.h"
+#include "simd_iv.h"
 
-// #define NO_PRECOMPUTED_IV
+/* #define NO_PRECOMPUTED_IV */
 
 
 /* 
@@ -100,9 +100,9 @@ HashReturn Init(hashState *state, int hashbitlen) {
       init = malloc(state->blocksize);
       memset(init, 0, state->blocksize);
 #if defined __STDC__ && __STDC_VERSION__ >= 199901L
-      snprintf(init, state->blocksize, "SIMD-%i v1.0", hashbitlen);
+      snprintf(init, state->blocksize, "SIMD-%i v1.1", hashbitlen);
 #else
-      sprintf(init, "SIMD-%i v1.0", hashbitlen);
+      sprintf(init, "SIMD-%i v1.1", hashbitlen);
 #endif
       SIMD_Compress(state, (unsigned char*) init, 0);
       free(init);
@@ -168,20 +168,22 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
 HashReturn Final(hashState *state, BitSequence *hashval) {
 #ifdef HAS_64
   u64 l;
+  int current = state->count & (state->blocksize - 1);
 #else
   u32 l;
+  int current = state->count_low & (state->blocksize - 1);
 #endif
   unsigned int i;
   BitSequence bs[64];
+  int isshort = 1;
 
   /* 
    * If there is still some data in the buffer, hash it
    */
-  if (state->count & (state->blocksize - 1)) {
+  if (current) {
     /* 
      * We first need to zero out the end of the buffer.
      */
-    int current = state->count & (state->blocksize - 1);
     if (current & 7) {
       BitSequence mask = 0xff >> (current&7);
       state->buffer[current/8] &= ~mask;
@@ -201,6 +203,8 @@ HashReturn Final(hashState *state, BitSequence *hashval) {
     state->buffer[i] = l & 0xff;
     l >>= 8;
   }
+  if (state->count < 16384)
+    isshort = 2;
 #else
   l = state->count_low;
   for (i=0; i<4; i++) {
@@ -212,9 +216,11 @@ HashReturn Final(hashState *state, BitSequence *hashval) {
     state->buffer[4+i] = l & 0xff;
     l >>= 8;
   }
+  if (state->count_high == 0 && state->count_low < 16384)
+    isshort = 2;
 #endif
 
-  SIMD_Compress(state, state->buffer, 1);
+  SIMD_Compress(state, state->buffer, isshort);
     
 
   /*

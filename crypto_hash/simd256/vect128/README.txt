@@ -1,5 +1,7 @@
-SIMD reference implementation - version 1.1
+SIMD reference implementation - version 2.0
 ===========================================
+
+This code implements version 1.1 of the specification of SIMD.
 
 The latest version of the specification of the SIMD hash function,
 supporting documentation, and reference code can be downloaded from
@@ -15,8 +17,8 @@ code currently includes 4 different implementations:
 
 - a slow reference implementation.
 - an optimized implementation.
-- a vectorized implementation for 128-bit vectors (SIMD-256 only).
-- a vectorized implementation for ARM with IwMMXt
+- a vectorized implementation for 128-bit vectors.
+- a vectorized implementation for ARM with IwMMXt (SIMD-256 only).
 
 The reference and optimized versions are written in ANSI C, and supports
 all functions of the SIMD family.  Note that the so-called "optimized"
@@ -43,7 +45,7 @@ API
 ===
 
 Each implementation of the hash function is given as a C source file
-that implements a simple internal API: the most main function is
+that implements a simple internal API: the main function is
 SIMD_Compress that implements the compression function.  When compiled,
 the object file can be linked with nist.o to implement the NIST API (and
 the iteration mode of the hash function) on top of this internal API.
@@ -59,6 +61,11 @@ preserves the sign bit (which is an implementation defined behaviour).
 
 Changelog
 =========
+
+  * 2.0
+    + Implements the tweaked version of SIMD (version 1.1 of the
+    specification)
+    + Small optimisations that benefit to GCC 4.3.
 
   * 1.1
     + The 128-bit vector implementation now supports SIMD-512.

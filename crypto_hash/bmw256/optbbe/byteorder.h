@@ -77,6 +77,10 @@
 		: "+r"(s4) : "r"(s64), "r"(h), "b"(d64));\
 }
 #else
+#if defined(_ARCH_PWR7)
+#define aix_ld_swap64(s64,d64)\
+	__asm__ ("ldbrx %0,0,%1" : "=r"(d64) : "r"(s64))
+#else
 #define aix_ld_swap64(s64,d64)\
 {\
 	uint32_t *s4, h, l;\
@@ -86,6 +90,7 @@
 \
 	d64 = ((uint64_t)h<<32) | l;\
 }
+#endif /*PWR7*/
 
 #define aix_st_swap64(s64,d64)\
 {\
@@ -112,7 +117,7 @@
 
 /* GCC fallback */
 #if ((__GNUC__ >= 4) || defined(__PGIC__)) && !defined(ld_swap32)
-#define ld_swap32(s,d) (d = __builtin_bswap32(*(u)))
+#define ld_swap32(s,d) (d = __builtin_bswap32(*(s)))
 #define st_swap32(s,d) (*(d) = __builtin_bswap32(s))
 #endif /*GCC4/PGIC && !swap32*/
 #if ((__GNUC__ >= 4) || defined(__PGIC__)) && !defined(ld_swap64)

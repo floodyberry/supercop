@@ -51,16 +51,14 @@ int RequiredAlignment(void) {
     for(j=0; j<4; j++) {                                                \
       state->D[j] = state->D[j] + w[j] +                                \
         F(state->A[j], state->B[j], state->C[j]);                       \
-      state->D[j] = T32(ROTL32(T32(state->D[j]), s) + R[(j+(i&1)+1)&3]); \
+      state->D[j] = T32(ROTL32(T32(state->D[j]), s) + R[(j^(((i)%3)+1))]); \
       state->A[j] = R[j];                                               \
     }                                                                   \
   }
   
-const int p8[4][8] = {
-  {1,0, 3,2, 5,4, 7,6},
-  {2,3, 0,1, 6,7, 4,5},
-  {7,6, 5,4, 3,2, 1,0},
-  {4,5, 6,7, 0,1, 2,3}};
+const int p8_xor [] = {1, 6, 2, 3, 5, 7, 4};
+
+#define tabsize(t) (sizeof(t)/sizeof(t[0]))
 
 #define STEP8(state, w, i, r, s, A, B, C, D, F)				\
   {                                                                     \
@@ -80,7 +78,8 @@ const int p8[4][8] = {
     for(j=0; j<8; j++) {                                                \
       state->D[j] = state->D[j] + w[j] +                                \
         F(state->A[j], state->B[j], state->C[j]);                       \
-      state->D[j] = T32(ROTL32(T32(state->D[j]), s) + R[p8[i & 3][j]]);	\
+      state->D[j] = T32(ROTL32(T32(state->D[j]), s) +                   \
+                        R[j^p8_xor[(i) % tabsize(p8_xor)]]);            \
       state->A[j] = R[j];                                               \
     }                                                                   \
   }
@@ -101,15 +100,15 @@ void Round4(hashState * state, fft_t y[128], int i,
       w[a][b] = (((u32) (y[Q4[8*i+a][b]] * code)) << 16) |
                 (((u32) (y[P4[8*i+a][b]] * code)) & 0xffff);
 
-  STEP4(state, w[0], 0, r, s, A, B, C, D, IF);
-  STEP4(state, w[1], 1, s, t, D, A, B, C, IF);
-  STEP4(state, w[2], 2, t, u, C, D, A, B, IF);
-  STEP4(state, w[3], 3, u, r, B, C, D, A, IF);
+  STEP4(state, w[0], 8*i+0, r, s, A, B, C, D, IF);
+  STEP4(state, w[1], 8*i+1, s, t, D, A, B, C, IF);
+  STEP4(state, w[2], 8*i+2, t, u, C, D, A, B, IF);
+  STEP4(state, w[3], 8*i+3, u, r, B, C, D, A, IF);
 
-  STEP4(state, w[4], 4, r, s, A, B, C, D, MAJ);
-  STEP4(state, w[5], 5, s, t, D, A, B, C, MAJ);
-  STEP4(state, w[6], 6, t, u, C, D, A, B, MAJ);
-  STEP4(state, w[7], 7, u, r, B, C, D, A, MAJ);
+  STEP4(state, w[4], 8*i+4, r, s, A, B, C, D, MAJ);
+  STEP4(state, w[5], 8*i+5, s, t, D, A, B, C, MAJ);
+  STEP4(state, w[6], 8*i+6, t, u, C, D, A, B, MAJ);
+  STEP4(state, w[7], 8*i+7, u, r, B, C, D, A, MAJ);
 }
 
 void Round8(hashState * state, fft_t y[128], int i,
@@ -128,15 +127,15 @@ void Round8(hashState * state, fft_t y[128], int i,
       w[a][b] = (((u32) (y[Q8[8*i+a][b]] * code)) << 16) |
                 (((u32) (y[P8[8*i+a][b]] * code)) & 0xffff);
 
-  STEP8(state, w[0], 0, r, s, A, B, C, D, IF);
-  STEP8(state, w[1], 1, s, t, D, A, B, C, IF);
-  STEP8(state, w[2], 2, t, u, C, D, A, B, IF);
-  STEP8(state, w[3], 3, u, r, B, C, D, A, IF);
+  STEP8(state, w[0], 8*i+0, r, s, A, B, C, D, IF);
+  STEP8(state, w[1], 8*i+1, s, t, D, A, B, C, IF);
+  STEP8(state, w[2], 8*i+2, t, u, C, D, A, B, IF);
+  STEP8(state, w[3], 8*i+3, u, r, B, C, D, A, IF);
 
-  STEP8(state, w[4], 4, r, s, A, B, C, D, MAJ);
-  STEP8(state, w[5], 5, s, t, D, A, B, C, MAJ);
-  STEP8(state, w[6], 6, t, u, C, D, A, B, MAJ);
-  STEP8(state, w[7], 7, u, r, B, C, D, A, MAJ);
+  STEP8(state, w[4], 8*i+4, r, s, A, B, C, D, MAJ);
+  STEP8(state, w[5], 8*i+5, s, t, D, A, B, C, MAJ);
+  STEP8(state, w[6], 8*i+6, t, u, C, D, A, B, MAJ);
+  STEP8(state, w[7], 8*i+7, u, r, B, C, D, A, MAJ);
 }
 
 
@@ -503,27 +502,27 @@ void SIMD_Compress(hashState * state, const unsigned char *M, int final) {
 
   /* Run the feistel ladders */
   if (n == 4) {
-    Round4(state, y, 0, 3,  20, 14, 27);
-    Round4(state, y, 1, 26,  4, 23, 11);
-    Round4(state, y, 2, 19, 28,  7, 22);
-    Round4(state, y, 3, 15,  5, 29, 9);
+    Round4(state, y, 0, 3,  23, 17, 27);
+    Round4(state, y, 1, 28, 19, 22,  7);
+    Round4(state, y, 2, 29,  9, 15,  5);
+    Round4(state, y, 3,  4, 13, 10, 25);
 
-    STEP4(state, IV[0], 0, 15, 5, A, B, C, D, IF);
-    STEP4(state, IV[1], 1, 5, 29, D, A, B, C, IF);
-    STEP4(state, IV[2], 2, 29, 9, C, D, A, B, IF);
-    STEP4(state, IV[3], 3, 9, 15, B, C, D, A, IF);
+    STEP4(state, IV[0], 32, 4,  13, A, B, C, D, IF);
+    STEP4(state, IV[1], 33, 13, 10, D, A, B, C, IF);
+    STEP4(state, IV[2], 34, 10, 25, C, D, A, B, IF);
+    STEP4(state, IV[3], 35, 25,  4, B, C, D, A, IF);
   }
   else
  {
-    Round8(state, y, 0, 3,  20, 14, 27);
-    Round8(state, y, 1, 26,  4, 23, 11);
-    Round8(state, y, 2, 19, 28,  7, 22);
-    Round8(state, y, 3, 15,  5, 29, 9);
+    Round8(state, y, 0, 3,  23, 17, 27);
+    Round8(state, y, 1, 28, 19, 22,  7);
+    Round8(state, y, 2, 29,  9, 15,  5);
+    Round8(state, y, 3,  4, 13, 10, 25);
 
-    STEP8(state, IV[0], 0, 15, 5, A, B, C, D, IF);
-    STEP8(state, IV[1], 1, 5, 29, D, A, B, C, IF);
-    STEP8(state, IV[2], 2, 29, 9, C, D, A, B, IF);
-    STEP8(state, IV[3], 3, 9, 15, B, C, D, A, IF);
+    STEP8(state, IV[0], 32, 4,  13, A, B, C, D, IF);
+    STEP8(state, IV[1], 33, 13, 10, D, A, B, C, IF);
+    STEP8(state, IV[2], 34, 10, 25, C, D, A, B, IF);
+    STEP8(state, IV[3], 35, 25,  4, B, C, D, A, IF);
   }
 }
 

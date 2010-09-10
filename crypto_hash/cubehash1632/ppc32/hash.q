@@ -134,8 +134,6 @@ stack32 i27_stack
 stack32 i28_stack
 stack32 i29_stack
 
-int32 constants
-
 enter crypto_hash_cubehash1632_ppc32
 
 i12_stack = i12
@@ -157,58 +155,87 @@ i27_stack = i27
 i28_stack = i28
 i29_stack = i29
 
-constants = &crypto_hash_cubehash1632_ppc32_constants & 0xffff0000
-constants |= &crypto_hash_cubehash1632_ppc32_constants & 0xffff
-
   out_stack = out
 
-  x08 = *(uint32 *) (constants + 32)
-  x09 = *(uint32 *) (constants + 36)
-  x0a = *(uint32 *) (constants + 40)
-  x0b = *(uint32 *) (constants + 44)
-  x0c = *(uint32 *) (constants + 48)
-  x0d = *(uint32 *) (constants + 52)
-  x0e = *(uint32 *) (constants + 56)
-  x0f = *(uint32 *) (constants + 60)
+  x08 = 65536 * 0x4d42
+  x09 = 65536 * 0xa647
+  x0a = 65536 * 0x97cf
+  x0b = 65536 * 0x825b
+  x0c = 65536 * 0xeef8
+  x0d = 65536 * 0xf220
+  x0e = 65536 * 0xd0e5
+  x0f = 65536 * 0xa239
+  x08 |= 0xc787
+  x09 |= 0xa8b3
+  x0a |= 0x0bef
+  x0b |= 0x4537
+  x0c |= 0x64d2
+  x0d |= 0x90c4
+  x0e |= 0xcd33
+  x0f |= 0x11ae
 
   x0b_stack = x0b
 
-  x10 = *(uint32 *) (constants + 64)
-  x11 = *(uint32 *) (constants + 68)
-  x12 = *(uint32 *) (constants + 72)
-  x13 = *(uint32 *) (constants + 76)
-  x14 = *(uint32 *) (constants + 80)
-  x15 = *(uint32 *) (constants + 84)
-  x16 = *(uint32 *) (constants + 88)
-  x17 = *(uint32 *) (constants + 92)
+  x10 = 65536 * 0xfcd3
+  x11 = 65536 * 0x148f
+  x12 = 65536 * 0x1b01
+  x13 = 65536 * 0xb644
+  x14 = 65536 * 0x6a53
+  x15 = 65536 * 0x2ff5
+  x16 = 65536 * 0x91fa
+  x17 = 65536 * 0x0dba
+  x10 |= 0x98d9
+  x11 |= 0xe485
+  x12 |= 0x7bef
+  x13 |= 0x4532
+  x14 |= 0x6159
+  x15 |= 0x781c
+  x16 |= 0x7934
+  x17 |= 0xdea9
 
   x14_stack = x14
   x15_stack = x15
   x16_stack = x16
   x17_stack = x17
 
-  x18 = *(uint32 *) (constants + 96)
-  x19 = *(uint32 *) (constants + 100)
-  x1a = *(uint32 *) (constants + 104)
-  x1b = *(uint32 *) (constants + 108)
-  x1c = *(uint32 *) (constants + 112)
-  x1d = *(uint32 *) (constants + 116)
-  x1e = *(uint32 *) (constants + 120)
-  x1f = *(uint32 *) (constants + 124)
+  x18 = 65536 * 0xd65c
+  x19 = 65536 * 0xa5a7
+  x1a = 65536 * 0xb1c6
+  x1b = 65536 * 0xbc79
+  x1c = 65536 * 0x1921
+  x1d = 65536 * 0xe798
+  x1e = 65536 * 0x7795
+  x1f = 65536 * 0xd43e
+  x18 |= 0x8a2b
+  x19 |= 0x0e75
+  x1a |= 0x2456
+  x1b |= 0x6576
+  x1c |= 0xc8f7
+  x1d |= 0x9af1
+  x1e |= 0xd246
+  x1f |= 0x3b44
 
   x1c_stack = x1c
   x1d_stack = x1d
   x1e_stack = x1e
   x1f_stack = x1f
 
-  x00 = *(uint32 *) (constants + 0)
-  x01 = *(uint32 *) (constants + 4)
-  x02 = *(uint32 *) (constants + 8)
-  x03 = *(uint32 *) (constants + 12)
-  x04 = *(uint32 *) (constants + 16)
-  x05 = *(uint32 *) (constants + 20)
-  x06 = *(uint32 *) (constants + 24)
-  x07 = *(uint32 *) (constants + 28)
+  x00 = 65536 * 0x2aea
+  x01 = 65536 * 0x50f4
+  x02 = 65536 * 0x2d53
+  x03 = 65536 * 0x4167
+  x04 = 65536 * 0x3fee
+  x05 = 65536 * 0xc701
+  x06 = 65536 * 0xcc39
+  x07 = 65536 * 0x50ac
+  x00 |= 0x2a61
+  x01 |= 0x94d4
+  x02 |= 0x8b8b
+  x03 |= 0xd83e
+  x04 |= 0x2313
+  x05 |= 0xcf8c
+  x06 |= 0x968e
+  x07 |= 0x5695
 
   finalization = 0
 

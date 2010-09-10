@@ -247,15 +247,17 @@
 
 # qhasm: stack64 i29_stack
 
-# qhasm: enter crypto_hash_cubehash1632_ppc64
-.text
+# qhasm: enter crypto_hash_cubehash1632_ppc64aix aix
+.csect .text[PR]
+.toc
+.globl crypto_hash_cubehash1632_ppc64aix
+.globl .crypto_hash_cubehash1632_ppc64aix
+.csect crypto_hash_cubehash1632_ppc64aix[DS],3
+crypto_hash_cubehash1632_ppc64aix:
+.llong .crypto_hash_cubehash1632_ppc64aix, TOC[tc0], 0
+.csect .text[PR]
 .align 3
-.globl .crypto_hash_cubehash1632_ppc64
-.globl _crypto_hash_cubehash1632_ppc64
-.globl crypto_hash_cubehash1632_ppc64
-_crypto_hash_cubehash1632_ppc64:
-.crypto_hash_cubehash1632_ppc64:
-crypto_hash_cubehash1632_ppc64:
+.crypto_hash_cubehash1632_ppc64aix:
 stwu 1,-400(1)
 
 # qhasm: i12_stack = i12

@@ -14,8 +14,8 @@
 /* tacitly assume ISO/IEC 9899:1999 <stdint.h> is present */
 #include <stdint.h>
 
-/* platforms using <string.h> for memory operations provides this include */
-#include <memory.h>
+/* ANSI C header header for memory operations (move/copy) */
+#include <string.h>
 
 /* big endian support, provides no-op's if run on little endian hosts */
 #include "byteorder.h"

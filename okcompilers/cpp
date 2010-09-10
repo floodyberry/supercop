@@ -803,6 +803,42 @@ g++ -mcpu=ep9312 -O3 -fomit-frame-pointer
 g++ -mcpu=ep9312 -Os -fomit-frame-pointer
 g++ -mcpu=ep9312 -O2 -fomit-frame-pointer
 g++ -mcpu=ep9312 -O -fomit-frame-pointer
+g++ -mcpu=cortex-a5 -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-a5 -Os -fomit-frame-pointer
+g++ -mcpu=cortex-a5 -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-a5 -O -fomit-frame-pointer
+g++ -mcpu=cortex-a8 -mfpu=neon -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-a8 -mfpu=neon -Os -fomit-frame-pointer
+g++ -mcpu=cortex-a8 -mfpu=neon -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-a8 -mfpu=neon -O -fomit-frame-pointer
+g++ -mcpu=cortex-a9 -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-a9 -Os -fomit-frame-pointer
+g++ -mcpu=cortex-a9 -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-a9 -O -fomit-frame-pointer
+g++ -mcpu=cortex-r4 -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-r4 -Os -fomit-frame-pointer
+g++ -mcpu=cortex-r4 -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-r4 -O -fomit-frame-pointer
+g++ -mcpu=cortex-r4f -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-r4f -Os -fomit-frame-pointer
+g++ -mcpu=cortex-r4f -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-r4f -O -fomit-frame-pointer
+g++ -mcpu=cortex-m4 -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-m4 -Os -fomit-frame-pointer
+g++ -mcpu=cortex-m4 -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-m4 -O -fomit-frame-pointer
+g++ -mcpu=cortex-m3 -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-m3 -Os -fomit-frame-pointer
+g++ -mcpu=cortex-m3 -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-m3 -O -fomit-frame-pointer
+g++ -mcpu=cortex-m1 -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-m1 -Os -fomit-frame-pointer
+g++ -mcpu=cortex-m1 -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-m1 -O -fomit-frame-pointer
+g++ -mcpu=cortex-m0 -O3 -fomit-frame-pointer
+g++ -mcpu=cortex-m0 -Os -fomit-frame-pointer
+g++ -mcpu=cortex-m0 -O2 -fomit-frame-pointer
+g++ -mcpu=cortex-m0 -O -fomit-frame-pointer
 g++ -funroll-loops -march=iwmmxt -O3 -fomit-frame-pointer
 g++ -funroll-loops -march=iwmmxt -Os -fomit-frame-pointer
 g++ -funroll-loops -march=iwmmxt -O2 -fomit-frame-pointer

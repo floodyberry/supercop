@@ -132,7 +132,7 @@ stack64 i27_stack
 stack64 i28_stack
 stack64 i29_stack
 
-enter crypto_hash_cubehash1632_ppc64
+enter crypto_hash_cubehash1632_ppc64aix aix
 
 i12_stack = i12
 i13_stack = i13

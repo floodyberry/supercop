@@ -33,17 +33,21 @@ u32 MAJ(const u32 x, const u32 y, const u32 z) {
   return (z & y) | ((z | y) & x);
 }
 
-const int p4[4][8] = {
-  {1,2,3,0},
-  {2,3,0,1},
-  {1,2,3,0},
-  {2,3,0,1}};
+const int p4[][8] = {
+  {1,0,3,2},  // XOR 1
+  {2,3,0,1},  // XOR 2
+  {3,2,1,0}}; // XOR 3
 
-const int p8[4][8] = {
-  {1,0, 3,2, 5,4, 7,6},
-  {2,3, 0,1, 6,7, 4,5},
-  {7,6, 5,4, 3,2, 1,0},
-  {4,5, 6,7, 0,1, 2,3}};
+const int p8[][8] = {
+  {1,0, 3,2, 5,4, 7,6},  // XOR 1
+  {6,7, 4,5, 2,3, 0,1},  // XOR 6
+  {2,3, 0,1, 6,7, 4,5},  // XOR 2
+  {3,2, 1,0, 7,6, 5,4},  // XOR 3
+  {5,4, 7,6, 1,0, 3,2},  // XOR 5
+  {7,6, 5,4, 3,2, 1,0},  // XOR 7
+  {4,5, 6,7, 0,1, 2,3}}; // XOR 4
+
+#define tabsize(t) (sizeof(t)/sizeof(t[0]))
 
 void Step(hashState *state, const u32 w[8], const int i,
           const int r, const int s, const boolean_function F) {
@@ -56,9 +60,9 @@ void Step(hashState *state, const u32 w[8], const int i,
     tmp[j] = ROTL32(state->A[j], r);
   
   if (n == 4) 
-    perm = &p4[i % 4][0];
+    perm = &p4[i % tabsize(p4)][0];
   else
-    perm = &p8[i % 4][0];
+    perm = &p8[i % tabsize(p8)][0];
 
   for(j=0; j < n; j++) {
     int p = perm[j];
@@ -70,6 +74,8 @@ void Step(hashState *state, const u32 w[8], const int i,
   }
 
 #if PRINT_STEPS
+  if (i >= 32)
+    printf ("Feed-Forward ");
   printf("Step %2i: (r=%2i, s=%2i)\n", i, r, s);
   for (j=0; j < n; j++) {
     printf ("A[%d]=%08x  B[%d]=%08x  C[%d]=%08x  D[%d]=%08x\n",
@@ -159,12 +165,14 @@ void message_expansion(hashState * const state, u32 W[32][8],
   }
 
 #if PRINT_STEPS  
+  printf ("\\begin{verbatim}\n");
   for(i=0; i<fft_size/8; i++) {
     printf("y[%3d..%3d] = ", 8*i, 8*(i+1)-1);
     for(j=0; j<8; j++)
       printf("%4i ", y[8*i+j]);
-    printf("\n");
+  printf ("\n");
   }
+  printf ("\\end{verbatim}\n\n");
 #endif
 
   /*
@@ -179,7 +187,7 @@ void message_expansion(hashState * const state, u32 W[32][8],
     if (y[i] > 128)
       y[i] -= 257; 
   
-#if PRINT_STEPS
+#if PRINT_STEPS_VERBOSE
   for(i=0; i<fft_size/8; i++) {
     printf("\\tilde{y}[%3d..%3d] = ", 8*i, 8*(i+1)-1);
     for(j=0; j<8; j++)
@@ -207,6 +215,7 @@ void message_expansion(hashState * const state, u32 W[32][8],
         | ((u32) (y[2*i*n+2*j+fft_size/2+1] * 233) << 16);
  
 #if PRINT_STEPS
+  printf ("\\paragraph{Intermediate Expanded Message}\n\n\\begin{verbatim}\n");
  for(i=0; i<32; i++) {
    printf("Z[%2d] = ",i);
    for(j=0; j<n; j++) {
@@ -217,6 +226,7 @@ void message_expansion(hashState * const state, u32 W[32][8],
 
    printf("\n");
  }
+  printf ("\\end{verbatim}\n\n");
 #endif
 
  /*
@@ -227,6 +237,7 @@ void message_expansion(hashState * const state, u32 W[32][8],
       W[i][j] = Z[P[i]][j];
 
 #if PRINT_STEPS
+  printf ("\\paragraph{Expanded Message}\n\n\\begin{verbatim}\n");
  for(i=0; i<32; i++) {
    printf("W[%2d] = ",i);
    for(j=0; j<n; j++) {
@@ -236,6 +247,7 @@ void message_expansion(hashState * const state, u32 W[32][8],
    }
    printf("\n");
  }
+  printf ("\\end{verbatim}\n\n");
 #endif
 }
 
@@ -250,20 +262,31 @@ void SIMD_Compress(hashState * const state, const unsigned char * const M, int f
   const int n = state->n_feistels;
 
 #if PRINT_STEPS
-  printf("M :\n");
+  if (final)
+    printf ("\\subsubsection{Final block}\n\n");
+  else {
+    static int blocknb = 0;
+    char* names[] = {
+      "First",
+      "Second",
+      "Third",
+      "Fourth"
+    };
+    if (blocknb < 4)
+      printf ("\\subsubsection{%s block}\n\n", names[blocknb++]);
+    else
+      printf ("\\subsubsection{%ith block}\n\n", ++blocknb);
+  }
+
+  printf ("\\begin{verbatim}\n");
   for(i=0; i<2*n; i++) {
     printf("M[%3d..%3d] = ", 8*i, 8*(i+1)-1);
     for(j=0; j<8; j++)
       printf("%02x ", M[8*i+j]);
     printf("\n");
   }
-  printf("\n");
+  printf ("\\end{verbatim}\n\n");
 
-  printf("IV :\n");
- for(i=0; i<n; i++)
-    printf("A[%d]=%08x  B[%d]=%08x  C[%d]=%08x  D[%d]=%08x\n", 
-           i,state->A[i], i,state->B[i], i,state->C[i], i,state->D[i]);
-  printf("\n");
 #endif
 
   /*
@@ -276,7 +299,20 @@ void SIMD_Compress(hashState * const state, const unsigned char * const M, int f
     IV[3][i] = state->D[i];
   }
 
+#if PRINT_STEPS
+  printf ("\\paragraph{NTT Output}\n\n");
+#endif
+
   message_expansion(state, W,  M, final);
+
+#if PRINT_STEPS
+  printf ("\\paragraph{Feistel Steps}\n\n\\begin{verbatim}\n");
+  printf("IV :\n");
+ for(i=0; i<n; i++)
+    printf("A[%d]=%08x  B[%d]=%08x  C[%d]=%08x  D[%d]=%08x\n", 
+           i,state->A[i], i,state->B[i], i,state->C[i], i,state->D[i]);
+  printf("\n");
+#endif
 
   /*
    * XOR the message to the chaining value
@@ -305,24 +341,26 @@ void SIMD_Compress(hashState * const state, const unsigned char * const M, int f
   /*
    * Run the feistel ladders.
    */
-  Round(state, W, 0, 3,  20, 14, 27);
-  Round(state, W, 1, 26,  4, 23, 11);
-  Round(state, W, 2, 19, 28,  7, 22);
-  Round(state, W, 3, 15,  5, 29, 9);
+  Round(state, W, 0, 3,  23, 17, 27);
+  Round(state, W, 1, 28, 19, 22,  7);
+  Round(state, W, 2, 29,  9, 15,  5);
+  Round(state, W, 3,  4, 13, 10, 25);
 
   /*
    * Modified Davies-Meyer Feed-Forward.
    */
-  Step(state, IV[0], 0, 15, 5, IF);
-  Step(state, IV[1], 1, 5, 29, IF);
-  Step(state, IV[2], 2, 29, 9, IF);
-  Step(state, IV[3], 3, 9, 15, IF);
+  Step(state, IV[0], 32, 4,  13, IF);
+  Step(state, IV[1], 33, 13, 10, IF);
+  Step(state, IV[2], 34, 10, 25, IF);
+  Step(state, IV[3], 35, 25,  4, IF);
 
 #if PRINT_STEPS
-  printf("Compression function output :\n");
+  printf ("\\end{verbatim}\n\n");
+
+  printf("\\paragraph{Compression Function Output}\n\n\\begin{verbatim}\n");
   for(i=0; i<n; i++)
     printf("A[%d]=%08x  B[%d]=%08x  C[%d]=%08x  D[%d]=%08x\n", 
            i,state->A[i], i,state->B[i], i,state->C[i], i,state->D[i]);
-  printf("\n");
+  printf ("\\end{verbatim}\n\n");
 #endif
 }

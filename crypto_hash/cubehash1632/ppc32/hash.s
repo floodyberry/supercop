@@ -251,13 +251,13 @@
 
 # qhasm: stack32 i29_stack
 
-# qhasm: int32 constants
-
 # qhasm: enter crypto_hash_cubehash1632_ppc32
 .text
 .align 3
+.globl .crypto_hash_cubehash1632_ppc32
 .globl _crypto_hash_cubehash1632_ppc32
 .globl crypto_hash_cubehash1632_ppc32
+.crypto_hash_cubehash1632_ppc32:
 _crypto_hash_cubehash1632_ppc32:
 crypto_hash_cubehash1632_ppc32:
 stwu 1,-320(1)
@@ -352,225 +352,375 @@ stw 30,64(1)
 # asm 2: stw <i29=31,>i29_stack=68(1)
 stw 31,68(1)
 
-# qhasm: constants = &crypto_hash_cubehash1632_ppc32_constants & 0xffff0000
-# asm 1: lis >constants=int32#5,crypto_hash_cubehash1632_ppc32_constants@h
-# asm 2: lis >constants=7,crypto_hash_cubehash1632_ppc32_constants@h
-lis 7,crypto_hash_cubehash1632_ppc32_constants@h
-
-# qhasm: constants |= &crypto_hash_cubehash1632_ppc32_constants & 0xffff
-# asm 1: ori >constants=int32#5,<constants=int32#5,crypto_hash_cubehash1632_ppc32_constants@l
-# asm 2: ori >constants=7,<constants=7,crypto_hash_cubehash1632_ppc32_constants@l
-ori 7,7,crypto_hash_cubehash1632_ppc32_constants@l
-
 # qhasm:   out_stack = out
 # asm 1: stw <out=int32#1,>out_stack=stack32#19
 # asm 2: stw <out=3,>out_stack=72(1)
 stw 3,72(1)
 
-# qhasm:   x08 = *(uint32 *) (constants + 32)
-# asm 1: lwz >x08=int32#1,32(<constants=int32#5)
-# asm 2: lwz >x08=3,32(<constants=7)
-lwz 3,32(7)
+# qhasm:   x08 = 65536 * 0x4d42
+# asm 1: lis >x08=int32#1,0x4d42
+# asm 2: lis >x08=3,0x4d42
+lis 3,0x4d42
 
-# qhasm:   x09 = *(uint32 *) (constants + 36)
-# asm 1: lwz >x09=int32#6,36(<constants=int32#5)
-# asm 2: lwz >x09=8,36(<constants=7)
-lwz 8,36(7)
+# qhasm:   x09 = 65536 * 0xa647
+# asm 1: lis >x09=int32#5,0xa647
+# asm 2: lis >x09=7,0xa647
+lis 7,0xa647
 
-# qhasm:   x0a = *(uint32 *) (constants + 40)
-# asm 1: lwz >x0a=int32#7,40(<constants=int32#5)
-# asm 2: lwz >x0a=9,40(<constants=7)
-lwz 9,40(7)
+# qhasm:   x0a = 65536 * 0x97cf
+# asm 1: lis >x0a=int32#6,0x97cf
+# asm 2: lis >x0a=8,0x97cf
+lis 8,0x97cf
 
-# qhasm:   x0b = *(uint32 *) (constants + 44)
-# asm 1: lwz >x0b=int32#8,44(<constants=int32#5)
-# asm 2: lwz >x0b=10,44(<constants=7)
-lwz 10,44(7)
+# qhasm:   x0b = 65536 * 0x825b
+# asm 1: lis >x0b=int32#7,0x825b
+# asm 2: lis >x0b=9,0x825b
+lis 9,0x825b
 
-# qhasm:   x0c = *(uint32 *) (constants + 48)
-# asm 1: lwz >x0c=int32#9,48(<constants=int32#5)
-# asm 2: lwz >x0c=11,48(<constants=7)
-lwz 11,48(7)
+# qhasm:   x0c = 65536 * 0xeef8
+# asm 1: lis >x0c=int32#8,0xeef8
+# asm 2: lis >x0c=10,0xeef8
+lis 10,0xeef8
 
-# qhasm:   x0d = *(uint32 *) (constants + 52)
-# asm 1: lwz >x0d=int32#10,52(<constants=int32#5)
-# asm 2: lwz >x0d=12,52(<constants=7)
-lwz 12,52(7)
+# qhasm:   x0d = 65536 * 0xf220
+# asm 1: lis >x0d=int32#9,0xf220
+# asm 2: lis >x0d=11,0xf220
+lis 11,0xf220
 
-# qhasm:   x0e = *(uint32 *) (constants + 56)
-# asm 1: lwz >x0e=int32#11,56(<constants=int32#5)
-# asm 2: lwz >x0e=13,56(<constants=7)
-lwz 13,56(7)
+# qhasm:   x0e = 65536 * 0xd0e5
+# asm 1: lis >x0e=int32#10,0xd0e5
+# asm 2: lis >x0e=12,0xd0e5
+lis 12,0xd0e5
 
-# qhasm:   x0f = *(uint32 *) (constants + 60)
-# asm 1: lwz >x0f=int32#12,60(<constants=int32#5)
-# asm 2: lwz >x0f=14,60(<constants=7)
-lwz 14,60(7)
+# qhasm:   x0f = 65536 * 0xa239
+# asm 1: lis >x0f=int32#11,0xa239
+# asm 2: lis >x0f=13,0xa239
+lis 13,0xa239
+
+# qhasm:   x08 |= 0xc787
+# asm 1: ori >x08=int32#1,<x08=int32#1,0xc787
+# asm 2: ori >x08=3,<x08=3,0xc787
+ori 3,3,0xc787
+
+# qhasm:   x09 |= 0xa8b3
+# asm 1: ori >x09=int32#5,<x09=int32#5,0xa8b3
+# asm 2: ori >x09=7,<x09=7,0xa8b3
+ori 7,7,0xa8b3
+
+# qhasm:   x0a |= 0x0bef
+# asm 1: ori >x0a=int32#6,<x0a=int32#6,0x0bef
+# asm 2: ori >x0a=8,<x0a=8,0x0bef
+ori 8,8,0x0bef
+
+# qhasm:   x0b |= 0x4537
+# asm 1: ori >x0b=int32#7,<x0b=int32#7,0x4537
+# asm 2: ori >x0b=9,<x0b=9,0x4537
+ori 9,9,0x4537
+
+# qhasm:   x0c |= 0x64d2
+# asm 1: ori >x0c=int32#8,<x0c=int32#8,0x64d2
+# asm 2: ori >x0c=10,<x0c=10,0x64d2
+ori 10,10,0x64d2
+
+# qhasm:   x0d |= 0x90c4
+# asm 1: ori >x0d=int32#9,<x0d=int32#9,0x90c4
+# asm 2: ori >x0d=11,<x0d=11,0x90c4
+ori 11,11,0x90c4
+
+# qhasm:   x0e |= 0xcd33
+# asm 1: ori >x0e=int32#10,<x0e=int32#10,0xcd33
+# asm 2: ori >x0e=12,<x0e=12,0xcd33
+ori 12,12,0xcd33
+
+# qhasm:   x0f |= 0x11ae
+# asm 1: ori >x0f=int32#11,<x0f=int32#11,0x11ae
+# asm 2: ori >x0f=13,<x0f=13,0x11ae
+ori 13,13,0x11ae
 
 # qhasm:   x0b_stack = x0b
-# asm 1: stw <x0b=int32#8,>x0b_stack=stack32#20
-# asm 2: stw <x0b=10,>x0b_stack=76(1)
-stw 10,76(1)
+# asm 1: stw <x0b=int32#7,>x0b_stack=stack32#20
+# asm 2: stw <x0b=9,>x0b_stack=76(1)
+stw 9,76(1)
 
-# qhasm:   x10 = *(uint32 *) (constants + 64)
-# asm 1: lwz >x10=int32#8,64(<constants=int32#5)
-# asm 2: lwz >x10=10,64(<constants=7)
-lwz 10,64(7)
+# qhasm:   x10 = 65536 * 0xfcd3
+# asm 1: lis >x10=int32#7,0xfcd3
+# asm 2: lis >x10=9,0xfcd3
+lis 9,0xfcd3
 
-# qhasm:   x11 = *(uint32 *) (constants + 68)
-# asm 1: lwz >x11=int32#13,68(<constants=int32#5)
-# asm 2: lwz >x11=15,68(<constants=7)
-lwz 15,68(7)
+# qhasm:   x11 = 65536 * 0x148f
+# asm 1: lis >x11=int32#12,0x148f
+# asm 2: lis >x11=14,0x148f
+lis 14,0x148f
 
-# qhasm:   x12 = *(uint32 *) (constants + 72)
-# asm 1: lwz >x12=int32#14,72(<constants=int32#5)
-# asm 2: lwz >x12=16,72(<constants=7)
-lwz 16,72(7)
+# qhasm:   x12 = 65536 * 0x1b01
+# asm 1: lis >x12=int32#13,0x1b01
+# asm 2: lis >x12=15,0x1b01
+lis 15,0x1b01
 
-# qhasm:   x13 = *(uint32 *) (constants + 76)
-# asm 1: lwz >x13=int32#15,76(<constants=int32#5)
-# asm 2: lwz >x13=17,76(<constants=7)
-lwz 17,76(7)
+# qhasm:   x13 = 65536 * 0xb644
+# asm 1: lis >x13=int32#14,0xb644
+# asm 2: lis >x13=16,0xb644
+lis 16,0xb644
 
-# qhasm:   x14 = *(uint32 *) (constants + 80)
-# asm 1: lwz >x14=int32#16,80(<constants=int32#5)
-# asm 2: lwz >x14=18,80(<constants=7)
-lwz 18,80(7)
+# qhasm:   x14 = 65536 * 0x6a53
+# asm 1: lis >x14=int32#15,0x6a53
+# asm 2: lis >x14=17,0x6a53
+lis 17,0x6a53
 
-# qhasm:   x15 = *(uint32 *) (constants + 84)
-# asm 1: lwz >x15=int32#17,84(<constants=int32#5)
-# asm 2: lwz >x15=19,84(<constants=7)
-lwz 19,84(7)
+# qhasm:   x15 = 65536 * 0x2ff5
+# asm 1: lis >x15=int32#16,0x2ff5
+# asm 2: lis >x15=18,0x2ff5
+lis 18,0x2ff5
 
-# qhasm:   x16 = *(uint32 *) (constants + 88)
-# asm 1: lwz >x16=int32#18,88(<constants=int32#5)
-# asm 2: lwz >x16=20,88(<constants=7)
-lwz 20,88(7)
+# qhasm:   x16 = 65536 * 0x91fa
+# asm 1: lis >x16=int32#17,0x91fa
+# asm 2: lis >x16=19,0x91fa
+lis 19,0x91fa
 
-# qhasm:   x17 = *(uint32 *) (constants + 92)
-# asm 1: lwz >x17=int32#19,92(<constants=int32#5)
-# asm 2: lwz >x17=21,92(<constants=7)
-lwz 21,92(7)
+# qhasm:   x17 = 65536 * 0x0dba
+# asm 1: lis >x17=int32#18,0x0dba
+# asm 2: lis >x17=20,0x0dba
+lis 20,0x0dba
+
+# qhasm:   x10 |= 0x98d9
+# asm 1: ori >x10=int32#7,<x10=int32#7,0x98d9
+# asm 2: ori >x10=9,<x10=9,0x98d9
+ori 9,9,0x98d9
+
+# qhasm:   x11 |= 0xe485
+# asm 1: ori >x11=int32#12,<x11=int32#12,0xe485
+# asm 2: ori >x11=14,<x11=14,0xe485
+ori 14,14,0xe485
+
+# qhasm:   x12 |= 0x7bef
+# asm 1: ori >x12=int32#13,<x12=int32#13,0x7bef
+# asm 2: ori >x12=15,<x12=15,0x7bef
+ori 15,15,0x7bef
+
+# qhasm:   x13 |= 0x4532
+# asm 1: ori >x13=int32#14,<x13=int32#14,0x4532
+# asm 2: ori >x13=16,<x13=16,0x4532
+ori 16,16,0x4532
+
+# qhasm:   x14 |= 0x6159
+# asm 1: ori >x14=int32#15,<x14=int32#15,0x6159
+# asm 2: ori >x14=17,<x14=17,0x6159
+ori 17,17,0x6159
+
+# qhasm:   x15 |= 0x781c
+# asm 1: ori >x15=int32#16,<x15=int32#16,0x781c
+# asm 2: ori >x15=18,<x15=18,0x781c
+ori 18,18,0x781c
+
+# qhasm:   x16 |= 0x7934
+# asm 1: ori >x16=int32#17,<x16=int32#17,0x7934
+# asm 2: ori >x16=19,<x16=19,0x7934
+ori 19,19,0x7934
+
+# qhasm:   x17 |= 0xdea9
+# asm 1: ori >x17=int32#18,<x17=int32#18,0xdea9
+# asm 2: ori >x17=20,<x17=20,0xdea9
+ori 20,20,0xdea9
 
 # qhasm:   x14_stack = x14
-# asm 1: stw <x14=int32#16,>x14_stack=stack32#21
-# asm 2: stw <x14=18,>x14_stack=80(1)
-stw 18,80(1)
+# asm 1: stw <x14=int32#15,>x14_stack=stack32#21
+# asm 2: stw <x14=17,>x14_stack=80(1)
+stw 17,80(1)
 
 # qhasm:   x15_stack = x15
-# asm 1: stw <x15=int32#17,>x15_stack=stack32#22
-# asm 2: stw <x15=19,>x15_stack=84(1)
-stw 19,84(1)
+# asm 1: stw <x15=int32#16,>x15_stack=stack32#22
+# asm 2: stw <x15=18,>x15_stack=84(1)
+stw 18,84(1)
 
 # qhasm:   x16_stack = x16
-# asm 1: stw <x16=int32#18,>x16_stack=stack32#23
-# asm 2: stw <x16=20,>x16_stack=88(1)
-stw 20,88(1)
+# asm 1: stw <x16=int32#17,>x16_stack=stack32#23
+# asm 2: stw <x16=19,>x16_stack=88(1)
+stw 19,88(1)
 
 # qhasm:   x17_stack = x17
-# asm 1: stw <x17=int32#19,>x17_stack=stack32#24
-# asm 2: stw <x17=21,>x17_stack=92(1)
-stw 21,92(1)
+# asm 1: stw <x17=int32#18,>x17_stack=stack32#24
+# asm 2: stw <x17=20,>x17_stack=92(1)
+stw 20,92(1)
 
-# qhasm:   x18 = *(uint32 *) (constants + 96)
-# asm 1: lwz >x18=int32#16,96(<constants=int32#5)
-# asm 2: lwz >x18=18,96(<constants=7)
-lwz 18,96(7)
+# qhasm:   x18 = 65536 * 0xd65c
+# asm 1: lis >x18=int32#15,0xd65c
+# asm 2: lis >x18=17,0xd65c
+lis 17,0xd65c
 
-# qhasm:   x19 = *(uint32 *) (constants + 100)
-# asm 1: lwz >x19=int32#17,100(<constants=int32#5)
-# asm 2: lwz >x19=19,100(<constants=7)
-lwz 19,100(7)
+# qhasm:   x19 = 65536 * 0xa5a7
+# asm 1: lis >x19=int32#16,0xa5a7
+# asm 2: lis >x19=18,0xa5a7
+lis 18,0xa5a7
 
-# qhasm:   x1a = *(uint32 *) (constants + 104)
-# asm 1: lwz >x1a=int32#18,104(<constants=int32#5)
-# asm 2: lwz >x1a=20,104(<constants=7)
-lwz 20,104(7)
+# qhasm:   x1a = 65536 * 0xb1c6
+# asm 1: lis >x1a=int32#17,0xb1c6
+# asm 2: lis >x1a=19,0xb1c6
+lis 19,0xb1c6
 
-# qhasm:   x1b = *(uint32 *) (constants + 108)
-# asm 1: lwz >x1b=int32#19,108(<constants=int32#5)
-# asm 2: lwz >x1b=21,108(<constants=7)
-lwz 21,108(7)
+# qhasm:   x1b = 65536 * 0xbc79
+# asm 1: lis >x1b=int32#18,0xbc79
+# asm 2: lis >x1b=20,0xbc79
+lis 20,0xbc79
 
-# qhasm:   x1c = *(uint32 *) (constants + 112)
-# asm 1: lwz >x1c=int32#20,112(<constants=int32#5)
-# asm 2: lwz >x1c=22,112(<constants=7)
-lwz 22,112(7)
+# qhasm:   x1c = 65536 * 0x1921
+# asm 1: lis >x1c=int32#19,0x1921
+# asm 2: lis >x1c=21,0x1921
+lis 21,0x1921
 
-# qhasm:   x1d = *(uint32 *) (constants + 116)
-# asm 1: lwz >x1d=int32#21,116(<constants=int32#5)
-# asm 2: lwz >x1d=23,116(<constants=7)
-lwz 23,116(7)
+# qhasm:   x1d = 65536 * 0xe798
+# asm 1: lis >x1d=int32#20,0xe798
+# asm 2: lis >x1d=22,0xe798
+lis 22,0xe798
 
-# qhasm:   x1e = *(uint32 *) (constants + 120)
-# asm 1: lwz >x1e=int32#22,120(<constants=int32#5)
-# asm 2: lwz >x1e=24,120(<constants=7)
-lwz 24,120(7)
+# qhasm:   x1e = 65536 * 0x7795
+# asm 1: lis >x1e=int32#21,0x7795
+# asm 2: lis >x1e=23,0x7795
+lis 23,0x7795
 
-# qhasm:   x1f = *(uint32 *) (constants + 124)
-# asm 1: lwz >x1f=int32#23,124(<constants=int32#5)
-# asm 2: lwz >x1f=25,124(<constants=7)
-lwz 25,124(7)
+# qhasm:   x1f = 65536 * 0xd43e
+# asm 1: lis >x1f=int32#22,0xd43e
+# asm 2: lis >x1f=24,0xd43e
+lis 24,0xd43e
+
+# qhasm:   x18 |= 0x8a2b
+# asm 1: ori >x18=int32#15,<x18=int32#15,0x8a2b
+# asm 2: ori >x18=17,<x18=17,0x8a2b
+ori 17,17,0x8a2b
+
+# qhasm:   x19 |= 0x0e75
+# asm 1: ori >x19=int32#16,<x19=int32#16,0x0e75
+# asm 2: ori >x19=18,<x19=18,0x0e75
+ori 18,18,0x0e75
+
+# qhasm:   x1a |= 0x2456
+# asm 1: ori >x1a=int32#17,<x1a=int32#17,0x2456
+# asm 2: ori >x1a=19,<x1a=19,0x2456
+ori 19,19,0x2456
+
+# qhasm:   x1b |= 0x6576
+# asm 1: ori >x1b=int32#18,<x1b=int32#18,0x6576
+# asm 2: ori >x1b=20,<x1b=20,0x6576
+ori 20,20,0x6576
+
+# qhasm:   x1c |= 0xc8f7
+# asm 1: ori >x1c=int32#19,<x1c=int32#19,0xc8f7
+# asm 2: ori >x1c=21,<x1c=21,0xc8f7
+ori 21,21,0xc8f7
+
+# qhasm:   x1d |= 0x9af1
+# asm 1: ori >x1d=int32#20,<x1d=int32#20,0x9af1
+# asm 2: ori >x1d=22,<x1d=22,0x9af1
+ori 22,22,0x9af1
+
+# qhasm:   x1e |= 0xd246
+# asm 1: ori >x1e=int32#21,<x1e=int32#21,0xd246
+# asm 2: ori >x1e=23,<x1e=23,0xd246
+ori 23,23,0xd246
+
+# qhasm:   x1f |= 0x3b44
+# asm 1: ori >x1f=int32#22,<x1f=int32#22,0x3b44
+# asm 2: ori >x1f=24,<x1f=24,0x3b44
+ori 24,24,0x3b44
 
 # qhasm:   x1c_stack = x1c
-# asm 1: stw <x1c=int32#20,>x1c_stack=stack32#25
-# asm 2: stw <x1c=22,>x1c_stack=96(1)
-stw 22,96(1)
+# asm 1: stw <x1c=int32#19,>x1c_stack=stack32#25
+# asm 2: stw <x1c=21,>x1c_stack=96(1)
+stw 21,96(1)
 
 # qhasm:   x1d_stack = x1d
-# asm 1: stw <x1d=int32#21,>x1d_stack=stack32#26
-# asm 2: stw <x1d=23,>x1d_stack=100(1)
-stw 23,100(1)
+# asm 1: stw <x1d=int32#20,>x1d_stack=stack32#26
+# asm 2: stw <x1d=22,>x1d_stack=100(1)
+stw 22,100(1)
 
 # qhasm:   x1e_stack = x1e
-# asm 1: stw <x1e=int32#22,>x1e_stack=stack32#27
-# asm 2: stw <x1e=24,>x1e_stack=104(1)
-stw 24,104(1)
+# asm 1: stw <x1e=int32#21,>x1e_stack=stack32#27
+# asm 2: stw <x1e=23,>x1e_stack=104(1)
+stw 23,104(1)
 
 # qhasm:   x1f_stack = x1f
-# asm 1: stw <x1f=int32#23,>x1f_stack=stack32#28
-# asm 2: stw <x1f=25,>x1f_stack=108(1)
-stw 25,108(1)
+# asm 1: stw <x1f=int32#22,>x1f_stack=stack32#28
+# asm 2: stw <x1f=24,>x1f_stack=108(1)
+stw 24,108(1)
 
-# qhasm:   x00 = *(uint32 *) (constants + 0)
-# asm 1: lwz >x00=int32#20,0(<constants=int32#5)
-# asm 2: lwz >x00=22,0(<constants=7)
-lwz 22,0(7)
+# qhasm:   x00 = 65536 * 0x2aea
+# asm 1: lis >x00=int32#19,0x2aea
+# asm 2: lis >x00=21,0x2aea
+lis 21,0x2aea
 
-# qhasm:   x01 = *(uint32 *) (constants + 4)
-# asm 1: lwz >x01=int32#21,4(<constants=int32#5)
-# asm 2: lwz >x01=23,4(<constants=7)
-lwz 23,4(7)
+# qhasm:   x01 = 65536 * 0x50f4
+# asm 1: lis >x01=int32#20,0x50f4
+# asm 2: lis >x01=22,0x50f4
+lis 22,0x50f4
 
-# qhasm:   x02 = *(uint32 *) (constants + 8)
-# asm 1: lwz >x02=int32#22,8(<constants=int32#5)
-# asm 2: lwz >x02=24,8(<constants=7)
-lwz 24,8(7)
+# qhasm:   x02 = 65536 * 0x2d53
+# asm 1: lis >x02=int32#21,0x2d53
+# asm 2: lis >x02=23,0x2d53
+lis 23,0x2d53
 
-# qhasm:   x03 = *(uint32 *) (constants + 12)
-# asm 1: lwz >x03=int32#23,12(<constants=int32#5)
-# asm 2: lwz >x03=25,12(<constants=7)
-lwz 25,12(7)
+# qhasm:   x03 = 65536 * 0x4167
+# asm 1: lis >x03=int32#22,0x4167
+# asm 2: lis >x03=24,0x4167
+lis 24,0x4167
 
-# qhasm:   x04 = *(uint32 *) (constants + 16)
-# asm 1: lwz >x04=int32#24,16(<constants=int32#5)
-# asm 2: lwz >x04=26,16(<constants=7)
-lwz 26,16(7)
+# qhasm:   x04 = 65536 * 0x3fee
+# asm 1: lis >x04=int32#23,0x3fee
+# asm 2: lis >x04=25,0x3fee
+lis 25,0x3fee
 
-# qhasm:   x05 = *(uint32 *) (constants + 20)
-# asm 1: lwz >x05=int32#25,20(<constants=int32#5)
-# asm 2: lwz >x05=27,20(<constants=7)
-lwz 27,20(7)
+# qhasm:   x05 = 65536 * 0xc701
+# asm 1: lis >x05=int32#24,0xc701
+# asm 2: lis >x05=26,0xc701
+lis 26,0xc701
 
-# qhasm:   x06 = *(uint32 *) (constants + 24)
-# asm 1: lwz >x06=int32#26,24(<constants=int32#5)
-# asm 2: lwz >x06=28,24(<constants=7)
-lwz 28,24(7)
+# qhasm:   x06 = 65536 * 0xcc39
+# asm 1: lis >x06=int32#25,0xcc39
+# asm 2: lis >x06=27,0xcc39
+lis 27,0xcc39
 
-# qhasm:   x07 = *(uint32 *) (constants + 28)
-# asm 1: lwz >x07=int32#5,28(<constants=int32#5)
-# asm 2: lwz >x07=7,28(<constants=7)
-lwz 7,28(7)
+# qhasm:   x07 = 65536 * 0x50ac
+# asm 1: lis >x07=int32#26,0x50ac
+# asm 2: lis >x07=28,0x50ac
+lis 28,0x50ac
+
+# qhasm:   x00 |= 0x2a61
+# asm 1: ori >x00=int32#19,<x00=int32#19,0x2a61
+# asm 2: ori >x00=21,<x00=21,0x2a61
+ori 21,21,0x2a61
+
+# qhasm:   x01 |= 0x94d4
+# asm 1: ori >x01=int32#20,<x01=int32#20,0x94d4
+# asm 2: ori >x01=22,<x01=22,0x94d4
+ori 22,22,0x94d4
+
+# qhasm:   x02 |= 0x8b8b
+# asm 1: ori >x02=int32#21,<x02=int32#21,0x8b8b
+# asm 2: ori >x02=23,<x02=23,0x8b8b
+ori 23,23,0x8b8b
+
+# qhasm:   x03 |= 0xd83e
+# asm 1: ori >x03=int32#22,<x03=int32#22,0xd83e
+# asm 2: ori >x03=24,<x03=24,0xd83e
+ori 24,24,0xd83e
+
+# qhasm:   x04 |= 0x2313
+# asm 1: ori >x04=int32#23,<x04=int32#23,0x2313
+# asm 2: ori >x04=25,<x04=25,0x2313
+ori 25,25,0x2313
+
+# qhasm:   x05 |= 0xcf8c
+# asm 1: ori >x05=int32#24,<x05=int32#24,0xcf8c
+# asm 2: ori >x05=26,<x05=26,0xcf8c
+ori 26,26,0xcf8c
+
+# qhasm:   x06 |= 0x968e
+# asm 1: ori >x06=int32#25,<x06=int32#25,0x968e
+# asm 2: ori >x06=27,<x06=27,0x968e
+ori 27,27,0x968e
+
+# qhasm:   x07 |= 0x5695
+# asm 1: ori >x07=int32#26,<x07=int32#26,0x5695
+# asm 2: ori >x07=28,<x07=28,0x5695
+ori 28,28,0x5695
 
 # qhasm:   finalization = 0
 # asm 1: li >finalization=int32#27,0
@@ -670,24 +820,24 @@ lwbrx 31,0,4
 addi 4,4,4
 
 # qhasm:   x00 ^= y00
-# asm 1: xor >x00=int32#20,<y00=int32#3,<x00=int32#20
-# asm 2: xor >x00=22,<y00=5,<x00=22
-xor 22,5,22
+# asm 1: xor >x00=int32#19,<y00=int32#3,<x00=int32#19
+# asm 2: xor >x00=21,<y00=5,<x00=21
+xor 21,5,21
 
 # qhasm:   x01 ^= y01
-# asm 1: xor >x01=int32#21,<y01=int32#4,<x01=int32#21
-# asm 2: xor >x01=23,<y01=6,<x01=23
-xor 23,6,23
+# asm 1: xor >x01=int32#20,<y01=int32#4,<x01=int32#20
+# asm 2: xor >x01=22,<y01=6,<x01=22
+xor 22,6,22
 
 # qhasm:   x02 ^= y02
-# asm 1: xor >x02=int32#22,<y02=int32#27,<x02=int32#22
-# asm 2: xor >x02=24,<y02=29,<x02=24
-xor 24,29,24
+# asm 1: xor >x02=int32#21,<y02=int32#27,<x02=int32#21
+# asm 2: xor >x02=23,<y02=29,<x02=23
+xor 23,29,23
 
 # qhasm:   x03 ^= y03
-# asm 1: xor >x03=int32#23,<y03=int32#29,<x03=int32#23
-# asm 2: xor >x03=25,<y03=31,<x03=25
-xor 25,31,25
+# asm 1: xor >x03=int32#22,<y03=int32#29,<x03=int32#22
+# asm 2: xor >x03=24,<y03=31,<x03=24
+xor 24,31,24
 
 # qhasm:   y04 = *(swapendian uint32 *) in
 # asm 1: lwbrx >y04=int32#3,0,<in=int32#2
@@ -710,14 +860,14 @@ lwbrx 6,0,4
 addi 4,4,4
 
 # qhasm:   x04 ^= y04
-# asm 1: xor >x04=int32#24,<y04=int32#3,<x04=int32#24
-# asm 2: xor >x04=26,<y04=5,<x04=26
-xor 26,5,26
+# asm 1: xor >x04=int32#23,<y04=int32#3,<x04=int32#23
+# asm 2: xor >x04=25,<y04=5,<x04=25
+xor 25,5,25
 
 # qhasm:   x05 ^= y05
-# asm 1: xor >x05=int32#25,<y05=int32#4,<x05=int32#25
-# asm 2: xor >x05=27,<y05=6,<x05=27
-xor 27,6,27
+# asm 1: xor >x05=int32#24,<y05=int32#4,<x05=int32#24
+# asm 2: xor >x05=26,<y05=6,<x05=26
+xor 26,6,26
 
 # qhasm:   y06 = *(swapendian uint32 *) in
 # asm 1: lwbrx >y06=int32#3,0,<in=int32#2
@@ -740,14 +890,14 @@ lwbrx 6,0,4
 addi 4,4,4
 
 # qhasm:   x06 ^= y06
-# asm 1: xor >x06=int32#26,<y06=int32#3,<x06=int32#26
-# asm 2: xor >x06=28,<y06=5,<x06=28
-xor 28,5,28
+# asm 1: xor >x06=int32#25,<y06=int32#3,<x06=int32#25
+# asm 2: xor >x06=27,<y06=5,<x06=27
+xor 27,5,27
 
 # qhasm:   x07 ^= y07
-# asm 1: xor >x07=int32#5,<y07=int32#4,<x07=int32#5
-# asm 2: xor >x07=7,<y07=6,<x07=7
-xor 7,6,7
+# asm 1: xor >x07=int32#26,<y07=int32#4,<x07=int32#26
+# asm 2: xor >x07=28,<y07=6,<x07=28
+xor 28,6,28
 
 # qhasm:   in_stack = in
 # asm 1: stw <in=int32#2,>in_stack=stack32#32
@@ -763,34 +913,34 @@ stw 4,124(1)
 stw 30,128(1)
 
 # qhasm:   x10 += x00
-# asm 1: add >x10=int32#2,<x10=int32#8,<x00=int32#20
-# asm 2: add >x10=4,<x10=10,<x00=22
-add 4,10,22
+# asm 1: add >x10=int32#2,<x10=int32#7,<x00=int32#19
+# asm 2: add >x10=4,<x10=9,<x00=21
+add 4,9,21
 
 # qhasm:   x12 += x02
-# asm 1: add >x12=int32#3,<x12=int32#14,<x02=int32#22
-# asm 2: add >x12=5,<x12=16,<x02=24
-add 5,16,24
+# asm 1: add >x12=int32#3,<x12=int32#13,<x02=int32#21
+# asm 2: add >x12=5,<x12=15,<x02=23
+add 5,15,23
 
 # qhasm:   x18 += x08
-# asm 1: add >x18=int32#4,<x18=int32#16,<x08=int32#1
-# asm 2: add >x18=6,<x18=18,<x08=3
-add 6,18,3
+# asm 1: add >x18=int32#4,<x18=int32#15,<x08=int32#1
+# asm 2: add >x18=6,<x18=17,<x08=3
+add 6,17,3
 
 # qhasm:   x1a += x0a
-# asm 1: add >x1a=int32#8,<x1a=int32#18,<x0a=int32#7
-# asm 2: add >x1a=10,<x1a=20,<x0a=9
-add 10,20,9
+# asm 1: add >x1a=int32#7,<x1a=int32#17,<x0a=int32#6
+# asm 2: add >x1a=9,<x1a=19,<x0a=8
+add 9,19,8
 
 # qhasm:   x00 <<<= 7
-# asm 1: rlwinm >x00=int32#14,<x00=int32#20,7,0xffffffff
-# asm 2: rlwinm >x00=16,<x00=22,7,0xffffffff
-rlwinm 16,22,7,0xffffffff
+# asm 1: rlwinm >x00=int32#13,<x00=int32#19,7,0xffffffff
+# asm 2: rlwinm >x00=15,<x00=21,7,0xffffffff
+rlwinm 15,21,7,0xffffffff
 
 # qhasm:   x02 <<<= 7
-# asm 1: rlwinm >x02=int32#16,<x02=int32#22,7,0xffffffff
-# asm 2: rlwinm >x02=18,<x02=24,7,0xffffffff
-rlwinm 18,24,7,0xffffffff
+# asm 1: rlwinm >x02=int32#15,<x02=int32#21,7,0xffffffff
+# asm 2: rlwinm >x02=17,<x02=23,7,0xffffffff
+rlwinm 17,23,7,0xffffffff
 
 # qhasm:   x08 <<<= 7
 # asm 1: rlwinm >x08=int32#1,<x08=int32#1,7,0xffffffff
@@ -798,19 +948,19 @@ rlwinm 18,24,7,0xffffffff
 rlwinm 3,3,7,0xffffffff
 
 # qhasm:   x0a <<<= 7
-# asm 1: rlwinm >x0a=int32#7,<x0a=int32#7,7,0xffffffff
-# asm 2: rlwinm >x0a=9,<x0a=9,7,0xffffffff
-rlwinm 9,9,7,0xffffffff
+# asm 1: rlwinm >x0a=int32#6,<x0a=int32#6,7,0xffffffff
+# asm 2: rlwinm >x0a=8,<x0a=8,7,0xffffffff
+rlwinm 8,8,7,0xffffffff
 
 # qhasm:   x00 ^= x18
-# asm 1: xor >x00=int32#14,<x18=int32#4,<x00=int32#14
-# asm 2: xor >x00=16,<x18=6,<x00=16
-xor 16,6,16
+# asm 1: xor >x00=int32#13,<x18=int32#4,<x00=int32#13
+# asm 2: xor >x00=15,<x18=6,<x00=15
+xor 15,6,15
 
 # qhasm:   x02 ^= x1a
-# asm 1: xor >x02=int32#16,<x1a=int32#8,<x02=int32#16
-# asm 2: xor >x02=18,<x1a=10,<x02=18
-xor 18,10,18
+# asm 1: xor >x02=int32#15,<x1a=int32#7,<x02=int32#15
+# asm 2: xor >x02=17,<x1a=9,<x02=17
+xor 17,9,17
 
 # qhasm:   x08 ^= x10
 # asm 1: xor >x08=int32#1,<x10=int32#2,<x08=int32#1
@@ -818,34 +968,34 @@ xor 18,10,18
 xor 3,4,3
 
 # qhasm:   x0a ^= x12
-# asm 1: xor >x0a=int32#7,<x12=int32#3,<x0a=int32#7
-# asm 2: xor >x0a=9,<x12=5,<x0a=9
-xor 9,5,9
+# asm 1: xor >x0a=int32#6,<x12=int32#3,<x0a=int32#6
+# asm 2: xor >x0a=8,<x12=5,<x0a=8
+xor 8,5,8
 
 # qhasm:           x02_stack = x02
-# asm 1: stw <x02=int32#16,>x02_stack=stack32#34
-# asm 2: stw <x02=18,>x02_stack=132(1)
-stw 18,132(1)
+# asm 1: stw <x02=int32#15,>x02_stack=stack32#34
+# asm 2: stw <x02=17,>x02_stack=132(1)
+stw 17,132(1)
 
 # qhasm:   x1a += x00
-# asm 1: add >x1a=int32#8,<x1a=int32#8,<x00=int32#14
-# asm 2: add >x1a=10,<x1a=10,<x00=16
-add 10,10,16
+# asm 1: add >x1a=int32#7,<x1a=int32#7,<x00=int32#13
+# asm 2: add >x1a=9,<x1a=9,<x00=15
+add 9,9,15
 
 # qhasm:           x0a_stack = x0a
-# asm 1: stw <x0a=int32#7,>x0a_stack=stack32#35
-# asm 2: stw <x0a=9,>x0a_stack=136(1)
-stw 9,136(1)
+# asm 1: stw <x0a=int32#6,>x0a_stack=stack32#35
+# asm 2: stw <x0a=8,>x0a_stack=136(1)
+stw 8,136(1)
 
 # qhasm:   x18 += x02
-# asm 1: add >x18=int32#4,<x18=int32#4,<x02=int32#16
-# asm 2: add >x18=6,<x18=6,<x02=18
-add 6,6,18
+# asm 1: add >x18=int32#4,<x18=int32#4,<x02=int32#15
+# asm 2: add >x18=6,<x18=6,<x02=17
+add 6,6,17
 
 # qhasm:           x14 = x14_stack
-# asm 1: lwz >x14=int32#16,<x14_stack=stack32#21
-# asm 2: lwz >x14=18,<x14_stack=80(1)
-lwz 18,80(1)
+# asm 1: lwz >x14=int32#15,<x14_stack=stack32#21
+# asm 2: lwz >x14=17,<x14_stack=80(1)
+lwz 17,80(1)
 
 # qhasm:   x12 += x08
 # asm 1: add >x12=int32#3,<x12=int32#3,<x08=int32#1
@@ -853,314 +1003,314 @@ lwz 18,80(1)
 add 5,5,3
 
 # qhasm:           x16 = x16_stack
-# asm 1: lwz >x16=int32#18,<x16_stack=stack32#23
-# asm 2: lwz >x16=20,<x16_stack=88(1)
-lwz 20,88(1)
+# asm 1: lwz >x16=int32#17,<x16_stack=stack32#23
+# asm 2: lwz >x16=19,<x16_stack=88(1)
+lwz 19,88(1)
 
 # qhasm:   x10 += x0a
-# asm 1: add >x10=int32#2,<x10=int32#2,<x0a=int32#7
-# asm 2: add >x10=4,<x10=4,<x0a=9
-add 4,4,9
+# asm 1: add >x10=int32#2,<x10=int32#2,<x0a=int32#6
+# asm 2: add >x10=4,<x10=4,<x0a=8
+add 4,4,8
 
 # qhasm:           x1c = x1c_stack
-# asm 1: lwz >x1c=int32#7,<x1c_stack=stack32#25
-# asm 2: lwz >x1c=9,<x1c_stack=96(1)
-lwz 9,96(1)
+# asm 1: lwz >x1c=int32#6,<x1c_stack=stack32#25
+# asm 2: lwz >x1c=8,<x1c_stack=96(1)
+lwz 8,96(1)
 
 # qhasm:   x14 += x04
-# asm 1: add >x14=int32#16,<x14=int32#16,<x04=int32#24
-# asm 2: add >x14=18,<x14=18,<x04=26
-add 18,18,26
+# asm 1: add >x14=int32#15,<x14=int32#15,<x04=int32#23
+# asm 2: add >x14=17,<x14=17,<x04=25
+add 17,17,25
 
 # qhasm:           x1e = x1e_stack
-# asm 1: lwz >x1e=int32#20,<x1e_stack=stack32#27
-# asm 2: lwz >x1e=22,<x1e_stack=104(1)
-lwz 22,104(1)
+# asm 1: lwz >x1e=int32#19,<x1e_stack=stack32#27
+# asm 2: lwz >x1e=21,<x1e_stack=104(1)
+lwz 21,104(1)
 
 # qhasm:   x16 += x06
-# asm 1: add >x16=int32#18,<x16=int32#18,<x06=int32#26
-# asm 2: add >x16=20,<x16=20,<x06=28
-add 20,20,28
+# asm 1: add >x16=int32#17,<x16=int32#17,<x06=int32#25
+# asm 2: add >x16=19,<x16=19,<x06=27
+add 19,19,27
 
 # qhasm:   x1c += x0c
-# asm 1: add >x1c=int32#7,<x1c=int32#7,<x0c=int32#9
-# asm 2: add >x1c=9,<x1c=9,<x0c=11
-add 9,9,11
+# asm 1: add >x1c=int32#6,<x1c=int32#6,<x0c=int32#8
+# asm 2: add >x1c=8,<x1c=8,<x0c=10
+add 8,8,10
 
 # qhasm:   x1e += x0e
-# asm 1: add >x1e=int32#20,<x1e=int32#20,<x0e=int32#11
-# asm 2: add >x1e=22,<x1e=22,<x0e=13
-add 22,22,13
+# asm 1: add >x1e=int32#19,<x1e=int32#19,<x0e=int32#10
+# asm 2: add >x1e=21,<x1e=21,<x0e=12
+add 21,21,12
 
 # qhasm:   x04 <<<= 7
-# asm 1: rlwinm >x04=int32#22,<x04=int32#24,7,0xffffffff
-# asm 2: rlwinm >x04=24,<x04=26,7,0xffffffff
-rlwinm 24,26,7,0xffffffff
+# asm 1: rlwinm >x04=int32#21,<x04=int32#23,7,0xffffffff
+# asm 2: rlwinm >x04=23,<x04=25,7,0xffffffff
+rlwinm 23,25,7,0xffffffff
 
 # qhasm:   x06 <<<= 7
-# asm 1: rlwinm >x06=int32#24,<x06=int32#26,7,0xffffffff
-# asm 2: rlwinm >x06=26,<x06=28,7,0xffffffff
-rlwinm 26,28,7,0xffffffff
+# asm 1: rlwinm >x06=int32#23,<x06=int32#25,7,0xffffffff
+# asm 2: rlwinm >x06=25,<x06=27,7,0xffffffff
+rlwinm 25,27,7,0xffffffff
 
 # qhasm:   x0c <<<= 7
-# asm 1: rlwinm >x0c=int32#9,<x0c=int32#9,7,0xffffffff
-# asm 2: rlwinm >x0c=11,<x0c=11,7,0xffffffff
-rlwinm 11,11,7,0xffffffff
+# asm 1: rlwinm >x0c=int32#8,<x0c=int32#8,7,0xffffffff
+# asm 2: rlwinm >x0c=10,<x0c=10,7,0xffffffff
+rlwinm 10,10,7,0xffffffff
 
 # qhasm:   x0e <<<= 7
-# asm 1: rlwinm >x0e=int32#11,<x0e=int32#11,7,0xffffffff
-# asm 2: rlwinm >x0e=13,<x0e=13,7,0xffffffff
-rlwinm 13,13,7,0xffffffff
-
-# qhasm:   x04 ^= x1c
-# asm 1: xor >x04=int32#22,<x1c=int32#7,<x04=int32#22
-# asm 2: xor >x04=24,<x1c=9,<x04=24
-xor 24,9,24
-
-# qhasm:   x06 ^= x1e
-# asm 1: xor >x06=int32#24,<x1e=int32#20,<x06=int32#24
-# asm 2: xor >x06=26,<x1e=22,<x06=26
-xor 26,22,26
-
-# qhasm:   x0c ^= x14
-# asm 1: xor >x0c=int32#9,<x14=int32#16,<x0c=int32#9
-# asm 2: xor >x0c=11,<x14=18,<x0c=11
-xor 11,18,11
-
-# qhasm:   x0e ^= x16
-# asm 1: xor >x0e=int32#11,<x16=int32#18,<x0e=int32#11
-# asm 2: xor >x0e=13,<x16=20,<x0e=13
-xor 13,20,13
-
-# qhasm:           x0b = x0b_stack
-# asm 1: lwz >x0b=int32#26,<x0b_stack=stack32#20
-# asm 2: lwz >x0b=28,<x0b_stack=76(1)
-lwz 28,76(1)
-
-# qhasm:   x1e += x04
-# asm 1: add >x1e=int32#20,<x1e=int32#20,<x04=int32#22
-# asm 2: add >x1e=22,<x1e=22,<x04=24
-add 22,22,24
-
-# qhasm:   x1c += x06
-# asm 1: add >x1c=int32#7,<x1c=int32#7,<x06=int32#24
-# asm 2: add >x1c=9,<x1c=9,<x06=26
-add 9,9,26
-
-# qhasm:   x16 += x0c
-# asm 1: add >x16=int32#18,<x16=int32#18,<x0c=int32#9
-# asm 2: add >x16=20,<x16=20,<x0c=11
-add 20,20,11
-
-# qhasm:   x14 += x0e
-# asm 1: add >x14=int32#16,<x14=int32#16,<x0e=int32#11
-# asm 2: add >x14=18,<x14=18,<x0e=13
-add 18,18,13
-
-# qhasm:           x1e_stack = x1e
-# asm 1: stw <x1e=int32#20,>x1e_stack=stack32#20
-# asm 2: stw <x1e=22,>x1e_stack=76(1)
-stw 22,76(1)
-
-# qhasm:   x11 += x01
-# asm 1: add >x11=int32#13,<x11=int32#13,<x01=int32#21
-# asm 2: add >x11=15,<x11=15,<x01=23
-add 15,15,23
-
-# qhasm:           x1c_stack = x1c
-# asm 1: stw <x1c=int32#7,>x1c_stack=stack32#21
-# asm 2: stw <x1c=9,>x1c_stack=80(1)
-stw 9,80(1)
-
-# qhasm:   x13 += x03
-# asm 1: add >x13=int32#7,<x13=int32#15,<x03=int32#23
-# asm 2: add >x13=9,<x13=17,<x03=25
-add 9,17,25
-
-# qhasm:           x16_stack = x16
-# asm 1: stw <x16=int32#18,>x16_stack=stack32#23
-# asm 2: stw <x16=20,>x16_stack=88(1)
-stw 20,88(1)
-
-# qhasm:   x19 += x09
-# asm 1: add >x19=int32#15,<x19=int32#17,<x09=int32#6
-# asm 2: add >x19=17,<x19=19,<x09=8
-add 17,19,8
-
-# qhasm:           x14_stack = x14
-# asm 1: stw <x14=int32#16,>x14_stack=stack32#25
-# asm 2: stw <x14=18,>x14_stack=96(1)
-stw 18,96(1)
-
-# qhasm:   x1b += x0b
-# asm 1: add >x1b=int32#16,<x1b=int32#19,<x0b=int32#26
-# asm 2: add >x1b=18,<x1b=21,<x0b=28
-add 18,21,28
-
-# qhasm:   x01 <<<= 7
-# asm 1: rlwinm >x01=int32#17,<x01=int32#21,7,0xffffffff
-# asm 2: rlwinm >x01=19,<x01=23,7,0xffffffff
-rlwinm 19,23,7,0xffffffff
-
-# qhasm:   x03 <<<= 7
-# asm 1: rlwinm >x03=int32#18,<x03=int32#23,7,0xffffffff
-# asm 2: rlwinm >x03=20,<x03=25,7,0xffffffff
-rlwinm 20,25,7,0xffffffff
-
-# qhasm:   x09 <<<= 7
-# asm 1: rlwinm >x09=int32#6,<x09=int32#6,7,0xffffffff
-# asm 2: rlwinm >x09=8,<x09=8,7,0xffffffff
-rlwinm 8,8,7,0xffffffff
-
-# qhasm:   x0b <<<= 7
-# asm 1: rlwinm >x0b=int32#19,<x0b=int32#26,7,0xffffffff
-# asm 2: rlwinm >x0b=21,<x0b=28,7,0xffffffff
-rlwinm 21,28,7,0xffffffff
-
-# qhasm:   x01 ^= x19
-# asm 1: xor >x01=int32#17,<x19=int32#15,<x01=int32#17
-# asm 2: xor >x01=19,<x19=17,<x01=19
-xor 19,17,19
-
-# qhasm:   x03 ^= x1b
-# asm 1: xor >x03=int32#18,<x1b=int32#16,<x03=int32#18
-# asm 2: xor >x03=20,<x1b=18,<x03=20
-xor 20,18,20
-
-# qhasm:   x09 ^= x11
-# asm 1: xor >x09=int32#6,<x11=int32#13,<x09=int32#6
-# asm 2: xor >x09=8,<x11=15,<x09=8
-xor 8,15,8
-
-# qhasm:   x0b ^= x13
-# asm 1: xor >x0b=int32#19,<x13=int32#7,<x0b=int32#19
-# asm 2: xor >x0b=21,<x13=9,<x0b=21
-xor 21,9,21
-
-# qhasm:           x15 = x15_stack
-# asm 1: lwz >x15=int32#20,<x15_stack=stack32#22
-# asm 2: lwz >x15=22,<x15_stack=84(1)
-lwz 22,84(1)
-
-# qhasm:   x1b += x01
-# asm 1: add >x1b=int32#16,<x1b=int32#16,<x01=int32#17
-# asm 2: add >x1b=18,<x1b=18,<x01=19
-add 18,18,19
-
-# qhasm:           x17 = x17_stack
-# asm 1: lwz >x17=int32#21,<x17_stack=stack32#24
-# asm 2: lwz >x17=23,<x17_stack=92(1)
-lwz 23,92(1)
-
-# qhasm:   x19 += x03
-# asm 1: add >x19=int32#15,<x19=int32#15,<x03=int32#18
-# asm 2: add >x19=17,<x19=17,<x03=20
-add 17,17,20
-
-# qhasm:           x1d = x1d_stack
-# asm 1: lwz >x1d=int32#23,<x1d_stack=stack32#26
-# asm 2: lwz >x1d=25,<x1d_stack=100(1)
-lwz 25,100(1)
-
-# qhasm:   x13 += x09
-# asm 1: add >x13=int32#7,<x13=int32#7,<x09=int32#6
-# asm 2: add >x13=9,<x13=9,<x09=8
-add 9,9,8
-
-# qhasm:           x1f = x1f_stack
-# asm 1: lwz >x1f=int32#26,<x1f_stack=stack32#28
-# asm 2: lwz >x1f=28,<x1f_stack=108(1)
-lwz 28,108(1)
-
-# qhasm:   x11 += x0b
-# asm 1: add >x11=int32#13,<x11=int32#13,<x0b=int32#19
-# asm 2: add >x11=15,<x11=15,<x0b=21
-add 15,15,21
-
-# qhasm:           x0b_stack = x0b
-# asm 1: stw <x0b=int32#19,>x0b_stack=stack32#22
-# asm 2: stw <x0b=21,>x0b_stack=84(1)
-stw 21,84(1)
-
-# qhasm:   x15 += x05
-# asm 1: add >x15=int32#19,<x15=int32#20,<x05=int32#25
-# asm 2: add >x15=21,<x15=22,<x05=27
-add 21,22,27
-
-# qhasm:   x17 += x07
-# asm 1: add >x17=int32#20,<x17=int32#21,<x07=int32#5
-# asm 2: add >x17=22,<x17=23,<x07=7
-add 22,23,7
-
-# qhasm:   x1d += x0d
-# asm 1: add >x1d=int32#21,<x1d=int32#23,<x0d=int32#10
-# asm 2: add >x1d=23,<x1d=25,<x0d=12
-add 23,25,12
-
-# qhasm:   x1f += x0f
-# asm 1: add >x1f=int32#23,<x1f=int32#26,<x0f=int32#12
-# asm 2: add >x1f=25,<x1f=28,<x0f=14
-add 25,28,14
-
-# qhasm:   x05 <<<= 7
-# asm 1: rlwinm >x05=int32#25,<x05=int32#25,7,0xffffffff
-# asm 2: rlwinm >x05=27,<x05=27,7,0xffffffff
-rlwinm 27,27,7,0xffffffff
-
-# qhasm:   x07 <<<= 7
-# asm 1: rlwinm >x07=int32#5,<x07=int32#5,7,0xffffffff
-# asm 2: rlwinm >x07=7,<x07=7,7,0xffffffff
-rlwinm 7,7,7,0xffffffff
-
-# qhasm:   x0d <<<= 7
-# asm 1: rlwinm >x0d=int32#10,<x0d=int32#10,7,0xffffffff
-# asm 2: rlwinm >x0d=12,<x0d=12,7,0xffffffff
+# asm 1: rlwinm >x0e=int32#10,<x0e=int32#10,7,0xffffffff
+# asm 2: rlwinm >x0e=12,<x0e=12,7,0xffffffff
 rlwinm 12,12,7,0xffffffff
 
+# qhasm:   x04 ^= x1c
+# asm 1: xor >x04=int32#21,<x1c=int32#6,<x04=int32#21
+# asm 2: xor >x04=23,<x1c=8,<x04=23
+xor 23,8,23
+
+# qhasm:   x06 ^= x1e
+# asm 1: xor >x06=int32#23,<x1e=int32#19,<x06=int32#23
+# asm 2: xor >x06=25,<x1e=21,<x06=25
+xor 25,21,25
+
+# qhasm:   x0c ^= x14
+# asm 1: xor >x0c=int32#8,<x14=int32#15,<x0c=int32#8
+# asm 2: xor >x0c=10,<x14=17,<x0c=10
+xor 10,17,10
+
+# qhasm:   x0e ^= x16
+# asm 1: xor >x0e=int32#10,<x16=int32#17,<x0e=int32#10
+# asm 2: xor >x0e=12,<x16=19,<x0e=12
+xor 12,19,12
+
+# qhasm:           x0b = x0b_stack
+# asm 1: lwz >x0b=int32#25,<x0b_stack=stack32#20
+# asm 2: lwz >x0b=27,<x0b_stack=76(1)
+lwz 27,76(1)
+
+# qhasm:   x1e += x04
+# asm 1: add >x1e=int32#19,<x1e=int32#19,<x04=int32#21
+# asm 2: add >x1e=21,<x1e=21,<x04=23
+add 21,21,23
+
+# qhasm:   x1c += x06
+# asm 1: add >x1c=int32#6,<x1c=int32#6,<x06=int32#23
+# asm 2: add >x1c=8,<x1c=8,<x06=25
+add 8,8,25
+
+# qhasm:   x16 += x0c
+# asm 1: add >x16=int32#17,<x16=int32#17,<x0c=int32#8
+# asm 2: add >x16=19,<x16=19,<x0c=10
+add 19,19,10
+
+# qhasm:   x14 += x0e
+# asm 1: add >x14=int32#15,<x14=int32#15,<x0e=int32#10
+# asm 2: add >x14=17,<x14=17,<x0e=12
+add 17,17,12
+
+# qhasm:           x1e_stack = x1e
+# asm 1: stw <x1e=int32#19,>x1e_stack=stack32#20
+# asm 2: stw <x1e=21,>x1e_stack=76(1)
+stw 21,76(1)
+
+# qhasm:   x11 += x01
+# asm 1: add >x11=int32#12,<x11=int32#12,<x01=int32#20
+# asm 2: add >x11=14,<x11=14,<x01=22
+add 14,14,22
+
+# qhasm:           x1c_stack = x1c
+# asm 1: stw <x1c=int32#6,>x1c_stack=stack32#21
+# asm 2: stw <x1c=8,>x1c_stack=80(1)
+stw 8,80(1)
+
+# qhasm:   x13 += x03
+# asm 1: add >x13=int32#6,<x13=int32#14,<x03=int32#22
+# asm 2: add >x13=8,<x13=16,<x03=24
+add 8,16,24
+
+# qhasm:           x16_stack = x16
+# asm 1: stw <x16=int32#17,>x16_stack=stack32#23
+# asm 2: stw <x16=19,>x16_stack=88(1)
+stw 19,88(1)
+
+# qhasm:   x19 += x09
+# asm 1: add >x19=int32#14,<x19=int32#16,<x09=int32#5
+# asm 2: add >x19=16,<x19=18,<x09=7
+add 16,18,7
+
+# qhasm:           x14_stack = x14
+# asm 1: stw <x14=int32#15,>x14_stack=stack32#25
+# asm 2: stw <x14=17,>x14_stack=96(1)
+stw 17,96(1)
+
+# qhasm:   x1b += x0b
+# asm 1: add >x1b=int32#15,<x1b=int32#18,<x0b=int32#25
+# asm 2: add >x1b=17,<x1b=20,<x0b=27
+add 17,20,27
+
+# qhasm:   x01 <<<= 7
+# asm 1: rlwinm >x01=int32#16,<x01=int32#20,7,0xffffffff
+# asm 2: rlwinm >x01=18,<x01=22,7,0xffffffff
+rlwinm 18,22,7,0xffffffff
+
+# qhasm:   x03 <<<= 7
+# asm 1: rlwinm >x03=int32#17,<x03=int32#22,7,0xffffffff
+# asm 2: rlwinm >x03=19,<x03=24,7,0xffffffff
+rlwinm 19,24,7,0xffffffff
+
+# qhasm:   x09 <<<= 7
+# asm 1: rlwinm >x09=int32#5,<x09=int32#5,7,0xffffffff
+# asm 2: rlwinm >x09=7,<x09=7,7,0xffffffff
+rlwinm 7,7,7,0xffffffff
+
+# qhasm:   x0b <<<= 7
+# asm 1: rlwinm >x0b=int32#18,<x0b=int32#25,7,0xffffffff
+# asm 2: rlwinm >x0b=20,<x0b=27,7,0xffffffff
+rlwinm 20,27,7,0xffffffff
+
+# qhasm:   x01 ^= x19
+# asm 1: xor >x01=int32#16,<x19=int32#14,<x01=int32#16
+# asm 2: xor >x01=18,<x19=16,<x01=18
+xor 18,16,18
+
+# qhasm:   x03 ^= x1b
+# asm 1: xor >x03=int32#17,<x1b=int32#15,<x03=int32#17
+# asm 2: xor >x03=19,<x1b=17,<x03=19
+xor 19,17,19
+
+# qhasm:   x09 ^= x11
+# asm 1: xor >x09=int32#5,<x11=int32#12,<x09=int32#5
+# asm 2: xor >x09=7,<x11=14,<x09=7
+xor 7,14,7
+
+# qhasm:   x0b ^= x13
+# asm 1: xor >x0b=int32#18,<x13=int32#6,<x0b=int32#18
+# asm 2: xor >x0b=20,<x13=8,<x0b=20
+xor 20,8,20
+
+# qhasm:           x15 = x15_stack
+# asm 1: lwz >x15=int32#19,<x15_stack=stack32#22
+# asm 2: lwz >x15=21,<x15_stack=84(1)
+lwz 21,84(1)
+
+# qhasm:   x1b += x01
+# asm 1: add >x1b=int32#15,<x1b=int32#15,<x01=int32#16
+# asm 2: add >x1b=17,<x1b=17,<x01=18
+add 17,17,18
+
+# qhasm:           x17 = x17_stack
+# asm 1: lwz >x17=int32#20,<x17_stack=stack32#24
+# asm 2: lwz >x17=22,<x17_stack=92(1)
+lwz 22,92(1)
+
+# qhasm:   x19 += x03
+# asm 1: add >x19=int32#14,<x19=int32#14,<x03=int32#17
+# asm 2: add >x19=16,<x19=16,<x03=19
+add 16,16,19
+
+# qhasm:           x1d = x1d_stack
+# asm 1: lwz >x1d=int32#22,<x1d_stack=stack32#26
+# asm 2: lwz >x1d=24,<x1d_stack=100(1)
+lwz 24,100(1)
+
+# qhasm:   x13 += x09
+# asm 1: add >x13=int32#6,<x13=int32#6,<x09=int32#5
+# asm 2: add >x13=8,<x13=8,<x09=7
+add 8,8,7
+
+# qhasm:           x1f = x1f_stack
+# asm 1: lwz >x1f=int32#25,<x1f_stack=stack32#28
+# asm 2: lwz >x1f=27,<x1f_stack=108(1)
+lwz 27,108(1)
+
+# qhasm:   x11 += x0b
+# asm 1: add >x11=int32#12,<x11=int32#12,<x0b=int32#18
+# asm 2: add >x11=14,<x11=14,<x0b=20
+add 14,14,20
+
+# qhasm:           x0b_stack = x0b
+# asm 1: stw <x0b=int32#18,>x0b_stack=stack32#22
+# asm 2: stw <x0b=20,>x0b_stack=84(1)
+stw 20,84(1)
+
+# qhasm:   x15 += x05
+# asm 1: add >x15=int32#18,<x15=int32#19,<x05=int32#24
+# asm 2: add >x15=20,<x15=21,<x05=26
+add 20,21,26
+
+# qhasm:   x17 += x07
+# asm 1: add >x17=int32#19,<x17=int32#20,<x07=int32#26
+# asm 2: add >x17=21,<x17=22,<x07=28
+add 21,22,28
+
+# qhasm:   x1d += x0d
+# asm 1: add >x1d=int32#20,<x1d=int32#22,<x0d=int32#9
+# asm 2: add >x1d=22,<x1d=24,<x0d=11
+add 22,24,11
+
+# qhasm:   x1f += x0f
+# asm 1: add >x1f=int32#22,<x1f=int32#25,<x0f=int32#11
+# asm 2: add >x1f=24,<x1f=27,<x0f=13
+add 24,27,13
+
+# qhasm:   x05 <<<= 7
+# asm 1: rlwinm >x05=int32#24,<x05=int32#24,7,0xffffffff
+# asm 2: rlwinm >x05=26,<x05=26,7,0xffffffff
+rlwinm 26,26,7,0xffffffff
+
+# qhasm:   x07 <<<= 7
+# asm 1: rlwinm >x07=int32#25,<x07=int32#26,7,0xffffffff
+# asm 2: rlwinm >x07=27,<x07=28,7,0xffffffff
+rlwinm 27,28,7,0xffffffff
+
+# qhasm:   x0d <<<= 7
+# asm 1: rlwinm >x0d=int32#9,<x0d=int32#9,7,0xffffffff
+# asm 2: rlwinm >x0d=11,<x0d=11,7,0xffffffff
+rlwinm 11,11,7,0xffffffff
+
 # qhasm:   x0f <<<= 7
-# asm 1: rlwinm >x0f=int32#12,<x0f=int32#12,7,0xffffffff
-# asm 2: rlwinm >x0f=14,<x0f=14,7,0xffffffff
-rlwinm 14,14,7,0xffffffff
+# asm 1: rlwinm >x0f=int32#11,<x0f=int32#11,7,0xffffffff
+# asm 2: rlwinm >x0f=13,<x0f=13,7,0xffffffff
+rlwinm 13,13,7,0xffffffff
 
 # qhasm:   x05 ^= x1d
-# asm 1: xor >x05=int32#25,<x1d=int32#21,<x05=int32#25
-# asm 2: xor >x05=27,<x1d=23,<x05=27
-xor 27,23,27
+# asm 1: xor >x05=int32#24,<x1d=int32#20,<x05=int32#24
+# asm 2: xor >x05=26,<x1d=22,<x05=26
+xor 26,22,26
 
 # qhasm:   x07 ^= x1f
-# asm 1: xor >x07=int32#5,<x1f=int32#23,<x07=int32#5
-# asm 2: xor >x07=7,<x1f=25,<x07=7
-xor 7,25,7
+# asm 1: xor >x07=int32#25,<x1f=int32#22,<x07=int32#25
+# asm 2: xor >x07=27,<x1f=24,<x07=27
+xor 27,24,27
 
 # qhasm:   x0d ^= x15
-# asm 1: xor >x0d=int32#10,<x15=int32#19,<x0d=int32#10
-# asm 2: xor >x0d=12,<x15=21,<x0d=12
-xor 12,21,12
+# asm 1: xor >x0d=int32#9,<x15=int32#18,<x0d=int32#9
+# asm 2: xor >x0d=11,<x15=20,<x0d=11
+xor 11,20,11
 
 # qhasm:   x0f ^= x17
-# asm 1: xor >x0f=int32#12,<x17=int32#20,<x0f=int32#12
-# asm 2: xor >x0f=14,<x17=22,<x0f=14
-xor 14,22,14
+# asm 1: xor >x0f=int32#11,<x17=int32#19,<x0f=int32#11
+# asm 2: xor >x0f=13,<x17=21,<x0f=13
+xor 13,21,13
 
 # qhasm:   x1f += x05
-# asm 1: add >x1f=int32#23,<x1f=int32#23,<x05=int32#25
-# asm 2: add >x1f=25,<x1f=25,<x05=27
-add 25,25,27
+# asm 1: add >x1f=int32#22,<x1f=int32#22,<x05=int32#24
+# asm 2: add >x1f=24,<x1f=24,<x05=26
+add 24,24,26
 
 # qhasm:   x1d += x07
-# asm 1: add >x1d=int32#21,<x1d=int32#21,<x07=int32#5
-# asm 2: add >x1d=23,<x1d=23,<x07=7
-add 23,23,7
+# asm 1: add >x1d=int32#20,<x1d=int32#20,<x07=int32#25
+# asm 2: add >x1d=22,<x1d=22,<x07=27
+add 22,22,27
 
 # qhasm:   x17 += x0d
-# asm 1: add >x17=int32#20,<x17=int32#20,<x0d=int32#10
-# asm 2: add >x17=22,<x17=22,<x0d=12
-add 22,22,12
+# asm 1: add >x17=int32#19,<x17=int32#19,<x0d=int32#9
+# asm 2: add >x17=21,<x17=21,<x0d=11
+add 21,21,11
 
 # qhasm:   x15 += x0f
-# asm 1: add >x15=int32#19,<x15=int32#19,<x0f=int32#12
-# asm 2: add >x15=21,<x15=21,<x0f=14
-add 21,21,14
+# asm 1: add >x15=int32#18,<x15=int32#18,<x0f=int32#11
+# asm 2: add >x15=20,<x15=20,<x0f=13
+add 20,20,13
 
 # qhasm:           x1e = x1e_stack
 # asm 1: lwz >x1e=int32#26,<x1e_stack=stack32#20
@@ -1168,9 +1318,9 @@ add 21,21,14
 lwz 28,76(1)
 
 # qhasm:   x00 <<<= 11
-# asm 1: rlwinm >x00=int32#14,<x00=int32#14,11,0xffffffff
-# asm 2: rlwinm >x00=16,<x00=16,11,0xffffffff
-rlwinm 16,16,11,0xffffffff
+# asm 1: rlwinm >x00=int32#13,<x00=int32#13,11,0xffffffff
+# asm 2: rlwinm >x00=15,<x00=15,11,0xffffffff
+rlwinm 15,15,11,0xffffffff
 
 # qhasm:           x16 = x16_stack
 # asm 1: lwz >x16=int32#27,<x16_stack=stack32#23
@@ -1178,14 +1328,14 @@ rlwinm 16,16,11,0xffffffff
 lwz 29,88(1)
 
 # qhasm:   x01 <<<= 11
-# asm 1: rlwinm >x01=int32#17,<x01=int32#17,11,0xffffffff
-# asm 2: rlwinm >x01=19,<x01=19,11,0xffffffff
-rlwinm 19,19,11,0xffffffff
+# asm 1: rlwinm >x01=int32#16,<x01=int32#16,11,0xffffffff
+# asm 2: rlwinm >x01=18,<x01=18,11,0xffffffff
+rlwinm 18,18,11,0xffffffff
 
 # qhasm:           x15_stack = x15
-# asm 1: stw <x15=int32#19,>x15_stack=stack32#20
-# asm 2: stw <x15=21,>x15_stack=76(1)
-stw 21,76(1)
+# asm 1: stw <x15=int32#18,>x15_stack=stack32#20
+# asm 2: stw <x15=20,>x15_stack=76(1)
+stw 20,76(1)
 
 # qhasm:   x08 <<<= 11
 # asm 1: rlwinm >x08=int32#1,<x08=int32#1,11,0xffffffff
@@ -1193,24 +1343,24 @@ stw 21,76(1)
 rlwinm 3,3,11,0xffffffff
 
 # qhasm:           x1d_stack = x1d
-# asm 1: stw <x1d=int32#21,>x1d_stack=stack32#23
-# asm 2: stw <x1d=23,>x1d_stack=88(1)
-stw 23,88(1)
+# asm 1: stw <x1d=int32#20,>x1d_stack=stack32#23
+# asm 2: stw <x1d=22,>x1d_stack=88(1)
+stw 22,88(1)
 
 # qhasm:   x09 <<<= 11
-# asm 1: rlwinm >x09=int32#6,<x09=int32#6,11,0xffffffff
-# asm 2: rlwinm >x09=8,<x09=8,11,0xffffffff
-rlwinm 8,8,11,0xffffffff
+# asm 1: rlwinm >x09=int32#5,<x09=int32#5,11,0xffffffff
+# asm 2: rlwinm >x09=7,<x09=7,11,0xffffffff
+rlwinm 7,7,11,0xffffffff
 
 # qhasm:   x00 ^= x1e
-# asm 1: xor >x00=int32#14,<x1e=int32#26,<x00=int32#14
-# asm 2: xor >x00=16,<x1e=28,<x00=16
-xor 16,28,16
+# asm 1: xor >x00=int32#13,<x1e=int32#26,<x00=int32#13
+# asm 2: xor >x00=15,<x1e=28,<x00=15
+xor 15,28,15
 
 # qhasm:   x01 ^= x1f
-# asm 1: xor >x01=int32#17,<x1f=int32#23,<x01=int32#17
-# asm 2: xor >x01=19,<x1f=25,<x01=19
-xor 19,25,19
+# asm 1: xor >x01=int32#16,<x1f=int32#22,<x01=int32#16
+# asm 2: xor >x01=18,<x1f=24,<x01=18
+xor 18,24,18
 
 # qhasm:   x08 ^= x16
 # asm 1: xor >x08=int32#1,<x16=int32#27,<x08=int32#1
@@ -1218,49 +1368,49 @@ xor 19,25,19
 xor 3,29,3
 
 # qhasm:   x09 ^= x17
-# asm 1: xor >x09=int32#6,<x17=int32#20,<x09=int32#6
-# asm 2: xor >x09=8,<x17=22,<x09=8
-xor 8,22,8
+# asm 1: xor >x09=int32#5,<x17=int32#19,<x09=int32#5
+# asm 2: xor >x09=7,<x17=21,<x09=7
+xor 7,21,7
 
 # qhasm:   x1f += x00
-# asm 1: add >x1f=int32#19,<x1f=int32#23,<x00=int32#14
-# asm 2: add >x1f=21,<x1f=25,<x00=16
-add 21,25,16
+# asm 1: add >x1f=int32#18,<x1f=int32#22,<x00=int32#13
+# asm 2: add >x1f=20,<x1f=24,<x00=15
+add 20,24,15
 
 # qhasm:   x1e += x01
-# asm 1: add >x1e=int32#21,<x1e=int32#26,<x01=int32#17
-# asm 2: add >x1e=23,<x1e=28,<x01=19
-add 23,28,19
+# asm 1: add >x1e=int32#20,<x1e=int32#26,<x01=int32#16
+# asm 2: add >x1e=22,<x1e=28,<x01=18
+add 22,28,18
 
 # qhasm:   x17 += x08
-# asm 1: add >x17=int32#20,<x17=int32#20,<x08=int32#1
-# asm 2: add >x17=22,<x17=22,<x08=3
-add 22,22,3
+# asm 1: add >x17=int32#19,<x17=int32#19,<x08=int32#1
+# asm 2: add >x17=21,<x17=21,<x08=3
+add 21,21,3
 
 # qhasm:   x16 += x09
-# asm 1: add >x16=int32#23,<x16=int32#27,<x09=int32#6
-# asm 2: add >x16=25,<x16=29,<x09=8
-add 25,29,8
+# asm 1: add >x16=int32#22,<x16=int32#27,<x09=int32#5
+# asm 2: add >x16=24,<x16=29,<x09=7
+add 24,29,7
 
 # qhasm:   x00 <<<= 7
-# asm 1: rlwinm >x00=int32#14,<x00=int32#14,7,0xffffffff
-# asm 2: rlwinm >x00=16,<x00=16,7,0xffffffff
-rlwinm 16,16,7,0xffffffff
+# asm 1: rlwinm >x00=int32#13,<x00=int32#13,7,0xffffffff
+# asm 2: rlwinm >x00=15,<x00=15,7,0xffffffff
+rlwinm 15,15,7,0xffffffff
 
 # qhasm:           x1f_stack = x1f
-# asm 1: stw <x1f=int32#19,>x1f_stack=stack32#24
-# asm 2: stw <x1f=21,>x1f_stack=92(1)
-stw 21,92(1)
+# asm 1: stw <x1f=int32#18,>x1f_stack=stack32#24
+# asm 2: stw <x1f=20,>x1f_stack=92(1)
+stw 20,92(1)
 
 # qhasm:   x01 <<<= 7
-# asm 1: rlwinm >x01=int32#17,<x01=int32#17,7,0xffffffff
-# asm 2: rlwinm >x01=19,<x01=19,7,0xffffffff
-rlwinm 19,19,7,0xffffffff
+# asm 1: rlwinm >x01=int32#16,<x01=int32#16,7,0xffffffff
+# asm 2: rlwinm >x01=18,<x01=18,7,0xffffffff
+rlwinm 18,18,7,0xffffffff
 
 # qhasm:           x1e_stack = x1e
-# asm 1: stw <x1e=int32#21,>x1e_stack=stack32#27
-# asm 2: stw <x1e=23,>x1e_stack=104(1)
-stw 23,104(1)
+# asm 1: stw <x1e=int32#20,>x1e_stack=stack32#27
+# asm 2: stw <x1e=22,>x1e_stack=104(1)
+stw 22,104(1)
 
 # qhasm:   x08 <<<= 7
 # asm 1: rlwinm >x08=int32#1,<x08=int32#1,7,0xffffffff
@@ -1268,64 +1418,64 @@ stw 23,104(1)
 rlwinm 3,3,7,0xffffffff
 
 # qhasm:           x17_stack = x17
-# asm 1: stw <x17=int32#20,>x17_stack=stack32#28
-# asm 2: stw <x17=22,>x17_stack=108(1)
-stw 22,108(1)
+# asm 1: stw <x17=int32#19,>x17_stack=stack32#28
+# asm 2: stw <x17=21,>x17_stack=108(1)
+stw 21,108(1)
 
 # qhasm:   x09 <<<= 7
-# asm 1: rlwinm >x09=int32#6,<x09=int32#6,7,0xffffffff
-# asm 2: rlwinm >x09=8,<x09=8,7,0xffffffff
-rlwinm 8,8,7,0xffffffff
+# asm 1: rlwinm >x09=int32#5,<x09=int32#5,7,0xffffffff
+# asm 2: rlwinm >x09=7,<x09=7,7,0xffffffff
+rlwinm 7,7,7,0xffffffff
 
 # qhasm:           x16_stack = x16
-# asm 1: stw <x16=int32#23,>x16_stack=stack32#36
-# asm 2: stw <x16=25,>x16_stack=140(1)
-stw 25,140(1)
+# asm 1: stw <x16=int32#22,>x16_stack=stack32#36
+# asm 2: stw <x16=24,>x16_stack=140(1)
+stw 24,140(1)
 
 # qhasm:   x00 ^= x17
-# asm 1: xor >x00=int32#14,<x17=int32#20,<x00=int32#14
-# asm 2: xor >x00=16,<x17=22,<x00=16
-xor 16,22,16
+# asm 1: xor >x00=int32#13,<x17=int32#19,<x00=int32#13
+# asm 2: xor >x00=15,<x17=21,<x00=15
+xor 15,21,15
 
 # qhasm:           x02 = x02_stack
-# asm 1: lwz >x02=int32#20,<x02_stack=stack32#34
-# asm 2: lwz >x02=22,<x02_stack=132(1)
-lwz 22,132(1)
+# asm 1: lwz >x02=int32#19,<x02_stack=stack32#34
+# asm 2: lwz >x02=21,<x02_stack=132(1)
+lwz 21,132(1)
 
 # qhasm:   x01 ^= x16
-# asm 1: xor >x01=int32#23,<x16=int32#23,<x01=int32#17
-# asm 2: xor >x01=25,<x16=25,<x01=19
-xor 25,25,19
+# asm 1: xor >x01=int32#22,<x16=int32#22,<x01=int32#16
+# asm 2: xor >x01=24,<x16=24,<x01=18
+xor 24,24,18
 
 # qhasm:           x0a = x0a_stack
-# asm 1: lwz >x0a=int32#17,<x0a_stack=stack32#35
-# asm 2: lwz >x0a=19,<x0a_stack=136(1)
-lwz 19,136(1)
+# asm 1: lwz >x0a=int32#16,<x0a_stack=stack32#35
+# asm 2: lwz >x0a=18,<x0a_stack=136(1)
+lwz 18,136(1)
 
 # qhasm:   x08 ^= x1f
-# asm 1: xor >x08=int32#1,<x1f=int32#19,<x08=int32#1
-# asm 2: xor >x08=3,<x1f=21,<x08=3
-xor 3,21,3
+# asm 1: xor >x08=int32#1,<x1f=int32#18,<x08=int32#1
+# asm 2: xor >x08=3,<x1f=20,<x08=3
+xor 3,20,3
 
 # qhasm:           x0b = x0b_stack
-# asm 1: lwz >x0b=int32#19,<x0b_stack=stack32#22
-# asm 2: lwz >x0b=21,<x0b_stack=84(1)
-lwz 21,84(1)
+# asm 1: lwz >x0b=int32#18,<x0b_stack=stack32#22
+# asm 2: lwz >x0b=20,<x0b_stack=84(1)
+lwz 20,84(1)
 
 # qhasm:   x09 ^= x1e
-# asm 1: xor >x09=int32#6,<x1e=int32#21,<x09=int32#6
-# asm 2: xor >x09=8,<x1e=23,<x09=8
-xor 8,23,8
+# asm 1: xor >x09=int32#5,<x1e=int32#20,<x09=int32#5
+# asm 2: xor >x09=7,<x1e=22,<x09=7
+xor 7,22,7
 
 # qhasm:           x1c = x1c_stack
-# asm 1: lwz >x1c=int32#21,<x1c_stack=stack32#21
-# asm 2: lwz >x1c=23,<x1c_stack=80(1)
-lwz 23,80(1)
+# asm 1: lwz >x1c=int32#20,<x1c_stack=stack32#21
+# asm 2: lwz >x1c=22,<x1c_stack=80(1)
+lwz 22,80(1)
 
 # qhasm:   x02 <<<= 11
-# asm 1: rlwinm >x02=int32#20,<x02=int32#20,11,0xffffffff
-# asm 2: rlwinm >x02=22,<x02=22,11,0xffffffff
-rlwinm 22,22,11,0xffffffff
+# asm 1: rlwinm >x02=int32#19,<x02=int32#19,11,0xffffffff
+# asm 2: rlwinm >x02=21,<x02=21,11,0xffffffff
+rlwinm 21,21,11,0xffffffff
 
 # qhasm:           x1d = x1d_stack
 # asm 1: lwz >x1d=int32#26,<x1d_stack=stack32#23
@@ -1333,9 +1483,9 @@ rlwinm 22,22,11,0xffffffff
 lwz 28,88(1)
 
 # qhasm:   x03 <<<= 11
-# asm 1: rlwinm >x03=int32#18,<x03=int32#18,11,0xffffffff
-# asm 2: rlwinm >x03=20,<x03=20,11,0xffffffff
-rlwinm 20,20,11,0xffffffff
+# asm 1: rlwinm >x03=int32#17,<x03=int32#17,11,0xffffffff
+# asm 2: rlwinm >x03=19,<x03=19,11,0xffffffff
+rlwinm 19,19,11,0xffffffff
 
 # qhasm:           x14 = x14_stack
 # asm 1: lwz >x14=int32#27,<x14_stack=stack32#25
@@ -1343,9 +1493,9 @@ rlwinm 20,20,11,0xffffffff
 lwz 29,96(1)
 
 # qhasm:   x0a <<<= 11
-# asm 1: rlwinm >x0a=int32#17,<x0a=int32#17,11,0xffffffff
-# asm 2: rlwinm >x0a=19,<x0a=19,11,0xffffffff
-rlwinm 19,19,11,0xffffffff
+# asm 1: rlwinm >x0a=int32#16,<x0a=int32#16,11,0xffffffff
+# asm 2: rlwinm >x0a=18,<x0a=18,11,0xffffffff
+rlwinm 18,18,11,0xffffffff
 
 # qhasm:           x15 = x15_stack
 # asm 1: lwz >x15=int32#28,<x15_stack=stack32#20
@@ -1353,49 +1503,49 @@ rlwinm 19,19,11,0xffffffff
 lwz 30,76(1)
 
 # qhasm:   x0b <<<= 11
-# asm 1: rlwinm >x0b=int32#19,<x0b=int32#19,11,0xffffffff
-# asm 2: rlwinm >x0b=21,<x0b=21,11,0xffffffff
-rlwinm 21,21,11,0xffffffff
+# asm 1: rlwinm >x0b=int32#18,<x0b=int32#18,11,0xffffffff
+# asm 2: rlwinm >x0b=20,<x0b=20,11,0xffffffff
+rlwinm 20,20,11,0xffffffff
 
 # qhasm:   x02 ^= x1c
-# asm 1: xor >x02=int32#20,<x1c=int32#21,<x02=int32#20
-# asm 2: xor >x02=22,<x1c=23,<x02=22
-xor 22,23,22
+# asm 1: xor >x02=int32#19,<x1c=int32#20,<x02=int32#19
+# asm 2: xor >x02=21,<x1c=22,<x02=21
+xor 21,22,21
 
 # qhasm:   x03 ^= x1d
-# asm 1: xor >x03=int32#18,<x1d=int32#26,<x03=int32#18
-# asm 2: xor >x03=20,<x1d=28,<x03=20
-xor 20,28,20
+# asm 1: xor >x03=int32#17,<x1d=int32#26,<x03=int32#17
+# asm 2: xor >x03=19,<x1d=28,<x03=19
+xor 19,28,19
 
 # qhasm:   x0a ^= x14
-# asm 1: xor >x0a=int32#17,<x14=int32#27,<x0a=int32#17
-# asm 2: xor >x0a=19,<x14=29,<x0a=19
-xor 19,29,19
+# asm 1: xor >x0a=int32#16,<x14=int32#27,<x0a=int32#16
+# asm 2: xor >x0a=18,<x14=29,<x0a=18
+xor 18,29,18
 
 # qhasm:   x0b ^= x15
-# asm 1: xor >x0b=int32#19,<x15=int32#28,<x0b=int32#19
-# asm 2: xor >x0b=21,<x15=30,<x0b=21
-xor 21,30,21
+# asm 1: xor >x0b=int32#18,<x15=int32#28,<x0b=int32#18
+# asm 2: xor >x0b=20,<x15=30,<x0b=20
+xor 20,30,20
 
 # qhasm:   x1d += x02
-# asm 1: add >x1d=int32#26,<x1d=int32#26,<x02=int32#20
-# asm 2: add >x1d=28,<x1d=28,<x02=22
-add 28,28,22
+# asm 1: add >x1d=int32#26,<x1d=int32#26,<x02=int32#19
+# asm 2: add >x1d=28,<x1d=28,<x02=21
+add 28,28,21
 
 # qhasm:   x1c += x03
-# asm 1: add >x1c=int32#21,<x1c=int32#21,<x03=int32#18
-# asm 2: add >x1c=23,<x1c=23,<x03=20
-add 23,23,20
+# asm 1: add >x1c=int32#20,<x1c=int32#20,<x03=int32#17
+# asm 2: add >x1c=22,<x1c=22,<x03=19
+add 22,22,19
 
 # qhasm:   x15 += x0a
-# asm 1: add >x15=int32#28,<x15=int32#28,<x0a=int32#17
-# asm 2: add >x15=30,<x15=30,<x0a=19
-add 30,30,19
+# asm 1: add >x15=int32#28,<x15=int32#28,<x0a=int32#16
+# asm 2: add >x15=30,<x15=30,<x0a=18
+add 30,30,18
 
 # qhasm:   x14 += x0b
-# asm 1: add >x14=int32#27,<x14=int32#27,<x0b=int32#19
-# asm 2: add >x14=29,<x14=29,<x0b=21
-add 29,29,21
+# asm 1: add >x14=int32#27,<x14=int32#27,<x0b=int32#18
+# asm 2: add >x14=29,<x14=29,<x0b=20
+add 29,29,20
 
 # qhasm:           x1d_stack = x1d
 # asm 1: stw <x1d=int32#26,>x1d_stack=stack32#20
@@ -1403,19 +1553,19 @@ add 29,29,21
 stw 28,76(1)
 
 # qhasm:   x02 <<<= 7
-# asm 1: rlwinm >x02=int32#20,<x02=int32#20,7,0xffffffff
-# asm 2: rlwinm >x02=22,<x02=22,7,0xffffffff
-rlwinm 22,22,7,0xffffffff
+# asm 1: rlwinm >x02=int32#19,<x02=int32#19,7,0xffffffff
+# asm 2: rlwinm >x02=21,<x02=21,7,0xffffffff
+rlwinm 21,21,7,0xffffffff
 
 # qhasm:           x1c_stack = x1c
-# asm 1: stw <x1c=int32#21,>x1c_stack=stack32#21
-# asm 2: stw <x1c=23,>x1c_stack=80(1)
-stw 23,80(1)
+# asm 1: stw <x1c=int32#20,>x1c_stack=stack32#21
+# asm 2: stw <x1c=22,>x1c_stack=80(1)
+stw 22,80(1)
 
 # qhasm:   x03 <<<= 7
-# asm 1: rlwinm >x03=int32#18,<x03=int32#18,7,0xffffffff
-# asm 2: rlwinm >x03=20,<x03=20,7,0xffffffff
-rlwinm 20,20,7,0xffffffff
+# asm 1: rlwinm >x03=int32#17,<x03=int32#17,7,0xffffffff
+# asm 2: rlwinm >x03=19,<x03=19,7,0xffffffff
+rlwinm 19,19,7,0xffffffff
 
 # qhasm:           x15_stack = x15
 # asm 1: stw <x15=int32#28,>x15_stack=stack32#22
@@ -1423,9 +1573,9 @@ rlwinm 20,20,7,0xffffffff
 stw 30,84(1)
 
 # qhasm:   x0a <<<= 7
-# asm 1: rlwinm >x0a=int32#17,<x0a=int32#17,7,0xffffffff
-# asm 2: rlwinm >x0a=19,<x0a=19,7,0xffffffff
-rlwinm 19,19,7,0xffffffff
+# asm 1: rlwinm >x0a=int32#16,<x0a=int32#16,7,0xffffffff
+# asm 2: rlwinm >x0a=18,<x0a=18,7,0xffffffff
+rlwinm 18,18,7,0xffffffff
 
 # qhasm:           x14_stack = x14
 # asm 1: stw <x14=int32#27,>x14_stack=stack32#23
@@ -1433,259 +1583,259 @@ rlwinm 19,19,7,0xffffffff
 stw 29,88(1)
 
 # qhasm:   x0b <<<= 7
-# asm 1: rlwinm >x0b=int32#19,<x0b=int32#19,7,0xffffffff
-# asm 2: rlwinm >x0b=21,<x0b=21,7,0xffffffff
-rlwinm 21,21,7,0xffffffff
+# asm 1: rlwinm >x0b=int32#18,<x0b=int32#18,7,0xffffffff
+# asm 2: rlwinm >x0b=20,<x0b=20,7,0xffffffff
+rlwinm 20,20,7,0xffffffff
 
 # qhasm:   x02 ^= x15
-# asm 1: xor >x02=int32#20,<x15=int32#28,<x02=int32#20
-# asm 2: xor >x02=22,<x15=30,<x02=22
-xor 22,30,22
+# asm 1: xor >x02=int32#19,<x15=int32#28,<x02=int32#19
+# asm 2: xor >x02=21,<x15=30,<x02=21
+xor 21,30,21
 
 # qhasm:   x03 ^= x14
-# asm 1: xor >x03=int32#27,<x14=int32#27,<x03=int32#18
-# asm 2: xor >x03=29,<x14=29,<x03=20
-xor 29,29,20
+# asm 1: xor >x03=int32#27,<x14=int32#27,<x03=int32#17
+# asm 2: xor >x03=29,<x14=29,<x03=19
+xor 29,29,19
 
 # qhasm:   x0a ^= x1d
-# asm 1: xor >x0a=int32#17,<x1d=int32#26,<x0a=int32#17
-# asm 2: xor >x0a=19,<x1d=28,<x0a=19
-xor 19,28,19
+# asm 1: xor >x0a=int32#16,<x1d=int32#26,<x0a=int32#16
+# asm 2: xor >x0a=18,<x1d=28,<x0a=18
+xor 18,28,18
 
 # qhasm:   x0b ^= x1c
-# asm 1: xor >x0b=int32#18,<x1c=int32#21,<x0b=int32#19
-# asm 2: xor >x0b=20,<x1c=23,<x0b=21
-xor 20,23,21
+# asm 1: xor >x0b=int32#17,<x1c=int32#20,<x0b=int32#18
+# asm 2: xor >x0b=19,<x1c=22,<x0b=20
+xor 19,22,20
 
 # qhasm:           x02_stack = x02
-# asm 1: stw <x02=int32#20,>x02_stack=stack32#34
-# asm 2: stw <x02=22,>x02_stack=132(1)
-stw 22,132(1)
+# asm 1: stw <x02=int32#19,>x02_stack=stack32#34
+# asm 2: stw <x02=21,>x02_stack=132(1)
+stw 21,132(1)
 
 # qhasm:   x04 <<<= 11
-# asm 1: rlwinm >x04=int32#19,<x04=int32#22,11,0xffffffff
-# asm 2: rlwinm >x04=21,<x04=24,11,0xffffffff
-rlwinm 21,24,11,0xffffffff
+# asm 1: rlwinm >x04=int32#18,<x04=int32#21,11,0xffffffff
+# asm 2: rlwinm >x04=20,<x04=23,11,0xffffffff
+rlwinm 20,23,11,0xffffffff
 
 # qhasm:           x0a_stack = x0a
-# asm 1: stw <x0a=int32#17,>x0a_stack=stack32#35
-# asm 2: stw <x0a=19,>x0a_stack=136(1)
-stw 19,136(1)
+# asm 1: stw <x0a=int32#16,>x0a_stack=stack32#35
+# asm 2: stw <x0a=18,>x0a_stack=136(1)
+stw 18,136(1)
 
 # qhasm:   x05 <<<= 11
-# asm 1: rlwinm >x05=int32#17,<x05=int32#25,11,0xffffffff
-# asm 2: rlwinm >x05=19,<x05=27,11,0xffffffff
-rlwinm 19,27,11,0xffffffff
+# asm 1: rlwinm >x05=int32#16,<x05=int32#24,11,0xffffffff
+# asm 2: rlwinm >x05=18,<x05=26,11,0xffffffff
+rlwinm 18,26,11,0xffffffff
 
 # qhasm:           x0b_stack = x0b
-# asm 1: stw <x0b=int32#18,>x0b_stack=stack32#37
-# asm 2: stw <x0b=20,>x0b_stack=144(1)
-stw 20,144(1)
+# asm 1: stw <x0b=int32#17,>x0b_stack=stack32#37
+# asm 2: stw <x0b=19,>x0b_stack=144(1)
+stw 19,144(1)
 
 # qhasm:   x0c <<<= 11
-# asm 1: rlwinm >x0c=int32#9,<x0c=int32#9,11,0xffffffff
-# asm 2: rlwinm >x0c=11,<x0c=11,11,0xffffffff
-rlwinm 11,11,11,0xffffffff
+# asm 1: rlwinm >x0c=int32#8,<x0c=int32#8,11,0xffffffff
+# asm 2: rlwinm >x0c=10,<x0c=10,11,0xffffffff
+rlwinm 10,10,11,0xffffffff
 
 # qhasm:   x0d <<<= 11
-# asm 1: rlwinm >x0d=int32#10,<x0d=int32#10,11,0xffffffff
-# asm 2: rlwinm >x0d=12,<x0d=12,11,0xffffffff
-rlwinm 12,12,11,0xffffffff
+# asm 1: rlwinm >x0d=int32#9,<x0d=int32#9,11,0xffffffff
+# asm 2: rlwinm >x0d=11,<x0d=11,11,0xffffffff
+rlwinm 11,11,11,0xffffffff
 
 # qhasm:   x04 ^= x1a
-# asm 1: xor >x04=int32#18,<x1a=int32#8,<x04=int32#19
-# asm 2: xor >x04=20,<x1a=10,<x04=21
-xor 20,10,21
+# asm 1: xor >x04=int32#17,<x1a=int32#7,<x04=int32#18
+# asm 2: xor >x04=19,<x1a=9,<x04=20
+xor 19,9,20
 
 # qhasm:   x05 ^= x1b
-# asm 1: xor >x05=int32#17,<x1b=int32#16,<x05=int32#17
-# asm 2: xor >x05=19,<x1b=18,<x05=19
-xor 19,18,19
+# asm 1: xor >x05=int32#16,<x1b=int32#15,<x05=int32#16
+# asm 2: xor >x05=18,<x1b=17,<x05=18
+xor 18,17,18
 
 # qhasm:   x0c ^= x12
-# asm 1: xor >x0c=int32#9,<x12=int32#3,<x0c=int32#9
-# asm 2: xor >x0c=11,<x12=5,<x0c=11
-xor 11,5,11
+# asm 1: xor >x0c=int32#8,<x12=int32#3,<x0c=int32#8
+# asm 2: xor >x0c=10,<x12=5,<x0c=10
+xor 10,5,10
 
 # qhasm:   x0d ^= x13
-# asm 1: xor >x0d=int32#10,<x13=int32#7,<x0d=int32#10
-# asm 2: xor >x0d=12,<x13=9,<x0d=12
-xor 12,9,12
+# asm 1: xor >x0d=int32#9,<x13=int32#6,<x0d=int32#9
+# asm 2: xor >x0d=11,<x13=8,<x0d=11
+xor 11,8,11
 
 # qhasm:   x1b += x04
-# asm 1: add >x1b=int32#19,<x1b=int32#16,<x04=int32#18
-# asm 2: add >x1b=21,<x1b=18,<x04=20
-add 21,18,20
+# asm 1: add >x1b=int32#18,<x1b=int32#15,<x04=int32#17
+# asm 2: add >x1b=20,<x1b=17,<x04=19
+add 20,17,19
 
 # qhasm:   x1a += x05
-# asm 1: add >x1a=int32#22,<x1a=int32#8,<x05=int32#17
-# asm 2: add >x1a=24,<x1a=10,<x05=19
-add 24,10,19
+# asm 1: add >x1a=int32#21,<x1a=int32#7,<x05=int32#16
+# asm 2: add >x1a=23,<x1a=9,<x05=18
+add 23,9,18
 
 # qhasm:   x13 += x0c
-# asm 1: add >x13=int32#7,<x13=int32#7,<x0c=int32#9
-# asm 2: add >x13=9,<x13=9,<x0c=11
-add 9,9,11
+# asm 1: add >x13=int32#6,<x13=int32#6,<x0c=int32#8
+# asm 2: add >x13=8,<x13=8,<x0c=10
+add 8,8,10
 
 # qhasm:   x12 += x0d
-# asm 1: add >x12=int32#3,<x12=int32#3,<x0d=int32#10
-# asm 2: add >x12=5,<x12=5,<x0d=12
-add 5,5,12
+# asm 1: add >x12=int32#3,<x12=int32#3,<x0d=int32#9
+# asm 2: add >x12=5,<x12=5,<x0d=11
+add 5,5,11
 
 # qhasm:   x04 <<<= 7
-# asm 1: rlwinm >x04=int32#8,<x04=int32#18,7,0xffffffff
-# asm 2: rlwinm >x04=10,<x04=20,7,0xffffffff
-rlwinm 10,20,7,0xffffffff
+# asm 1: rlwinm >x04=int32#7,<x04=int32#17,7,0xffffffff
+# asm 2: rlwinm >x04=9,<x04=19,7,0xffffffff
+rlwinm 9,19,7,0xffffffff
 
 # qhasm:   x05 <<<= 7
-# asm 1: rlwinm >x05=int32#16,<x05=int32#17,7,0xffffffff
-# asm 2: rlwinm >x05=18,<x05=19,7,0xffffffff
-rlwinm 18,19,7,0xffffffff
+# asm 1: rlwinm >x05=int32#15,<x05=int32#16,7,0xffffffff
+# asm 2: rlwinm >x05=17,<x05=18,7,0xffffffff
+rlwinm 17,18,7,0xffffffff
 
 # qhasm:   x0c <<<= 7
-# asm 1: rlwinm >x0c=int32#9,<x0c=int32#9,7,0xffffffff
-# asm 2: rlwinm >x0c=11,<x0c=11,7,0xffffffff
-rlwinm 11,11,7,0xffffffff
-
-# qhasm:   x0d <<<= 7
-# asm 1: rlwinm >x0d=int32#10,<x0d=int32#10,7,0xffffffff
-# asm 2: rlwinm >x0d=12,<x0d=12,7,0xffffffff
-rlwinm 12,12,7,0xffffffff
-
-# qhasm:   x04 ^= x13
-# asm 1: xor >x04=int32#18,<x13=int32#7,<x04=int32#8
-# asm 2: xor >x04=20,<x13=9,<x04=10
-xor 20,9,10
-
-# qhasm:   x05 ^= x12
-# asm 1: xor >x05=int32#20,<x12=int32#3,<x05=int32#16
-# asm 2: xor >x05=22,<x12=5,<x05=18
-xor 22,5,18
-
-# qhasm:   x0c ^= x1b
-# asm 1: xor >x0c=int32#9,<x1b=int32#19,<x0c=int32#9
-# asm 2: xor >x0c=11,<x1b=21,<x0c=11
-xor 11,21,11
-
-# qhasm:   x0d ^= x1a
-# asm 1: xor >x0d=int32#10,<x1a=int32#22,<x0d=int32#10
-# asm 2: xor >x0d=12,<x1a=24,<x0d=12
-xor 12,24,12
-
-# qhasm:   x06 <<<= 11
-# asm 1: rlwinm >x06=int32#8,<x06=int32#24,11,0xffffffff
-# asm 2: rlwinm >x06=10,<x06=26,11,0xffffffff
-rlwinm 10,26,11,0xffffffff
-
-# qhasm:   x07 <<<= 11
-# asm 1: rlwinm >x07=int32#5,<x07=int32#5,11,0xffffffff
-# asm 2: rlwinm >x07=7,<x07=7,11,0xffffffff
-rlwinm 7,7,11,0xffffffff
-
-# qhasm:   x0e <<<= 11
-# asm 1: rlwinm >x0e=int32#11,<x0e=int32#11,11,0xffffffff
-# asm 2: rlwinm >x0e=13,<x0e=13,11,0xffffffff
-rlwinm 13,13,11,0xffffffff
-
-# qhasm:   x0f <<<= 11
-# asm 1: rlwinm >x0f=int32#12,<x0f=int32#12,11,0xffffffff
-# asm 2: rlwinm >x0f=14,<x0f=14,11,0xffffffff
-rlwinm 14,14,11,0xffffffff
-
-# qhasm:   x06 ^= x18
-# asm 1: xor >x06=int32#8,<x18=int32#4,<x06=int32#8
-# asm 2: xor >x06=10,<x18=6,<x06=10
-xor 10,6,10
-
-# qhasm:   x07 ^= x19
-# asm 1: xor >x07=int32#5,<x19=int32#15,<x07=int32#5
-# asm 2: xor >x07=7,<x19=17,<x07=7
-xor 7,17,7
-
-# qhasm:   x0e ^= x10
-# asm 1: xor >x0e=int32#11,<x10=int32#2,<x0e=int32#11
-# asm 2: xor >x0e=13,<x10=4,<x0e=13
-xor 13,4,13
-
-# qhasm:   x0f ^= x11
-# asm 1: xor >x0f=int32#12,<x11=int32#13,<x0f=int32#12
-# asm 2: xor >x0f=14,<x11=15,<x0f=14
-xor 14,15,14
-
-# qhasm:   x19 += x06
-# asm 1: add >x19=int32#15,<x19=int32#15,<x06=int32#8
-# asm 2: add >x19=17,<x19=17,<x06=10
-add 17,17,10
-
-# qhasm:   x18 += x07
-# asm 1: add >x18=int32#4,<x18=int32#4,<x07=int32#5
-# asm 2: add >x18=6,<x18=6,<x07=7
-add 6,6,7
-
-# qhasm:   x11 += x0e
-# asm 1: add >x11=int32#13,<x11=int32#13,<x0e=int32#11
-# asm 2: add >x11=15,<x11=15,<x0e=13
-add 15,15,13
-
-# qhasm:   x10 += x0f
-# asm 1: add >x10=int32#2,<x10=int32#2,<x0f=int32#12
-# asm 2: add >x10=4,<x10=4,<x0f=14
-add 4,4,14
-
-# qhasm:   x06 <<<= 7
-# asm 1: rlwinm >x06=int32#8,<x06=int32#8,7,0xffffffff
-# asm 2: rlwinm >x06=10,<x06=10,7,0xffffffff
+# asm 1: rlwinm >x0c=int32#8,<x0c=int32#8,7,0xffffffff
+# asm 2: rlwinm >x0c=10,<x0c=10,7,0xffffffff
 rlwinm 10,10,7,0xffffffff
 
+# qhasm:   x0d <<<= 7
+# asm 1: rlwinm >x0d=int32#9,<x0d=int32#9,7,0xffffffff
+# asm 2: rlwinm >x0d=11,<x0d=11,7,0xffffffff
+rlwinm 11,11,7,0xffffffff
+
+# qhasm:   x04 ^= x13
+# asm 1: xor >x04=int32#17,<x13=int32#6,<x04=int32#7
+# asm 2: xor >x04=19,<x13=8,<x04=9
+xor 19,8,9
+
+# qhasm:   x05 ^= x12
+# asm 1: xor >x05=int32#19,<x12=int32#3,<x05=int32#15
+# asm 2: xor >x05=21,<x12=5,<x05=17
+xor 21,5,17
+
+# qhasm:   x0c ^= x1b
+# asm 1: xor >x0c=int32#8,<x1b=int32#18,<x0c=int32#8
+# asm 2: xor >x0c=10,<x1b=20,<x0c=10
+xor 10,20,10
+
+# qhasm:   x0d ^= x1a
+# asm 1: xor >x0d=int32#9,<x1a=int32#21,<x0d=int32#9
+# asm 2: xor >x0d=11,<x1a=23,<x0d=11
+xor 11,23,11
+
+# qhasm:   x06 <<<= 11
+# asm 1: rlwinm >x06=int32#7,<x06=int32#23,11,0xffffffff
+# asm 2: rlwinm >x06=9,<x06=25,11,0xffffffff
+rlwinm 9,25,11,0xffffffff
+
+# qhasm:   x07 <<<= 11
+# asm 1: rlwinm >x07=int32#15,<x07=int32#25,11,0xffffffff
+# asm 2: rlwinm >x07=17,<x07=27,11,0xffffffff
+rlwinm 17,27,11,0xffffffff
+
+# qhasm:   x0e <<<= 11
+# asm 1: rlwinm >x0e=int32#10,<x0e=int32#10,11,0xffffffff
+# asm 2: rlwinm >x0e=12,<x0e=12,11,0xffffffff
+rlwinm 12,12,11,0xffffffff
+
+# qhasm:   x0f <<<= 11
+# asm 1: rlwinm >x0f=int32#11,<x0f=int32#11,11,0xffffffff
+# asm 2: rlwinm >x0f=13,<x0f=13,11,0xffffffff
+rlwinm 13,13,11,0xffffffff
+
+# qhasm:   x06 ^= x18
+# asm 1: xor >x06=int32#7,<x18=int32#4,<x06=int32#7
+# asm 2: xor >x06=9,<x18=6,<x06=9
+xor 9,6,9
+
+# qhasm:   x07 ^= x19
+# asm 1: xor >x07=int32#15,<x19=int32#14,<x07=int32#15
+# asm 2: xor >x07=17,<x19=16,<x07=17
+xor 17,16,17
+
+# qhasm:   x0e ^= x10
+# asm 1: xor >x0e=int32#10,<x10=int32#2,<x0e=int32#10
+# asm 2: xor >x0e=12,<x10=4,<x0e=12
+xor 12,4,12
+
+# qhasm:   x0f ^= x11
+# asm 1: xor >x0f=int32#11,<x11=int32#12,<x0f=int32#11
+# asm 2: xor >x0f=13,<x11=14,<x0f=13
+xor 13,14,13
+
+# qhasm:   x19 += x06
+# asm 1: add >x19=int32#14,<x19=int32#14,<x06=int32#7
+# asm 2: add >x19=16,<x19=16,<x06=9
+add 16,16,9
+
+# qhasm:   x18 += x07
+# asm 1: add >x18=int32#4,<x18=int32#4,<x07=int32#15
+# asm 2: add >x18=6,<x18=6,<x07=17
+add 6,6,17
+
+# qhasm:   x11 += x0e
+# asm 1: add >x11=int32#12,<x11=int32#12,<x0e=int32#10
+# asm 2: add >x11=14,<x11=14,<x0e=12
+add 14,14,12
+
+# qhasm:   x10 += x0f
+# asm 1: add >x10=int32#2,<x10=int32#2,<x0f=int32#11
+# asm 2: add >x10=4,<x10=4,<x0f=13
+add 4,4,13
+
+# qhasm:   x06 <<<= 7
+# asm 1: rlwinm >x06=int32#7,<x06=int32#7,7,0xffffffff
+# asm 2: rlwinm >x06=9,<x06=9,7,0xffffffff
+rlwinm 9,9,7,0xffffffff
+
 # qhasm:   x07 <<<= 7
-# asm 1: rlwinm >x07=int32#5,<x07=int32#5,7,0xffffffff
-# asm 2: rlwinm >x07=7,<x07=7,7,0xffffffff
-rlwinm 7,7,7,0xffffffff
+# asm 1: rlwinm >x07=int32#15,<x07=int32#15,7,0xffffffff
+# asm 2: rlwinm >x07=17,<x07=17,7,0xffffffff
+rlwinm 17,17,7,0xffffffff
 
 # qhasm:   x0e <<<= 7
-# asm 1: rlwinm >x0e=int32#11,<x0e=int32#11,7,0xffffffff
-# asm 2: rlwinm >x0e=13,<x0e=13,7,0xffffffff
-rlwinm 13,13,7,0xffffffff
+# asm 1: rlwinm >x0e=int32#10,<x0e=int32#10,7,0xffffffff
+# asm 2: rlwinm >x0e=12,<x0e=12,7,0xffffffff
+rlwinm 12,12,7,0xffffffff
 
 # qhasm:   x0f <<<= 7
-# asm 1: rlwinm >x0f=int32#12,<x0f=int32#12,7,0xffffffff
-# asm 2: rlwinm >x0f=14,<x0f=14,7,0xffffffff
-rlwinm 14,14,7,0xffffffff
+# asm 1: rlwinm >x0f=int32#11,<x0f=int32#11,7,0xffffffff
+# asm 2: rlwinm >x0f=13,<x0f=13,7,0xffffffff
+rlwinm 13,13,7,0xffffffff
 
 # qhasm:   x06 ^= x11
-# asm 1: xor >x06=int32#26,<x11=int32#13,<x06=int32#8
-# asm 2: xor >x06=28,<x11=15,<x06=10
-xor 28,15,10
+# asm 1: xor >x06=int32#25,<x11=int32#12,<x06=int32#7
+# asm 2: xor >x06=27,<x11=14,<x06=9
+xor 27,14,9
 
 # qhasm:           x15 = x15_stack
-# asm 1: lwz >x15=int32#21,<x15_stack=stack32#22
-# asm 2: lwz >x15=23,<x15_stack=84(1)
-lwz 23,84(1)
+# asm 1: lwz >x15=int32#20,<x15_stack=stack32#22
+# asm 2: lwz >x15=22,<x15_stack=84(1)
+lwz 22,84(1)
 
 # qhasm:   x07 ^= x10
-# asm 1: xor >x07=int32#5,<x10=int32#2,<x07=int32#5
-# asm 2: xor >x07=7,<x10=4,<x07=7
-xor 7,4,7
+# asm 1: xor >x07=int32#26,<x10=int32#2,<x07=int32#15
+# asm 2: xor >x07=28,<x10=4,<x07=17
+xor 28,4,17
 
 # qhasm:           x14 = x14_stack
-# asm 1: lwz >x14=int32#24,<x14_stack=stack32#23
-# asm 2: lwz >x14=26,<x14_stack=88(1)
-lwz 26,88(1)
+# asm 1: lwz >x14=int32#23,<x14_stack=stack32#23
+# asm 2: lwz >x14=25,<x14_stack=88(1)
+lwz 25,88(1)
 
 # qhasm:   x0e ^= x19
-# asm 1: xor >x0e=int32#11,<x19=int32#15,<x0e=int32#11
-# asm 2: xor >x0e=13,<x19=17,<x0e=13
-xor 13,17,13
+# asm 1: xor >x0e=int32#10,<x19=int32#14,<x0e=int32#10
+# asm 2: xor >x0e=12,<x19=16,<x0e=12
+xor 12,16,12
 
 # qhasm:           x1d = x1d_stack
-# asm 1: lwz >x1d=int32#25,<x1d_stack=stack32#20
-# asm 2: lwz >x1d=27,<x1d_stack=76(1)
-lwz 27,76(1)
+# asm 1: lwz >x1d=int32#24,<x1d_stack=stack32#20
+# asm 2: lwz >x1d=26,<x1d_stack=76(1)
+lwz 26,76(1)
 
 # qhasm:   x0f ^= x18
-# asm 1: xor >x0f=int32#12,<x18=int32#4,<x0f=int32#12
-# asm 2: xor >x0f=14,<x18=6,<x0f=14
-xor 14,6,14
+# asm 1: xor >x0f=int32#11,<x18=int32#4,<x0f=int32#11
+# asm 2: xor >x0f=13,<x18=6,<x0f=13
+xor 13,6,13
 
 # qhasm:           x1c = x1c_stack
 # asm 1: lwz >x1c=int32#28,<x1c_stack=stack32#21
@@ -1693,49 +1843,49 @@ xor 14,6,14
 lwz 30,80(1)
 
 # qhasm:   x11 += x04
-# asm 1: add >x11=int32#13,<x11=int32#13,<x04=int32#18
-# asm 2: add >x11=15,<x11=15,<x04=20
-add 15,15,20
+# asm 1: add >x11=int32#12,<x11=int32#12,<x04=int32#17
+# asm 2: add >x11=14,<x11=14,<x04=19
+add 14,14,19
 
 # qhasm:   x10 += x05
-# asm 1: add >x10=int32#8,<x10=int32#2,<x05=int32#20
-# asm 2: add >x10=10,<x10=4,<x05=22
-add 10,4,22
+# asm 1: add >x10=int32#7,<x10=int32#2,<x05=int32#19
+# asm 2: add >x10=9,<x10=4,<x05=21
+add 9,4,21
 
 # qhasm:   x19 += x0c
-# asm 1: add >x19=int32#17,<x19=int32#15,<x0c=int32#9
-# asm 2: add >x19=19,<x19=17,<x0c=11
-add 19,17,11
+# asm 1: add >x19=int32#16,<x19=int32#14,<x0c=int32#8
+# asm 2: add >x19=18,<x19=16,<x0c=10
+add 18,16,10
 
 # qhasm:   x18 += x0d
-# asm 1: add >x18=int32#16,<x18=int32#4,<x0d=int32#10
-# asm 2: add >x18=18,<x18=6,<x0d=12
-add 18,6,12
+# asm 1: add >x18=int32#15,<x18=int32#4,<x0d=int32#9
+# asm 2: add >x18=17,<x18=6,<x0d=11
+add 17,6,11
 
 # qhasm:   x15 += x00
-# asm 1: add >x15=int32#2,<x15=int32#21,<x00=int32#14
-# asm 2: add >x15=4,<x15=23,<x00=16
-add 4,23,16
+# asm 1: add >x15=int32#2,<x15=int32#20,<x00=int32#13
+# asm 2: add >x15=4,<x15=22,<x00=15
+add 4,22,15
 
 # qhasm:   x14 += x01
-# asm 1: add >x14=int32#4,<x14=int32#24,<x01=int32#23
-# asm 2: add >x14=6,<x14=26,<x01=25
-add 6,26,25
+# asm 1: add >x14=int32#4,<x14=int32#23,<x01=int32#22
+# asm 2: add >x14=6,<x14=25,<x01=24
+add 6,25,24
 
 # qhasm:   x1d += x08
-# asm 1: add >x1d=int32#15,<x1d=int32#25,<x08=int32#1
-# asm 2: add >x1d=17,<x1d=27,<x08=3
-add 17,27,3
+# asm 1: add >x1d=int32#14,<x1d=int32#24,<x08=int32#1
+# asm 2: add >x1d=16,<x1d=26,<x08=3
+add 16,26,3
 
 # qhasm:   x1c += x09
-# asm 1: add >x1c=int32#21,<x1c=int32#28,<x09=int32#6
-# asm 2: add >x1c=23,<x1c=30,<x09=8
-add 23,30,8
+# asm 1: add >x1c=int32#20,<x1c=int32#28,<x09=int32#5
+# asm 2: add >x1c=22,<x1c=30,<x09=7
+add 22,30,7
 
 # qhasm:   x04 <<<= 11
-# asm 1: rlwinm >x04=int32#18,<x04=int32#18,11,0xffffffff
-# asm 2: rlwinm >x04=20,<x04=20,11,0xffffffff
-rlwinm 20,20,11,0xffffffff
+# asm 1: rlwinm >x04=int32#17,<x04=int32#17,11,0xffffffff
+# asm 2: rlwinm >x04=19,<x04=19,11,0xffffffff
+rlwinm 19,19,11,0xffffffff
 
 # qhasm:           x15_stack = x15
 # asm 1: stw <x15=int32#2,>x15_stack=stack32#22
@@ -1743,9 +1893,9 @@ rlwinm 20,20,11,0xffffffff
 stw 4,84(1)
 
 # qhasm:   x05 <<<= 11
-# asm 1: rlwinm >x05=int32#20,<x05=int32#20,11,0xffffffff
-# asm 2: rlwinm >x05=22,<x05=22,11,0xffffffff
-rlwinm 22,22,11,0xffffffff
+# asm 1: rlwinm >x05=int32#19,<x05=int32#19,11,0xffffffff
+# asm 2: rlwinm >x05=21,<x05=21,11,0xffffffff
+rlwinm 21,21,11,0xffffffff
 
 # qhasm:           x14_stack = x14
 # asm 1: stw <x14=int32#4,>x14_stack=stack32#21
@@ -1753,54 +1903,54 @@ rlwinm 22,22,11,0xffffffff
 stw 6,80(1)
 
 # qhasm:   x0c <<<= 11
-# asm 1: rlwinm >x0c=int32#9,<x0c=int32#9,11,0xffffffff
-# asm 2: rlwinm >x0c=11,<x0c=11,11,0xffffffff
-rlwinm 11,11,11,0xffffffff
+# asm 1: rlwinm >x0c=int32#8,<x0c=int32#8,11,0xffffffff
+# asm 2: rlwinm >x0c=10,<x0c=10,11,0xffffffff
+rlwinm 10,10,11,0xffffffff
 
 # qhasm:           x1d_stack = x1d
-# asm 1: stw <x1d=int32#15,>x1d_stack=stack32#26
-# asm 2: stw <x1d=17,>x1d_stack=100(1)
-stw 17,100(1)
+# asm 1: stw <x1d=int32#14,>x1d_stack=stack32#26
+# asm 2: stw <x1d=16,>x1d_stack=100(1)
+stw 16,100(1)
 
 # qhasm:   x0d <<<= 11
-# asm 1: rlwinm >x0d=int32#10,<x0d=int32#10,11,0xffffffff
-# asm 2: rlwinm >x0d=12,<x0d=12,11,0xffffffff
-rlwinm 12,12,11,0xffffffff
+# asm 1: rlwinm >x0d=int32#9,<x0d=int32#9,11,0xffffffff
+# asm 2: rlwinm >x0d=11,<x0d=11,11,0xffffffff
+rlwinm 11,11,11,0xffffffff
 
 # qhasm:           x1c_stack = x1c
-# asm 1: stw <x1c=int32#21,>x1c_stack=stack32#25
-# asm 2: stw <x1c=23,>x1c_stack=96(1)
-stw 23,96(1)
+# asm 1: stw <x1c=int32#20,>x1c_stack=stack32#25
+# asm 2: stw <x1c=22,>x1c_stack=96(1)
+stw 22,96(1)
 
 # qhasm:   x04 ^= x15
-# asm 1: xor >x04=int32#24,<x15=int32#2,<x04=int32#18
-# asm 2: xor >x04=26,<x15=4,<x04=20
-xor 26,4,20
+# asm 1: xor >x04=int32#23,<x15=int32#2,<x04=int32#17
+# asm 2: xor >x04=25,<x15=4,<x04=19
+xor 25,4,19
 
 # qhasm:   x05 ^= x14
-# asm 1: xor >x05=int32#25,<x14=int32#4,<x05=int32#20
-# asm 2: xor >x05=27,<x14=6,<x05=22
-xor 27,6,22
+# asm 1: xor >x05=int32#24,<x14=int32#4,<x05=int32#19
+# asm 2: xor >x05=26,<x14=6,<x05=21
+xor 26,6,21
 
 # qhasm:   x0c ^= x1d
-# asm 1: xor >x0c=int32#9,<x1d=int32#15,<x0c=int32#9
-# asm 2: xor >x0c=11,<x1d=17,<x0c=11
-xor 11,17,11
+# asm 1: xor >x0c=int32#8,<x1d=int32#14,<x0c=int32#8
+# asm 2: xor >x0c=10,<x1d=16,<x0c=10
+xor 10,16,10
 
 # qhasm:   x0d ^= x1c
-# asm 1: xor >x0d=int32#10,<x1c=int32#21,<x0d=int32#10
-# asm 2: xor >x0d=12,<x1c=23,<x0d=12
-xor 12,23,12
+# asm 1: xor >x0d=int32#9,<x1c=int32#20,<x0d=int32#9
+# asm 2: xor >x0d=11,<x1c=22,<x0d=11
+xor 11,22,11
 
 # qhasm:   x00 <<<= 11
-# asm 1: rlwinm >x00=int32#2,<x00=int32#14,11,0xffffffff
-# asm 2: rlwinm >x00=4,<x00=16,11,0xffffffff
-rlwinm 4,16,11,0xffffffff
+# asm 1: rlwinm >x00=int32#2,<x00=int32#13,11,0xffffffff
+# asm 2: rlwinm >x00=4,<x00=15,11,0xffffffff
+rlwinm 4,15,11,0xffffffff
 
 # qhasm:   x01 <<<= 11
-# asm 1: rlwinm >x01=int32#4,<x01=int32#23,11,0xffffffff
-# asm 2: rlwinm >x01=6,<x01=25,11,0xffffffff
-rlwinm 6,25,11,0xffffffff
+# asm 1: rlwinm >x01=int32#4,<x01=int32#22,11,0xffffffff
+# asm 2: rlwinm >x01=6,<x01=24,11,0xffffffff
+rlwinm 6,24,11,0xffffffff
 
 # qhasm:   x08 <<<= 11
 # asm 1: rlwinm >x08=int32#1,<x08=int32#1,11,0xffffffff
@@ -1808,19 +1958,19 @@ rlwinm 6,25,11,0xffffffff
 rlwinm 3,3,11,0xffffffff
 
 # qhasm:   x09 <<<= 11
-# asm 1: rlwinm >x09=int32#6,<x09=int32#6,11,0xffffffff
-# asm 2: rlwinm >x09=8,<x09=8,11,0xffffffff
-rlwinm 8,8,11,0xffffffff
+# asm 1: rlwinm >x09=int32#5,<x09=int32#5,11,0xffffffff
+# asm 2: rlwinm >x09=7,<x09=7,11,0xffffffff
+rlwinm 7,7,11,0xffffffff
 
 # qhasm:   x00 ^= x11
-# asm 1: xor >x00=int32#20,<x11=int32#13,<x00=int32#2
-# asm 2: xor >x00=22,<x11=15,<x00=4
-xor 22,15,4
+# asm 1: xor >x00=int32#19,<x11=int32#12,<x00=int32#2
+# asm 2: xor >x00=21,<x11=14,<x00=4
+xor 21,14,4
 
 # qhasm:   x01 ^= x10
-# asm 1: xor >x01=int32#21,<x10=int32#8,<x01=int32#4
-# asm 2: xor >x01=23,<x10=10,<x01=6
-xor 23,10,6
+# asm 1: xor >x01=int32#20,<x10=int32#7,<x01=int32#4
+# asm 2: xor >x01=22,<x10=9,<x01=6
+xor 22,9,6
 
 # qhasm:           x17 = x17_stack
 # asm 1: lwz >x17=int32#2,<x17_stack=stack32#28
@@ -1828,9 +1978,9 @@ xor 23,10,6
 lwz 4,108(1)
 
 # qhasm:   x08 ^= x19
-# asm 1: xor >x08=int32#1,<x19=int32#17,<x08=int32#1
-# asm 2: xor >x08=3,<x19=19,<x08=3
-xor 3,19,3
+# asm 1: xor >x08=int32#1,<x19=int32#16,<x08=int32#1
+# asm 2: xor >x08=3,<x19=18,<x08=3
+xor 3,18,3
 
 # qhasm:           x02 = x02_stack
 # asm 1: lwz >x02=int32#4,<x02_stack=stack32#34
@@ -1838,29 +1988,29 @@ xor 3,19,3
 lwz 6,132(1)
 
 # qhasm:   x09 ^= x18
-# asm 1: xor >x09=int32#6,<x18=int32#16,<x09=int32#6
-# asm 2: xor >x09=8,<x18=18,<x09=8
-xor 8,18,8
+# asm 1: xor >x09=int32#5,<x18=int32#15,<x09=int32#5
+# asm 2: xor >x09=7,<x18=17,<x09=7
+xor 7,17,7
 
 # qhasm:           x16 = x16_stack
-# asm 1: lwz >x16=int32#23,<x16_stack=stack32#36
-# asm 2: lwz >x16=25,<x16_stack=140(1)
-lwz 25,140(1)
+# asm 1: lwz >x16=int32#22,<x16_stack=stack32#36
+# asm 2: lwz >x16=24,<x16_stack=140(1)
+lwz 24,140(1)
 
 # qhasm:   x13 += x06
-# asm 1: add >x13=int32#15,<x13=int32#7,<x06=int32#26
-# asm 2: add >x13=17,<x13=9,<x06=28
-add 17,9,28
+# asm 1: add >x13=int32#14,<x13=int32#6,<x06=int32#25
+# asm 2: add >x13=16,<x13=8,<x06=27
+add 16,8,27
 
 # qhasm:           x1f = x1f_stack
-# asm 1: lwz >x1f=int32#7,<x1f_stack=stack32#24
-# asm 2: lwz >x1f=9,<x1f_stack=92(1)
-lwz 9,92(1)
+# asm 1: lwz >x1f=int32#6,<x1f_stack=stack32#24
+# asm 2: lwz >x1f=8,<x1f_stack=92(1)
+lwz 8,92(1)
 
 # qhasm:   x12 += x07
-# asm 1: add >x12=int32#14,<x12=int32#3,<x07=int32#5
-# asm 2: add >x12=16,<x12=5,<x07=7
-add 16,5,7
+# asm 1: add >x12=int32#13,<x12=int32#3,<x07=int32#26
+# asm 2: add >x12=15,<x12=5,<x07=28
+add 15,5,28
 
 # qhasm:           x0a = x0a_stack
 # asm 1: lwz >x0a=int32#3,<x0a_stack=stack32#35
@@ -1868,9 +2018,9 @@ add 16,5,7
 lwz 5,136(1)
 
 # qhasm:   x1b += x0e
-# asm 1: add >x1b=int32#19,<x1b=int32#19,<x0e=int32#11
-# asm 2: add >x1b=21,<x1b=21,<x0e=13
-add 21,21,13
+# asm 1: add >x1b=int32#18,<x1b=int32#18,<x0e=int32#10
+# asm 2: add >x1b=20,<x1b=20,<x0e=12
+add 20,20,12
 
 # qhasm:           x1e = x1e_stack
 # asm 1: lwz >x1e=int32#28,<x1e_stack=stack32#27
@@ -1878,14 +2028,14 @@ add 21,21,13
 lwz 30,104(1)
 
 # qhasm:   x1a += x0f
-# asm 1: add >x1a=int32#18,<x1a=int32#22,<x0f=int32#12
-# asm 2: add >x1a=20,<x1a=24,<x0f=14
-add 20,24,14
+# asm 1: add >x1a=int32#17,<x1a=int32#21,<x0f=int32#11
+# asm 2: add >x1a=19,<x1a=23,<x0f=13
+add 19,23,13
 
 # qhasm:           x0b = x0b_stack
-# asm 1: lwz >x0b=int32#22,<x0b_stack=stack32#37
-# asm 2: lwz >x0b=24,<x0b_stack=144(1)
-lwz 24,144(1)
+# asm 1: lwz >x0b=int32#21,<x0b_stack=stack32#37
+# asm 2: lwz >x0b=23,<x0b_stack=144(1)
+lwz 23,144(1)
 
 # qhasm:   x17 += x02
 # asm 1: add >x17=int32#2,<x17=int32#2,<x02=int32#4
@@ -1893,19 +2043,19 @@ lwz 24,144(1)
 add 4,4,6
 
 # qhasm:   x16 += x03
-# asm 1: add >x16=int32#23,<x16=int32#23,<x03=int32#27
-# asm 2: add >x16=25,<x16=25,<x03=29
-add 25,25,29
+# asm 1: add >x16=int32#22,<x16=int32#22,<x03=int32#27
+# asm 2: add >x16=24,<x16=24,<x03=29
+add 24,24,29
 
 # qhasm:   x1f += x0a
-# asm 1: add >x1f=int32#7,<x1f=int32#7,<x0a=int32#3
-# asm 2: add >x1f=9,<x1f=9,<x0a=5
-add 9,9,5
+# asm 1: add >x1f=int32#6,<x1f=int32#6,<x0a=int32#3
+# asm 2: add >x1f=8,<x1f=8,<x0a=5
+add 8,8,5
 
 # qhasm:   x1e += x0b
-# asm 1: add >x1e=int32#29,<x1e=int32#28,<x0b=int32#22
-# asm 2: add >x1e=31,<x1e=30,<x0b=24
-add 31,30,24
+# asm 1: add >x1e=int32#29,<x1e=int32#28,<x0b=int32#21
+# asm 2: add >x1e=31,<x1e=30,<x0b=23
+add 31,30,23
 
 # qhasm:         r = r_stack
 # asm 1: lwz >r=int32#28,<r_stack=stack32#33
@@ -1913,9 +2063,9 @@ add 31,30,24
 lwz 30,128(1)
 
 # qhasm:   x06 <<<= 11
-# asm 1: rlwinm >x06=int32#26,<x06=int32#26,11,0xffffffff
-# asm 2: rlwinm >x06=28,<x06=28,11,0xffffffff
-rlwinm 28,28,11,0xffffffff
+# asm 1: rlwinm >x06=int32#25,<x06=int32#25,11,0xffffffff
+# asm 2: rlwinm >x06=27,<x06=27,11,0xffffffff
+rlwinm 27,27,11,0xffffffff
 
 # qhasm:           x17_stack = x17
 # asm 1: stw <x17=int32#2,>x17_stack=stack32#24
@@ -1923,29 +2073,29 @@ rlwinm 28,28,11,0xffffffff
 stw 4,92(1)
 
 # qhasm:   x07 <<<= 11
-# asm 1: rlwinm >x07=int32#5,<x07=int32#5,11,0xffffffff
-# asm 2: rlwinm >x07=7,<x07=7,11,0xffffffff
-rlwinm 7,7,11,0xffffffff
+# asm 1: rlwinm >x07=int32#26,<x07=int32#26,11,0xffffffff
+# asm 2: rlwinm >x07=28,<x07=28,11,0xffffffff
+rlwinm 28,28,11,0xffffffff
 
 # qhasm:           x16_stack = x16
-# asm 1: stw <x16=int32#23,>x16_stack=stack32#23
-# asm 2: stw <x16=25,>x16_stack=88(1)
-stw 25,88(1)
+# asm 1: stw <x16=int32#22,>x16_stack=stack32#23
+# asm 2: stw <x16=24,>x16_stack=88(1)
+stw 24,88(1)
 
 # qhasm:   x0e <<<= 11
-# asm 1: rlwinm >x0e=int32#11,<x0e=int32#11,11,0xffffffff
-# asm 2: rlwinm >x0e=13,<x0e=13,11,0xffffffff
-rlwinm 13,13,11,0xffffffff
+# asm 1: rlwinm >x0e=int32#10,<x0e=int32#10,11,0xffffffff
+# asm 2: rlwinm >x0e=12,<x0e=12,11,0xffffffff
+rlwinm 12,12,11,0xffffffff
 
 # qhasm:           x1f_stack = x1f
-# asm 1: stw <x1f=int32#7,>x1f_stack=stack32#28
-# asm 2: stw <x1f=9,>x1f_stack=108(1)
-stw 9,108(1)
+# asm 1: stw <x1f=int32#6,>x1f_stack=stack32#28
+# asm 2: stw <x1f=8,>x1f_stack=108(1)
+stw 8,108(1)
 
 # qhasm:   x0f <<<= 11
-# asm 1: rlwinm >x0f=int32#12,<x0f=int32#12,11,0xffffffff
-# asm 2: rlwinm >x0f=14,<x0f=14,11,0xffffffff
-rlwinm 14,14,11,0xffffffff
+# asm 1: rlwinm >x0f=int32#11,<x0f=int32#11,11,0xffffffff
+# asm 2: rlwinm >x0f=13,<x0f=13,11,0xffffffff
+rlwinm 13,13,11,0xffffffff
 
 # qhasm:           x1e_stack = x1e
 # asm 1: stw <x1e=int32#29,>x1e_stack=stack32#27
@@ -1958,29 +2108,29 @@ stw 31,104(1)
 addic. 30,30,-2
 
 # qhasm:   x06 ^= x17
-# asm 1: xor >x06=int32#26,<x17=int32#2,<x06=int32#26
-# asm 2: xor >x06=28,<x17=4,<x06=28
-xor 28,4,28
+# asm 1: xor >x06=int32#25,<x17=int32#2,<x06=int32#25
+# asm 2: xor >x06=27,<x17=4,<x06=27
+xor 27,4,27
 
 # qhasm:   x07 ^= x16
-# asm 1: xor >x07=int32#5,<x16=int32#23,<x07=int32#5
-# asm 2: xor >x07=7,<x16=25,<x07=7
-xor 7,25,7
+# asm 1: xor >x07=int32#26,<x16=int32#22,<x07=int32#26
+# asm 2: xor >x07=28,<x16=24,<x07=28
+xor 28,24,28
 
 # qhasm:   x0e ^= x1f
-# asm 1: xor >x0e=int32#11,<x1f=int32#7,<x0e=int32#11
-# asm 2: xor >x0e=13,<x1f=9,<x0e=13
-xor 13,9,13
+# asm 1: xor >x0e=int32#10,<x1f=int32#6,<x0e=int32#10
+# asm 2: xor >x0e=12,<x1f=8,<x0e=12
+xor 12,8,12
 
 # qhasm:   x0f ^= x1e
-# asm 1: xor >x0f=int32#12,<x1e=int32#29,<x0f=int32#12
-# asm 2: xor >x0f=14,<x1e=31,<x0f=14
-xor 14,31,14
+# asm 1: xor >x0f=int32#11,<x1e=int32#29,<x0f=int32#11
+# asm 2: xor >x0f=13,<x1e=31,<x0f=13
+xor 13,31,13
 
 # qhasm:   x0b <<<= 11
-# asm 1: rlwinm >x0b=int32#2,<x0b=int32#22,11,0xffffffff
-# asm 2: rlwinm >x0b=4,<x0b=24,11,0xffffffff
-rlwinm 4,24,11,0xffffffff
+# asm 1: rlwinm >x0b=int32#2,<x0b=int32#21,11,0xffffffff
+# asm 2: rlwinm >x0b=4,<x0b=23,11,0xffffffff
+rlwinm 4,23,11,0xffffffff
 
 # qhasm:   x0a <<<= 11
 # asm 1: rlwinm >x0a=int32#3,<x0a=int32#3,11,0xffffffff
@@ -1988,9 +2138,9 @@ rlwinm 4,24,11,0xffffffff
 rlwinm 5,5,11,0xffffffff
 
 # qhasm:   x03 <<<= 11
-# asm 1: rlwinm >x03=int32#22,<x03=int32#27,11,0xffffffff
-# asm 2: rlwinm >x03=24,<x03=29,11,0xffffffff
-rlwinm 24,29,11,0xffffffff
+# asm 1: rlwinm >x03=int32#21,<x03=int32#27,11,0xffffffff
+# asm 2: rlwinm >x03=23,<x03=29,11,0xffffffff
+rlwinm 23,29,11,0xffffffff
 
 # qhasm:   x02 <<<= 11
 # asm 1: rlwinm >x02=int32#4,<x02=int32#4,11,0xffffffff
@@ -1998,24 +2148,24 @@ rlwinm 24,29,11,0xffffffff
 rlwinm 6,6,11,0xffffffff
 
 # qhasm:   x0b ^= x1a
-# asm 1: xor >x0b=int32#2,<x1a=int32#18,<x0b=int32#2
-# asm 2: xor >x0b=4,<x1a=20,<x0b=4
-xor 4,20,4
+# asm 1: xor >x0b=int32#2,<x1a=int32#17,<x0b=int32#2
+# asm 2: xor >x0b=4,<x1a=19,<x0b=4
+xor 4,19,4
 
 # qhasm:   x0a ^= x1b
-# asm 1: xor >x0a=int32#7,<x1b=int32#19,<x0a=int32#3
-# asm 2: xor >x0a=9,<x1b=21,<x0a=5
-xor 9,21,5
+# asm 1: xor >x0a=int32#6,<x1b=int32#18,<x0a=int32#3
+# asm 2: xor >x0a=8,<x1b=20,<x0a=5
+xor 8,20,5
 
 # qhasm:   x03 ^= x12
-# asm 1: xor >x03=int32#23,<x12=int32#14,<x03=int32#22
-# asm 2: xor >x03=25,<x12=16,<x03=24
-xor 25,16,24
+# asm 1: xor >x03=int32#22,<x12=int32#13,<x03=int32#21
+# asm 2: xor >x03=24,<x12=15,<x03=23
+xor 24,15,23
 
 # qhasm:   x02 ^= x13
-# asm 1: xor >x02=int32#22,<x13=int32#15,<x02=int32#4
-# asm 2: xor >x02=24,<x13=17,<x02=6
-xor 24,17,6
+# asm 1: xor >x02=int32#21,<x13=int32#14,<x02=int32#4
+# asm 2: xor >x02=23,<x13=16,<x02=6
+xor 23,16,6
 
 # qhasm:           x0b_stack = x0b
 # asm 1: stw <x0b=int32#2,>x0b_stack=stack32#20
@@ -2247,9 +2397,9 @@ b .label.morerounds
 lwz 4,72(1)
 
 # qhasm:   *(swapendian uint32 *) out = x00
-# asm 1: stwbrx <x00=int32#20,0,<out=int32#2
-# asm 2: stwbrx <x00=22,0,<out=4
-stwbrx 22,0,4
+# asm 1: stwbrx <x00=int32#19,0,<out=int32#2
+# asm 2: stwbrx <x00=21,0,<out=4
+stwbrx 21,0,4
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#2,<out=int32#2,4
@@ -2257,9 +2407,9 @@ stwbrx 22,0,4
 addi 4,4,4
 
 # qhasm:   *(swapendian uint32 *) out = x01
-# asm 1: stwbrx <x01=int32#21,0,<out=int32#2
-# asm 2: stwbrx <x01=23,0,<out=4
-stwbrx 23,0,4
+# asm 1: stwbrx <x01=int32#20,0,<out=int32#2
+# asm 2: stwbrx <x01=22,0,<out=4
+stwbrx 22,0,4
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#2,<out=int32#2,4
@@ -2267,9 +2417,9 @@ stwbrx 23,0,4
 addi 4,4,4
 
 # qhasm:   *(swapendian uint32 *) out = x02
-# asm 1: stwbrx <x02=int32#22,0,<out=int32#2
-# asm 2: stwbrx <x02=24,0,<out=4
-stwbrx 24,0,4
+# asm 1: stwbrx <x02=int32#21,0,<out=int32#2
+# asm 2: stwbrx <x02=23,0,<out=4
+stwbrx 23,0,4
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#2,<out=int32#2,4
@@ -2277,9 +2427,9 @@ stwbrx 24,0,4
 addi 4,4,4
 
 # qhasm:   *(swapendian uint32 *) out = x03
-# asm 1: stwbrx <x03=int32#23,0,<out=int32#2
-# asm 2: stwbrx <x03=25,0,<out=4
-stwbrx 25,0,4
+# asm 1: stwbrx <x03=int32#22,0,<out=int32#2
+# asm 2: stwbrx <x03=24,0,<out=4
+stwbrx 24,0,4
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#2,<out=int32#2,4
@@ -2287,9 +2437,9 @@ stwbrx 25,0,4
 addi 4,4,4
 
 # qhasm:   *(swapendian uint32 *) out = x04
-# asm 1: stwbrx <x04=int32#24,0,<out=int32#2
-# asm 2: stwbrx <x04=26,0,<out=4
-stwbrx 26,0,4
+# asm 1: stwbrx <x04=int32#23,0,<out=int32#2
+# asm 2: stwbrx <x04=25,0,<out=4
+stwbrx 25,0,4
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#2,<out=int32#2,4
@@ -2297,9 +2447,9 @@ stwbrx 26,0,4
 addi 4,4,4
 
 # qhasm:   *(swapendian uint32 *) out = x05
-# asm 1: stwbrx <x05=int32#25,0,<out=int32#2
-# asm 2: stwbrx <x05=27,0,<out=4
-stwbrx 27,0,4
+# asm 1: stwbrx <x05=int32#24,0,<out=int32#2
+# asm 2: stwbrx <x05=26,0,<out=4
+stwbrx 26,0,4
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#2,<out=int32#2,4
@@ -2307,9 +2457,9 @@ stwbrx 27,0,4
 addi 4,4,4
 
 # qhasm:   *(swapendian uint32 *) out = x06
-# asm 1: stwbrx <x06=int32#26,0,<out=int32#2
-# asm 2: stwbrx <x06=28,0,<out=4
-stwbrx 28,0,4
+# asm 1: stwbrx <x06=int32#25,0,<out=int32#2
+# asm 2: stwbrx <x06=27,0,<out=4
+stwbrx 27,0,4
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#2,<out=int32#2,4
@@ -2317,9 +2467,9 @@ stwbrx 28,0,4
 addi 4,4,4
 
 # qhasm:   *(swapendian uint32 *) out = x07
-# asm 1: stwbrx <x07=int32#5,0,<out=int32#2
-# asm 2: stwbrx <x07=7,0,<out=4
-stwbrx 7,0,4
+# asm 1: stwbrx <x07=int32#26,0,<out=int32#2
+# asm 2: stwbrx <x07=28,0,<out=4
+stwbrx 28,0,4
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#2,<out=int32#2,4
@@ -2342,9 +2492,9 @@ stwbrx 3,0,4
 addi 3,4,4
 
 # qhasm:   *(swapendian uint32 *) out = x09
-# asm 1: stwbrx <x09=int32#6,0,<out=int32#1
-# asm 2: stwbrx <x09=8,0,<out=3
-stwbrx 8,0,3
+# asm 1: stwbrx <x09=int32#5,0,<out=int32#1
+# asm 2: stwbrx <x09=7,0,<out=3
+stwbrx 7,0,3
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#1,<out=int32#1,4
@@ -2352,9 +2502,9 @@ stwbrx 8,0,3
 addi 3,3,4
 
 # qhasm:   *(swapendian uint32 *) out = x0a
-# asm 1: stwbrx <x0a=int32#7,0,<out=int32#1
-# asm 2: stwbrx <x0a=9,0,<out=3
-stwbrx 9,0,3
+# asm 1: stwbrx <x0a=int32#6,0,<out=int32#1
+# asm 2: stwbrx <x0a=8,0,<out=3
+stwbrx 8,0,3
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#1,<out=int32#1,4
@@ -2372,9 +2522,9 @@ stwbrx 5,0,3
 addi 3,3,4
 
 # qhasm:   *(swapendian uint32 *) out = x0c
-# asm 1: stwbrx <x0c=int32#9,0,<out=int32#1
-# asm 2: stwbrx <x0c=11,0,<out=3
-stwbrx 11,0,3
+# asm 1: stwbrx <x0c=int32#8,0,<out=int32#1
+# asm 2: stwbrx <x0c=10,0,<out=3
+stwbrx 10,0,3
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#1,<out=int32#1,4
@@ -2382,9 +2532,9 @@ stwbrx 11,0,3
 addi 3,3,4
 
 # qhasm:   *(swapendian uint32 *) out = x0d
-# asm 1: stwbrx <x0d=int32#10,0,<out=int32#1
-# asm 2: stwbrx <x0d=12,0,<out=3
-stwbrx 12,0,3
+# asm 1: stwbrx <x0d=int32#9,0,<out=int32#1
+# asm 2: stwbrx <x0d=11,0,<out=3
+stwbrx 11,0,3
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#1,<out=int32#1,4
@@ -2392,9 +2542,9 @@ stwbrx 12,0,3
 addi 3,3,4
 
 # qhasm:   *(swapendian uint32 *) out = x0e
-# asm 1: stwbrx <x0e=int32#11,0,<out=int32#1
-# asm 2: stwbrx <x0e=13,0,<out=3
-stwbrx 13,0,3
+# asm 1: stwbrx <x0e=int32#10,0,<out=int32#1
+# asm 2: stwbrx <x0e=12,0,<out=3
+stwbrx 12,0,3
 
 # qhasm:   out += 4
 # asm 1: addi >out=int32#1,<out=int32#1,4
@@ -2402,9 +2552,9 @@ stwbrx 13,0,3
 addi 3,3,4
 
 # qhasm:   *(swapendian uint32 *) out = x0f
-# asm 1: stwbrx <x0f=int32#12,0,<out=int32#1
-# asm 2: stwbrx <x0f=14,0,<out=3
-stwbrx 14,0,3
+# asm 1: stwbrx <x0f=int32#11,0,<out=int32#1
+# asm 2: stwbrx <x0f=13,0,<out=3
+stwbrx 13,0,3
 
 # qhasm:   result = 0
 # asm 1: li >result=int32#1,0
