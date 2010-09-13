@@ -2,9 +2,9 @@
 	.pred.safe_across_calls p1-p5,p16-p63
 	.text
 	.align 16
-	.global crypto_hash_cubehash1632_unrolled3#
-	.proc crypto_hash_cubehash1632_unrolled3#
-crypto_hash_cubehash1632_unrolled3:
+	.global crypto_hash_cubehash1632_precompiled_ia64#
+	.proc crypto_hash_cubehash1632_precompiled_ia64#
+crypto_hash_cubehash1632_precompiled_ia64:
 	.prologue
 	.mmi
 	alloc r16 = ar.pfs, 3, 69, 8, 0
@@ -1303,5 +1303,5 @@ crypto_hash_cubehash1632_unrolled3:
 	.restore sp
 	adds r12 = 16, r12
 	br.ret.sptk.many b0
-	.endp crypto_hash_cubehash1632_unrolled3#
+	.endp crypto_hash_cubehash1632_precompiled_ia64#
 	.ident	"GCC: (GNU) 3.2.3 20030502 (Red Hat Linux 3.2.3-52)"

@@ -3,8 +3,10 @@
 //Universidade de Campinas - Institute of Computing - Brazil
 //thomaz.oliveira@students.ic.unicamp.br
 
-#include "crypto_hash.h"
+//#include "crypto_hash.h"
 #include <stdio.h>
+#include <string.h>
+#include "crypto_hash.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -26,8 +28,8 @@ static const u32 CONSTS[48] = {
 0xd9847356,0x36eda57f,0xa2c78434,0x703aace7
 };
 
-//global var
-static u32 chaining[24] = {
+//IV
+static const u32 IV[24] = {
 0x6d251e69,0x44b051e0,0x4eaa6fb4,0xdbf78465,
 0x6e292011,0x90152df4,0xee058139,0xdef610bb,
 0xc3b44b95,0xd9d2f256,0x70eee9a0,0xde099fa3,
@@ -35,6 +37,9 @@ static u32 chaining[24] = {
 0xf7efc89d,0x5dba5781,0x04016ce5,0xad659c05,
 0x0306194f,0x666d1836,0x24aa230a,0x8b264ae7
 };
+
+//global var
+static u32 chaining[24];
 
 //round subcrumb
 static void fLuffaRoundPermSubCrumb(u32 *r0, u32 *r1, u32 *r2, u32 *r3) {
@@ -197,18 +202,28 @@ static void fLuffaFinalization(u32 *buffer) {
 	for (i=0;i<8;i++) { chaining[i] = chaining[i] ^ chaining[8+i] ^ chaining[16+i]; }
 }
 
+static void fOutputPrint256(u8 *output, u8 *chaining) {
+	int i;
+	for (i=0;i<32;i++) { output[i] = chaining[i]; }
+}
+
 int crypto_hash(unsigned char *out, const unsigned char *in, unsigned long long inlen) {
 	u8 buffer[32];
 	int i;
+	int bufinit = 0;
+
+	//Init
+	for (i=0;i<24;i++) { chaining[i] = IV[i]; }
 
 	//Round
-	while(inlen >= 32) {		
-		fLuffaRound((u32 *) in);
+	while(inlen >= 32) {
+		for (i=0;i<32;i++) { buffer[i] = in[bufinit + i]; }				
+		fLuffaRound((u32 *) buffer);
 		inlen = inlen - 32;
-		in = in + 32;
+		bufinit = bufinit + 32;
 	}
 
-	for (i=0;i<inlen;i++) {	buffer[i] = *in++; }
+	for (i=0;i<inlen;i++) {	buffer[i] = in[bufinit + i]; }
 
 	//Padding
 	fLuffaPadding(buffer, inlen);
@@ -217,10 +232,9 @@ int crypto_hash(unsigned char *out, const unsigned char *in, unsigned long long 
 	//Final message
 	fLuffaFinalization((u32 *) buffer);
 
-	//Print
+	//To output
 	fLittleEndian(chaining);
-	memcpy(out, &chaining, 32);	
+	fOutputPrint256(out, (u8 *) chaining);	
 
 	return 0;
 }
-

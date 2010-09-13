@@ -183,7 +183,9 @@ do
       if [ "$t1" = implementation ]
       then
         implementationdir="$t2etc"
-	find "$implementationdir" -follow -type f '!' -name implementors \
+	find "$implementationdir" -follow -type f \
+	'!' -name implementors \
+	'!' -name architectures \
 	| sort \
 	| while read f
 	do

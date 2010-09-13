@@ -43,6 +43,7 @@ okabi | (
           echo sgi
 	  ;;
 	arm*)
+	  echo cortex
           echo dev4ns
 	  ;;
       esac
@@ -64,6 +65,7 @@ okabi | (
       echo hppapstat
       echo alpha
       echo sgi
+      echo cortex
       echo dev4ns
       echo monotoniccpuinfo
       echo monotonic
