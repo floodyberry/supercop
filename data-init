@@ -204,6 +204,17 @@ do
 	implementationdir=`dirname $doth`
 	opi=`echo "$implementationdir" | tr ./- !!!`
 
+	if [ -f "$implementationdir/architectures" ]
+	then
+	  if grep '^'"$abi"'$' "$implementationdir/architectures" >/dev/null
+	  then
+	    :
+	  else
+            echo "=== `date` === skipping $abi/implementation/$implementationdir"
+	    continue
+	  fi
+	fi
+
         echo "=== `date` === todo $abi/implementation/$implementationdir"
         echo "$abi/implementation/$implementationdir" >&6
         mkdir -p "$top/$abi/implementation/$implementationdir"
