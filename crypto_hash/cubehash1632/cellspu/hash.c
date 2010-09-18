@@ -20,7 +20,7 @@ static inline vec_uchar16 mylvsr(unsigned char *b)
                                 (vector unsigned short)(spu_splats((unsigned char)(((int)(b)) & 0xF))));
 }
 
-int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long originlen)
+int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long inlen)
 {
   vector unsigned int x0;
   vector unsigned int x1;
@@ -43,7 +43,7 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long or
   unsigned char tmp[32];
   int i;
   int r;
-  long long inlen = originlen;
+  int finalization = 0;
 
   x0 = (vector unsigned int){0x2aea2a61,0x50f494d4,0x2d538b8b,0x4167d83e};
   x1 = (vector unsigned int){0x3fee2313,0xc701cf8c,0xcc39968e,0x50ac5695};
@@ -124,21 +124,22 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long or
 
   endofloop:
 
-  if (inlen >= 0) {
+  if (finalization == 0) {
     for (i = 0;i < inlen;++i) tmp[i] = in[i];
     tmp[i] = 128;
     for (++i;i < 32;++i) tmp[i] = 0;
     in = tmp;
     align = mylvsl((unsigned char *) in);
     alignswap = spu_shuffle(align,align,littleendian);
-    inlen = 31;
+    inlen = 32;
+    finalization = 1;
     goto mainloop;
   }
 
-  if (inlen == -1) {
+  if (finalization == 1) {
     x7 ^= (vector unsigned int){0,0,0,1};
     r = 10 * CUBEHASH_ROUNDS;
-    inlen = -2;
+    finalization = 2;
     goto morerounds;
   }
 

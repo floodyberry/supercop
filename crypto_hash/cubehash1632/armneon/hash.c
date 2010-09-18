@@ -14,7 +14,7 @@ const uint32_t constants[36] = {
   0,0,0,1
 } ;
 
-int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long originlen)
+int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long inlen)
 {
   uint32x4_t x0;
   uint32x4_t x1;
@@ -28,7 +28,7 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long or
   uint32x4_t y1;
   int i;
   int r;
-  long long inlen = originlen;
+  int finalization = 0;
 
   x0 = vld1q_u32(constants);
   x1 = vld1q_u32(constants + 4);
@@ -123,31 +123,28 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long or
 
   inlenbelow32:
 
-  if (inlen >= 16) {
-    x0 = veorq_u32(x0,vld1q_u32((uint32_t *) in));
-    y1 ^= y1;
-    for (i = 0;i < inlen - 16;++i) ((unsigned char *) &y1)[i] = in[16 + i];
-    ((unsigned char *) &y1)[i] = 128;
-    x1 = veorq_u32(x1,y1);
+  if (finalization == 0) {
+    if (inlen >= 16) {
+      x0 = veorq_u32(x0,vld1q_u32((uint32_t *) in));
+      y1 ^= y1;
+      for (i = 0;i < inlen - 16;++i) ((unsigned char *) &y1)[i] = in[16 + i];
+      ((unsigned char *) &y1)[i] = 128;
+      x1 = veorq_u32(x1,y1);
+    } else {
+      y0 ^= y0;
+      for (i = 0;i < inlen;++i) ((unsigned char *) &y0)[i] = in[i];
+      ((unsigned char *) &y0)[i] = 128;
+      x0 = veorq_u32(x0,y0);
+    }
     r = CUBEHASH_ROUNDS;
-    inlen = -1;
+    finalization = 1;
     goto morerounds;
   }
 
-  if (inlen >= 0) {
-    y0 ^= y0;
-    for (i = 0;i < inlen;++i) ((unsigned char *) &y0)[i] = in[i];
-    ((unsigned char *) &y0)[i] = 128;
-    x0 = veorq_u32(x0,y0);
-    r = CUBEHASH_ROUNDS;
-    inlen = -1;
-    goto morerounds;
-  }
-
-  if (inlen == -1) {
+  if (finalization == 1) {
     x7 = veorq_u32(x7,vld1q_u32((uint32_t *) (constants + 32)));
     r = 10 * CUBEHASH_ROUNDS;
-    inlen = -2;
+    finalization = 2;
     goto morerounds;
   }
 

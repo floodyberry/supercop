@@ -2,7 +2,7 @@
 #include <emmintrin.h>
 #include "crypto_hash.h"
 
-int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long originlen)
+int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long inlen)
 {
   __m128i x0;
   __m128i x1;
@@ -18,7 +18,7 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long or
   __m128i y3;
   int i;
   int r;
-  long long inlen = originlen;
+  int finalization = 0;
 
   x0 = _mm_set_epi32(0x4167d83e,0x2d538b8b,0x50f494d4,0x2aea2a61);
   x1 = _mm_set_epi32(0x50ac5695,0xcc39968e,0xc701cf8c,0x3fee2313);
@@ -88,31 +88,28 @@ int crypto_hash(unsigned char *out,const unsigned char *in,unsigned long long or
 
   inlenbelow32:
 
-  if (inlen >= 16) {
-    x0 = _mm_xor_si128(x0,_mm_loadu_si128((__m128i *) in));
-    y1 ^= y1;
-    for (i = 0;i < inlen - 16;++i) ((unsigned char *) &y1)[i] = in[16 + i];
-    ((unsigned char *) &y1)[i] = 128;
-    x1 = _mm_xor_si128(x1,y1);
+  if (finalization == 0) {
+    if (inlen >= 16) {
+      x0 = _mm_xor_si128(x0,_mm_loadu_si128((__m128i *) in));
+      y1 ^= y1;
+      for (i = 0;i < inlen - 16;++i) ((unsigned char *) &y1)[i] = in[16 + i];
+      ((unsigned char *) &y1)[i] = 128;
+      x1 = _mm_xor_si128(x1,y1);
+    } else {
+      y0 ^= y0;
+      for (i = 0;i < inlen;++i) ((unsigned char *) &y0)[i] = in[i];
+      ((unsigned char *) &y0)[i] = 128;
+      x0 = _mm_xor_si128(x0,y0);
+    }
     r = CUBEHASH_ROUNDS;
-    inlen = -1;
+    finalization = 1;
     goto morerounds;
   }
 
-  if (inlen >= 0) {
-    y0 ^= y0;
-    for (i = 0;i < inlen;++i) ((unsigned char *) &y0)[i] = in[i];
-    ((unsigned char *) &y0)[i] = 128;
-    x0 = _mm_xor_si128(x0,y0);
-    r = CUBEHASH_ROUNDS;
-    inlen = -1;
-    goto morerounds;
-  }
-
-  if (inlen == -1) {
+  if (finalization == 1) {
     x7 = _mm_xor_si128(x7,_mm_set_epi32(1,0,0,0));
     r = 10 * CUBEHASH_ROUNDS;
-    inlen = -2;
+    finalization = 2;
     goto morerounds;
   }
 
