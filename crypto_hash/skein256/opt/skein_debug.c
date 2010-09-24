@@ -12,7 +12,7 @@
 #ifdef SKEIN_DEBUG  /* only instantiate this code if SKEIN_DEBUG is on */
 #include "skein.h"
 
-static const char *INDENT = "    ";  /* how much to indent on new line */
+static const char INDENT[] =  "    ";  /* how much to indent on new line */
 
 uint_t skein_DebugFlag = 0;  /* off by default. Must be set externally */
 
@@ -138,7 +138,7 @@ void Skein_Show_Round(uint_t bits,const Skein_Ctxt_Hdr_t *h,size_t r,const u64b_
                     
             if ((skein_DebugFlag & SKEIN_DEBUG_PERMUTE) && (r & 3))
                 {
-                printf("\n%s [state after round %2d (permuted)]=\n",AlgoHeader(bits),r);
+                printf("\n%s [state after round %2d (permuted)]=\n",AlgoHeader(bits),(int)r);
                 switch (bits)
                     {
                     case  256: perm = PERM_256 [r&3];   break;
@@ -151,7 +151,7 @@ void Skein_Show_Round(uint_t bits,const Skein_Ctxt_Hdr_t *h,size_t r,const u64b_
                 }
             else
                 {
-                printf("\n%s [state after round %2d]=\n",AlgoHeader(bits),r);
+                printf("\n%s [state after round %2d]=\n",AlgoHeader(bits),(int)r);
                 Show64(bits/64,X);
                 }
             }
@@ -240,7 +240,7 @@ void Skein_Show_Key(uint_t bits,const Skein_Ctxt_Hdr_t *h,const u08b_t *key,size
     if (skein_DebugFlag & SKEIN_DEBUG_CONFIG || ((h->T[1] & SKEIN_T1_BLK_TYPE_MASK) != SKEIN_T1_BLK_TYPE_CFG))
     if (skein_DebugFlag & SKEIN_DEBUG_KEY)
         {
-        printf("\n%s MAC key = %4u bytes\n",AlgoHeader(bits),keyBytes);
+        printf("\n%s MAC key = %4u bytes\n",AlgoHeader(bits),(unsigned) keyBytes);
         Show08(keyBytes,key);
         }
     }

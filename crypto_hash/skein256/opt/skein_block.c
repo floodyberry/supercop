@@ -86,7 +86,7 @@ void Skein_256_Process_Block(Skein_256_Ctxt_t *ctx,const u08b_t *blkPtr,size_t b
         ts[2] = ts[0] ^ ts[1];
 
         Skein_Get64_LSB_First(w,blkPtr,WCNT);   /* get input block in little-endian format */
-		DebugSaveTweak(ctx);
+        DebugSaveTweak(ctx);
         Skein_Show_Block(BLK_BITS,&ctx->h,ctx->X,blkPtr,w,ks,ts);
 
         X0 = w[0] + ks[0];                      /* do the first full key injection */
@@ -257,8 +257,8 @@ void Skein_512_Process_Block(Skein_512_Ctxt_t *ctx,const u08b_t *blkPtr,size_t b
 #endif
 
     Skein_assert(blkCnt != 0);                  /* never call with blkCnt == 0! */
-	ts[0] = ctx->h.T[0];
-	ts[1] = ctx->h.T[1];
+    ts[0] = ctx->h.T[0];
+    ts[1] = ctx->h.T[1];
     do  {
         /* this implementation only supports 2**64 input bytes (no carry out here) */
         ts[0] += byteCntAdd;                    /* update processed length */
@@ -278,7 +278,7 @@ void Skein_512_Process_Block(Skein_512_Ctxt_t *ctx,const u08b_t *blkPtr,size_t b
         ts[2] = ts[0] ^ ts[1];
 
         Skein_Get64_LSB_First(w,blkPtr,WCNT); /* get input block in little-endian format */
-		DebugSaveTweak(ctx);
+        DebugSaveTweak(ctx);
         Skein_Show_Block(BLK_BITS,&ctx->h,ctx->X,blkPtr,w,ks,ts);
 
         X0   = w[0] + ks[0];                    /* do the first full key injection */
@@ -500,7 +500,7 @@ void Skein1024_Process_Block(Skein1024_Ctxt_t *ctx,const u08b_t *blkPtr,size_t b
         ts[2]  = ts[0] ^ ts[1];
 
         Skein_Get64_LSB_First(w,blkPtr,WCNT); /* get input block in little-endian format */
-		DebugSaveTweak(ctx);
+        DebugSaveTweak(ctx);
         Skein_Show_Block(BLK_BITS,&ctx->h,ctx->X,blkPtr,w,ks,ts);
 
         X00    = w[ 0] + ks[ 0];                 /* do the first full key injection */

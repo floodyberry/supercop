@@ -197,7 +197,7 @@ int  Skein1024_Output   (Skein1024_Ctxt_t *ctx, u08b_t * hashVal);
 
 #define SKEIN_MK_64(hi32,lo32)  ((lo32) + (((u64b_t) (hi32)) << 32))
 #define SKEIN_SCHEMA_VER        SKEIN_MK_64(SKEIN_VERSION,SKEIN_ID_STRING_LE)
-#define SKEIN_KS_PARITY         SKEIN_MK_64(0x55555555,0x55555555)
+#define SKEIN_KS_PARITY         SKEIN_MK_64(0x1BD11BDA,0xA9FC1A22)
 
 #define SKEIN_CFG_STR_LEN       (4*8)
 
