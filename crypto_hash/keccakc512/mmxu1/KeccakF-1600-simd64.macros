@@ -38,7 +38,7 @@ http://keccak.noekeon.org/
     Co = XOR64(Abo, XOR64(Ago, XOR64(Ako, XOR64(Amo, Aso)))); \
     Cu = XOR64(Abu, XOR64(Agu, XOR64(Aku, XOR64(Amu, Asu)))); \
 
-// --- Theta Rho Pi Chi Iota Prepare-theta
+// --- Code for round, with prepare-theta
 // --- 64-bit lanes mapped to 64-bit words
 #define thetaRhoPiChiIotaPrepareTheta(i, A, E) \
     Da = XOR64(Cu, ROL64(Ce, 1)); \
@@ -154,7 +154,7 @@ http://keccak.noekeon.org/
     XOReq64(Cu, E##su); \
 \
 
-// --- Theta Rho Pi Chi Iota
+// --- Code for round
 // --- 64-bit lanes mapped to 64-bit words
 #define thetaRhoPiChiIota(i, A, E) \
     Da = XOR64(Cu, ROL64(Ce, 1)); \
@@ -271,6 +271,60 @@ const UINT64 KeccakF1600RoundConstants[24] = {
     0x0000000080000001ULL,
     0x8000000080008008ULL };
 
+#define copyFromStateAndXor576bits(X, state, input) \
+    X##ba = XOR64(LOAD64(state[ 0]), LOAD64(input[ 0])); \
+    X##be = XOR64(LOAD64(state[ 1]), LOAD64(input[ 1])); \
+    X##bi = XOR64(LOAD64(state[ 2]), LOAD64(input[ 2])); \
+    X##bo = XOR64(LOAD64(state[ 3]), LOAD64(input[ 3])); \
+    X##bu = XOR64(LOAD64(state[ 4]), LOAD64(input[ 4])); \
+    X##ga = XOR64(LOAD64(state[ 5]), LOAD64(input[ 5])); \
+    X##ge = XOR64(LOAD64(state[ 6]), LOAD64(input[ 6])); \
+    X##gi = XOR64(LOAD64(state[ 7]), LOAD64(input[ 7])); \
+    X##go = XOR64(LOAD64(state[ 8]), LOAD64(input[ 8])); \
+    X##gu = LOAD64(state[ 9]); \
+    X##ka = LOAD64(state[10]); \
+    X##ke = LOAD64(state[11]); \
+    X##ki = LOAD64(state[12]); \
+    X##ko = LOAD64(state[13]); \
+    X##ku = LOAD64(state[14]); \
+    X##ma = LOAD64(state[15]); \
+    X##me = LOAD64(state[16]); \
+    X##mi = LOAD64(state[17]); \
+    X##mo = LOAD64(state[18]); \
+    X##mu = LOAD64(state[19]); \
+    X##sa = LOAD64(state[20]); \
+    X##se = LOAD64(state[21]); \
+    X##si = LOAD64(state[22]); \
+    X##so = LOAD64(state[23]); \
+    X##su = LOAD64(state[24]); \
+
+#define copyFromStateAndXor832bits(X, state, input) \
+    X##ba = XOR64(LOAD64(state[ 0]), LOAD64(input[ 0])); \
+    X##be = XOR64(LOAD64(state[ 1]), LOAD64(input[ 1])); \
+    X##bi = XOR64(LOAD64(state[ 2]), LOAD64(input[ 2])); \
+    X##bo = XOR64(LOAD64(state[ 3]), LOAD64(input[ 3])); \
+    X##bu = XOR64(LOAD64(state[ 4]), LOAD64(input[ 4])); \
+    X##ga = XOR64(LOAD64(state[ 5]), LOAD64(input[ 5])); \
+    X##ge = XOR64(LOAD64(state[ 6]), LOAD64(input[ 6])); \
+    X##gi = XOR64(LOAD64(state[ 7]), LOAD64(input[ 7])); \
+    X##go = XOR64(LOAD64(state[ 8]), LOAD64(input[ 8])); \
+    X##gu = XOR64(LOAD64(state[ 9]), LOAD64(input[ 9])); \
+    X##ka = XOR64(LOAD64(state[10]), LOAD64(input[10])); \
+    X##ke = XOR64(LOAD64(state[11]), LOAD64(input[11])); \
+    X##ki = XOR64(LOAD64(state[12]), LOAD64(input[12])); \
+    X##ko = LOAD64(state[13]); \
+    X##ku = LOAD64(state[14]); \
+    X##ma = LOAD64(state[15]); \
+    X##me = LOAD64(state[16]); \
+    X##mi = LOAD64(state[17]); \
+    X##mo = LOAD64(state[18]); \
+    X##mu = LOAD64(state[19]); \
+    X##sa = LOAD64(state[20]); \
+    X##se = LOAD64(state[21]); \
+    X##si = LOAD64(state[22]); \
+    X##so = LOAD64(state[23]); \
+    X##su = LOAD64(state[24]); \
+
 #define copyFromStateAndXor1024bits(X, state, input) \
     X##ba = XOR64(LOAD64(state[ 0]), LOAD64(input[ 0])); \
     X##be = XOR64(LOAD64(state[ 1]), LOAD64(input[ 1])); \
@@ -320,6 +374,60 @@ const UINT64 KeccakF1600RoundConstants[24] = {
     X##mo = LOAD64(state[18]); \
     X##mu = LOAD64(state[19]); \
     X##sa = LOAD64(state[20]); \
+    X##se = LOAD64(state[21]); \
+    X##si = LOAD64(state[22]); \
+    X##so = LOAD64(state[23]); \
+    X##su = LOAD64(state[24]); \
+
+#define copyFromStateAndXor1152bits(X, state, input) \
+    X##ba = XOR64(LOAD64(state[ 0]), LOAD64(input[ 0])); \
+    X##be = XOR64(LOAD64(state[ 1]), LOAD64(input[ 1])); \
+    X##bi = XOR64(LOAD64(state[ 2]), LOAD64(input[ 2])); \
+    X##bo = XOR64(LOAD64(state[ 3]), LOAD64(input[ 3])); \
+    X##bu = XOR64(LOAD64(state[ 4]), LOAD64(input[ 4])); \
+    X##ga = XOR64(LOAD64(state[ 5]), LOAD64(input[ 5])); \
+    X##ge = XOR64(LOAD64(state[ 6]), LOAD64(input[ 6])); \
+    X##gi = XOR64(LOAD64(state[ 7]), LOAD64(input[ 7])); \
+    X##go = XOR64(LOAD64(state[ 8]), LOAD64(input[ 8])); \
+    X##gu = XOR64(LOAD64(state[ 9]), LOAD64(input[ 9])); \
+    X##ka = XOR64(LOAD64(state[10]), LOAD64(input[10])); \
+    X##ke = XOR64(LOAD64(state[11]), LOAD64(input[11])); \
+    X##ki = XOR64(LOAD64(state[12]), LOAD64(input[12])); \
+    X##ko = XOR64(LOAD64(state[13]), LOAD64(input[13])); \
+    X##ku = XOR64(LOAD64(state[14]), LOAD64(input[14])); \
+    X##ma = XOR64(LOAD64(state[15]), LOAD64(input[15])); \
+    X##me = XOR64(LOAD64(state[16]), LOAD64(input[16])); \
+    X##mi = XOR64(LOAD64(state[17]), LOAD64(input[17])); \
+    X##mo = LOAD64(state[18]); \
+    X##mu = LOAD64(state[19]); \
+    X##sa = LOAD64(state[20]); \
+    X##se = LOAD64(state[21]); \
+    X##si = LOAD64(state[22]); \
+    X##so = LOAD64(state[23]); \
+    X##su = LOAD64(state[24]); \
+
+#define copyFromStateAndXor1344bits(X, state, input) \
+    X##ba = XOR64(LOAD64(state[ 0]), LOAD64(input[ 0])); \
+    X##be = XOR64(LOAD64(state[ 1]), LOAD64(input[ 1])); \
+    X##bi = XOR64(LOAD64(state[ 2]), LOAD64(input[ 2])); \
+    X##bo = XOR64(LOAD64(state[ 3]), LOAD64(input[ 3])); \
+    X##bu = XOR64(LOAD64(state[ 4]), LOAD64(input[ 4])); \
+    X##ga = XOR64(LOAD64(state[ 5]), LOAD64(input[ 5])); \
+    X##ge = XOR64(LOAD64(state[ 6]), LOAD64(input[ 6])); \
+    X##gi = XOR64(LOAD64(state[ 7]), LOAD64(input[ 7])); \
+    X##go = XOR64(LOAD64(state[ 8]), LOAD64(input[ 8])); \
+    X##gu = XOR64(LOAD64(state[ 9]), LOAD64(input[ 9])); \
+    X##ka = XOR64(LOAD64(state[10]), LOAD64(input[10])); \
+    X##ke = XOR64(LOAD64(state[11]), LOAD64(input[11])); \
+    X##ki = XOR64(LOAD64(state[12]), LOAD64(input[12])); \
+    X##ko = XOR64(LOAD64(state[13]), LOAD64(input[13])); \
+    X##ku = XOR64(LOAD64(state[14]), LOAD64(input[14])); \
+    X##ma = XOR64(LOAD64(state[15]), LOAD64(input[15])); \
+    X##me = XOR64(LOAD64(state[16]), LOAD64(input[16])); \
+    X##mi = XOR64(LOAD64(state[17]), LOAD64(input[17])); \
+    X##mo = XOR64(LOAD64(state[18]), LOAD64(input[18])); \
+    X##mu = XOR64(LOAD64(state[19]), LOAD64(input[19])); \
+    X##sa = XOR64(LOAD64(state[20]), LOAD64(input[20])); \
     X##se = LOAD64(state[21]); \
     X##si = LOAD64(state[22]); \
     X##so = LOAD64(state[23]); \

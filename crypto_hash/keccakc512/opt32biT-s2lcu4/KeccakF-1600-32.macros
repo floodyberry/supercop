@@ -1,0 +1,13 @@
+#ifdef UseSchedule
+    #if (UseSchedule == 1)
+        #include "KeccakF-1600-32-s1.macros"
+    #elif (UseSchedule == 2)
+        #include "KeccakF-1600-32-s2.macros"
+    #elif (UseSchedule == 3)
+        #include "KeccakF-1600-32-rvk.macros"
+    #else
+        #error "This schedule is not supported."
+    #endif
+#else
+    #include "KeccakF-1600-32-s1.macros"
+#endif

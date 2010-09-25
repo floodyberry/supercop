@@ -1,7 +1,6 @@
 /*
 Algorithm Name: Keccak
 Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
-Date: September 14, 2009
 
 This code, originally by Guido Bertoni, Joan Daemen, Michaël Peeters and
 Gilles Van Assche as a part of the SHA-3 submission, is hereby put in the
@@ -20,7 +19,7 @@ typedef enum { SUCCESS = 0, FAIL = 1, BAD_HASHLEN = 2 } HashReturn;
 
 #define KeccakPermutationSize 1600
 #define KeccakPermutationSizeInBytes (KeccakPermutationSize/8)
-#define KeccakMaximumRate 1152
+#define KeccakMaximumRate 1536
 #define KeccakMaximumRateInBytes (KeccakMaximumRate/8)
 
 #if defined(__GNUC__)
@@ -31,7 +30,7 @@ typedef enum { SUCCESS = 0, FAIL = 1, BAD_HASHLEN = 2 } HashReturn;
 #define ALIGN
 #endif
 
-ALIGN typedef struct {
+ALIGN typedef struct hashStateStruct {
     ALIGN unsigned char state[KeccakPermutationSizeInBytes];
     ALIGN BitSequence dataQueue[KeccakMaximumRateInBytes];
     unsigned int rate;
@@ -44,6 +43,7 @@ ALIGN typedef struct {
 } hashState;
 
 HashReturn Init(hashState *state, int hashbitlen);
+HashReturn InitEx(hashState *state, unsigned int rate, unsigned int capacity, unsigned char diversifier);
 HashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen);
 HashReturn Final(hashState *state, BitSequence *hashval);
 HashReturn Squeeze(hashState *state, BitSequence *output, DataLength outputLength);

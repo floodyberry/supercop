@@ -1,7 +1,6 @@
 /*
 Algorithm Name: Keccak
 Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
-Date: October 12, 2009
 
 This code, originally by Guido Bertoni, Joan Daemen, Michaël Peeters and
 Gilles Van Assche as a part of the SHA-3 submission, is hereby put in the
@@ -13,7 +12,7 @@ http://keccak.noekeon.org/
 
 #include <string.h>
 #include "KeccakNISTInterface.h"
-#include "KeccakPermutationInterface.h"
+#include "KeccakF-1600-interface.h"
 #ifdef KeccakReference
 #include "displayIntermediateValues.h"
 #endif
@@ -52,6 +51,26 @@ HashReturn Init(hashState *state, int hashbitlen)
     return SUCCESS;
 }
 
+HashReturn InitEx(hashState *state, unsigned int rate, unsigned int capacity, unsigned char diversifier)
+{
+    if (rate+capacity != 1600)
+        return BAD_HASHLEN;
+    if ((rate <= 0) || (rate >= 1600) || ((rate % 64) != 0))
+        return BAD_HASHLEN;
+    KeccakInitialize();
+    state->rate = rate;
+    state->capacity = capacity;
+    state->diversifier = diversifier;
+    state->hashbitlen = 0;
+    KeccakInitializeState(state->state);
+    memset(state->dataQueue, 0, KeccakMaximumRateInBytes);
+    state->bitsInQueue = 0;
+    state->squeezing = 0;
+    state->bitsAvailableForSqueezing = 0;
+
+    return SUCCESS;
+}
+
 void AbsorbQueue(hashState *state)
 {
     #ifdef KeccakReference
@@ -59,11 +78,36 @@ void AbsorbQueue(hashState *state)
     #endif
     // state->bitsInQueue is assumed to be equal a multiple of 8
     memset(state->dataQueue+state->bitsInQueue/8, 0, state->rate/8-state->bitsInQueue/8);
+#ifdef ProvideFast576
+    if (state->rate == 576)
+        KeccakAbsorb576bits(state->state, state->dataQueue);
+    else 
+#endif
+#ifdef ProvideFast832
+    if (state->rate == 832)
+        KeccakAbsorb832bits(state->state, state->dataQueue);
+    else 
+#endif
+#ifdef ProvideFast1024
     if (state->rate == 1024)
         KeccakAbsorb1024bits(state->state, state->dataQueue);
-    else if (state->rate == 1088)
+    else 
+#endif
+#ifdef ProvideFast1088
+    if (state->rate == 1088)
         KeccakAbsorb1088bits(state->state, state->dataQueue);
     else
+#endif
+#ifdef ProvideFast1152
+    if (state->rate == 1152)
+        KeccakAbsorb1152bits(state->state, state->dataQueue);
+    else 
+#endif
+#ifdef ProvideFast1344
+    if (state->rate == 1344)
+        KeccakAbsorb1344bits(state->state, state->dataQueue);
+    else 
+#endif
         KeccakAbsorb(state->state, state->dataQueue, state->rate/64);
     state->bitsInQueue = 0;
 }
@@ -85,6 +129,29 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
         if ((state->bitsInQueue == 0) && (databitlen >= state->rate) && (i <= (databitlen-state->rate))) {
             wholeBlocks = (databitlen-i)/state->rate;
             curData = data+i/8;
+#ifdef ProvideFast576
+            if (state->rate == 576) {
+                for(j=0; j<wholeBlocks; j++, curData+=576/8) {
+                    #ifdef KeccakReference
+                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    #endif
+                    KeccakAbsorb576bits(state->state, curData);
+                }
+            }
+            else
+#endif
+#ifdef ProvideFast832
+            if (state->rate == 832) {
+                for(j=0; j<wholeBlocks; j++, curData+=832/8) {
+                    #ifdef KeccakReference
+                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    #endif
+                    KeccakAbsorb832bits(state->state, curData);
+                }
+            }
+            else
+#endif
+#ifdef ProvideFast1024
             if (state->rate == 1024) {
                 for(j=0; j<wholeBlocks; j++, curData+=1024/8) {
                     #ifdef KeccakReference
@@ -93,7 +160,10 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
                     KeccakAbsorb1024bits(state->state, curData);
                 }
             }
-            else if (state->rate == 1088) {
+            else
+#endif
+#ifdef ProvideFast1088
+            if (state->rate == 1088) {
                 for(j=0; j<wholeBlocks; j++, curData+=1088/8) {
                     #ifdef KeccakReference
                     displayBytes(1, "Data to be absorbed", curData, state->rate/8);
@@ -101,7 +171,31 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
                     KeccakAbsorb1088bits(state->state, curData);
                 }
             }
-            else {
+            else
+#endif
+#ifdef ProvideFast1152
+            if (state->rate == 1152) {
+                for(j=0; j<wholeBlocks; j++, curData+=1152/8) {
+                    #ifdef KeccakReference
+                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    #endif
+                    KeccakAbsorb1152bits(state->state, curData);
+                }
+            }
+            else
+#endif
+#ifdef ProvideFast1344
+            if (state->rate == 1344) {
+                for(j=0; j<wholeBlocks; j++, curData+=1344/8) {
+                    #ifdef KeccakReference
+                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    #endif
+                    KeccakAbsorb1344bits(state->state, curData);
+                }
+            }
+            else
+#endif
+            {
                 for(j=0; j<wholeBlocks; j++, curData+=state->rate/8) {
                     #ifdef KeccakReference
                     displayBytes(1, "Data to be absorbed", curData, state->rate/8);
@@ -160,11 +254,14 @@ void PadAndSwitchToSqueezingPhase(hashState *state)
     state->bitsInQueue += 8;
     if (state->bitsInQueue > 0)
         AbsorbQueue(state);
-    if ((state->rate == 1024) && ((state->hashbitlen > 512) || (state->hashbitlen == 0))) {
+#ifdef ProvideFast1024
+    if (state->rate == 1024) {
         KeccakExtract1024bits(state->state, state->dataQueue);
         state->bitsAvailableForSqueezing = 1024;
     }
-    else {
+    else
+#endif
+    {
         KeccakExtract(state->state, state->dataQueue, state->rate/64);
         state->bitsAvailableForSqueezing = state->rate;
     }
@@ -197,12 +294,17 @@ HashReturn Squeeze(hashState *state, BitSequence *output, DataLength outputLengt
     while(i < outputLength) {
         if (state->bitsAvailableForSqueezing == 0) {
             KeccakPermutation(state->state);
+#ifdef ProvideFast1024
             if (state->rate == 1024) {
                 KeccakExtract1024bits(state->state, state->dataQueue);
-                state->bitsAvailableForSqueezing = state->rate;
+                state->bitsAvailableForSqueezing = 1024;
             }
             else
-                return FAIL; // Inconsistent rate
+#endif
+            {
+                KeccakExtract(state->state, state->dataQueue, state->rate/64);
+                state->bitsAvailableForSqueezing = state->rate;
+            }
         }
         partialBlock = outputLength - i;
         if (partialBlock > state->bitsAvailableForSqueezing)

@@ -23,6 +23,7 @@
  and/or fitness for purpose.
  ---------------------------------------------------------------------------
  Issue Date: 20/12/2007
+ Changes for ARM 9/9/2010
 */
 
 #ifndef _BRG_ENDIAN_H
@@ -31,6 +32,7 @@
 #define IS_BIG_ENDIAN      4321 /* byte 0 is most significant (mc68k) */
 #define IS_LITTLE_ENDIAN   1234 /* byte 0 is least significant (i386) */
 
+#if 0
 /* Include files where endian defines and byteswap functions may reside */
 #if defined( __sun )
 #  include <sys/isa_defs.h>
@@ -46,6 +48,7 @@
 #      include <byteswap.h>
 #    endif
 #  endif
+#endif
 #endif
 
 /* Now attempt to set the define for platform byte order using any  */
@@ -120,12 +123,18 @@
       defined( THINK_C ) || defined( __VMCMS__ ) || defined( _AIX )
 #  define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
 
-#elif 0     /* **** EDIT HERE IF NECESSARY **** */
+#elif defined(__arm__)
+# ifdef __BIG_ENDIAN
+#  define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
+# else
+#  define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
+# endif
+#elif 1     /* **** EDIT HERE IF NECESSARY **** */
 #  define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
 #elif 0     /* **** EDIT HERE IF NECESSARY **** */
 #  define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
 #else
-#  error Please edit lines 126 or 128 in brg_endian.h to set the platform byte order
+#  error Please edit lines 132 or 134 in brg_endian.h to set the platform byte order
 #endif
 
 #endif

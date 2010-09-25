@@ -1,0 +1,210 @@
+/*
+Algorithm Name: Keccak
+Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
+Implementation by Ronny Van Keer, STMicroelectronics
+
+This code, originally by Ronny Van Keer, is hereby put in the public domain.
+It is given as is, without any guarantee.
+
+For more information, feedback or questions, please refer to our website:
+http://keccak.noekeon.org/
+*/
+
+// WARNING: This implementation assumes a little-endian platform. Support for big-endinanness is not yet implemented.
+
+#include    <string.h>
+#include "Keccak-compact-settings.h"
+#define cKeccakR_SizeInBytes    (cKeccakR / 8)
+#include "crypto_hash.h"
+#ifndef crypto_hash_BYTES
+    #define crypto_hash_BYTES cKeccakR_SizeInBytes
+#endif
+#if (crypto_hash_BYTES > cKeccakR_SizeInBytes)
+    #error "Full squeezing not yet implemented"
+#endif
+
+#if     (cKeccakB   == 1600)
+    typedef unsigned long long  UINT64;
+    typedef UINT64 tKeccakLane;
+    #define cKeccakNumberOfRounds   24
+#elif   (cKeccakB   == 800)
+    typedef unsigned int        UINT32;
+    // WARNING: on 8-bit and 16-bit platforms, this should be replaced by:
+    //typedef unsigned long       UINT32;
+    typedef UINT32 tKeccakLane;
+    #define cKeccakNumberOfRounds   22
+#elif   (cKeccakB   == 400)
+    typedef unsigned short      UINT16;
+    typedef UINT16 tKeccakLane;
+    #define cKeccakNumberOfRounds   20
+#elif   (cKeccakB   == 200)
+    typedef unsigned char       UINT8;
+    typedef UINT8 tKeccakLane;
+    #define cKeccakNumberOfRounds   18
+#else
+    #error  "Unsupported Keccak-f width"
+#endif
+
+#define cKeccakLaneSizeInBits   (sizeof(tKeccakLane) * 8)
+
+#define ROL(a, offset) ((((tKeccakLane)a) << ((offset) % cKeccakLaneSizeInBits)) ^ (((tKeccakLane)a) >> (cKeccakLaneSizeInBits-((offset) % cKeccakLaneSizeInBits))))
+
+void KeccakF( tKeccakLane * state, const tKeccakLane *in, int laneCount );
+
+
+unsigned char KeccakPadding[] = { 1, cKeccakD, cKeccakR_SizeInBytes, 1, 0, 0, 0, 0, 0, 0, 0 };
+
+int crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long inlen )
+{
+    tKeccakLane		state[5 * 5];
+	unsigned int	i; //INFO It could be more optimized to use unsigned char on an 8-bit CPU
+	#if (crypto_hash_BYTES >= cKeccakR_SizeInBytes)
+    #define temp out
+	#else
+    unsigned char 	temp[cKeccakR_SizeInBytes];
+	#endif
+
+    memset( state, 0, sizeof(state) );
+
+    for ( /* empty */; inlen >= cKeccakR_SizeInBytes; inlen -= cKeccakR_SizeInBytes, in += cKeccakR_SizeInBytes )
+    {
+        KeccakF( state, (const tKeccakLane*)in, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
+    }
+
+    //    padding
+    memcpy( temp, in, (size_t)inlen );
+
+	for ( i = 0; (i < 4) || ((inlen % sizeof(tKeccakLane)) != 0); ++i )
+	{
+	    temp[inlen++] = KeccakPadding[i];
+	    if ( inlen == cKeccakR_SizeInBytes )
+	    {
+	        KeccakF( state, (const tKeccakLane*)temp, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
+	        inlen = 0;
+	    }
+	}
+
+    if ( inlen != 0 )
+    {
+	    KeccakF( state, (const tKeccakLane*)temp, (int)(inlen / sizeof(tKeccakLane)) );
+    }
+
+    memcpy( out, state, crypto_hash_BYTES );
+	#if (crypto_hash_BYTES >= cKeccakR_SizeInBytes)
+    #undef temp
+	#endif
+
+    return ( 0 );
+}
+
+
+const tKeccakLane KeccakF_RoundConstants[cKeccakNumberOfRounds] = 
+{
+    (tKeccakLane)0x0000000000000001ULL,
+    (tKeccakLane)0x0000000000008082ULL,
+    (tKeccakLane)0x800000000000808aULL,
+    (tKeccakLane)0x8000000080008000ULL,
+    (tKeccakLane)0x000000000000808bULL,
+    (tKeccakLane)0x0000000080000001ULL,
+    (tKeccakLane)0x8000000080008081ULL,
+    (tKeccakLane)0x8000000000008009ULL,
+    (tKeccakLane)0x000000000000008aULL,
+    (tKeccakLane)0x0000000000000088ULL,
+    (tKeccakLane)0x0000000080008009ULL,
+    (tKeccakLane)0x000000008000000aULL,
+    (tKeccakLane)0x000000008000808bULL,
+    (tKeccakLane)0x800000000000008bULL,
+    (tKeccakLane)0x8000000000008089ULL,
+    (tKeccakLane)0x8000000000008003ULL,
+    (tKeccakLane)0x8000000000008002ULL,
+    (tKeccakLane)0x8000000000000080ULL
+	#if		(cKeccakB	>= 400)
+  , (tKeccakLane)0x000000000000800aULL,
+    (tKeccakLane)0x800000008000000aULL
+	#if		(cKeccakB	>= 800)
+  , (tKeccakLane)0x8000000080008081ULL,
+    (tKeccakLane)0x8000000000008080ULL
+	#if		(cKeccakB	== 1600)
+  , (tKeccakLane)0x0000000080000001ULL,
+    (tKeccakLane)0x8000000080008008ULL
+	#endif
+	#endif
+	#endif
+};
+
+//INFO It could be more optimized to use unsigned char on an 8-bit CPU
+const unsigned int KeccakF_RotationConstants[25] = 
+{
+	 1,  3,  6, 10, 15, 21, 28, 36, 45, 55,  2, 14, 27, 41, 56,  8, 25, 43, 62, 18, 39, 61, 20, 44
+};
+
+//INFO It could be more optimized to use unsigned char on an 8-bit CPU
+const unsigned int KeccakF_PiLane[25] = 
+{
+    10,  7, 11, 17, 18,  3,  5, 16,  8, 21, 24,  4, 15, 23, 19, 13, 12,  2, 20, 14, 22,  9,  6,  1 
+};
+
+//INFO It could be more optimized to use unsigned char on an 8-bit CPU
+const unsigned int KeccakF_Mod5[10] = 
+{
+    0, 1, 2, 3, 4, 0, 1, 2, 3, 4
+};
+
+
+void KeccakF( tKeccakLane * state, const tKeccakLane *in, int laneCount )
+{
+	unsigned int x, y; //INFO It could be more optimized to use unsigned char on an 8-bit CPU
+    tKeccakLane BC[5];
+    tKeccakLane temp;
+
+    while ( --laneCount >= 0 )
+	{
+        state[laneCount] ^= in[laneCount];
+	}
+
+	#define	round	laneCount
+    for( round = 0; round < cKeccakNumberOfRounds; ++round )
+    {
+		// Theta
+		for ( x = 0; x < 5; ++x )
+		{
+			BC[x] = state[x] ^ state[5 + x] ^ state[10 + x] ^ state[15 + x] ^ state[20 + x];
+		}
+		for ( x = 0; x < 5; ++x )
+		{
+			temp = BC[KeccakF_Mod5[x+4]] ^ ROL(BC[KeccakF_Mod5[x+1]], 1);
+			for ( y = 0; y < 25; y += 5 )
+			{
+				state[y + x] ^= temp;
+			}
+		}
+
+        // Rho Pi
+		temp = state[1];
+		for ( x = 0; x < 24; ++x )
+		{
+			BC[0] = state[KeccakF_PiLane[x]];
+			state[KeccakF_PiLane[x]] = ROL( temp, KeccakF_RotationConstants[x] );
+			temp = BC[0];
+		}
+
+		//	Chi
+		for ( y = 0; y < 25; y += 5 )
+		{
+			BC[0] = state[y + 0];
+			BC[1] = state[y + 1];
+			BC[2] = state[y + 2];
+			BC[3] = state[y + 3];
+			BC[4] = state[y + 4];
+			for ( x = 0; x < 5; ++x )
+			{
+				state[y + x] = BC[x] ^((~BC[KeccakF_Mod5[x+1]]) & BC[KeccakF_Mod5[x+2]]);
+			}
+		}
+
+		//	Iota
+		state[0] ^= KeccakF_RoundConstants[round];
+    }
+	#undef	round
+
+}
