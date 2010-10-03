@@ -510,11 +510,11 @@ void KeccakExtract(const unsigned char *state, unsigned char *data, unsigned int
                     ((UINT32*)data)[24] = ~((UINT32*)data)[24];
                     ((UINT32*)data)[25] = ~((UINT32*)data)[25];
                     if (laneCount > 17) {
-                        ((UINT64*)data)[34] = ~((UINT64*)data)[34];
-                        ((UINT64*)data)[35] = ~((UINT64*)data)[35];
+                        ((UINT32*)data)[34] = ~((UINT32*)data)[34];
+                        ((UINT32*)data)[35] = ~((UINT32*)data)[35];
                         if (laneCount > 20) {
-                            ((UINT64*)data)[40] = ~((UINT64*)data)[40];
-                            ((UINT64*)data)[41] = ~((UINT64*)data)[41];
+                            ((UINT32*)data)[40] = ~((UINT32*)data)[40];
+                            ((UINT32*)data)[41] = ~((UINT32*)data)[41];
                         }
                     }
                 }

@@ -10,10 +10,10 @@ For more information, feedback or questions, please refer to our website:
 http://keccak.noekeon.org/
 */
 
-// WARNING: This implementation assumes a little-endian platform. Support for big-endinanness is not yet implemented.
 
 #include    <string.h>
 #include "Keccak-compact-settings.h"
+#include "Keccak-compact.h"
 #define cKeccakR_SizeInBytes    (cKeccakR / 8)
 #include "crypto_hash.h"
 #ifndef crypto_hash_BYTES
@@ -22,6 +22,10 @@ http://keccak.noekeon.org/
 #if (crypto_hash_BYTES > cKeccakR_SizeInBytes)
     #error "Full squeezing not yet implemented"
 #endif
+
+#define IS_BIG_ENDIAN      4321 /* byte 0 is most significant (mc68k) */
+#define IS_LITTLE_ENDIAN   1234 /* byte 0 is least significant (i386) */
+#define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN /* WARNING: This implementation works on little-endian platform. Support for big-endinanness is implemented, but not tested. */
 
 #if     (cKeccakB   == 1600)
     typedef unsigned long long  UINT64;
@@ -45,9 +49,12 @@ http://keccak.noekeon.org/
     #error  "Unsupported Keccak-f width"
 #endif
 
+typedef unsigned int tSmallUInt; /*INFO It could be more optimized to use "unsigned char" on an 8-bit CPU	*/
+
+
 #define cKeccakLaneSizeInBits   (sizeof(tKeccakLane) * 8)
 
-#define ROL(a, offset) ((((tKeccakLane)a) << ((offset) % cKeccakLaneSizeInBits)) ^ (((tKeccakLane)a) >> (cKeccakLaneSizeInBits-((offset) % cKeccakLaneSizeInBits))))
+#define ROL(a, offset) (tKeccakLane)((((tKeccakLane)a) << ((offset) % cKeccakLaneSizeInBits)) ^ (((tKeccakLane)a) >> (cKeccakLaneSizeInBits-((offset) % cKeccakLaneSizeInBits))))
 
 void KeccakF( tKeccakLane * state, const tKeccakLane *in, int laneCount );
 
@@ -57,7 +64,7 @@ unsigned char KeccakPadding[] = { 1, cKeccakD, cKeccakR_SizeInBytes, 1, 0, 0, 0,
 int crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long inlen )
 {
     tKeccakLane		state[5 * 5];
-	unsigned int	i; //INFO It could be more optimized to use unsigned char on an 8-bit CPU
+	tSmallUInt		i;
 	#if (crypto_hash_BYTES >= cKeccakR_SizeInBytes)
     #define temp out
 	#else
@@ -71,7 +78,7 @@ int crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long
         KeccakF( state, (const tKeccakLane*)in, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
     }
 
-    //    padding
+    /*    Last data and padding	*/
     memcpy( temp, in, (size_t)inlen );
 
 	for ( i = 0; (i < 4) || ((inlen % sizeof(tKeccakLane)) != 0); ++i )
@@ -89,7 +96,26 @@ int crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long
 	    KeccakF( state, (const tKeccakLane*)temp, (int)(inlen / sizeof(tKeccakLane)) );
     }
 
+	#if (PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN) || (cKeccakB == 200)
+
     memcpy( out, state, crypto_hash_BYTES );
+
+	#else
+
+    for ( i = 0; i < (crypto_hash_BYTES / sizeof(tKeccakLane)); ++i )
+	{
+		tSmallUInt		j;
+	    tKeccakLane		t;
+
+		t = state[i];
+		for ( j = 0; j < sizeof(tKeccakLane); ++j )
+		{
+			*(out++) = (unsigned char)t;
+			t >>= 8;
+		}
+	}
+
+	#endif
 	#if (crypto_hash_BYTES >= cKeccakR_SizeInBytes)
     #undef temp
 	#endif
@@ -132,20 +158,17 @@ const tKeccakLane KeccakF_RoundConstants[cKeccakNumberOfRounds] =
 	#endif
 };
 
-//INFO It could be more optimized to use unsigned char on an 8-bit CPU
-const unsigned int KeccakF_RotationConstants[25] = 
+const tSmallUInt KeccakF_RotationConstants[25] = 
 {
 	 1,  3,  6, 10, 15, 21, 28, 36, 45, 55,  2, 14, 27, 41, 56,  8, 25, 43, 62, 18, 39, 61, 20, 44
 };
 
-//INFO It could be more optimized to use unsigned char on an 8-bit CPU
-const unsigned int KeccakF_PiLane[25] = 
+const tSmallUInt KeccakF_PiLane[25] = 
 {
     10,  7, 11, 17, 18,  3,  5, 16,  8, 21, 24,  4, 15, 23, 19, 13, 12,  2, 20, 14, 22,  9,  6,  1 
 };
 
-//INFO It could be more optimized to use unsigned char on an 8-bit CPU
-const unsigned int KeccakF_Mod5[10] = 
+const tSmallUInt KeccakF_Mod5[10] = 
 {
     0, 1, 2, 3, 4, 0, 1, 2, 3, 4
 };
@@ -153,14 +176,27 @@ const unsigned int KeccakF_Mod5[10] =
 
 void KeccakF( tKeccakLane * state, const tKeccakLane *in, int laneCount )
 {
-	unsigned int x, y; //INFO It could be more optimized to use unsigned char on an 8-bit CPU
-    tKeccakLane BC[5];
+	tSmallUInt x, y;
     tKeccakLane temp;
+    tKeccakLane BC[5];
 
+	#if (PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN) || (cKeccakB == 200)
     while ( --laneCount >= 0 )
 	{
         state[laneCount] ^= in[laneCount];
 	}
+	#else
+	temp = 0; /* please compiler */
+    while ( --laneCount >= 0 )
+	{
+		for ( x = 0; x < sizeof(tKeccakLane); ++x )
+		{
+			temp <<= 8;
+			temp |= ((char*)&in[laneCount])[x];
+		}
+        state[laneCount] = temp;
+	}
+	#endif
 
 	#define	round	laneCount
     for( round = 0; round < cKeccakNumberOfRounds; ++round )
@@ -207,4 +243,113 @@ void KeccakF( tKeccakLane * state, const tKeccakLane *in, int laneCount )
     }
 	#undef	round
 
+}
+
+
+HashReturn Init(hashState *state)
+{
+
+	state->bitsInQueue = 0;
+	memset( state->state, 0, sizeof(state->state) );
+
+	return ( SUCCESS );
+}
+
+HashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen)
+{
+	
+	if ( (state->bitsInQueue < 0) || ((state->bitsInQueue % 8) != 0) )
+	{
+		/*	 Final() already called or bits already in queue not modulo 8.	*/
+		return ( FAIL );
+	}
+
+	/*	If already data in queue, continue queuing first */
+	for ( /* empty */; (databitlen >= 8) && (state->bitsInQueue != 0); databitlen -= 8 )
+	{
+		state->state[state->bitsInQueue / 8] ^= *(data++);
+		if ( (state->bitsInQueue += 8) == cKeccakR )
+		{
+			KeccakF( (tKeccakLane *)state->state, 0, 0 );
+			state->bitsInQueue = 0;
+		}
+	}
+
+	/*	Absorb complete blocks */
+	for ( /* */; databitlen >= cKeccakR; databitlen -= cKeccakR, data += cKeccakR_SizeInBytes )
+	{
+		KeccakF( (tKeccakLane *)state->state, (const tKeccakLane *)data, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
+	}
+
+	/*	Queue remaining data bytes */
+	for ( /* empty */; databitlen >=8; databitlen -= 8, state->bitsInQueue += 8 )
+	{
+		state->state[state->bitsInQueue / 8] ^= *(data++);
+	}
+	/*	Queue eventual remaining data bits plus add first padding bit */
+	if ( databitlen != 0 )
+	{
+		state->state[state->bitsInQueue / 8] ^= (*data >> (8 - databitlen)) | (1 << databitlen);
+		state->bitsInQueue += (int)databitlen;
+	}
+	return ( SUCCESS );
+}
+
+HashReturn Final(hashState *state, BitSequence *hashval, int hashbytelen)
+{
+	tSmallUInt	i;
+	tSmallUInt	offset;
+
+	if ( state->bitsInQueue < 0 )
+	{
+		/*	 Final() already called.	*/
+		return ( FAIL );
+	}
+
+	offset = (state->bitsInQueue + 7) / 8;
+	for ( i = ((state->bitsInQueue % 8) == 0) ? 0 : 1; i < 4; ++i )
+	{
+	    if ( offset == cKeccakR_SizeInBytes )
+	    {
+			KeccakF( (tKeccakLane *)state->state, 0, 0 );
+	        offset = 0;
+	    }
+	    state->state[offset++] ^= KeccakPadding[i];
+	}
+
+    if ( offset != 0 )
+    {
+		KeccakF( (tKeccakLane *)state->state, 0, 0 );
+    }
+
+	for ( /* empty */; hashbytelen != 0; hashval += i, hashbytelen -= i )
+	{
+		i = (hashbytelen < cKeccakR_SizeInBytes) ? hashbytelen : cKeccakR_SizeInBytes;
+
+		#if (PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN) || (cKeccakB == 200)
+
+	    memcpy( hashval, state->state, i );
+
+		#else
+
+	    for ( offset = 0; offset < i; offset += sizeof(tKeccakLane) )
+		{
+			tSmallUInt		j;
+
+			for ( j = 0; j < sizeof(tKeccakLane); ++j )
+			{
+				hashval[offset + j] = state->state[offset + (sizeof(tKeccakLane) - 1) - j];
+			}
+		}
+
+		#endif
+
+		if ( i != hashbytelen )
+		{
+			KeccakF( (tKeccakLane *)state->state, 0, 0 );
+		}
+	}
+
+	state->bitsInQueue = -1;	/* flag final state */
+	return ( SUCCESS );
 }
