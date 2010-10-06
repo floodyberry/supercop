@@ -1,0 +1,10 @@
+Shabal-512, under the eBASH API, optimized for 64-bit x86.
+
+The code is meant to be freely redistributable and modifiable. There
+is no known copyright or patent infringement claim on this code and
+algorithm, and no plan to establish such a patent. In the words
+of the eBASH call for submission web page, this means a level 0
+of copyright protection, and a level 0 of patent protection.
+
+Technical comments and questions may be addressed to:
+<thomas.pornin@cryptolog.com>
