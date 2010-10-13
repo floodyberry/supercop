@@ -13,21 +13,21 @@
 #include "SHAvite3-256.h"
 #include "SHAvite3-512.h"
 
-u32 IV_224[8] =  {0xC4C67795, 0xC0B1817F, 0xEAD88924, 0x1ABB1BB0,
-                  0xE0C29152, 0xBDE046BA, 0xAEEECF99, 0x58D509D8};
+u32 IV_224[8] =  {0x6774F31C, 0x990AE210, 0xC87D4274, 0xC9546371, 
+                  0x62B2AEA8, 0x4B5801D8, 0x1B702860, 0x842F3017};
 
-u32 IV_256[8] =  {0x3EECF551, 0xBF10819B, 0xE6DC8559, 0xF3E23FD5,
-                  0x431AEC73, 0x79E3F731, 0x98325F05, 0xA92A31F1};
+u32 IV_256[8] =  {0x49BB3E47, 0x2674860D, 0xA8B392AC, 0x021AC4E6, 
+                  0x409283CF, 0x620E5D86, 0x6D929DCB, 0x96CC2A8B};
 
-u32 IV_384[16] = {0x71F48510, 0xA903A8AC, 0xFE3216DD, 0x0B2D2AD4, 
-                  0x6672900A, 0x41032819, 0x15A7D780, 0xB3CAB8D9, 
-                  0x34EF4711, 0xDE019FE8, 0x4D674DC4, 0xE056D96B, 
-                  0xA35C016B, 0xDD903BA7, 0x8C1B09B4, 0x2C3E9F25};
+u32 IV_384[16] = {0x4164E55A, 0x92332228, 0x658565BB, 0x07F66B77, 
+                  0x8ACF5755, 0x650B6A85, 0x4AC0E038, 0x6814ECD5, 
+                  0x6B87E864, 0xB31D971F, 0x75ADA1C8, 0x0A89885D, 
+                  0x8A06A5DB, 0x34037C2E, 0x08F156E2, 0xD8CA287C};
 
-u32 IV_512[16] = {0xD5652B63, 0x25F1E6EA, 0xB18F48FA, 0xA1EE3A47, 
-                  0xC8B67B07, 0xBDCE48D3, 0xE3937B78, 0x05DB5186, 
-                  0x613BE326, 0xA11FA303, 0x90C833D4, 0x79CEE316, 
-                  0x1E1AF00F, 0x2829B165, 0x23B25F80, 0x21E11499};
+u32 IV_512[16] = {0x7F532ACF, 0xCA7B9ADB, 0x251708DE, 0xCF31EDF8, 
+                  0xB7411A0D, 0x3C712D17, 0x5A38CF04, 0x9A27ABD2, 
+                  0x8C4540AD, 0x5D99F41B, 0xE3887683, 0x26B73DFF, 
+                  0x27994E0F, 0x00E3F726, 0x1606C84C, 0x719A682A};
 
 /* Initialization of the internal state of the hash function         */
 
@@ -212,7 +212,7 @@ HashReturn Update (hashState *state, const BitSequence *data, DataLength
 
 /* Update the number of bits hashed so far (locally)                 */
 
-         local_bitcount+=BlockSizeB*8;
+         local_bitcount+=8*BlockSizeB;
 
 /* Call the respective compression function to process the current   */
 /* block                                                             */
@@ -316,11 +316,10 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 /* last message block and compress it				    */
            U64TO8_LITTLE(block+BlockSizeB-10, state->bitcount);
            U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
-           if ((state->bitcount % state->BlockSize)==0)
-              Compress256(block,result, 0x0ULL);
-           else
+           if (state->bitcount % state->BlockSize)
               Compress256(block,result, state->bitcount);
-
+	   else
+              Compress256(block,result, 0x0ULL);
         }
    }
 
@@ -355,10 +354,11 @@ HashReturn Final (hashState *state, BitSequence *hashval)
                U64TO8_LITTLE(block+BlockSizeB-18, state->bitcount);
                memset(block+BlockSizeB-10,0,8);
                U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
-               if ((state->bitcount % state->BlockSize)==0)
-                  Compress512(block,result, 0x0ULL);
-               else
+               if (state->bitcount % state->BlockSize)
                   Compress512(block,result, state->bitcount);
+	       else
+                  Compress512(block,result, 0x0ULL);
+
             }
       }
 

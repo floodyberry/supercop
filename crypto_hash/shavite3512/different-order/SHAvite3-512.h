@@ -3,7 +3,7 @@
 #include "SHA3api_ref.h"
  
 #define InternalRounds512 4
-#define ExternalRounds512 14
+#define ExternalRounds512 16
 #define ExpandedMessageSize512 (ExternalRounds512*4*(InternalRounds512)*2)
 
 #define NonLinExpansionRegular(rk,position,x0,x1,x2,x3,y0,y1,y2,y3)\
@@ -87,6 +87,46 @@
         rk[47] = y3^rk[43];\
 }
 
+#define NonLinExpansion112_512(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3)\
+{\
+        x0 = rk[81];\
+        x1 = rk[82];\
+        x2 = rk[83];\
+        x3 = rk[80];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[112] = y0^rk[108]^~counter[0];\
+        rk[113] = y1^rk[109]^~counter[1];\
+        rk[114] = y2^rk[110]^~counter[2];\
+        rk[115] = y3^rk[111]^counter[3];\
+	x0 = rk[85];\
+        x1 = rk[86];\
+        x2 = rk[87];\
+        x3 = rk[84];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[116] = y0^rk[112];\
+        rk[117] = y1^rk[113];\
+        rk[118] = y2^rk[114];\
+        rk[119] = y3^rk[115];\
+        x0 = rk[89];\
+        x1 = rk[90];\
+        x2 = rk[91];\
+        x3 = rk[88];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[120] = y0^rk[116];\
+        rk[121] = y1^rk[117];\
+        rk[122] = y2^rk[118];\
+        rk[123] = y3^rk[119];\
+        x0 = rk[93];\
+        x1 = rk[94];\
+        x2 = rk[95];\
+        x3 = rk[92];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[124] = y0^rk[120];\
+        rk[125] = y1^rk[121];\
+        rk[126] = y2^rk[122];\
+        rk[127] = y3^rk[123];\
+}
+
 
 #define NonLinExpansion160(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3)\
 {\
@@ -126,6 +166,46 @@
         rk[173] = y1^rk[169];\
         rk[174] = y2^rk[170];\
         rk[175] = y3^rk[171];\
+}
+
+#define NonLinExpansion240(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3)\
+{\
+        x0 = rk[209];\
+        x1 = rk[210];\
+        x2 = rk[211];\
+        x3 = rk[208];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[240] = y0^rk[236];\
+        rk[241] = y1^rk[237];\
+        rk[242] = y2^rk[238];\
+        rk[243] = y3^rk[239];\
+	x0 = rk[213];\
+        x1 = rk[214];\
+        x2 = rk[215];\
+        x3 = rk[212];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[244] = y0^rk[240]^~counter[3];\
+        rk[245] = y1^rk[241]^~counter[2];\
+        rk[246] = y2^rk[242]^~counter[1];\
+        rk[247] = y3^rk[243]^counter[0];\
+        x0 = rk[217];\
+        x1 = rk[218];\
+        x2 = rk[219];\
+        x3 = rk[216];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[248] = y0^rk[244];\
+        rk[249] = y1^rk[245];\
+        rk[250] = y2^rk[246];\
+        rk[251] = y3^rk[247];\
+        x0 = rk[221];\
+        x1 = rk[222];\
+        x2 = rk[223];\
+        x3 = rk[220];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[252] = y0^rk[248];\
+        rk[253] = y1^rk[249];\
+        rk[254] = y2^rk[250];\
+        rk[255] = y3^rk[251];\
 }
 
 #define NonLinExpansion304(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3)\
@@ -168,6 +248,46 @@
         rk[319] = y3^rk[315]^~counter[1];\
 }
 
+#define NonLinExpansion352(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3)\
+{\
+        x0 = rk[321];\
+        x1 = rk[322];\
+        x2 = rk[323];\
+        x3 = rk[320];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[352] = y0^rk[348];\
+        rk[353] = y1^rk[349];\
+        rk[354] = y2^rk[350];\
+        rk[355] = y3^rk[351];\
+	x0 = rk[325];\
+        x1 = rk[326];\
+        x2 = rk[327];\
+        x3 = rk[324];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[356] = y0^rk[352];\
+        rk[357] = y1^rk[353];\
+        rk[358] = y2^rk[354];\
+        rk[359] = y3^rk[355];\
+        x0 = rk[329];\
+        x1 = rk[330];\
+        x2 = rk[331];\
+        x3 = rk[328];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[360] = y0^rk[356];\
+        rk[361] = y1^rk[357];\
+        rk[362] = y2^rk[358];\
+        rk[363] = y3^rk[359];\
+        x0 = rk[333];\
+        x1 = rk[334];\
+        x2 = rk[335];\
+        x3 = rk[332];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[364] = y0^rk[360]^~counter[2];\
+        rk[365] = y1^rk[361]^~counter[3];\
+        rk[366] = y2^rk[362]^~counter[0];\
+        rk[367] = y3^rk[363]^counter[1];\
+}
+
 #define NonLinExpansion432(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3)\
 {\
         x0 = rk[401];\
@@ -206,6 +326,46 @@
         rk[445] = y1^rk[441];\
         rk[446] = y2^rk[442];\
         rk[447] = y3^rk[443];\
+}
+
+#define NonLinExpansion480(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3)\
+{\
+        x0 = rk[449];\
+        x1 = rk[450];\
+        x2 = rk[451];\
+        x3 = rk[448];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[480] = y0^rk[476];\
+        rk[481] = y1^rk[477];\
+        rk[482] = y2^rk[478];\
+        rk[483] = y3^rk[479];\
+	x0 = rk[453];\
+        x1 = rk[454];\
+        x2 = rk[455];\
+        x3 = rk[452];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[484] = y0^rk[480];\
+        rk[485] = y1^rk[481];\
+        rk[486] = y2^rk[482];\
+        rk[487] = y3^rk[483];\
+        x0 = rk[457];\
+        x1 = rk[458];\
+        x2 = rk[459];\
+        x3 = rk[456];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[488] = y0^rk[484]^~counter[1];\
+        rk[489] = y1^rk[485]^~counter[0];\
+        rk[490] = y2^rk[486]^~counter[3];\
+        rk[491] = y3^rk[487]^counter[2];\
+        x0 = rk[461];\
+        x1 = rk[462];\
+        x2 = rk[463];\
+        x3 = rk[460];\
+        roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
+        rk[492] = y0^rk[488];\
+        rk[493] = y1^rk[489];\
+        rk[494] = y2^rk[490];\
+        rk[495] = y3^rk[491];\
 }
 
 #define LinExpansion512(rk,position,temp0,temp1,temp2)\
@@ -275,7 +435,7 @@ void E512(u32 pt[16], u32 ct[16], u32 message[32], u32 counter[4])
    LinExpansion512(rk,64,i,j,k);
    oneround(state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],x0,x1,x2,x3,y0,y1,y2,y3,rk,64);
    NonLinExpansionRegular(rk,96,x0,x1,x2,x3,y0,y1,y2,y3);
-   NonLinExpansionRegular(rk,112,x0,x1,x2,x3,y0,y1,y2,y3);
+   NonLinExpansion112_512(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
    oneround(state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],x0,x1,x2,x3,y0,y1,y2,y3,rk,96);
    LinExpansion512(rk,128,i,j,k);
    oneround(state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],x0,x1,x2,x3,y0,y1,y2,y3,rk,128);
@@ -285,7 +445,7 @@ void E512(u32 pt[16], u32 ct[16], u32 message[32], u32 counter[4])
    LinExpansion512(rk,192,i,j,k);
    oneround(state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],x0,x1,x2,x3,y0,y1,y2,y3,rk,192);
    NonLinExpansionRegular(rk,224,x0,x1,x2,x3,y0,y1,y2,y3);
-   NonLinExpansionRegular(rk,240,x0,x1,x2,x3,y0,y1,y2,y3);
+   NonLinExpansion240(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
    oneround(state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],x0,x1,x2,x3,y0,y1,y2,y3,rk,224);
    LinExpansion512(rk,256,i,j,k);
    oneround(state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],x0,x1,x2,x3,y0,y1,y2,y3,rk,256);
@@ -294,7 +454,7 @@ void E512(u32 pt[16], u32 ct[16], u32 message[32], u32 counter[4])
    oneround(state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],x0,x1,x2,x3,y0,y1,y2,y3,rk,288);
    LinExpansion512(rk,320,i,j,k);
    oneround(state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],x0,x1,x2,x3,y0,y1,y2,y3,rk,320);
-   NonLinExpansionRegular(rk,352,x0,x1,x2,x3,y0,y1,y2,y3);
+   NonLinExpansion352(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansionRegular(rk,368,x0,x1,x2,x3,y0,y1,y2,y3);
    oneround(state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],x0,x1,x2,x3,y0,y1,y2,y3,rk,352);
    LinExpansion512(rk,384,i,j,k);
@@ -302,24 +462,28 @@ void E512(u32 pt[16], u32 ct[16], u32 message[32], u32 counter[4])
    NonLinExpansionRegular(rk,416,x0,x1,x2,x3,y0,y1,y2,y3);
    NonLinExpansion432(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
    oneround(state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],x0,x1,x2,x3,y0,y1,y2,y3,rk,416);
+   LinExpansion512(rk,448,i,j,k);
+   oneround(state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],state[4],state[5],state[6],state[7],x0,x1,x2,x3,y0,y1,y2,y3,rk,448);
+   NonLinExpansion480(rk,counter,x0,x1,x2,x3,y0,y1,y2,y3);
+   NonLinExpansionRegular(rk,496,x0,x1,x2,x3,y0,y1,y2,y3);
+   oneround(state[4],state[5],state[6],state[7],state[8],state[9],state[10],state[11],state[12],state[13],state[14],state[15],state[0],state[1],state[2],state[3],x0,x1,x2,x3,y0,y1,y2,y3,rk,480);
    
-
-   ct[0]=state[8]; 
-   ct[1]=state[9]; 
-   ct[2]=state[10]; 
-   ct[3]=state[11];
-   ct[4]=state[12];
-   ct[5]=state[13];
-   ct[6]=state[14];
-   ct[7]=state[15];
-   ct[8]=state[0]; 
-   ct[9]=state[1]; 
-   ct[10]=state[2]; 
-   ct[11]=state[3];
-   ct[12]=state[4];
-   ct[13]=state[5];
-   ct[14]=state[6];
-   ct[15]=state[7];
+   ct[0]=state[0]; 
+   ct[1]=state[1]; 
+   ct[2]=state[2]; 
+   ct[3]=state[3];
+   ct[4]=state[4];
+   ct[5]=state[5];
+   ct[6]=state[6];
+   ct[7]=state[7];
+   ct[8]=state[8]; 
+   ct[9]=state[9]; 
+   ct[10]=state[10]; 
+   ct[11]=state[11];
+   ct[12]=state[12];
+   ct[13]=state[13];
+   ct[14]=state[14];
+   ct[15]=state[15];
 
    return;
 }

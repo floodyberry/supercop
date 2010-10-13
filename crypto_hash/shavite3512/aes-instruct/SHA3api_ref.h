@@ -1,6 +1,3 @@
-/* Modified (July 2010) by Eli Biham and Orr Dunkelman (applying the
-SHAvite-3 tweak) from:                                       */
-
 /* Modified (June 2009) from: */
 
 /*********************************************************************/
@@ -13,6 +10,7 @@ SHAvite-3 tweak) from:                                       */
 /*                                                                   */
 /*********************************************************************/
 
+#include <string.h>
 #include "compress.h"
 
 typedef unsigned char BitSequence;
@@ -78,7 +76,7 @@ HashReturn Init(hashState *state, int hashbitlen)
 /* and not more than 512 bits                                        */
 
    if (hashbitlen>512) return BAD_HASHBITLEN;
-   if (hashbitlen<257) return BAD_HASHBITLEN;
+   if (hashbitlen<1) return BAD_HASHBITLEN;
 
 
 /* Setting the salt to zero. Applications which wish to use          */
@@ -109,25 +107,35 @@ HashReturn Init(hashState *state, int hashbitlen)
    memset(state->chaining_value,0,64); 
 
    
+/* Compute the respective MIV and the respective IV. These values    */
+/* depend on the used compression function.                          */
+
+   if (hashbitlen>=257)
+      {
+
 /* Compute MIV_{512}                                                 */
 
-   Compress512(state->buffer,state->chaining_value,0x0ULL,state->salt);
+         Compress512(state->buffer,state->chaining_value,0x0UL,state->salt);
 
 /* Set the message block to the size of the requested digest size    */
          
-   U16TO8_LITTLE(state->buffer,hashbitlen);
+         U16TO8_LITTLE(state->buffer,hashbitlen);
+
 
 /* Compute IV_m                                                      */
 
-   Compress512(state->buffer,state->chaining_value,0x0ULL,state->salt);
+         Compress512(state->buffer,state->chaining_value,0x0ULL,state->salt);
 
 /* Set the block size to be 1024 bits (as required for C_{512})      */
  
-   state->BlockSize=1024; 
+         state->BlockSize=1024; 
+
+      }
 
 /* Set the message block to zero				     */
 
    memset(state->buffer,0,128);
+
 
    return SUCCESS;
 }
@@ -222,9 +230,11 @@ HashReturn Update (hashState *state, const BitSequence *data, DataLength
 
          SHAVITE_CNT+=8*(BlockSizeB-bufcnt);
 
-/* Call the compression function to process the current block        */
+/* Call the respective compression function to process the current   */
+/* block                                                             */
 
-	 Compress512(state->buffer, state->chaining_value, SHAVITE_CNT, state->salt);
+         if (state->DigestSize>=257)
+            Compress512(state->buffer, state->chaining_value, SHAVITE_CNT, state->salt);
     }
 
 
@@ -239,11 +249,13 @@ HashReturn Update (hashState *state, const BitSequence *data, DataLength
 
 /* Update the number of bits hashed so far (locally)                 */
 
-         SHAVITE_CNT+=8*BlockSizeB;
+         SHAVITE_CNT+=BlockSizeB*8;
 
-/* Call the compression function to process the current   block      */
+/* Call the respective compression function to process the current   */
+/* block                                                             */
 
-	 Compress512(p, state->chaining_value, SHAVITE_CNT, state->salt);
+         if (state->DigestSize>=257)
+            Compress512(p, state->chaining_value, SHAVITE_CNT, state->salt);
       }
 
 
@@ -286,7 +298,10 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 
 /* Copy the current chaining value into result (as a temporary step) */
 
-   memcpy(result, state->chaining_value, 64);
+   if (state->DigestSize < 257)
+      memcpy(result, state->chaining_value, 32);
+   else
+      memcpy(result, state->chaining_value, 64);
 
 
 /* Initialize block as the message block to compress with the bytes  */
@@ -305,39 +320,41 @@ HashReturn Final (hashState *state, BitSequence *hashval)
 
 /* Compress the last block (according to the digest size)            */
 
-/* An additional message block is required if there are less than 18 */
+  if (state->DigestSize>=257) {
+/* An additional message block is required if there are less than 10 */
 /* more bytes for message length and digest length encoding          */
 
-    if (bufcnt>=BlockSizeB-18)
-       {
+
+         if (bufcnt>=BlockSizeB-18)
+            {
 
 /* Compress the current block                                        */
-          Compress512(block,result,state->bitcount,state->salt);
+               Compress512(block,result,state->bitcount,state->salt);
 
 /* Generate the full padding block                                   */
-          memset(block, 0, BlockSizeB);
-          U64TO8_LITTLE(block+BlockSizeB-18, state->bitcount);
-          U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
+               memset(block, 0, BlockSizeB);
+               U64TO8_LITTLE(block+BlockSizeB-18, state->bitcount);
+               U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
 
 /* Compress the full padding block                                   */
-          Compress512(block,result,0x0UL,state->salt);
-       }
+               Compress512(block,result,0x0UL,state->salt);
+            }
 
-    else
+         else
 
-       {
+            {
 /* Pad the number of bits hashed so far and the digest size to the   */
-/* last message block and compress it
-*/
-           U64TO8_LITTLE(block+BlockSizeB-18, state->bitcount);
-           memset(block+BlockSizeB-10,0,8);
-           U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
-	   if ((state->bitcount&(state->BlockSize-1))==0)
-	      Compress512(block,result, 0ULL, state->salt);
-	   else
-	      Compress512(block,result, state->bitcount, state->salt);
+/* last message block and compress it				     */
+               U64TO8_LITTLE(block+BlockSizeB-18, state->bitcount);
+               memset(block+BlockSizeB-10,0,8);
+               U16TO8_LITTLE(block+BlockSizeB-2, state->DigestSize);
+               if ((state->bitcount&(state->BlockSize-1))==0)
+                  Compress512(block,result, 0x0ULL, state->salt);
+               else
+                  Compress512(block,result, state->bitcount, state->salt);
 
-        }
+            }
+ }
 /* Copy the result into the supplied array of bytes.                 */
 
    for (i=0;i<(state->DigestSize+7)/8;i++)

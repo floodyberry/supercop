@@ -13,6 +13,7 @@ SHAvite-3 tweak) from:                                       */
 /*                                                                   */
 /*********************************************************************/
 
+#include <string.h>
 #include "compress.h"
 
 typedef unsigned char BitSequence;
@@ -108,7 +109,6 @@ HashReturn Init(hashState *state, int hashbitlen)
 
    memset(state->chaining_value,0,32); 
 
-   
 /* Compute MIV_{256}                                                 */
 
    Compress256(state->buffer,state->chaining_value,0x0ULL,state->salt);

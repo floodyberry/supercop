@@ -20,7 +20,7 @@
         x3 = rk[0];\
         roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
         rk[16] = y0^rk[12]^counter[0];\
-        rk[17] = y1^rk[13]^counter[1];\
+        rk[17] = y1^rk[13]^~counter[1];\
         rk[18] = y2^rk[14];\
         rk[19] = y3^rk[15];\
         x0 = rk[5];\
@@ -81,7 +81,7 @@
         roundAESnokey(x0,x1,x2,x3,y0,y1,y2,y3);\
         rk[56] = y0^rk[52];\
         rk[57] = y1^rk[53]^counter[1];\
-        rk[58] = y2^rk[54]^counter[0];\
+        rk[58] = y2^rk[54]^~counter[0];\
         rk[59] = y3^rk[55];\
         x0 = rk[45];\
         x1 = rk[46];\
@@ -115,7 +115,7 @@
         rk[84] = y0^rk[80];\
         rk[85] = y1^rk[81];\
         rk[86] = y2^rk[82]^counter[1];\
-        rk[87] = y3^rk[83]^counter[0];\
+        rk[87] = y3^rk[83]^~counter[0];\
 	x0 = rk[73];\
         x1 = rk[74];\
         x2 = rk[75];\
@@ -175,7 +175,7 @@
         rk[124] = y0^rk[120]^counter[0];\
         rk[125] = y1^rk[121];\
         rk[126] = y2^rk[122];\
-        rk[127] = y3^rk[123]^counter[1];\
+        rk[127] = y3^rk[123]^~counter[1];\
 }
 
 #define LinExpansion(rk,position,temp0,temp1,temp2)\
