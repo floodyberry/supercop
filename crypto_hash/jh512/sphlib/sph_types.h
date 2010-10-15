@@ -1,4 +1,4 @@
-/* $Id: sph_types.h 230 2010-06-16 21:39:32Z tp $ */
+/* $Id: sph_types.h 250 2010-09-10 20:23:02Z tp $ */
 /**
  * Basic type definitions.
  *
@@ -48,12 +48,6 @@
 #define SPH_TYPES_H__
 
 #include <limits.h>
-#include <endian.h> 
-#ifdef LITTLE_ENDIAN 
-  #define SPH_LITTLE_ENDIAN 1 
-#else 
-  #define SPH_BIG_ENDIAN 1 
-#endif
 
 /*
  * All our I/O functions are defined over octet streams. We do not know
@@ -991,6 +985,8 @@ typedef long long sph_s64;
  * SPH_I386_MSVC        x86-compatible (32-bit) with Microsoft Visual C
  * SPH_AMD64_GCC        x86-compatible (64-bit) with gcc
  * SPH_AMD64_MSVC       x86-compatible (64-bit) with Microsoft Visual C
+ * SPH_PPC32_GCC        PowerPC, 32-bit, with gcc
+ * SPH_PPC64_GCC        PowerPC, 64-bit, with gcc
  *
  * TODO: enhance automatic detection, for more architectures and compilers.
  * Endianness is the most important. SPH_UNALIGNED and SPH_UPTR help with
@@ -1081,6 +1077,21 @@ typedef long long sph_s64;
  */
 #elif defined __powerpc__ || defined __POWERPC__ || defined __ppc__ \
 	|| defined _ARCH_PPC
+
+/*
+ * Note: we do not declare cross-endian access to be "fast": even if
+ * using inline assembly, implementation should still assume that
+ * keeping the decoded word in a temporary is faster than decoding
+ * it again.
+ */
+#if defined __GNUC__
+#if SPH_64_TRUE
+#define SPH_DETECT_PPC64_GCC         1
+#else
+#define SPH_DETECT_PPC32_GCC         1
+#endif
+#endif
+
 #if defined __BIG_ENDIAN__ || defined _BIG_ENDIAN
 #define SPH_DETECT_BIG_ENDIAN        1
 #elif defined __LITTLE_ENDIAN__ || defined _LITTLE_ENDIAN
@@ -1148,6 +1159,12 @@ typedef long long sph_s64;
 #endif
 #if defined SPH_DETECT_AMD64_MSVC && !defined SPH_AMD64_MSVC
 #define SPH_AMD64_MSVC        SPH_DETECT_AMD64_MSVC
+#endif
+#if defined SPH_DETECT_PPC32_GCC && !defined SPH_PPC32_GCC
+#define SPH_PPC32_GCC         SPH_DETECT_PPC32_GCC
+#endif
+#if defined SPH_DETECT_PPC64_GCC && !defined SPH_PPC64_GCC
+#define SPH_PPC64_GCC         SPH_DETECT_PPC64_GCC
 #endif
 
 #if SPH_LITTLE_ENDIAN && !defined SPH_LITTLE_FAST
@@ -1548,6 +1565,25 @@ sph_dec32le(const void *src)
 		__asm__ __volatile__ (
 			"lda [%1]0x88,%0" : "=r" (tmp) : "r" (src));
 		return tmp;
+/*
+ * On PowerPC, this turns out not to be worth the effort: the inline
+ * assembly makes GCC optimizer uncomfortable, which tends to nullify
+ * the decoding gains.
+ *
+ * For most hash functions, using this inline assembly trick changes
+ * hashing speed by less than 5% and often _reduces_ it. The biggest
+ * gains are for MD4 (+11%) and CubeHash (+30%). For all others, it is
+ * less then 10%. The speed gain on CubeHash is probably due to the
+ * chronic shortage of registers that CubeHash endures; for the other
+ * functions, the generic code appears to be efficient enough already.
+ *
+#elif (SPH_PPC32_GCC || SPH_PPC64_GCC) && !SPH_NO_ASM
+		sph_u32 tmp;
+
+		__asm__ __volatile__ (
+			"lwbrx %0,0,%1" : "=r" (tmp) : "r" (src));
+		return tmp;
+ */
 #else
 		return sph_bswap32(*(const sph_u32 *)src);
 #endif
@@ -1587,6 +1623,15 @@ sph_dec32le_aligned(const void *src)
 
 	__asm__ __volatile__ ("lda [%1]0x88,%0" : "=r" (tmp) : "r" (src));
 	return tmp;
+/*
+ * Not worth it generally.
+ *
+#elif (SPH_PPC32_GCC || SPH_PPC64_GCC) && !SPH_NO_ASM
+	sph_u32 tmp;
+
+	__asm__ __volatile__ ("lwbrx %0,0,%1" : "=r" (tmp) : "r" (src));
+	return tmp;
+ */
 #else
 	return sph_bswap32(*(const sph_u32 *)src);
 #endif
@@ -1837,6 +1882,20 @@ sph_dec64le(const void *src)
 		__asm__ __volatile__ (
 			"ldxa [%1]0x88,%0" : "=r" (tmp) : "r" (src));
 		return tmp;
+/*
+ * Not worth it generally.
+ *
+#elif SPH_PPC32_GCC && !SPH_NO_ASM
+		return (sph_u64)sph_dec32le_aligned(src)
+			| ((sph_u64)sph_dec32le_aligned(
+				(const char *)src + 4) << 32);
+#elif SPH_PPC64_GCC && !SPH_NO_ASM
+		sph_u64 tmp;
+
+		__asm__ __volatile__ (
+			"ldbrx %0,0,%1" : "=r" (tmp) : "r" (src));
+		return tmp;
+ */
 #else
 		return sph_bswap64(*(const sph_u64 *)src);
 #endif
@@ -1884,6 +1943,18 @@ sph_dec64le_aligned(const void *src)
 
 	__asm__ __volatile__ ("ldxa [%1]0x88,%0" : "=r" (tmp) : "r" (src));
 	return tmp;
+/*
+ * Not worth it generally.
+ *
+#elif SPH_PPC32_GCC && !SPH_NO_ASM
+	return (sph_u64)sph_dec32le_aligned(src)
+		| ((sph_u64)sph_dec32le_aligned((const char *)src + 4) << 32);
+#elif SPH_PPC64_GCC && !SPH_NO_ASM
+	sph_u64 tmp;
+
+	__asm__ __volatile__ ("ldbrx %0,0,%1" : "=r" (tmp) : "r" (src));
+	return tmp;
+ */
 #else
 	return sph_bswap64(*(const sph_u64 *)src);
 #endif
