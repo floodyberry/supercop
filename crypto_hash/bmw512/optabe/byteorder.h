@@ -19,24 +19,24 @@
 
 #if defined(__BYTE_ORDER)
   #if (__BYTE_ORDER == __BIG_ENDIAN)
-    #define MACHINE_IS_BIG_ENDIAN
+	#define MACHINE_IS_BIG_ENDIAN
   #elif (__BYTE_ORDER == __LITTLE_ENDIAN)
-    #define MACHINE_IS_LITTLE_ENDIAN
+	#define MACHINE_IS_LITTLE_ENDIAN
   #endif
 #elif defined(BYTE_ORDER)
   #if (BYTE_ORDER == BIG_ENDIAN)
-    #define MACHINE_IS_BIG_ENDIAN
+	#define MACHINE_IS_BIG_ENDIAN
   #elif (BYTE_ORDER == LITTLE_ENDIAN)
-    #define MACHINE_IS_LITTLE_ENDIAN
+	#define MACHINE_IS_LITTLE_ENDIAN
   #endif
 #endif /*__BYTE_ORDER || BYTE_ORDER*/
 
 #if !defined(MACHINE_IS_BIG_ENDIAN) && !defined(MACHINE_IS_LITTLE_ENDIAN)
   #if defined(_BIG_ENDIAN) || defined(_MIPSEB)
-    #define MACHINE_IS_BIG_ENDIAN
+	#define MACHINE_IS_BIG_ENDIAN
   #endif
   #if defined(_LITTLE_ENDIAN) || defined(_MIPSEL)
-    #define MACHINE_IS_LITTLE_ENDIAN
+	#define MACHINE_IS_LITTLE_ENDIAN
   #endif
 #endif /*!MACHINE_IS_BIG_ENDIAN && !MACHINE_IS_LITTLE_ENDIAN*/
 
@@ -59,6 +59,12 @@
 #if defined(__PPC__) || defined(_ARCH_PPC)
 
 #if defined(__64BIT__)
+#if defined(_ARCH_PWR7)
+#define aix_ld_swap64(s64,d64)\
+	__asm__ ("ldbrx %0,0,%1" : "=r"(d64) : "r"(s64))
+#define aix_st_swap64(s64,d64)\
+	__asm__ volatile ("stdbrx %1,0,%0" : : "r"(d64), "r"(s64))
+#else
 #define aix_ld_swap64(s64,d64)\
 {\
 	uint64_t *s4, h;\
@@ -76,10 +82,7 @@
 	__asm__ volatile ("addi %0,%3,4;stwbrx %1,0,%3;stwbrx %2,0,%0"\
 		: "+r"(s4) : "r"(s64), "r"(h), "b"(d64));\
 }
-#else
-#if defined(_ARCH_PWR7)
-#define aix_ld_swap64(s64,d64)\
-	__asm__ ("ldbrx %0,0,%1" : "=r"(d64) : "r"(s64))
+#endif /*64BIT && PWR7*/
 #else
 #define aix_ld_swap64(s64,d64)\
 {\
@@ -90,7 +93,6 @@
 \
 	d64 = ((uint64_t)h<<32) | l;\
 }
-#endif /*PWR7*/
 
 #define aix_st_swap64(s64,d64)\
 {\
@@ -102,18 +104,58 @@
 		: "+r"(s4) : "r"(l), "r"(h), "b"(d64));\
 }
 #endif /*__64BIT__*/
-
 #define aix_ld_swap32(s32,d32)\
 	__asm__ ("lwbrx %0,0,%1" : "=r"(d32) : "r"(s32))
-
 #define aix_st_swap32(s32,d32)\
 	__asm__ volatile ("stwbrx %1,0,%0" : : "r"(d32), "r"(s32))
-
 #define ld_swap32(s,d) aix_ld_swap32(s,d)
 #define st_swap32(s,d) aix_st_swap32(s,d)
 #define ld_swap64(s,d) aix_ld_swap64(s,d)
 #define st_swap64(s,d) aix_st_swap64(s,d)
 #endif /*__PPC__ || _ARCH_PPC*/
+
+#if defined(__sparc)
+#if !defined(__arch64__) && !defined(__sparcv8) && defined(__sparcv9)
+#define __arch64__
+#endif
+#if defined(__GNUC__) || (defined(__SUNPRO_C) && __SUNPRO_C > 0x590)
+/* need Sun Studio C 5.10 and above for GNU inline assembly */
+#if defined(__arch64__)
+#define sparc_ld_swap64(s64,d64)\
+	__asm__ ("ldxa [%1]0x88,%0" : "=r"(d64) : "r"(s64))
+#define sparc_st_swap64(s64,d64)\
+	__asm__ volatile ("stxa %0,[%1]0x88" : : "r"(s64), "r"(d64))
+#define st_swap64(s,d) sparc_st_swap64(s,d)
+#else
+#define sparc_ld_swap64(s64,d64)\
+{\
+	uint32_t *s4, h, l;\
+\
+	__asm__ ("add %3,4,%0\n\tlda [%3]0x88,%1\n\tlda [%0]0x88,%2"\
+		: "+r"(s4), "=r"(l), "=r"(h) : "r"(s64));\
+\
+	d64 = ((uint64_t)h<<32) | l;\
+}
+#define sparc_st_swap64(s64,d64)\
+{\
+	uint32_t *s4, h, l;\
+\
+	l = (s64) & 0xfffffffful, h = (s64) >> 32;\
+\
+	__asm__ volatile ("add %3,4,%0\n\tsta %1,[%3]0x88\n\tsta %2,[%0]0x88"\
+		: "+r"(s4) : "r"(l), "r"(h), "r"(d64));\
+}
+#endif /*sparc64*/
+#define sparc_ld_swap32(s32,d32)\
+	__asm__ ("lda [%1]0x88,%0" : "=r"(d32) : "r"(s32))
+#define sparc_st_swap32(s32,d32)\
+	__asm__ volatile ("sta %0,[%1]0x88" : : "r"(s32), "r"(d32))
+#define ld_swap32(s,d) sparc_ld_swap32(s,d)
+#define st_swap32(s,d) sparc_st_swap32(s,d)
+#define ld_swap64(s,d) sparc_ld_swap64(s,d)
+#define st_swap64(s,d) sparc_st_swap64(s,d)
+#endif /* GCC || Sun Studio C > 5.9 */
+#endif /*sparc*/
 
 /* GCC fallback */
 #if ((__GNUC__ >= 4) || defined(__PGIC__)) && !defined(ld_swap32)
@@ -134,11 +176,11 @@
 #endif
 #if !defined(ld_swap64)
 #define ld_swap64(s,d) (d = (*(s)>>56)|(*(s)>>40&0xff00)|(*(s)>>24&0xff0000)|\
-    (*(s)>>8&0xff000000)|(*(s)&0xff000000)<<8|(*(s)&0xff0000)<<24|\
-    (*(s)&0xff00)<<40|*(s)<<56)
+	(*(s)>>8&0xff000000)|(*(s)&0xff000000)<<8|(*(s)&0xff0000)<<24|\
+	(*(s)&0xff00)<<40|*(s)<<56)
 #define st_swap64(s,d) (*(d) = ((s)>>56)|((s)>>40&0xff00)|((s)>>24&0xff0000)|\
-    ((s)>>8&0xff000000)|((s)&0xff000000)<<8|((s)&0xff0000)<<24|\
-    ((s)&0xff00)<<40|(s)<<56)
+	((s)>>8&0xff000000)|((s)&0xff000000)<<8|((s)&0xff0000)<<24|\
+	((s)&0xff00)<<40|(s)<<56)
 #endif
 
 #endif /*MACHINE_IS_BIG_ENDIAN*/

@@ -1,0 +1,10 @@
+Blue Midnight Wish - 512 as submitted to NIST on 15 Sept 2009.
+This is an un-optimized ARM NEON eBASH implementation (based on the SSE2 version for x86).
+Note: Search/replace of SSE intrinsics with NEON intrinsics in the optx86sse2 implementation.
+
+Programmer:  Rune E. Jensen, 
+             email: runeerle@stud.ntnu.no
+             October 2010
+
+Level of copyright protection: 0
+Level of patent protection: 0

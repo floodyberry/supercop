@@ -4,7 +4,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <spu_mfcio.h>
-#include "osfreq.c"
 
 static long myround(double u)
 {
@@ -56,8 +55,7 @@ static void init(void)
 
   spu_write_decrementer(0xffffffff);
 
-  cpufrequency = osfreq();
-  if (!cpufrequency) return;
+  cpufrequency = 3192000000.0;
 
   for (loop = 0;loop < 100;++loop) {
     guess1 = guesstbcycles();
