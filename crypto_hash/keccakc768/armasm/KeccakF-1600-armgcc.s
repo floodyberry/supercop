@@ -1,125 +1,135 @@
+@ This file was created from a .asm file
+@  using the ads2gas.pl script.
+	.equ DO1STROUNDING, 0
 
-		PRESERVE8
-		THUMB
-		AREA    |.text|, CODE, READONLY
-
-;// --- defines
-
-_ba0	equ  0*4
-_ba1	equ  1*4
-_be0	equ  2*4
-_be1	equ  3*4
-_bi0	equ  4*4
-_bi1	equ  5*4
-_bo0	equ  6*4
-_bo1	equ  7*4
-_bu0	equ  8*4
-_bu1	equ  9*4
-_ga0	equ 10*4
-_ga1	equ 11*4
-_ge0	equ 12*4
-_ge1	equ 13*4
-_gi0	equ 14*4
-_gi1	equ 15*4
-_go0	equ 16*4
-_go1	equ 17*4
-_gu0	equ 18*4
-_gu1	equ 19*4
-_ka0	equ 20*4
-_ka1	equ 21*4
-_ke0	equ 22*4
-_ke1	equ 23*4
-_ki0	equ 24*4
-_ki1	equ 25*4
-_ko0	equ 26*4
-_ko1	equ 27*4
-_ku0	equ 28*4
-_ku1	equ 29*4
-_ma0	equ 30*4
-_ma1	equ 31*4
-_me0	equ 32*4
-_me1	equ 33*4
-_mi0	equ 34*4
-_mi1	equ 35*4
-_mo0	equ 36*4
-_mo1	equ 37*4
-_mu0	equ 38*4
-_mu1	equ 39*4
-_sa0	equ 40*4
-_sa1	equ 41*4
-_se0	equ 42*4
-_se1	equ 43*4
-_si0	equ 44*4
-_si1	equ 45*4
-_so0	equ 46*4
-_so1	equ 47*4
-_su0	equ 48*4
-_su1	equ 49*4
-
-mDe1	equ 50*4
-mDi0	equ 51*4
-mDo0	equ 52*4
-mDo1	equ 53*4
-
-;// --- macros
-
-		MACRO
-		xor5		$result,$ptr,$b,$g,$k,$m,$s
-
-		ldr			$result, [$ptr, #$b]
-		ldr			r1, [$ptr, #$g]
-		ldr			r2, [$ptr, #$k]
-		eor			$result, $result, r1				
-		ldr			r1, [$ptr, #$m]
-		eor			$result, $result, r2
-		ldr			r2, [$ptr, #$s]
-		eor			$result, $result, r1				
-		eor			$result, $result, r2
-		MEND
-
-		MACRO
-		xorrol 		$b, $yy, $rr
-
-		eor			$b, $b, $yy
-		ror			$b, #32-$rr
-		MEND
+	@ PRESERVE8
+	@	THUMB
+	.syntax unified
+	.cpu cortex-m3
+	.thumb
 
 
-		MACRO
-		xandnot 	$resptr, $resofs, $aa, $bb, $cc
+@// --- defines
 
-		bic			r1, $cc, $bb
-		eor			r1, r1, $aa
-		str			r1, [$resptr, #$resofs]
-		MEND
+.equ _ba0	,   0*4
+.equ _ba1	,   1*4
+.equ _be0	,   2*4
+.equ _be1	,   3*4
+.equ _bi0	,   4*4
+.equ _bi1	,   5*4
+.equ _bo0	,   6*4
+.equ _bo1	,   7*4
+.equ _bu0	,   8*4
+.equ _bu1	,   9*4
+.equ _ga0	,  10*4
+.equ _ga1	,  11*4
+.equ _ge0	,  12*4
+.equ _ge1	,  13*4
+.equ _gi0	,  14*4
+.equ _gi1	,  15*4
+.equ _go0	,  16*4
+.equ _go1	,  17*4
+.equ _gu0	,  18*4
+.equ _gu1	,  19*4
+.equ _ka0	,  20*4
+.equ _ka1	,  21*4
+.equ _ke0	,  22*4
+.equ _ke1	,  23*4
+.equ _ki0	,  24*4
+.equ _ki1	,  25*4
+.equ _ko0	,  26*4
+.equ _ko1	,  27*4
+.equ _ku0	,  28*4
+.equ _ku1	,  29*4
+.equ _ma0	,  30*4
+.equ _ma1	,  31*4
+.equ _me0	,  32*4
+.equ _me1	,  33*4
+.equ _mi0	,  34*4
+.equ _mi1	,  35*4
+.equ _mo0	,  36*4
+.equ _mo1	,  37*4
+.equ _mu0	,  38*4
+.equ _mu1	,  39*4
+.equ _sa0	,  40*4
+.equ _sa1	,  41*4
+.equ _se0	,  42*4
+.equ _se1	,  43*4
+.equ _si0	,  44*4
+.equ _si1	,  45*4
+.equ _so0	,  46*4
+.equ _so1	,  47*4
+.equ _su0	,  48*4
+.equ _su1	,  49*4
 
-		MACRO
-		xandnotRC 	$resptr, $resofs, $aa, $bb, $cc
+.equ mDe1	,  50*4
+.equ mDi0	,  51*4
+.equ mDo0	,  52*4
+.equ mDo1	,  53*4
+
+@// --- macros
+
+.macro		xor5		result,ptr,b,g,k,m,s
+
+		ldr			\result, [\ptr, #\b]
+		ldr			r1, [\ptr, #\g]
+		ldr			r2, [\ptr, #\k]
+		eor			\result, \result, r1				
+		ldr			r1, [\ptr, #\m]
+		eor			\result, \result, r2
+		ldr			r2, [\ptr, #\s]
+		eor			\result, \result, r1				
+		eor			\result, \result, r2
+		.endm
+
+.macro		xorrol 		b, yy, rr
+
+		eor			\b, \b, \yy
+		ror			\b, #32-\rr
+		.endm
+
+
+.macro		xandnot 	resptr, resofs, aa, bb, cc
+
+		bic			r1, \cc, \bb
+		eor			r1, r1, \aa
+		str			r1, [\resptr, #\resofs]
+		.endm
+
+.macro		xandnotRC 	resptr, resofs, aa, bb, cc
 
 		ldr			r1, [r3], #4
-		bic			$cc, $cc, $bb
-		eor			$cc, $cc, r1
-		eor			$cc, $cc, $aa
-		str			$cc, [$resptr, #$resofs]
-		MEND
+		bic			\cc, \cc, \bb
+		eor			\cc, \cc, r1
+		eor			\cc, \cc, \aa
+		str			\cc, [\resptr, #\resofs]
+		.endm
 
 
-		EXPORT  KeccakPermutationOnWordsAfterXoring_ARM_asm
-KeccakPermutationOnWordsAfterXoring_ARM_asm   PROC
+	.size	KeccakPermutationOnWords, .-KeccakPermutationOnWords
+	.align	2
+	.global	KeccakPermutationOnWordsAfterXoring_ARM_asm
+	.thumb
+	.thumb_func
+	.type	KeccakPermutationOnWordsAfterXoring_ARM_asm, %function
+KeccakPermutationOnWordsAfterXoring_ARM_asm:
+	@ args = 0, pretend = 0, frame = 408
+	@ frame_needed = 0, uses_anonymous_args = 0
+	@ link register save eliminated.
 
-		push	{r4-r12,lr}
-		sub      sp,sp,#4*(50+4)
+    push	{r4-r12,lr}
+		sub   sp,sp,#4*(50+4)
 
 		movs	r9, r2
 		beq		interleaveDone
 		mov		r8,r0
-interleaveLoop
+interleaveLoop:
 
 		ldr		r4, [r1], #4
 		ldr		r5, [r1], #4
 		ldrd    r6, r7, [r8]
 
-		;// Credit: Henry S. Warren, Hacker's Delight, Addison-Wesley, 2002
+		@// Credit: Henry S. Warren, Hacker's Delight, Addison-Wesley, 2002
 		and		r3,r4,#0x55555555
 		orr		r3,r3,r3, LSR #1
 		and		r3,r3,#0x33333333
@@ -166,45 +176,69 @@ interleaveLoop
 		subs	r9,r9,#1
 		bne		interleaveLoop
 
-interleaveDone
+interleaveDone:
 
 		ldr		r3, =KeccakF1600RoundConstantsWithTerminator
-		b		roundLoop	;//jump over the table
-		LTORG
+		b		roundLoop	@//jump over the table
+		.ltorg
 
-		ALIGN
+	@ ALIGN
 
-KeccakF1600RoundConstantsWithTerminator
-		;//		0			1
-		dcd		0x00000001,	0x00000000
-		dcd		0x00000000,	0x00000089
-		dcd		0x00000000,	0x8000008b
-		dcd		0x00000000,	0x80008080
-		dcd		0x00000001,	0x0000008b
-		dcd		0x00000001,	0x00008000
-		dcd		0x00000001,	0x80008088
-		dcd		0x00000001,	0x80000082
-		dcd		0x00000000,	0x0000000b
-		dcd		0x00000000,	0x0000000a
-		dcd		0x00000001,	0x00008082
-		dcd		0x00000000,	0x00008003
-		dcd		0x00000001,	0x0000808b
-		dcd		0x00000001,	0x8000000b
-		dcd		0x00000001,	0x8000008a
-		dcd		0x00000001,	0x80000081
-		dcd		0x00000000,	0x80000081
-		dcd		0x00000000,	0x80000008
-		dcd		0x00000000,	0x00000083
-		dcd		0x00000000,	0x80008003
-		dcd		0x00000001,	0x80008088
-		dcd		0x00000000,	0x80000088
-		dcd		0x00000001,	0x00008000
-		dcd		0x00000000,	0x80008082
-		dcd		0xFFFFFFFF	;//terminator
+KeccakF1600RoundConstantsWithTerminator:
+		@//		0			1
+		.word	0x00000001
+    .word 0x00000000
+		.word 0x00000000
+    .word 0x00000089
+		.word 0x00000000
+    .word 0x8000008b
+		.word 0x00000000
+    .word 0x80008080
+		.word 0x00000001
+    .word 0x0000008b
+		.word 0x00000001
+		.word 0x00008000
+		.word 0x00000001
+		.word 0x80008088
+		.word 0x00000001
+		.word 0x80000082
+		.word 0x00000000
+		.word 0x0000000b
+		.word 0x00000000
+		.word 0x0000000a
+		.word 0x00000001
+		.word 0x00008082
+		.word 0x00000000
+		.word 0x00008003
+		.word 0x00000001
+		.word 0x0000808b
+		.word 0x00000001
+ 		.word 0x8000000b
+		.word 0x00000001
+		.word 0x8000008a
+		.word 0x00000001
+		.word 0x80000081
+		.word 0x00000000
+		.word 0x80000081
+		.word 0x00000000
+		.word 0x80000008
+		.word 0x00000000
+		.word 0x00000083
+		.word 0x00000000
+		.word 0x80008003
+		.word 0x00000001
+		.word 0x80008088
+		.word 0x00000000
+		.word 0x80000088
+		.word 0x00000001
+		.word 0x00008000
+		.word 0x00000000
+		.word 0x80008082
+		.word 0xFFFFFFFF	@//terminator
 
-roundLoop
+roundLoop:
 
-		;//prepTheta	A		
+		@//prepTheta	A		
 	    xor5		r10, r0,_bu0, _gu0, _ku0, _mu0, _su0
 	    xor5		r6, r0,_be1, _ge1, _ke1, _me1, _se1
 		eor			r5, r10, r6, ROR #31
@@ -234,7 +268,7 @@ roundLoop
 	    eor			r7, r8, r11, ROR #31
 	    eor			r6, r9, r10
 
-		;//thetaRhoPiChiIota 0, in A, out E
+		@//thetaRhoPiChiIota 0, in A, out E
 		ldr			r8, [r0, #_ba0]
 		ldr			r9, [r0, #_ge0]
 		ldr			r10, [r0, #_ki1]
@@ -324,7 +358,7 @@ roundLoop
 		xandnot		sp, _so0, r11, r12, r8
 		xandnot		sp, _su0, r12, r8, r9
 
-		;//	thetaRhoPiChiIota 1, in A, out E
+		@//	thetaRhoPiChiIota 1, in A, out E
 		ldr			r1, [sp, #mDe1]
 		ldr			r9, [r0, #_ge1]
 		ldr			r8, [r0, #_ba1]
@@ -416,7 +450,7 @@ roundLoop
 		xandnot		sp, _so1, r11, r12, r8
 		xandnot		sp, _su1, r12, r8, r9
 
-		;//prepTheta	E		
+		@//prepTheta	E		
 	    xor5		r10, sp,_bu0, _gu0, _ku0, _mu0, _su0
 	    xor5		r6, sp,_be1, _ge1, _ke1, _me1, _se1
 		eor			r5, r10, r6, ROR #31
@@ -446,7 +480,7 @@ roundLoop
 	    eor			r7, r8, r11, ROR #31
 	    eor			r6, r9, r10
 
-		;//thetaRhoPiChiIota 0, in E, out A
+		@//thetaRhoPiChiIota 0, in E, out A
 		ldr			r8, [sp, #_ba0]
 		ldr			r9, [sp, #_ge0]
 		ldr			r10, [sp, #_ki1]
@@ -536,7 +570,7 @@ roundLoop
 		xandnot		r0, _so0, r11, r12, r8
 		xandnot		r0, _su0, r12, r8, r9
 
-		;//	thetaRhoPiChiIota 1, in A, out E
+		@//	thetaRhoPiChiIota 1, in A, out E
 		ldr			r1, [sp, #mDe1]
 		ldr			r9, [sp, #_ge1]
 		ldr			r8, [sp, #_ba1]
@@ -635,8 +669,7 @@ roundLoop
 		add			sp,sp,#4*(50+4)
 		pop			{r4-r12,pc}
 
-		ENDP
+	@
 
-		ALIGN
+	@ ALIGN
 
-		END

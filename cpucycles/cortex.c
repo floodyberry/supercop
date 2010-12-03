@@ -1,5 +1,5 @@
 /*
-cpucycles/cortex.c version 20100912
+cpucycles/cortex.c version 20101203
 D. J. Bernstein
 Public domain.
 */
@@ -21,7 +21,9 @@ static void readticks(unsigned int *result)
   struct timeval t;
   unsigned int cc;
   if (!enabled) {
-    asm volatile("mcr p15, 0, %0, c9, c12, 1" :: "r"(1<<31));
+    asm volatile("mcr p15, 0, %0, c9, c12, 0" :: "r"(17);
+    asm volatile("mcr p15, 0, %0, c9, c12, 1" :: "r"(0x8000000f));
+    asm volatile("mcr p15, 0, %0, c9, c12, 3" :: "r"(0x8000000f));
     enabled = 1;
   }
   asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(cc));
