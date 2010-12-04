@@ -21,7 +21,7 @@ static void readticks(unsigned int *result)
   struct timeval t;
   unsigned int cc;
   if (!enabled) {
-    asm volatile("mcr p15, 0, %0, c9, c12, 0" :: "r"(17);
+    asm volatile("mcr p15, 0, %0, c9, c12, 0" :: "r"(17));
     asm volatile("mcr p15, 0, %0, c9, c12, 1" :: "r"(0x8000000f));
     asm volatile("mcr p15, 0, %0, c9, c12, 3" :: "r"(0x8000000f));
     enabled = 1;
