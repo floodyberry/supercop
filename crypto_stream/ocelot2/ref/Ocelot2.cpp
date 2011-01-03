@@ -4,7 +4,7 @@
 
 //****************************************************************************
 //
-// The OCELOT2 stream ciphering method, Version 2.0.0 (30 September 2010)
+// The OCELOT2 stream ciphering method, Version 2.1.0 (09 December 2010)
 // Copyright (C) 2009-2010, George Anescu, www.scgen.com
 // All right reserved.
 //
@@ -57,39 +57,38 @@ void Ocelot2::Initialize(OCELOTSize size4, BYTE const* key, int keysize)
     _cnt.Initialize(words, _size);
     memcpy(_data, _data0, _size4);
     _val = _data0[_size];
-    BYTE temp[4];
+    BYTE temp[4], by;
     UINT rnd, temp1;
-    _incr = (_val & _size1) | 1;	
+    _incr = (_ss[_val & 0xFF] & _size1) | 1;
     _ix = -1;
     _ix1 = _incr;
-    for (; _ssix < 256; _ssix+=4)
+    while (_ssix < 256)
     {
         _ix++;
         if (_ix == _size)
         {
             _ix = 0;
             _cnt.Increment();
-            _incr = (_val & _size1) | 1;
+            _ix1 += _incr;
+            _ix1 &= _size1;
+            _incr = (_ss[_val & 0xFF] & _size1) | 1;
         }
         _ix1 += _incr;
-        if (_ix1 >= _size) _ix1 -= _size;
-        _val ^= _data[_ix];
-        _val += Ocelot2::F1(_cnt[_ix]);
-        temp1 = _val;
+        _ix1 &= _size1;
+        _val ^= Ocelot2::F1(_data[_ix]);
+        _val += _cnt[_ix];
+        by = _val;
         _val ^= _data[_ix1];
-        _val += Ocelot2::G1(_cnt[_ix1]);
-        if (_ix == _ix1)
+        _data[_ix1] ^= SS(_val);
+        if (_ix != _ix1)
         {
-            rnd = SS(((_data[_ix] = SS(Ocelot2::F2(temp1))) +
-                  Ocelot2::G2(_val)) ^ Ocelot2::F1(temp1));
+            _data[_ix] += by;
         }
-        else
-        {
-            rnd = SS(((_data[_ix] = SS(Ocelot2::F2(temp1))) +
-                  (_data[_ix1] = Ocelot2::G2(_val))) ^ Ocelot2::F1(temp1));
-        }
-        temp[0] = (BYTE)_ssix; temp[1] = (BYTE)(_ssix+1);
-        temp[2] = (BYTE)(_ssix+2); temp[3] = (BYTE)(_ssix+3);
+        rnd = SS((_cnt[_ix1] + by) ^ _val);
+        temp[0] = (BYTE)_ssix++;
+        temp[1] = (BYTE)_ssix++;
+        temp[2] = (BYTE)_ssix++;
+        temp[3] = (BYTE)_ssix++;
         temp1 = Bytes2Word(temp);
         (this->*Swap)(temp1, rnd);
     }
@@ -119,7 +118,7 @@ void Ocelot2::Initialize(OCELOTSize size4, UINT const* data, BYTE const* ss)
     memcpy(words, data+_size+1, _size4<<1);
     Bytes2Words(words, words, _size<<1);
     _cnt.Initialize(words, _size);
-    _incr = (_val & _size1) | 1;	
+	_incr = (_ss[_val & 0xFF] & _size1) | 1;
     _ix = -1;
     _ix1 = _incr;
     //Create initial state
@@ -242,30 +241,28 @@ void Ocelot2::Expansion(UINT const* data, int size, UINT* res, int dim, short it
 
 void Ocelot2::GetNextWord(UINT& rnd)
 {
+    static UINT temp;
     _ix++;
     if (_ix == _size)
     {
         _ix = 0;
         _cnt.Increment();
-        _incr = (_val & _size1) | 1;
+        _ix1 += _incr;
+        _ix1 &= _size1;
+        _incr = (_ss[_val & 0xFF] & _size1) | 1;
     }
     _ix1 += _incr;
-    if (_ix1 >= _size) _ix1 -= _size;
-    _val ^= _data[_ix];
-    _val += Ocelot2::F1(_cnt[_ix]);
-    UINT temp = _val;
+    _ix1 &= _size1;
+    _val ^= Ocelot2::F1(_data[_ix]);
+    _val += _cnt[_ix];
+    temp = _val;
     _val ^= _data[_ix1];
-    _val += Ocelot2::G1(_cnt[_ix1]);
-    if (_ix == _ix1)
+    _data[_ix1] ^= SS(_val);
+    if (_ix != _ix1)
     {
-        rnd = SS(((_data[_ix] = SS(Ocelot2::F2(temp))) +
-              Ocelot2::G2(_val)) ^ Ocelot2::F1(temp));
+        _data[_ix] += temp;
     }
-    else
-    {
-        rnd = SS((BYTE)((_data[_ix] = SS(Ocelot2::F2(temp))) +
-              (_data[_ix1] = Ocelot2::G2(_val))) ^ Ocelot2::F1(temp));
-    }
+    rnd = SS((_cnt[_ix1] + temp) ^ _val);
     (this->*Swap)(_val, temp);
 }
 

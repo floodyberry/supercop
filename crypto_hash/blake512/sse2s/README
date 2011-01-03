@@ -1,0 +1,10 @@
+BLAKE-512 sse2 eBASH implementation
+authors:   Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+     Shawn Kirst <skirst@gmail.com>
+     Samuel Neves <sneves@dei.uc.pt>
+	   Peter Schwabe <peter@cryptojedi.org>
+
+This implementation assumes that no salt is used.
+
+Level of copyright protection: 0
+Level of patent protection: 0

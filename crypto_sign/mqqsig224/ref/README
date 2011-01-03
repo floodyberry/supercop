@@ -1,0 +1,59 @@
+This is the reference C code for the MQQ-SIG public-key signature scheme designed to provide 
+ultra high speed signing in software, ultra high speed signing and verification in hardware 
+and short signatures. 
+
+The technical description of the scheme and the Intellectual Property Statement has been 
+published in Cryptology ePrint Archive as Report 2010/527.
+
+Basic properties of MQQ-SIG are:
+
+  1. The length of the signature is n bits where n = 160, 192, 224 or 256. The number n can 
+     be also bigger, (just change the constant N in mqqsig.h) but we do not provide that in 
+     this SUPERCOP package and for bigger values of N the code is not fully optimized.
+
+  2. The conjectured security level is 2^(n/2). This means that the following table can be 
+     used to adequately compare MQQ-SIG with RSA and ECC measured in the current SUPERCOP
+     version:
+     _________________________________
+     |  RSA    |    ECC   |  MQQ-SIG |
+     |=========|==========|==========|
+     | RSA1024 |  ECC160  |  MQQ160  |
+     | RSA1536 |  ECC192  |  MQQ192  |
+     | RSA2048 |  ECC224  |  MQQ224  |
+     | RSA3072 |  ECC256  |  MQQ256  |
+     | RSA4096 |  ECC283  |  MQQ288  |
+     |         |  ECC384  |  MQQ384  |
+     |         |  ECC521  |  MQQ512  |
+     =================================
+
+  3. The length of the public key is 0.75 n (1 + n (n+1)/2 ) / (8 x 1024) KBytes.
+
+  4. The length of the private key is 2 n + 81 bytes.
+
+  5. The verification speed is comparable to the speed of other multivariate quadratic PKCs. 
+     The verification problem is highly parallelizable and can be executed on multicore systems 
+     giving almost linear speedup with the number of used cores, but it is not implemented yet.
+
+  6. In software its signing speed is in the range of 550 - 7,000 times faster than corresponding 
+     RSA and ECC schemes. We note that the signing speed of MQQ-SIG is affected a lot by the 
+     speed of the used hash function (currently in this implementation we use SHA-512).
+
+  7. In this implementation we use two look-up tables that are precomputed from a part of the 
+     secret key (the secret quasigroup of order 256). The total size of the look-up tables is 
+     128 KBytes. For constrained environments, signing can be done without precomputed tables, 
+     with a performance degradation of about 4-10 times.
+
+  8. In hardware its signing or verification speed can be more than 10,000 times faster than 
+     the corresponding RSA and ECC schemes.
+
+  9. It is well suited for producing fast and short signatures in smart cards and RFIDs.
+
+The C code that is provided here is mainly optimized for the operation of signing, there is a 
+little optimization for the verification part and the key-generation part is not very optimized.
+
+
+Copyright License Level for the C code: 
+GPLv3 or later
+
+Patent Level for the MQQ-SIG scheme: 
+0

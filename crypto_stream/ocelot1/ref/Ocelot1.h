@@ -14,7 +14,7 @@ class Ocelot1
 {
 //****************************************************************************
 //
-// The OCELOT1 stream ciphering method method, Version 2.0.0 (30 September 2010)
+// The OCELOT1 stream ciphering method method, Version 2.1.0 (09 December 2010)
 // Copyright (C) 2009-2010, George Anescu, www.sc-gen.com
 // All right reserved.
 //
@@ -31,21 +31,24 @@ class Ocelot1
 // Updates for Version 2.0.0 (30 September 2010):
 // - Adaptation from arrays of bytes to arays of words for increased performance
 //
+// Updates for Version 2.1.0 (09 December 2010):
+// - Changes for efficiency and security improvements
+//
 // For C++ portability testing please use the Test Samples. The test code is given in readme.txt.
 // Test Samples:
 //
 // 1)
 // statesize=16, key="XXXXXXX"
-// hexresult="F1018898 3A9FD7BA 0C462708 43474612 45474EBC 08BE4FCB 908DB206 FC55FFFE 09670415 C64E1947 70E3CE8C A56A9FBB E9C371E6 386883EA 6545A712 75283568 8DCA805A B56B0311 C37C287D DFF62B09 6DD2A4D0 953B857A DFA68A26 "...
-// hexresult=..."ADA6AC7D CC43121D 7869F8F1 64749F2F 436866F3 DBBA98C0 064E2F3B 1BB2DBFF E17281A3 6E1843AA F67E74CD F38E6AA5 18858985 D2F3BD2D 030601DD 650E159E 84D00DFF 351CBE28 14D2086A F8CA1D98 C8E709AA 3006CBBB A50C7A5F "
+// hexresult="85815117 AC8FDE76 B322240B 5FD687F5 9CE2702B ED5D1777 3257698A 832B4BE7 A0811520 2E0D7F29 A675853B 563655E6 5063716D 05FBA749 3A37BD59 CB6C3415 754C64FE 5C77352F B3DC188B B4172E84 46709D74 671A8C0A A4DDB042 "...
+// hexresult=..."FE797E42 095BCE1A 28616AFE 8AF1AAFF 904C0AEB CC2CA0B9 6604DC8E 1696CFB2 4A0D84AC E3344F80 B6EACB1B 5821BDA0 73BF9945 6F2D8C12 73A5A787 AD205816 D0B7B83C 82D3684B 53973504 BD2469AF 6B7B53F3 4B5A8CAF 56AFB44A "
 //
 // 2)
 // statesize=16, key="YXXXXXX"
-// hexresult="D824AE10 B563163F 397241B5 797A5BBC F6BF88B8 C50F03EC 5B13A52C E047DE28 22476357 D75FDC15 335CE1D6 59335D2E 56927318 99DBF457 14F3D97E 53BC436D 62E720CE B6FA197D 81A54614 6B33D5C7 4F7C0F43 A757411B 256C4942 768B887E 98CAB9F9 "...
+// hexresult="BB53781D 00E53372 C30DA673 13033AB2 0234D468 9A010A9B B1C0A0BE 0B40BF0C BF6584CA 2F26079E 5EA11379 2B259F47 56AEFD90 B7243AEF FBFC242A A3187B68 957062A2 0EFF2AC9 E23C2988 F95A7D9D 6E50DDBE B3F5E4BD B5767CE3 C8467B96 A4891FCA "...
 //
 // 3)
 // statesize=16, key="\0\0\0\0"
-// hexresult="FF30B446 4D95ED43 ADEE177C 1E29995A 439B68D4 86F02BB0 9896731C CE647511 F68E8EC5 B343251C B5DC8A32 4540E9BE 1EE3A382 CBECFFFB A7B6966D C89AC83C E153A3FF CC511D59 889BCA2F DE62FE7B CE9DEE1F B67C2C77 89278E62 "...
+// hexresult="93912BB7 3814C2D9 6B8D4CC4 CE160707 286C80FE AEA22044 021261BD 37A7310E 99CDD9E5 4780651C 5441AA6D DCCB8235 8B9B1184 7F489A0C 03AC5612 92849891 195078AE F0DBC3BD EE50179D 1804EC33 9D210FE0 17A81801 A0C8C1E7 "...
 //
 //****************************************************************************
 public:
@@ -143,19 +146,15 @@ private:
         p2 = (BYTE*)(&val2) + 3;
         //1
         v1 = *p1; v2 = *p2;
-        if (v1 == v2) v2++;
         temp = _ss[v1]; _ss[v1] = _ss[v2]; _ss[v2] = temp;
         //2
         v1 = *(--p1); v2 = *(--p2);
-        if (v1 == v2) v2++;
         temp = _ss[v1]; _ss[v1] = _ss[v2]; _ss[v2] = temp;
         //3
         v1 = *(--p1); v2 = *(--p2);
-        if (v1 == v2) v2++;
         temp = _ss[v1]; _ss[v1] = _ss[v2]; _ss[v2] = temp;
         //4
         v1 = *(--p1); v2 = *(--p2);
-        if (v1 == v2) v2++;
         temp = _ss[v1]; _ss[v1] = _ss[v2]; _ss[v2] = temp;
 	}
 
@@ -167,19 +166,15 @@ private:
         p2 = (BYTE*)&val2;
         //1
         v1 = *p1; v2 = *p2;
-        if (v1 == v2) v2++;
         temp = _ss[v1]; _ss[v1] = _ss[v2]; _ss[v2] = temp;
         //2
         v1 = *(++p1); v2 = *(++p2);
-        if (v1 == v2) v2++;
         temp = _ss[v1]; _ss[v1] = _ss[v2]; _ss[v2] = temp;
         //3
         v1 = *(++p1); v2 = *(++p2);
-        if (v1 == v2) v2++;
         temp = _ss[v1]; _ss[v1] = _ss[v2]; _ss[v2] = temp;
         //4
         v1 = *(++p1); v2 = *(++p2);
-        if (v1 == v2) v2++;
         temp = _ss[v1]; _ss[v1] = _ss[v2]; _ss[v2] = temp;
 	}
 

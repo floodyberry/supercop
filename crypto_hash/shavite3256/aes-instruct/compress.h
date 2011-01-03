@@ -20,6 +20,7 @@
 
 #define rev_reg_0321(j){\
         asm ("pshufb xmm"tostr(j)", [SHAVITE_REVERSE]");\
+        /* asm ("shufps xmm"tostr(j)", xmm"tostr(j)", 39h"); */\
 }
 
 #define replace_aes(i, j){\

@@ -4,7 +4,7 @@
 
 //****************************************************************************
 //
-// The OCELOT1 stream ciphering method, Version 2.0.0 (30 September 2010)
+// The OCELOT1 stream ciphering method, Version 2.1.0 (09 December 2010)
 // Copyright (C) 2009-2010, George Anescu, www.sc-gen.com
 // All right reserved.
 //
@@ -12,25 +12,25 @@
 
 const BYTE Ocelot1::_sss[256] = {
     246, 79, 28, 40, 39, 27, 4, 148, 153, 149, 22, 75, 31, 38,
-	222, 233, 110, 147, 102, 189, 144, 143, 11, 215, 249, 70,
+    222, 233, 110, 147, 102, 189, 144, 143, 11, 215, 249, 70,
     112, 207, 195, 192, 35, 124, 133, 66, 127, 188, 62, 104, 180,
-	211, 19, 213, 68, 128, 82, 6, 203, 95, 156, 204, 119, 239,
+    211, 19, 213, 68, 128, 82, 6, 203, 95, 156, 204, 119, 239,
     220, 43, 247, 221, 109, 238, 7, 118, 9, 15, 163, 101, 52, 94,
-	64, 0, 197, 138, 85, 235, 176, 65, 25, 45, 24, 241, 21, 2,
+    64, 0, 197, 138, 85, 235, 176, 65, 25, 45, 24, 241, 21, 2,
     51, 255, 125, 140, 10, 13, 61, 228, 33, 14, 161, 115, 202,
-	114, 191, 205, 83, 30, 67, 54, 186, 5, 169, 226, 165, 132, 69,
+    114, 191, 205, 83, 30, 67, 54, 186, 5, 169, 226, 165, 132, 69,
     23, 200, 20, 146, 183, 193, 48, 253, 56, 72, 126, 59, 209, 16,
-	103, 81, 113, 60, 47, 73, 229, 208, 80, 106, 34, 50, 243,
+    103, 81, 113, 60, 47, 73, 229, 208, 80, 106, 34, 50, 243,
     3, 178, 107, 108, 242, 100, 162, 217, 181, 129, 87, 250, 219,
-	150, 167, 78, 29, 1, 168, 199, 12, 201, 155, 231, 91, 46,
+    150, 167, 78, 29, 1, 168, 199, 12, 201, 155, 231, 91, 46,
     177, 53, 214, 92, 121, 136, 71, 17, 42, 36, 49, 158, 175, 254,
-	137, 170, 173, 26, 252, 120, 88, 174, 139, 122, 58, 18,
+    137, 170, 173, 26, 252, 120, 88, 174, 139, 122, 58, 18,
     141, 184, 84, 37, 166, 230, 32, 160, 152, 117, 159, 240, 164,
-	44, 245, 99, 232, 74, 135, 223, 55, 96, 63, 131, 134, 182,
+    44, 245, 99, 232, 74, 135, 223, 55, 96, 63, 131, 134, 182,
     218, 130, 77, 142, 111, 244, 187, 248, 76, 57, 157, 97, 145,
-	172, 171, 86, 41, 236, 151, 206, 198, 194, 227, 105, 8, 116,
+    172, 171, 86, 41, 236, 151, 206, 198, 194, 227, 105, 8, 116,
     225, 210, 93, 212, 89, 154, 234, 237, 123, 196, 251, 224, 90,
-	216, 190, 185, 98,179,
+    216, 190, 185, 98,179,
 };
 
 void Ocelot1::Initialize(OCELOTSize size4, BYTE const* key, int keysize)
@@ -57,28 +57,33 @@ void Ocelot1::Initialize(OCELOTSize size4, BYTE const* key, int keysize)
     _cnt.Initialize(words, _size);
     memcpy(_data, _data0, _size4);
     _val = _data0[_size];
-    BYTE temp[4];
+    BYTE temp[4], by;
     UINT rnd, temp1;
-    _incr = (_val & _size1) | 1;	
+    _incr = (_ss[_val & 0xFF] & _size1) | 1;
     _ix = -1;
     _ix1 = _incr;
-    for (; _ssix < 256; _ssix+=4)
+    while (_ssix < 256)
     {
         _ix++;
         if (_ix == _size)
         {
             _ix = 0;
             _cnt.Increment();
-            _incr = (_val & _size1) | 1;
+            _ix1 += _incr;
+            _ix1 &= _size1;
+            _incr = (_ss[_val & 0xFF] & _size1) | 1;
         }
         _ix1 += _incr;
-        if (_ix1 >= _size) _ix1 -= _size;
-        _val ^= _data[_ix];
-        _val += Ocelot1::F1(_cnt[_ix]);
-        _data[_ix] = SS(Ocelot1::F2(_val));
-        rnd = SS(Ocelot1::G1(_cnt[_ix1]) ^ (_data[_ix1] + Ocelot1::G2(_val)));
-        temp[0] = (BYTE)_ssix; temp[1] = (BYTE)(_ssix+1);
-        temp[2] = (BYTE)(_ssix+2); temp[3] = (BYTE)(_ssix+3);
+        _ix1 &= _size1;
+        by = _data[_ix];
+        _val ^= Ocelot1::F1(by);
+        _val += _cnt[_ix];
+        _data[_ix1] ^= SS(_val);
+        rnd = SS((_cnt[_ix1] + by) ^ _val);
+        temp[0] = (BYTE)_ssix++;
+        temp[1] = (BYTE)_ssix++;
+        temp[2] = (BYTE)_ssix++;
+        temp[3] = (BYTE)_ssix++;
         temp1 = Bytes2Word(temp);
         (this->*Swap)(temp1, rnd);
     }
@@ -108,7 +113,7 @@ void Ocelot1::Initialize(OCELOTSize size4, UINT const* data, BYTE const* ss)
     memcpy(words, data+_size+1, _size4 << 1);
     Bytes2Words(words, words, _size << 1);
     _cnt.Initialize(words, _size);
-    _incr = (_val & _size1) | 1;	
+    _incr = (_ss[_val & 0xFF] & _size1) | 1;
     _ix = -1;
     _ix1 = _incr;
     //Create initial state
@@ -231,20 +236,23 @@ void Ocelot1::Expansion(UINT const* data, int size, UINT* res, int dim, short it
 
 void Ocelot1::GetNextWord(UINT& rnd)
 {
+    static UINT temp;
     _ix++;
     if (_ix == _size)
     {
         _ix = 0;
         _cnt.Increment();
-        _incr = (_val & _size1) | 1;
+        _ix1 += _incr;
+        _ix1 &= _size1;
+        _incr = (_ss[_val & 0xFF] & _size1) | 1;
     }
     _ix1 += _incr;
-    if (_ix1 >= _size) _ix1 -= _size;
-    UINT temp = _data[_ix];
-    _val ^= temp;
-    _val += Ocelot1::F1(_cnt[_ix]);
-    _data[_ix] = SS(Ocelot1::F2(_val));
-    rnd = SS(Ocelot1::G1(_cnt[_ix1]) ^ (_data[_ix1] + Ocelot1::G2(_val)));
+    _ix1 &= _size1;
+    temp = _data[_ix];
+    _val ^= Ocelot1::F1(temp);
+    _val += _cnt[_ix];
+    _data[_ix1] ^= SS(_val);
+    rnd = SS((_cnt[_ix1] + temp) ^ _val);
     (this->*Swap)(_val, temp);
 }
 

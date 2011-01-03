@@ -1,9 +1,10 @@
+
 // Atelopus.cpp
 #include "Atelopus.h"
 
 //****************************************************************************
 //
-// The ATELOPUS hashing method, Version 2.0.0 (28 August 2010)
+// The ATELOPUS hashing method, Version 2.1.0 (09 December 2010)
 // Copyright (C) 2009-2010, George Anescu, www.sc-gen.com
 // All right reserved.
 //
@@ -33,67 +34,33 @@ const BYTE Atelopus::_skk1[256] = {
     38, 199, 159, 55, 89, 69, 74, 182, 172,
 };
 
-const short Atelopus::_sarrprimes[256] = {
-    719, 1229, 1759, 467, 971, 1489, 2053, 709, 1223, 1753, 
-    463, 967, 1487, 2039, 701, 1217, 1747, 461, 953, 1483,
-    2029, 691, 1213, 1741, 457, 947, 1481, 2027, 683, 1201, 
-    1733, 449, 941, 1471, 2017, 677, 1193, 1723, 443, 937, 
-    1459, 2011, 673, 1187, 1721, 439, 929, 1453, 2003, 661, 
-    1181, 1709, 433, 919, 1451, 1999, 659, 1171, 1699, 431, 
-    911, 1447, 1997, 653, 1163, 1697, 421, 907, 1439, 1993, 
-    647, 1153, 1693, 419, 887, 1433, 1987, 643, 1151, 1669, 
-    409, 883, 1429, 1979, 641, 1129, 1667, 401, 881, 1427, 
-    1973, 631, 1123, 1663, 397, 877, 1423, 1951, 619, 1117, 
-    1657, 389, 863, 1409, 1949, 617, 1109, 1637, 383, 859, 
-    1399, 1933, 613, 1103, 1627, 379, 857, 1381, 1931, 607, 
-    1097, 1621, 373, 853, 1373, 1913, 601, 1093, 1619, 367, 
-    839, 1367, 1907, 599, 1091, 1613, 359, 829, 1361, 1901, 
-    593, 1087, 1609, 353, 827, 1327, 1889, 587, 1069, 1607, 
-    349, 823, 1321, 1879, 577, 1063, 1601, 347, 821, 1319, 
-    1877, 571, 1061, 1597, 337, 811, 1307, 1873, 569, 1051, 
-    1583, 331, 809, 1303, 1871, 563, 1049, 1579, 317, 797, 
-    1301, 1867, 557, 1039, 1571, 313, 787, 1297, 1861, 547, 
-    1033, 1567, 311, 773, 1291, 1847, 541, 1031, 1559, 307, 
-    769, 1289, 1831, 523, 1021, 1553, 293, 761, 1283, 1823, 
-    521, 1019, 1549, 283, 757, 1279, 1811, 509, 1013, 1543, 
-    281, 751, 1277, 1801, 503, 1009, 1531, 277, 743, 1259, 
-    1789, 499, 997, 1523, 271, 739, 1249, 1787, 491, 991, 
-    1511, 269, 733, 1237, 1783, 487, 983, 1499, 263, 727, 
-    1231, 1777, 479, 977, 1493, 257, 
-};
-
-void Atelopus::HashPrimitive(UINT const* data, UINT* res, int const& len)
+void Atelopus::HashPrimitive(UINT const* data, UINT* res)
 {
-    //Copy in work buffer
+    // Copy in work buffer
     UINT ar[BlockSize256];
-    memcpy(ar, data, len<<2);
-    int len1 = len - 1;
-    int lend2 = len >> 1;
-    //1) Propagate differences
+    memcpy(ar, data, _bs4);
+    // 1) Propagate differences
     register UINT temp1, temp2;
     register int i, k, ix, ix1, pos1, pos2, incr1, incr2;
     for (k = 0; k < (int)_iter; k++)
     {
         if (k == 1)
         {
-            //Introduce a data difference based on _size
+            // Introduce a data difference based on _size
             ar[0] ^= KK(_size);
         }
-        ix = H1(Atelopus::F1(_val1) ^ KK(_val2)) % len;
-        ix1 = ix + lend2;
-        if (ix1 >= len) ix1 -= len;
-        incr1 = _sarrprimes[H1(KK(_val1) ^ _val2)];
-        incr2 = _sarrprimes[H2(_val1 + KK(_val2))];
-        incr1 %= len;
-        incr2 %= len;
-        pos1 = H1(Atelopus::G2(_val1)) % len;
-        pos2 = H2(Atelopus::F2(_val2)) % len;
+        ix = H1(Atelopus::F1(_val1) ^ KK(_val2)) & _bs1;
+        ix1 = (ix + _bs2) & _bs1;
+        incr1 = H1(KK(_val1) ^ _val2) & _bs1;
+        incr2 = H2(_val1 + KK(_val2)) & _bs1;
+        pos1 = H1(_val1) & _bs1;
+        pos2 = H2(Atelopus::F2(_val2)) & _bs1;
         if ((incr1 == incr2) && (pos1 == pos2))
         {
             pos2++;
-            if (pos2 == len) pos2 = 0;
+            pos2 &= _bs1;
         }
-        for (i=0; i<len; i++)
+        for (i=0; i<(int)_bs; i++)
         {
             if (pos1 == pos2)
             {
@@ -103,8 +70,9 @@ void Atelopus::HashPrimitive(UINT const* data, UINT* res, int const& len)
                 _val2 ^= Atelopus::F1(_val1);
                 _val2 += temp1;
                 _val2 ^= ar[ix1];
-                (this->*Swap)((temp1 = Atelopus::G1(temp1) ^ _val1), KK(_val2));
-                ar[pos1] = Atelopus::F2(KK(temp1)) + _val2;
+                temp1 ^= KK(_val1);
+                ar[pos1] = temp1 + KK(_val2);
+                (this->*Swap)(temp1, _val2);
             }
             else
             {
@@ -115,59 +83,45 @@ void Atelopus::HashPrimitive(UINT const* data, UINT* res, int const& len)
                 _val2 ^= Atelopus::F1(_val1);
                 _val2 += temp2;
                 _val2 ^= ar[ix1];
-                (this->*Swap)((ar[pos1] = Atelopus::G1(temp1) ^ _val1), KK(_val2));
-                ar[pos2] = Atelopus::F2(KK(temp2)) + _val2;
+                ar[pos2] = temp2 + KK(_val2);
+                (this->*Swap)((ar[pos1] = temp1 ^ KK(_val1)), _val2);
             }
-            if (i < len1)
+            if (i < (int)_bs1)
             {
                 ix++;
-                if (ix == len) ix = 0;
+                ix &= _bs1;
                 ix1++;
-                if (ix1 == len) ix1 = 0;
+                ix1 &= _bs1;
                 pos1 += incr1;
-                if (pos1 >= len) pos1 -= len;
+                pos1 &= _bs1;
                 pos2 += incr2;
-                if (pos2 >= len) pos2 -= len;
+                pos2 &= _bs1;
             }
         }
     }
-    //2) Contracting (assuming _size < len, but it can also expand)
-    incr1 = _sarrprimes[H1(KK(_val1) ^ _val2)];
-    incr2 = _sarrprimes[H2(_val1 + KK(_val2))];
-    incr1 %= len;
-    incr2 %= len;
-    pos1 = H1(Atelopus::G2(_val1)) % len;
-    pos2 = H2(Atelopus::F2(_val2)) % len;
+    // 2) Contracting (assuming _size < len, but it can also expand)
+    incr1 = H1(KK(_val1) ^ _val2) & _bs1;
+    incr2 = H2(_val1 + KK(_val2)) & _bs1;
+    pos1 = H1(_val1) & _bs1;
+    pos2 = H2(Atelopus::F2(_val2)) & _bs1;
     if ((incr1 == incr2) && (pos1 == pos2))
     {
         pos2++;
-        if (pos2 == len) pos2 = 0;
+        pos2 &= _bs1;
     }
     int ik, pk;
-    ik = _sarrprimes[H1(KK(Atelopus::F1(_val1)) + _val2)] % _size;
-    pk = H1(Atelopus::F1(_val1) ^ KK(_val2)) % _size;
-    int max = (lend2 < (int)_size) ? _size : (lend2+1);
+    ik = H1(KK(Atelopus::F1(_val1)) + _val2) & _size1;
+    pk = H1(Atelopus::F1(_val1) ^ KK(_val2)) & _size1;
+    int max = (_bs2 < _size) ? _size : (_bs2+1);
     register bool over = false;
-    int size1 = _size - len;
-    for (i=0,k=pk,ix=lend2,ix1=0; ix1<max; i++,k+=ik,ix++,ix1++,pos1+=incr1,pos2+=incr2)
+    int sz = _size - _bs;
+    i=0; k=pk; ix=_bs2;
+    for (ix1=0; ix1<max; ix1++)
     {
-        if (i == len)
-        {
-            i = 0;
-            size1 -= len;
-        }
-        if (k >= (int)_size)
-        {
-            k -= _size;
-            if (k == pk) over = true;
-        }
-        if (ix == len) ix = 0;
-        if (pos1 >= len) pos1 -= len;
-        if (pos2 >= len) pos2 -= len;
         temp1 = ar[pos1];
         _val1 ^= KK(temp1);
         _val1 += ar[i];
-        _val2 ^= Atelopus::F1(_val1);
+        _val2 ^= Atelopus::F2(_val1);
         if (over)
         {
             res[k] += _val2;
@@ -178,59 +132,71 @@ void Atelopus::HashPrimitive(UINT const* data, UINT* res, int const& len)
         }
         _val2 += ar[pos2];
         _val2 ^= ar[ix];
-        if (size1 > 0)
+        if (sz > 0)
         {
-            //only for expansion
+            // Only for expansion
             ar[i] ^= KK(_val2);
-            ar[ix] += Atelopus::F2(_val1);
+            ar[ix] += Atelopus::F1(_val1);
         }
-        (this->*Swap)(Atelopus::G2(temp1) ^ KK(_val1), _val2); 
+        (this->*Swap)(temp1 ^ KK(_val1), _val2);
+        i++;
+        i &= _bs1;
+        if (i == 0)
+        {
+            sz -= _bs;
+        }
+        k += ik;
+        k &= _size1;
+        if (k == pk)
+        {
+            over = true;
+        }
+        ix++,
+        ix &= _bs1;
+        pos1+=incr1;
+        pos1 &= _bs1;
+        pos2+=incr2;
+        pos2 &= _bs1;
     }
-    //3) Combining with the original
-    incr1 = _sarrprimes[H1(KK(_val1))] % len;
-    incr2 = _sarrprimes[H2(KK(_val2))] % _size;
-    i = H1(Atelopus::F1(_val1)) % len;
-    k = H2(Atelopus::G2(_val2)) % _size;
-    max = (len < (int)_size) ? _size : len;
+    // 3) Combining with the original
+    incr1 = H1(KK(_val1)) & _bs1;
+    incr2 = H2(KK(_val2)) & _size1;
+    i = H1(Atelopus::F1(_val1)) & _bs1;
+    k = H2(_val2) & _size1;
+    max = (_bs < _size) ? _size : _bs;
     for (ix = 0; ix < max; ix++)
     {
         temp1 = data[i];
-        _val1 += Atelopus::F1(KK(temp1));
-        _val2 ^= _val1 + temp1;
+        _val1 += KK(temp1);
+        _val2 ^= Atelopus::F1(_val1 + temp1);
         res[k] ^= _val2;
         i += incr1;
-        if (i >= len) i -= len;
+        i &= _bs1;
         k += incr2;
-        if (k >= (int)_size) k -= _size;
+        k &= _size1;
     }
 }
 
-void Atelopus::Init(UINT* ar, int const& len)
+void Atelopus::Init(UINT* ar)
 {
     register int pos1 = 0;
-    register int pos2 = (len >> 2);
-    register int pos3 = (len >> 1);
+    register int pos2 = _bs >> 2;
+    register int pos3 = _bs >> 1;
     register int pos4 = pos2 + pos3;
-    if ((len & 0x3) == 3) //4k+3
-    {
-        pos2++;
-        pos3++;
-        pos4++;
-    }
-    register UINT val1 = _val1 ^ len;
-    register UINT val2 = _val2 + Atelopus::F1((BYTE)len);
+    register UINT val1 = _val1 ^ _bs;
+    register UINT val2 = _val2 + Atelopus::F1((BYTE)_bs);
     BYTE temp[4];
     temp[0] = _kk1[16]; temp[1] = _kk1[80]; temp[2] = _kk1[144]; temp[3] = _kk1[208];
     register UINT val3;
     val3 = Bytes2Word(temp);
-    val3 ^= Atelopus::F2((BYTE)len);
+    val3 ^= Atelopus::F2((BYTE)_bs);
     temp[0] = _kk1[48]; temp[1] = _kk1[112]; temp[2] = _kk1[176]; temp[3] = _kk1[240];
     register UINT val4;
     val4 = Bytes2Word(temp);
-    val4 += (BYTE)len;
+    val4 += (BYTE)_bs;
     UINT *pui1, *pui2, *pui3, *pui4, temp1;
-    //at least 2 rounds
-    int len2 = len<<1;
+    // At least 2 rounds
+    int len2 = _bs<<1;
     int max = (len2 > 256) ? len2 : 256;
     for (register int i = 0; i < max; i += 4)
     {
@@ -244,175 +210,126 @@ void Atelopus::Init(UINT* ar, int const& len)
         val4 ^= *pui4; val4 += Atelopus::F2(*pui1); val4 ^= KK(*pui2);
         temp[0] = (BYTE)i; temp[1] = (BYTE)(i+1); temp[2] = (BYTE)(i+2); temp[3] = (BYTE)(i+3);
         temp1 = Bytes2Word(temp);
-        (this->*Swap)(temp1, Atelopus::G1((val1 + val2)^(val3 + val4)));
+        (this->*Swap)(temp1, Atelopus::G1(val1 + val2)^Atelopus::G1(val3 + val4));
         pos1++;
-        if (pos1 == len) pos1 = 0;
+        pos1 &= _bs1;
         pos2++;
-        if (pos2 == len) pos2 = 0;
+        pos2 &= _bs1;
         pos3++;
-        if (pos3 == len) pos3 = 0;
+        pos3 &= _bs1;
         pos4++;
-        if (pos4 == len) pos4 = 0;
+        pos4 &= _bs1;
     }
     _val1 = val1 ^ val2; _val1 += val3;
     _val2 = val2 + val3; _val2 ^= val4;
 }
 
-//Dynamic block size hashing (it is not using padding, excepting messages with length less
-//than the maximum block size)
-void Atelopus::Hash(BYTE const* data, BYTE* res, unsigned long long const& length)
+// Hashing a large array
+void Atelopus::Hash(BYTE const* data, BYTE* res, ULONG const& length)
 {
-    //calculate min, max, double max
-    int max = _bs4;
-    int maxw = max >> 2;
-    int min = max >> 1;
-    int max2 = max << 1;
-    //work buffers
+    // Work buffers
     UINT ar[BlockSize256];
     UINT ar1[BlockSize256];
-    register int i, blocksize, blocksize4;
+    register int i;
     BYTE* pbytes;
-    if (length <= (unsigned long long)max)
+    if (length <= _bs4)
     {
-        //Just one block
-        blocksize4 = max;
-        blocksize = max >> 2;
-        //Padding
+        // Just one block
+        // Padding
         pbytes = (BYTE*)ar + (int)length;
-        for (i = 0; i < blocksize4-(int)length; i++,pbytes++)
+        for (i = 0; i < (int)(_bs4-(int)length); i++, pbytes++)
         {
-            *pbytes = (BYTE)i;
+            *pbytes = _kk1[i];
         }
         memcpy(ar, data, (size_t)length);
-        memcpy(ar1, ar, blocksize4);
-        //XOR with the length (no more than 2 bytes)
+        memcpy(ar1, ar, _bs4);
+        // XOR with the length (no more than 2 bytes)
         int temp = (int)length;
         pbytes = (BYTE*)ar1;
         *pbytes ^= (BYTE)temp;
         temp >>= 8;
         *(++pbytes) ^= (BYTE)temp;
-        Bytes2Words(ar, ar, blocksize);
-        Bytes2Words(ar1, ar1, blocksize);
-        Init(ar1, blocksize);
-        HashPrimitive(ar, (UINT*)res, blocksize);
-        XORIPE((UINT*)res, ar1, _size, blocksize);
-        //Result in bytes
+        Bytes2Words(ar, ar, _bs);
+        Bytes2Words(ar1, ar1, _bs);
+        Init(ar1);
+        HashPrimitive(ar, (UINT*)res);
+        XORIPE((UINT*)res, ar1, _size, _bs);
+        // Result in bytes
         Words2Bytes((UINT*)res, res, _size);
         return;
     }
-    int min1 = min - 1;
-    unsigned long long pos = 0;
-    unsigned long long len1;
+    ULONG pos = 0;
+    ULONG lblocks = length / _bs4;
     register bool init = false;
-    while (true)
+    for (ULONG j=0; j<lblocks; j++, pos += _bs4)
     {
-        len1 = length - pos; //remaining bytes
-        if (len1 <= (unsigned long long)max2)
+        if (!init)
         {
-            //Second to last block
-            blocksize4 = (int)len1;
-            blocksize4 >>= 1;
-            blocksize = blocksize4 >> 2;
-            blocksize4 = blocksize << 2;
-            memcpy(ar, data+pos, (size_t)blocksize4);
-            if (!init)
+            memcpy(ar1, data, (size_t)_bs4);
+            // XOR with the length
+            ULONG temp = length;
+            pbytes = (BYTE*)ar1;
+            *pbytes ^= (BYTE)temp;
+            for (i = 1; i < 8; i++)
             {
-                memcpy(ar1, data, (size_t)max);
-                //XOR with the length (no more than 2 bytes)
-                unsigned long long temp = length;
-                pbytes = (BYTE*)ar1;
-                *pbytes ^= (BYTE)temp;
                 temp >>= 8;
                 *(++pbytes) ^= (BYTE)temp;
-                Bytes2Words(ar1, ar1, maxw);
-                Init(ar1, maxw);
-                Bytes2Words(ar, ar, blocksize);
-                HashPrimitive(ar, (UINT*)res, blocksize);
-                XORIPE((UINT*)res, ar1, _size, maxw);
             }
-            else
-            {
-                HashPrimitive(ar, (UINT*)res, blocksize);
-                XORIPE((UINT*)res, ar1, _size);
-            }
-            memcpy(ar1, res, (size_t)_size4);
-            //Last block
-            pos += blocksize4;
-            blocksize4 = (int)(len1 - blocksize4);
-            blocksize = blocksize4 >> 2;
-            if ((blocksize4 & 3) != 0)
-            {
-                ar[blocksize] = 0;
-                blocksize++;
-            }
-            memcpy(ar, data+pos, (size_t)blocksize4);
-            Bytes2Words(ar, ar, blocksize);
-            HashPrimitive(ar, (UINT*)res, blocksize);
-            XORIPE((UINT*)res, ar1, _size);
-            //Result in bytes
-            Words2Bytes((UINT*)res, res, _size);
-            return;
+            Bytes2Words(ar1, ar1, _bs);
+            Init(ar1);
+        }
+        memcpy(ar, data+pos, (size_t)_bs4);
+        Bytes2Words(ar, ar, _bs);
+        HashPrimitive(ar, (UINT*)res);
+        if (!init)
+        {
+            XORIPE((UINT*)res, ar1, _size, _bs);
+            init = true;
         }
         else
         {
-            if (!init)
-            {
-                memcpy(ar1, data, (size_t)max);
-                //XOR with the length
-                unsigned long long temp = length;
-                pbytes = (BYTE*)ar1;
-                *pbytes ^= (BYTE)temp;
-                for (i = 1; i < 8; i++)
-                {
-                    temp >>= 8;
-                    *(++pbytes) ^= (BYTE)temp;
-                }
-                Bytes2Words(ar1, ar1, maxw);
-                Init(ar1, maxw);
-            }
-            blocksize4 = _val1 + _val2;
-            blocksize4 &= min1;
-            blocksize4 |= min;
-            ++blocksize4;
-            blocksize = blocksize4 >> 2;
-            blocksize4 = blocksize << 2;
-            memcpy(ar, data+pos, (size_t)blocksize4);
-            Bytes2Words(ar, ar, blocksize);
-            HashPrimitive(ar, (UINT*)res, blocksize);
-            if (!init)
-            {
-                XORIPE((UINT*)res, ar1, _size, maxw);
-                init = true;
-            }
-            else
-            {
-                XORIPE((UINT*)res, ar1, _size);
-            }
-            memcpy(ar1, res, (size_t)_size4);
-            pos += blocksize4;
+            XORIPE((UINT*)res, ar1, _size);
         }
+        memcpy(ar1, res, (size_t)_size4);
     }
+    int r = length & _bs41;
+    if (r > 0)
+    {
+        // Possible last block
+        // Padding
+        pbytes = (BYTE*)ar + r;
+        for (i = 0; i < (int)(_bs4-r); i++, pbytes++)
+        {
+            *pbytes = _kk1[i];
+        }
+        memcpy(ar, data, r);
+        Bytes2Words(ar, ar, _bs);
+        HashPrimitive(ar, (UINT*)res);
+        XORIPE((UINT*)res, ar1, _size);
+    }
+    // Result in bytes
+    Words2Bytes((UINT*)res, res, _size);
 }
 
-//Input File Length
-unsigned long long Atelopus::FileLength(ifstream& in)
+// Input File Length
+ULONG Atelopus::FileLength(ifstream& in)
 {
-    //Check first the file's state
+    // Check first the file's state
     if(!in.is_open() || in.bad())
     {
         throw runtime_error("FileLength(), file not opened or in bad state.");
     }
-    //Get current position
+    // Get current position
     streampos currpos = in.tellg();
-    //Move to the end
+    // Move to the end
     in.seekg(0, ios::end);
     streampos endpos = in.tellg();
-    //Go Back
+    // Go Back
     in.seekg(currpos, ios::beg);
-    return (unsigned long long)endpos;
+    return (ULONG)endpos;
 }
 
-//Dynamic block size hashing for a file
+// Hashing a file
 void Atelopus::HashFile(string const& filepath, BYTE* res)
 {
     if (filepath.empty())
@@ -421,152 +338,98 @@ void Atelopus::HashFile(string const& filepath, BYTE* res)
     }
     try
     {
-        //calculate min, max, double max
-        int max = _bs4;
-        int maxw = max >> 2;
-        int min = max >> 1;
-        int max2 = max << 1;
         ifstream fs(filepath.c_str());
         if(!fs)
         {
             throw runtime_error("Atelopus::HashFile(), cannot open file.");
         }
-        unsigned long long length = FileLength(fs);
-        //work buffers
+        ULONG length = FileLength(fs);
+        // Work buffers
         UINT ar[BlockSize256];
         UINT ar1[BlockSize256];
-        register int i, blocksize, blocksize4;
+        register int i;
         BYTE* pbytes;
-        if (length <= (unsigned long long)max)
+        if (length <= _bs4)
         {
-            //Just one block
-            blocksize4 = max;
-            blocksize = max >> 2;
-            //Padding
+            // Just one block
+            // Padding
             pbytes = (BYTE*)ar + (int)length;
-            for (i = 0; i < blocksize4-(int)length; i++,pbytes++)
+            for (i = 0; i < (int)(_bs4-(int)length); i++, pbytes++)
             {
-                *pbytes = (BYTE)i;
+                *pbytes = _kk1[i];
             }
-            if (length > 0)
-            {
-                fs.read((char*)ar, (streamsize)length);
-            }
-            memcpy(ar1, ar, blocksize4);
-            //XOR with the length (no more than 2 bytes)
+            fs.read((char*)ar, (streamsize)length);
+            memcpy(ar1, ar, _bs4);
+            // XOR with the length (no more than 2 bytes)
             int temp = (int)length;
             pbytes = (BYTE*)ar1;
-            *pbytes ^= (BYTE)temp;			
+            *pbytes ^= (BYTE)temp;
             temp >>= 8;
             *(++pbytes) ^= (BYTE)temp;
-            Bytes2Words(ar, ar, blocksize);
-            Bytes2Words(ar1, ar1, blocksize);
-            Init(ar1, blocksize);
-            HashPrimitive(ar, (UINT*)res, blocksize);
-            XORIPE((UINT*)res, ar1, _size, blocksize);
-            //Result in bytes
+            Bytes2Words(ar, ar, _bs);
+            Bytes2Words(ar1, ar1, _bs);
+            Init(ar1);
+            HashPrimitive(ar, (UINT*)res);
+            XORIPE((UINT*)res, ar1, _size, _bs);
+            // Result in bytes
             Words2Bytes((UINT*)res, res, _size);
             fs.close();
             return;
         }
-        int min1 = min - 1;
-        unsigned long long pos = 0;
-        unsigned long long len1;
+        ULONG pos = 0;
+        ULONG lblocks = length / _bs4;
         register bool init = false;
-        while (true)
+        for (ULONG j=0; j<lblocks; j++, pos+=_bs4)
         {
-            len1 = length - pos; //remaining bytes
-            if (len1 <= (unsigned long long)max2)
+            if (!init)
             {
-                //Second to last block
-                blocksize4 = (int)len1;
-                blocksize4 >>= 1;
-                blocksize = blocksize4 >> 2;
-                blocksize4 = blocksize << 2;
-                if (!init)
+                fs.read((char*)ar1, (size_t)_bs4);
+                // Reset file position
+                fs.seekg(0, ios::beg);
+                // XOR with the length
+                ULONG temp = length;
+                pbytes = (BYTE*)ar1;
+                *pbytes ^= (BYTE)temp;
+                for (i = 1; i < 8; i++)
                 {
-                    fs.read((char*)ar1, (streamsize)max);
-                    //Reset file position
-                    fs.seekg(0, ios::beg);
-                    //XOR with the length (no more than 2 bytes)
-                    unsigned long long temp = length;
-                    pbytes = (BYTE*)ar1;
-                    *pbytes ^= (BYTE)temp;
                     temp >>= 8;
                     *(++pbytes) ^= (BYTE)temp;
-                    Bytes2Words(ar1, ar1, maxw);
-                    Init(ar1, maxw);
-                    fs.read((char*)ar, (streamsize)blocksize4);
-                    Bytes2Words(ar, ar, blocksize);
-                    HashPrimitive(ar, (UINT*)res, blocksize);
-                    XORIPE((UINT*)res, ar1, _size, maxw);
                 }
-                else
-                {
-                    fs.read((char*)ar, (streamsize)blocksize4);
-                    HashPrimitive(ar, (UINT*)res, blocksize);
-                    XORIPE((UINT*)res, ar1, _size);
-                }
-                memcpy(ar1, res, (size_t)_size4);
-                //Last block
-                pos += blocksize4;
-                blocksize4 = (int)(len1 - blocksize4);
-                blocksize = blocksize4 >> 2;
-                if ((blocksize4 & 3) != 0)
-                {
-                    ar[blocksize] = 0;
-                    blocksize++;
-                }
-                fs.read((char*)ar, (streamsize)blocksize4);
-                Bytes2Words(ar, ar, blocksize);
-                HashPrimitive(ar, (UINT*)res, blocksize);
-                XORIPE((UINT*)res, ar1, _size);
-                //Result in bytes
-                Words2Bytes((UINT*)res, res, _size);
-                fs.close();
-                return;
+                Bytes2Words(ar1, ar1, _bs);
+                Init(ar1);
+            }
+            fs.read((char*)ar, (streamsize)_bs4);
+            Bytes2Words(ar, ar, _bs);
+            HashPrimitive(ar, (UINT*)res);
+            if (!init)
+            {
+                XORIPE((UINT*)res, ar1, _size, _bs);
+                init = true;
             }
             else
             {
-                if (!init)
-                {
-                    fs.read((char*)ar1, (streamsize)max);
-                    //Reset file position
-                    fs.seekg(0, ios::beg);
-                    //XOR with the length
-                    unsigned long long temp = length;
-                    pbytes = (BYTE*)ar1;
-                    *pbytes ^= (BYTE)temp;
-                    for (i = 1; i < 8; i++)
-                    {
-                        temp >>= 8;
-                        *(++pbytes) ^= (BYTE)temp;
-                    }
-                    Bytes2Words(ar1, ar1, maxw);
-                    Init(ar1, maxw);
-                }
-                blocksize4 = _val1 + _val2;
-                blocksize4 &= min1;
-                blocksize4 |= min;
-                ++blocksize4;
-                blocksize = blocksize4 >> 2;
-                blocksize4 = blocksize << 2;
-                fs.read((char*)ar, (streamsize)blocksize4);
-                Bytes2Words(ar, ar, blocksize);
-                HashPrimitive(ar, (UINT*)res, blocksize);
-                if (!init)
-                {
-                    XORIPE((UINT*)res, ar1, _size, maxw);
-                    init = true;
-                }
-                else
-                {
-                    XORIPE((UINT*)res, ar1, _size);
-                }
-                memcpy(ar1, res, (size_t)_size4);
-                pos += blocksize4;
+                XORIPE((UINT*)res, ar1, _size);
             }
+            memcpy(ar1, res, (size_t)_size4);
         }
+        int r = length & _bs41;
+        if (r > 0)
+        {
+            // Possible last block
+            // Padding
+            pbytes = (BYTE*)ar + r;
+            for (i = 0; i < (int)(_bs4-r); i++, pbytes++)
+            {
+                *pbytes = _kk1[i];
+            }
+            fs.read((char*)ar, (streamsize)r);
+            Bytes2Words(ar, ar, _bs);
+            HashPrimitive(ar, (UINT*)res);
+            XORIPE((UINT*)res, ar1, _size);
+        }
+        // Result in bytes
+        Words2Bytes((UINT*)res, res, _size);
+        fs.close();
     }
     catch (exception const& ex)
     {

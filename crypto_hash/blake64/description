@@ -1,1 +1,1 @@
-BLAKE with 512-bit output
+BLAKE-64: BLAKE with 64-bit words, 14 rounds, and 512-bit output

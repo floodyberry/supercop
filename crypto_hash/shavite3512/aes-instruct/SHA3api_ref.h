@@ -10,7 +10,6 @@
 /*                                                                   */
 /*********************************************************************/
 
-#include <string.h>
 #include "compress.h"
 
 typedef unsigned char BitSequence;
@@ -174,6 +173,9 @@ HashReturn Update (hashState *state, const BitSequence *data, DataLength
 
    if (state->bitcount&7ULL)
       {
+         fprintf(stderr, "We are sorry, you are calling Update one time after\n"
+ 		         "what should have been the last call. We ignore\n"
+		         "few bits of the input.\n");
          state->bitcount &= ~7ULL;
       }
 

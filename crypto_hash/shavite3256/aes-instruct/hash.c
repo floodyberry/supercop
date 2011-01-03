@@ -1,4 +1,5 @@
-#include "crypto_hash.h"
+#include <stdio.h>
+#include <string.h>
 #include "SHA3api_ref.h"
 
 int crypto_hash(unsigned char *out, const unsigned char *in, 
