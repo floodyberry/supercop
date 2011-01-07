@@ -89,7 +89,6 @@ static  int blake512_compress( state * state, const u8 * datablock ) {
     u64     u64[16];
     __m128i u128[8];
   } m;
-  u64 y[16]; 
 
   /* constants and permutation */
   static const int sig[][16] = {
@@ -212,17 +211,15 @@ static  int blake512_compress( state * state, const u8 * datablock ) {
     row2b = _mm_xor_si128(_mm_srli_epi64( row2b, 11 ),_mm_slli_epi64( row2b, 53 )); \
 \
     /* shuffle */\
-    _mm_store_si128( 0+ (__m128i *)y, row4a); \
-    _mm_store_si128( 1+ (__m128i *)y, row4b); \
+    buf1a = row4a;\
+    buf2a = row2a;\
     row4a = row3a;\
     row3a = row3b;\
     row3b = row4a;\
-    row4a  = _mm_set_epi64( (__m64)y[0], (__m64)y[3] );\
-    row4b  = _mm_set_epi64( (__m64)y[2], (__m64)y[1] );\
-    _mm_store_si128( 0+ (__m128i *)y, row2a);  \
-    _mm_store_si128( 1+ (__m128i *)y, row2b);  \
-    row2a  = _mm_set_epi64( (__m64)y[2], (__m64)y[1] );  \
-    row2b  = _mm_set_epi64( (__m64)y[0], (__m64)y[3] );  \
+    row4a = _mm_unpackhi_epi64(row4b, _mm_unpacklo_epi64(buf1a, buf1a)); \
+    row4b = _mm_unpackhi_epi64(buf1a, _mm_unpacklo_epi64(row4b, row4b)); \
+    row2a = _mm_unpackhi_epi64(row2a, _mm_unpacklo_epi64(row2b, row2b)); \
+    row2b = _mm_unpackhi_epi64(row2b, _mm_unpacklo_epi64(buf2a, buf2a)); \
     /* diagonal step */\
     /***************************************************/\
     /* high-order side: words 0, 1, 4, 5, 8, 9, 12, 13  */\
@@ -271,14 +268,12 @@ static  int blake512_compress( state * state, const u8 * datablock ) {
     buf1a = row3a;\
     row3a = row3b;\
     row3b = buf1a;\
-    _mm_store_si128( 0+ (__m128i *)y, row2a);	\
-    _mm_store_si128( 1+ (__m128i *)y, row2b);  \
-    row2a  = _mm_set_epi64( (__m64)y[0], (__m64)y[3] );  \
-    row2b  = _mm_set_epi64( (__m64)y[2], (__m64)y[1] );  \
-    _mm_store_si128( 0+ (__m128i *)y, row4a);  \
-    _mm_store_si128( 1+ (__m128i *)y, row4b);  \
-    row4a  = _mm_set_epi64( (__m64)y[2], (__m64)y[1] );  \
-    row4b  = _mm_set_epi64( (__m64)y[0], (__m64)y[3] );  \
+    buf1a = row2a;\
+    buf2a = row4a;\
+    row2a = _mm_unpackhi_epi64(row2b, _mm_unpacklo_epi64(row2a, row2a)); \
+    row2b = _mm_unpackhi_epi64(buf1a, _mm_unpacklo_epi64(row2b, row2b)); \
+    row4a = _mm_unpackhi_epi64(row4a, _mm_unpacklo_epi64(row4b, row4b)); \
+    row4b = _mm_unpackhi_epi64(row4b, _mm_unpacklo_epi64(buf2a, buf2a)); \
     							 \
 
   round( 0);
