@@ -1,1 +1,1 @@
-Keccak[r=1344,c=256,nr=24] with 1344-bit output
+Keccak[r=1344,c=256,nr=24] with 1344-bit output; padding tweaked starting in supercop-20110426

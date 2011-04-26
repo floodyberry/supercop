@@ -1,14 +1,12 @@
-/* hash.c     April 2010
+/* hash.c     January 2011
  *
- * Groestl implementation with inline assembly containing mmx
- * instructions.
- *
- * Authors: Krystian Matusiewicz and Soren S. Thomsen
+ * Groestl-512 implementation with inline assembly containing mmx and
+ * sse instructions. Optimized for Opteron.
+ * Authors: Krystian Matusiewicz and Soeren S. Thomsen
  *
  * This code is placed in the public domain
  */
 
-#include "crypto_hash.h"
 #include "hash.h"
 #include "tables.h"
 
@@ -18,8 +16,8 @@
 void Transform(context *ctx, 
 	       const unsigned char *in, 
 	       unsigned long long len) {
-  u64 y[COLS] __attribute__ ((aligned (16)));
-  u64 z[COLS] __attribute__ ((aligned (16)));
+  u64 y[COLS+2] __attribute__ ((aligned (16)));
+  u64 z[COLS+2] __attribute__ ((aligned (16)));
   u64 *m, *h = (u64*)ctx->state;
   int i;
   
@@ -37,7 +35,7 @@ void Transform(context *ctx,
 
     Q1024ASM(y);
     P1024ASM(z);
-    
+
     /* h' == h + Q(m) + P(h+m) */
     for (i = 0; i < COLS; i++) {
       h[i] ^= z[i] ^ y[i];

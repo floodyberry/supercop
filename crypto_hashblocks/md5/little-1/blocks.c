@@ -100,5 +100,5 @@ int crypto_hashblocks(unsigned char *statebytes,const unsigned char *in,unsigned
     inlen -= 64;
   }
 
-  return 0;
+  return inlen;
 }

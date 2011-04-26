@@ -1,1 +1,1 @@
-Keccak[r=832,c=768,nr=24] with 384-bit output
+Keccak[r=832,c=768,nr=24] with 384-bit output; padding tweaked starting in supercop-20110426

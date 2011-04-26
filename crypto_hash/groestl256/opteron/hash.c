@@ -1,13 +1,12 @@
-/* hash.c     April 2010
+/* hash.c     January 2011
  *
- * Groestl implementation with inline assembly containing mmx and sse
- * instructions.
- * Authors: Krystian Matusiewicz and Soren S. Thomsen
+ * Groestl-256 implementation with inline assembly containing mmx and
+ * sse instructions. Optimized for Opteron.
+ * Authors: Krystian Matusiewicz and Soeren S. Thomsen
  *
  * This code is placed in the public domain
  */
 
-#include "crypto_hash.h"
 #include "hash.h"
 #include "tables.h"
 
@@ -36,7 +35,7 @@ void Transform(context *ctx,
 
     Q512ASM(y);
     P512ASM(z);
-    
+
     /* h' == h + Q(m) + P(h+m) */
     for (i = 0; i < COLS; i++) {
       h[i] ^= z[i] ^ y[i];

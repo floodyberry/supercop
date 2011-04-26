@@ -1,2 +1,2 @@
-#define crypto_hashblocks_md5_little_1_STATEBYTES 16
-#define crypto_hashblocks_md5_little_1_BLOCKBYTES 64
+#define CRYPTO_STATEBYTES 16
+#define CRYPTO_BLOCKBYTES 64

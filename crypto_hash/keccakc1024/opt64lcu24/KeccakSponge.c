@@ -1,83 +1,48 @@
 /*
-Algorithm Name: Keccak
-Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
+The Keccak sponge function, designed by Guido Bertoni, Joan Daemen,
+Michaël Peeters and Gilles Van Assche. For more information, feedback or
+questions, please refer to our website: http://keccak.noekeon.org/
 
-This code, originally by Guido Bertoni, Joan Daemen, Michaël Peeters and
-Gilles Van Assche as a part of the SHA-3 submission, is hereby put in the
-public domain. It is given as is, without any guarantee.
+Implementation by the designers,
+hereby denoted as "the implementer".
 
-For more information, feedback or questions, please refer to our website:
-http://keccak.noekeon.org/
+To the extent possible under law, the implementer has waived all copyright
+and related or neighboring rights to the source code in this file.
+http://creativecommons.org/publicdomain/zero/1.0/
 */
 
 #include <string.h>
-#include "KeccakNISTInterface.h"
+#include "KeccakSponge.h"
 #include "KeccakF-1600-interface.h"
 #ifdef KeccakReference
 #include "displayIntermediateValues.h"
 #endif
 
-HashReturn Init(hashState *state, int hashbitlen)
-{
-    KeccakInitialize();
-    switch(hashbitlen) {
-        case 0: // Arbitrary length output
-            state->capacity = 576;
-            break;
-        case 224:
-            state->capacity = 448;
-            break;
-        case 256:
-            state->capacity = 512;
-            break;
-        case 384:
-            state->capacity = 768;
-            break;
-        case 512:
-            state->capacity = 1024;
-            break;
-        default:
-            return BAD_HASHLEN;
-    }
-    state->rate = KeccakPermutationSize - state->capacity;
-    state->diversifier = hashbitlen/8;
-    state->hashbitlen = hashbitlen;
-    KeccakInitializeState(state->state);
-    memset(state->dataQueue, 0, KeccakMaximumRateInBytes);
-    state->bitsInQueue = 0;
-    state->squeezing = 0;
-    state->bitsAvailableForSqueezing = 0;
-
-    return SUCCESS;
-}
-
-HashReturn InitEx(hashState *state, unsigned int rate, unsigned int capacity, unsigned char diversifier)
+int InitSponge(spongeState *state, unsigned int rate, unsigned int capacity)
 {
     if (rate+capacity != 1600)
-        return BAD_HASHLEN;
+        return 1;
     if ((rate <= 0) || (rate >= 1600) || ((rate % 64) != 0))
-        return BAD_HASHLEN;
+        return 1;
     KeccakInitialize();
     state->rate = rate;
     state->capacity = capacity;
-    state->diversifier = diversifier;
-    state->hashbitlen = 0;
+    state->fixedOutputLength = 0;
     KeccakInitializeState(state->state);
     memset(state->dataQueue, 0, KeccakMaximumRateInBytes);
     state->bitsInQueue = 0;
     state->squeezing = 0;
     state->bitsAvailableForSqueezing = 0;
 
-    return SUCCESS;
+    return 0;
 }
 
-void AbsorbQueue(hashState *state)
+void AbsorbQueue(spongeState *state)
 {
+    // state->bitsInQueue is assumed to be equal to state->rate
     #ifdef KeccakReference
-    displayBytes(1, "Data to be absorbed", state->dataQueue, state->bitsInQueue/8);
+    displayBytes(1, "Block to be absorbed", state->dataQueue, state->rate/8);
     #endif
-    // state->bitsInQueue is assumed to be equal a multiple of 8
-    memset(state->dataQueue+state->bitsInQueue/8, 0, state->rate/8-state->bitsInQueue/8);
 #ifdef ProvideFast576
     if (state->rate == 576)
         KeccakAbsorb576bits(state->state, state->dataQueue);
@@ -112,17 +77,16 @@ void AbsorbQueue(hashState *state)
     state->bitsInQueue = 0;
 }
 
-HashReturn Update(hashState *state, const BitSequence *data, DataLength databitlen)
+int Absorb(spongeState *state, const unsigned char *data, unsigned long long databitlen)
 {
-    DataLength i, j;
-    DataLength partialBlock, partialByte, wholeBlocks;
-    BitSequence lastByte;
-    const BitSequence *curData;
+    unsigned long long i, j, wholeBlocks;
+    unsigned int partialBlock, partialByte;
+    const unsigned char *curData;
 
     if ((state->bitsInQueue % 8) != 0)
-        return FAIL; // Only the last call may contain a partial byte
+        return 1; // Only the last call may contain a partial byte
     if (state->squeezing)
-        return FAIL; // Too late for additional input
+        return 1; // Too late for additional input
 
     i = 0;
     while(i < databitlen) {
@@ -133,7 +97,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             if (state->rate == 576) {
                 for(j=0; j<wholeBlocks; j++, curData+=576/8) {
                     #ifdef KeccakReference
-                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    displayBytes(1, "Block to be absorbed", curData, state->rate/8);
                     #endif
                     KeccakAbsorb576bits(state->state, curData);
                 }
@@ -144,7 +108,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             if (state->rate == 832) {
                 for(j=0; j<wholeBlocks; j++, curData+=832/8) {
                     #ifdef KeccakReference
-                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    displayBytes(1, "Block to be absorbed", curData, state->rate/8);
                     #endif
                     KeccakAbsorb832bits(state->state, curData);
                 }
@@ -155,7 +119,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             if (state->rate == 1024) {
                 for(j=0; j<wholeBlocks; j++, curData+=1024/8) {
                     #ifdef KeccakReference
-                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    displayBytes(1, "Block to be absorbed", curData, state->rate/8);
                     #endif
                     KeccakAbsorb1024bits(state->state, curData);
                 }
@@ -166,7 +130,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             if (state->rate == 1088) {
                 for(j=0; j<wholeBlocks; j++, curData+=1088/8) {
                     #ifdef KeccakReference
-                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    displayBytes(1, "Block to be absorbed", curData, state->rate/8);
                     #endif
                     KeccakAbsorb1088bits(state->state, curData);
                 }
@@ -177,7 +141,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             if (state->rate == 1152) {
                 for(j=0; j<wholeBlocks; j++, curData+=1152/8) {
                     #ifdef KeccakReference
-                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    displayBytes(1, "Block to be absorbed", curData, state->rate/8);
                     #endif
                     KeccakAbsorb1152bits(state->state, curData);
                 }
@@ -188,7 +152,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             if (state->rate == 1344) {
                 for(j=0; j<wholeBlocks; j++, curData+=1344/8) {
                     #ifdef KeccakReference
-                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    displayBytes(1, "Block to be absorbed", curData, state->rate/8);
                     #endif
                     KeccakAbsorb1344bits(state->state, curData);
                 }
@@ -198,7 +162,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             {
                 for(j=0; j<wholeBlocks; j++, curData+=state->rate/8) {
                     #ifdef KeccakReference
-                    displayBytes(1, "Data to be absorbed", curData, state->rate/8);
+                    displayBytes(1, "Block to be absorbed", curData, state->rate/8);
                     #endif
                     KeccakAbsorb(state->state, curData, state->rate/64);
                 }
@@ -206,7 +170,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             i += wholeBlocks*state->rate;
         }
         else {
-            partialBlock = databitlen - i;
+            partialBlock = (unsigned int)(databitlen - i);
             if (partialBlock+state->bitsInQueue > state->rate)
                 partialBlock = state->rate-state->bitsInQueue;
             partialByte = partialBlock % 8;
@@ -217,43 +181,34 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
             if (state->bitsInQueue == state->rate)
                 AbsorbQueue(state);
             if (partialByte > 0) {
-                // Align the last partial byte to the least significant bits
-                lastByte = data[i/8] >> (8-partialByte);
-                state->dataQueue[state->bitsInQueue/8] = lastByte;
+                unsigned char mask = (1 << partialByte)-1;
+                state->dataQueue[state->bitsInQueue/8] = data[i/8] & mask;
                 state->bitsInQueue += partialByte;
                 i += partialByte;
             }
         }
     }
-    return SUCCESS;
+    return 0;
 }
 
-void PadAndSwitchToSqueezingPhase(hashState *state)
+void PadAndSwitchToSqueezingPhase(spongeState *state)
 {
-    if ((state->bitsInQueue % 8) != 0) {
-        // The bits are numbered from 0=LSB to 7=MSB
-        unsigned char padByte = 1 << (state->bitsInQueue % 8);
-        state->dataQueue[state->bitsInQueue/8] |= padByte;
-        state->bitsInQueue += 8-(state->bitsInQueue % 8);
+    // Note: the bits are numbered from 0=LSB to 7=MSB
+    if (state->bitsInQueue + 1 == state->rate) {
+        state->dataQueue[state->bitsInQueue/8 ] |= 1 << (state->bitsInQueue % 8);
+        AbsorbQueue(state);
+        memset(state->dataQueue, 0, state->rate/8);
     }
     else {
-        state->dataQueue[state->bitsInQueue/8] = 0x01;
-        state->bitsInQueue += 8;
+        memset(state->dataQueue + (state->bitsInQueue+7)/8, 0, state->rate/8 - (state->bitsInQueue+7)/8);
+        state->dataQueue[state->bitsInQueue/8 ] |= 1 << (state->bitsInQueue % 8);
     }
-    if (state->bitsInQueue == state->rate)
-        AbsorbQueue(state);
-    state->dataQueue[state->bitsInQueue/8] = state->diversifier;
-    state->bitsInQueue += 8;
-    if (state->bitsInQueue == state->rate)
-        AbsorbQueue(state);
-    state->dataQueue[state->bitsInQueue/8] = state->rate/8;
-    state->bitsInQueue += 8;
-    if (state->bitsInQueue == state->rate)
-        AbsorbQueue(state);
-    state->dataQueue[state->bitsInQueue/8] = 0x01;
-    state->bitsInQueue += 8;
-    if (state->bitsInQueue > 0)
-        AbsorbQueue(state);
+    state->dataQueue[(state->rate-1)/8] |= 1 << ((state->rate-1) % 8);
+    AbsorbQueue(state);
+
+    #ifdef KeccakReference
+    displayText(1, "--- Switching to squeezing phase ---");
+    #endif
 #ifdef ProvideFast1024
     if (state->rate == 1024) {
         KeccakExtract1024bits(state->state, state->dataQueue);
@@ -265,30 +220,21 @@ void PadAndSwitchToSqueezingPhase(hashState *state)
         KeccakExtract(state->state, state->dataQueue, state->rate/64);
         state->bitsAvailableForSqueezing = state->rate;
     }
+    #ifdef KeccakReference
+    displayBytes(1, "Block available for squeezing", state->dataQueue, state->bitsAvailableForSqueezing/8);
+    #endif
     state->squeezing = 1;
 }
 
-HashReturn Final(hashState *state, BitSequence *hashval)
+int Squeeze(spongeState *state, unsigned char *output, unsigned long long outputLength)
 {
-    if (state->squeezing)
-        return FAIL; // Too late, we are already squeezing
-    PadAndSwitchToSqueezingPhase(state);
-    if (state->hashbitlen > 0)
-        memcpy(hashval, state->dataQueue, state->hashbitlen/8);
-    return SUCCESS;
-}
-
-HashReturn Squeeze(hashState *state, BitSequence *output, DataLength outputLength)
-{
-    DataLength i;
-    DataLength partialBlock;
+    unsigned long long i;
+    unsigned int partialBlock;
 
     if (!state->squeezing)
-        return FAIL; // Too early, we are still absorbing
-    if (state->hashbitlen != 0)
-        return FAIL; // Arbitrary length output is not permitted in this case
+        PadAndSwitchToSqueezingPhase(state);
     if ((outputLength % 8) != 0)
-        return FAIL; // Only multiple of 8 bits are allowed, truncation can be done at user level
+        return 1; // Only multiple of 8 bits are allowed, truncation can be done at user level
 
     i = 0;
     while(i < outputLength) {
@@ -305,30 +251,16 @@ HashReturn Squeeze(hashState *state, BitSequence *output, DataLength outputLengt
                 KeccakExtract(state->state, state->dataQueue, state->rate/64);
                 state->bitsAvailableForSqueezing = state->rate;
             }
+            #ifdef KeccakReference
+            displayBytes(1, "Block available for squeezing", state->dataQueue, state->bitsAvailableForSqueezing/8);
+            #endif
         }
-        partialBlock = outputLength - i;
-        if (partialBlock > state->bitsAvailableForSqueezing)
-            partialBlock = state->bitsAvailableForSqueezing;
+        partialBlock = state->bitsAvailableForSqueezing;
+        if ((unsigned long long)partialBlock > outputLength - i)
+            partialBlock = (unsigned int)(outputLength - i);
         memcpy(output+i/8, state->dataQueue+(state->rate-state->bitsAvailableForSqueezing)/8, partialBlock/8);
         state->bitsAvailableForSqueezing -= partialBlock;
         i += partialBlock;
     }
-    return SUCCESS;
-}
-
-HashReturn Hash(int hashbitlen, const BitSequence *data, DataLength databitlen, BitSequence *hashval)
-{
-    hashState state;
-    HashReturn result;
-
-    if (hashbitlen == 0)
-        return BAD_HASHLEN; // Arbitrary length output not available through this API
-    result = Init(&state, hashbitlen);
-    if (result != SUCCESS)
-        return result;
-    result = Update(&state, data, databitlen);
-    if (result != SUCCESS)
-        return result;
-    result = Final(&state, hashval);
-    return result;
+    return 0;
 }

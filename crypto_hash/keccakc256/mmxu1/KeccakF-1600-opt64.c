@@ -1,18 +1,18 @@
 /*
-Algorithm Name: Keccak
-Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
+The Keccak sponge function, designed by Guido Bertoni, Joan Daemen,
+Michaël Peeters and Gilles Van Assche. For more information, feedback or
+questions, please refer to our website: http://keccak.noekeon.org/
 
-This code, originally by Guido Bertoni, Joan Daemen, Michaël Peeters and
-Gilles Van Assche as a part of the SHA-3 submission, is hereby put in the
-public domain. It is given as is, without any guarantee.
+Implementation by the designers,
+hereby denoted as "the implementer".
 
-For more information, feedback or questions, please refer to our website:
-http://keccak.noekeon.org/
+To the extent possible under law, the implementer has waived all copyright
+and related or neighboring rights to the source code in this file.
+http://creativecommons.org/publicdomain/zero/1.0/
 */
 
 #include <string.h>
 #include "brg_endian.h"
-#include "KeccakNISTInterface.h"
 #include "KeccakF-1600-opt64-settings.h"
 #include "KeccakF-1600-interface.h"
 
@@ -227,7 +227,7 @@ void KeccakInitialize()
 
 void KeccakInitializeState(unsigned char *state)
 {
-    memset(state, 0, KeccakPermutationSizeInBytes);
+    memset(state, 0, 200);
 #ifdef UseBebigokimisa
     ((UINT64*)state)[ 1] = ~(UINT64)0;
     ((UINT64*)state)[ 2] = ~(UINT64)0;

@@ -1,7 +1,7 @@
-This package contains an implementation of the Groestl hash functions,
-optimised for 32-bit architectures.
+This package contains a 32-bit C implementation of the Groestl
+hash function.
 
-The author is Soeren S. Thomsen.
+The authors are Krystian Matusiewicz and Soren S. Thomsen.
 
 There are no known present or future claims by a copyright holder that
 the distribution of this software infringes the copyright. In

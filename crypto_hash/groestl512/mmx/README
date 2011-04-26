@@ -1,6 +1,7 @@
-This package contains an implementation of the Groestl hash functions using MMX intrinsics.
+This package contains a C implementation using MMX intrinsics of the
+Groestl-512 hash function.
 
-The author is Soeren S. Thomsen.
+The author is Soren S. Thomsen.
 
 There are no known present or future claims by a copyright holder that
 the distribution of this software infringes the copyright. In

@@ -1,13 +1,14 @@
 /*
-Algorithm Name: Keccak
-Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
-Implementation by Ronny Van Keer, STMicroelectronics
+The Keccak sponge function, designed by Guido Bertoni, Joan Daemen,
+Michaël Peeters and Gilles Van Assche. For more information, feedback or
+questions, please refer to our website: http://keccak.noekeon.org/
 
-This code, originally by Ronny Van Keer, is hereby put in the public domain. 
-It is given as is, without any guarantee.
+Implementation by Ronny Van Keer,
+hereby denoted as "the implementer".
 
-For more information, feedback or questions, please refer to our website:
-http://keccak.noekeon.org/
+To the extent possible under law, the implementer has waived all copyright
+and related or neighboring rights to the source code in this file.
+http://creativecommons.org/publicdomain/zero/1.0/
 */
 
 #include "KeccakF-1600-interface.h"

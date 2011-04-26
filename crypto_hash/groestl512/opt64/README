@@ -1,10 +1,7 @@
-This package contains an implementation of the Groestl hash functions,
-optimised for 64-bit architectures. It has been tested on an Intel
-Core 2 Duo (E4600).
+This package contains a 64-bit C implementation of the Groestl
+hash function.
 
-The authors are
- Soeren S. Thomsen
- Krystian Matusiewicz
+The authors are Krystian Matusiewicz and Soren S. Thomsen.
 
 There are no known present or future claims by a copyright holder that
 the distribution of this software infringes the copyright. In

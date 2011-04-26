@@ -1,5 +1,5 @@
 
-# qhasm: int32 eax
+# qhasm: int32 ecx
 
 # qhasm: int32 ebx
 
@@ -9,7 +9,7 @@
 
 # qhasm: int32 ebp
 
-# qhasm: caller eax
+# qhasm: caller ecx
 
 # qhasm: caller ebx
 
@@ -19,7 +19,7 @@
 
 # qhasm: caller ebp
 
-# qhasm: stack32 eax_stack
+# qhasm: stack32 ecx_stack
 
 # qhasm: stack32 ebx_stack
 
@@ -74,10 +74,10 @@
 .globl crypto_hashblocks_md5_x86_1
 _crypto_hashblocks_md5_x86_1:
 crypto_hashblocks_md5_x86_1:
-mov %esp,%eax
-and $31,%eax
-add $64,%eax
-sub %eax,%esp
+mov %esp,%ecx
+and $31,%ecx
+add $64,%ecx
+sub %ecx,%esp
 
 # qhasm: input state_input
 
@@ -85,10 +85,10 @@ sub %eax,%esp
 
 # qhasm: input inlen_input
 
-# qhasm: eax_stack = eax
-# asm 1: movl <eax=int32#1,>eax_stack=stack32#1
-# asm 2: movl <eax=%eax,>eax_stack=0(%esp)
-movl %eax,0(%esp)
+# qhasm: ecx_stack = ecx
+# asm 1: movl <ecx=int32#2,>ecx_stack=stack32#1
+# asm 2: movl <ecx=%ecx,>ecx_stack=0(%esp)
+movl %ecx,0(%esp)
 
 # qhasm: ebx_stack = ebx
 # asm 1: movl <ebx=int32#4,>ebx_stack=stack32#2
@@ -112,18 +112,18 @@ movl %ebp,16(%esp)
 
 # qhasm: state = state_input
 # asm 1: movl <state_input=stack32#-1,>state=int32#5
-# asm 2: movl <state_input=4(%esp,%eax),>state=%esi
-movl 4(%esp,%eax),%esi
+# asm 2: movl <state_input=4(%esp,%ecx),>state=%esi
+movl 4(%esp,%ecx),%esi
 
 # qhasm: in = in_input
 # asm 1: movl <in_input=stack32#-2,>in=int32#6
-# asm 2: movl <in_input=8(%esp,%eax),>in=%edi
-movl 8(%esp,%eax),%edi
+# asm 2: movl <in_input=8(%esp,%ecx),>in=%edi
+movl 8(%esp,%ecx),%edi
 
 # qhasm: inlen = inlen_input
 # asm 1: movl <inlen_input=stack32#-3,>inlen=int32#7
-# asm 2: movl <inlen_input=12(%esp,%eax),>inlen=%ebp
-movl 12(%esp,%eax),%ebp
+# asm 2: movl <inlen_input=12(%esp,%ecx),>inlen=%ebp
+movl 12(%esp,%ecx),%ebp
 
 # qhasm: a = *(uint32 *) (state + 0)
 # asm 1: movl 0(<state=int32#5),>a=int32#1
@@ -3008,9 +3008,9 @@ movl 24(%esp),%ebp
 add  $64,%edi
 
 # qhasm:   inlen -= 64
-# asm 1: sub  $64,<inlen=int32#7
-# asm 2: sub  $64,<inlen=%ebp
-sub  $64,%ebp
+# asm 1: sub $64,<inlen=int32#7
+# asm 2: sub $64,<inlen=%ebp
+sub $64,%ebp
 
 # qhasm:   a += ha
 # asm 1: addl <ha=stack32#8,<a=int32#1
@@ -3070,10 +3070,19 @@ movl %edx,8(%esi)
 # asm 2: movl <d=%ebx,12(<state=%esi)
 movl %ebx,12(%esi)
 
-# qhasm: eax = eax_stack
-# asm 1: movl <eax_stack=stack32#1,>eax=int32#1
-# asm 2: movl <eax_stack=0(%esp),>eax=%eax
-movl 0(%esp),%eax
+# qhasm: int32 result
+
+# qhasm: assign outputreg 0 to result
+
+# qhasm: result = inlen
+# asm 1: mov  <inlen=int32#7,>result=int32#1
+# asm 2: mov  <inlen=%ebp,>result=%eax
+mov  %ebp,%eax
+
+# qhasm: ecx = ecx_stack
+# asm 1: movl <ecx_stack=stack32#1,>ecx=int32#2
+# asm 2: movl <ecx_stack=0(%esp),>ecx=%ecx
+movl 0(%esp),%ecx
 
 # qhasm: ebx = ebx_stack
 # asm 1: movl <ebx_stack=stack32#2,>ebx=int32#4
@@ -3096,6 +3105,5 @@ movl 12(%esp),%edi
 movl 16(%esp),%ebp
 
 # qhasm: leave
-add %eax,%esp
-xor %eax,%eax
+add %ecx,%esp
 ret

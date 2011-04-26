@@ -128,5 +128,5 @@ int crypto_hashblocks(unsigned char *statebytes,const unsigned char *in,unsigned
   store_littleendian(statebytes +  8,state[2]);
   store_littleendian(statebytes + 12,state[3]);
 
-  return 0;
+  return inlen;
 }

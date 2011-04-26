@@ -1,7 +1,14 @@
 /*
 File: AVR8-rotate64.h
 
-This code is originally by Daniel Otte (daniel.otte@rub.de) in 2006-2010 as part of the AVR-Crypto-Lib, and was then improved by Ronny Van Keer, STMicroelectronics, in 2010. This code is hereby put in the public domain in agreement with the authors. It is given as is, without any guarantee.
+This code is originally by Daniel Otte (daniel.otte@rub.de) in 2006-2010 as part of the AVR-Crypto-Lib, and was then improved by Ronny Van Keer, STMicroelectronics, in 2010. 
+
+Implementation by Daniel Otte and Ronny Van Keer,
+hereby denoted as "the implementer".
+
+To the extent possible under law, the implementer has waived all copyright
+and related or neighboring rights to the source code in this file.
+http://creativecommons.org/publicdomain/zero/1.0/
 */
 
 #ifndef ROTATE64_H_

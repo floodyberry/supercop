@@ -1,13 +1,14 @@
 /*
-Algorithm Name: Keccak
-Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
-Implementation by Ronny Van Keer, STMicroelectronics
+The Keccak sponge function, designed by Guido Bertoni, Joan Daemen,
+Michaël Peeters and Gilles Van Assche. For more information, feedback or
+questions, please refer to our website: http://keccak.noekeon.org/
 
-This code, originally by Ronny Van Keer, is hereby put in the public domain.
-It is given as is, without any guarantee.
+Implementation by Ronny Van Keer,
+hereby denoted as "the implementer".
 
-For more information, feedback or questions, please refer to our website:
-http://keccak.noekeon.org/
+To the extent possible under law, the implementer has waived all copyright
+and related or neighboring rights to the source code in this file.
+http://creativecommons.org/publicdomain/zero/1.0/
 */
 
 
@@ -17,7 +18,11 @@ http://keccak.noekeon.org/
 #define cKeccakR_SizeInBytes    (cKeccakR / 8)
 #include "crypto_hash.h"
 #ifndef crypto_hash_BYTES
-    #define crypto_hash_BYTES cKeccakR_SizeInBytes
+    #ifdef cKeccakFixedOutputLengthInBytes
+        #define crypto_hash_BYTES cKeccakFixedOutputLengthInBytes
+    #else
+        #define crypto_hash_BYTES cKeccakR_SizeInBytes
+    #endif
 #endif
 #if (crypto_hash_BYTES > cKeccakR_SizeInBytes)
     #error "Full squeezing not yet implemented"
@@ -59,12 +64,9 @@ typedef unsigned int tSmallUInt; /*INFO It could be more optimized to use "unsig
 void KeccakF( tKeccakLane * state, const tKeccakLane *in, int laneCount );
 
 
-unsigned char KeccakPadding[] = { 1, cKeccakD, cKeccakR_SizeInBytes, 1, 0, 0, 0, 0, 0, 0, 0 };
-
 int crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long inlen )
 {
     tKeccakLane		state[5 * 5];
-	tSmallUInt		i;
 	#if (crypto_hash_BYTES >= cKeccakR_SizeInBytes)
     #define temp out
 	#else
@@ -80,23 +82,12 @@ int crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long
 
     /*    Last data and padding	*/
     memcpy( temp, in, (size_t)inlen );
+    temp[inlen++] = 1;
+    memset( temp+inlen, 0, cKeccakR_SizeInBytes - (size_t)inlen );
+    temp[cKeccakR_SizeInBytes-1] |= 0x80;
+    KeccakF( state, (const tKeccakLane*)temp, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
 
-	for ( i = 0; (i < 4) || ((inlen % sizeof(tKeccakLane)) != 0); ++i )
-	{
-	    temp[inlen++] = KeccakPadding[i];
-	    if ( inlen == cKeccakR_SizeInBytes )
-	    {
-	        KeccakF( state, (const tKeccakLane*)temp, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
-	        inlen = 0;
-	    }
-	}
-
-    if ( inlen != 0 )
-    {
-	    KeccakF( state, (const tKeccakLane*)temp, (int)(inlen / sizeof(tKeccakLane)) );
-    }
-
-	#if (PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN) || (cKeccakB == 200)
+    #if (PLATFORM_BYTE_ORDER == IS_LITTLE_ENDIAN) || (cKeccakB == 200)
 
     memcpy( out, state, crypto_hash_BYTES );
 
@@ -289,7 +280,7 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
 	/*	Queue eventual remaining data bits plus add first padding bit */
 	if ( databitlen != 0 )
 	{
-		state->state[state->bitsInQueue / 8] ^= (*data >> (8 - databitlen)) | (1 << databitlen);
+		state->state[state->bitsInQueue / 8] ^= (*data >> (8 - databitlen));
 		state->bitsInQueue += (int)databitlen;
 	}
 	return ( SUCCESS );
@@ -298,7 +289,6 @@ HashReturn Update(hashState *state, const BitSequence *data, DataLength databitl
 HashReturn Final(hashState *state, BitSequence *hashval, int hashbytelen)
 {
 	tSmallUInt	i;
-	tSmallUInt	offset;
 
 	if ( state->bitsInQueue < 0 )
 	{
@@ -306,22 +296,18 @@ HashReturn Final(hashState *state, BitSequence *hashval, int hashbytelen)
 		return ( FAIL );
 	}
 
-	offset = (state->bitsInQueue + 7) / 8;
-	for ( i = ((state->bitsInQueue % 8) == 0) ? 0 : 1; i < 4; ++i )
-	{
-	    if ( offset == cKeccakR_SizeInBytes )
-	    {
-			KeccakF( (tKeccakLane *)state->state, 0, 0 );
-	        offset = 0;
-	    }
-	    state->state[offset++] ^= KeccakPadding[i];
-	}
-
-    if ( offset != 0 )
-    {
+    // Padding
+    if (state->bitsInQueue + 1 == cKeccakR_SizeInBytes*8) {
+        state->state[cKeccakR_SizeInBytes-1] ^= 0x80;
 		KeccakF( (tKeccakLane *)state->state, 0, 0 );
     }
+    else {
+        state->state[state->bitsInQueue/8] ^= 1 << (state->bitsInQueue % 8);
+    }
+    state->state[cKeccakR_SizeInBytes-1] ^= 0x80;
+    KeccakF( (tKeccakLane *)state->state, 0, 0 );
 
+    // Output
 	for ( /* empty */; hashbytelen != 0; hashval += i, hashbytelen -= i )
 	{
 		i = (hashbytelen < cKeccakR_SizeInBytes) ? hashbytelen : cKeccakR_SizeInBytes;

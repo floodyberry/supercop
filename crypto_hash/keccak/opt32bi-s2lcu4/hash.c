@@ -1,12 +1,11 @@
 #include "crypto_hash.h"
-#include "KeccakNISTInterface.h"
+#include "KeccakSponge.h"
 
 int crypto_hash(unsigned char *out, const unsigned char *in, unsigned long long inlen)
 {
-    hashState state;
-    Init(&state, 0);
-    Update(&state, in, inlen*8);
-    Final(&state, 0);
+    spongeState state;
+    InitSponge(&state, 1024, 576);
+    Absorb(&state, in, inlen*8);
     Squeeze(&state, out, crypto_hash_BYTES*8);
     return 0;
 }

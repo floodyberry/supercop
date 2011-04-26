@@ -1,3 +1,4 @@
+
 # qhasm: int64 r11_caller
 
 # qhasm: int64 r12_caller
@@ -3069,9 +3070,15 @@ movq 40(%rsp),%rbx
 # asm 2: movq <rbp_stack=48(%rsp),>rbp_caller=%rbp
 movq 48(%rsp),%rbp
 
+# qhasm: int64 result
+
+# qhasm: result = inlen
+# asm 1: mov  <inlen=int64#3,>result=int64#7
+# asm 2: mov  <inlen=%rdx,>result=%rax
+mov  %rdx,%rax
+
+# qhasm: assign outputreg 0 to result
+
 # qhasm: leave
 add %r11,%rsp
-mov %rdi,%rax
-mov %rsi,%rdx
-xor %rax,%rax
 ret

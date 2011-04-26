@@ -1,0 +1,12 @@
+compress.c and matrix.c:
+Peter Schwabe's reference C implementation
+of the RFSB-509 compression function.
+Includes some tweaks from D. J. Bernstein
+to fit better into eBASH and to improve portability.
+
+*.py:
+Reference Python implementation from D. J. Bernstein.
+"python genmatrix.py" prints a copy of matrix.c.
+"python genmatrix2.py" does the same in another way.
+"python compress.py" prints the compression of a test string.
+"python compress2.py" does the same in another way.

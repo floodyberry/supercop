@@ -235,5 +235,5 @@ int crypto_hashblocks(unsigned char *statebytes,const unsigned char *in,unsigned
   store_bigendian(statebytes + 48,state[6]);
   store_bigendian(statebytes + 56,state[7]);
 
-  return 0;
+  return inlen;
 }

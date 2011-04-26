@@ -1,3 +1,3 @@
-#define crypto_hash_groestl512_opt64_BYTES 64
-#define crypto_hash_groestl512_opt64_VERSION "1.1"
+#define CRYPTO_BYTES 64
+#define CRYPTO_VERSION "2.0"
 

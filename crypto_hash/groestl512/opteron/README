@@ -1,6 +1,5 @@
 This package contains an implementation of the Groestl-512 hash
-function containing some inline assembly using MMX instructions. The
-implementation is optimized for the AMD Opteron.
+function optimised for the AMD Opteron.
 
 The authors are Krystian Matusiewicz and Soren S. Thomsen.
 

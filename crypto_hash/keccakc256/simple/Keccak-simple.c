@@ -1,13 +1,14 @@
 /*
-Algorithm Name: Keccak
-Authors: Guido Bertoni, Joan Daemen, Michaël Peeters and Gilles Van Assche
-Implementation by Ronny Van Keer, STMicroelectronics
+The Keccak sponge function, designed by Guido Bertoni, Joan Daemen,
+Michaël Peeters and Gilles Van Assche. For more information, feedback or
+questions, please refer to our website: http://keccak.noekeon.org/
 
-This code, originally by Ronny Van Keer, is hereby put in the public domain.
-It is given as is, without any guarantee.
+Implementation by Ronny Van Keer,
+hereby denoted as "the implementer".
 
-For more information, feedback or questions, please refer to our website:
-http://keccak.noekeon.org/
+To the extent possible under law, the implementer has waived all copyright
+and related or neighboring rights to the source code in this file.
+http://creativecommons.org/publicdomain/zero/1.0/
 */
 
 // WARNING: This implementation assumes a little-endian platform. Support for big-endinanness is not yet implemented.
@@ -17,7 +18,11 @@ http://keccak.noekeon.org/
 #define cKeccakR_SizeInBytes    (cKeccakR / 8)
 #include "crypto_hash.h"
 #ifndef crypto_hash_BYTES
-    #define crypto_hash_BYTES cKeccakR_SizeInBytes
+    #ifdef cKeccakFixedOutputLengthInBytes
+        #define crypto_hash_BYTES cKeccakFixedOutputLengthInBytes
+    #else
+        #define crypto_hash_BYTES cKeccakR_SizeInBytes
+    #endif
 #endif
 #if (crypto_hash_BYTES > cKeccakR_SizeInBytes)
     #error "Full squeezing not yet implemented"
@@ -74,35 +79,13 @@ int crypto_hash( unsigned char *out, const unsigned char *in, unsigned long long
     //    padding
     memcpy( temp, in, (size_t)inlen );
     temp[inlen++] = 1;
-    if ( inlen == cKeccakR_SizeInBytes )
-    {
-        KeccakF( state, (const tKeccakLane*)temp, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
-        inlen = 0;
-    }
-    temp[inlen++] = cKeccakD;
-    if ( inlen == cKeccakR_SizeInBytes )
-    {
-        KeccakF( state, (const tKeccakLane*)temp, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
-        inlen = 0;
-    }
-    temp[inlen++] = cKeccakR_SizeInBytes;
-    if ( inlen == cKeccakR_SizeInBytes )
-    {
-        KeccakF( state, (const tKeccakLane*)temp, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
-        inlen = 0;
-    }
-    temp[inlen++] = 1;
-
-    while ( (inlen % sizeof(tKeccakLane)) != 0 )
-    {
-        temp[inlen++] = 0;
-    }
-
-    KeccakF( state, (const tKeccakLane*)temp, (int)(inlen / sizeof(tKeccakLane)) );
+    memset( temp+inlen, 0, cKeccakR_SizeInBytes - (size_t)inlen );
+    temp[cKeccakR_SizeInBytes-1] |= 0x80;
+    KeccakF( state, (const tKeccakLane*)temp, cKeccakR_SizeInBytes / sizeof(tKeccakLane) );
     memcpy( out, state, crypto_hash_BYTES );
-	#if (crypto_hash_BYTES >= cKeccakR_SizeInBytes)
+    #if (crypto_hash_BYTES >= cKeccakR_SizeInBytes)
     #undef temp
-	#endif
+    #endif
 
     return ( 0 );
 }

@@ -1,5 +1,5 @@
 /*
- * crypto_hashblocks/try.c version 20090118
+ * crypto_hashblocks/try.c version 20110424
  * D. J. Bernstein
  * Public domain.
  */
@@ -57,18 +57,18 @@ const char *checksum_compute(void)
     for (j = -16;j < 0;++j) m[j] = random();
     for (j = mlen;j < mlen + 16;++j) m[j] = random();
     for (j = -16;j < mlen + 16;++j) m2[j] = m[j];
-    if (crypto_hashblocks(h,m,mlen) != 0) return "crypto_hashblocks returns nonzero";
+    if (crypto_hashblocks(h,m,mlen) != mlen % crypto_hashblocks_BLOCKBYTES) return "crypto_hashblocks returns wrong remaining length";
     for (j = -16;j < mlen + 16;++j) if (m2[j] != m[j]) return "crypto_hashblocks writes to input";
     for (j = -16;j < 0;++j) if (h2[j] != h[j]) return "crypto_hashblocks writes before output";
     for (j = hlen;j < hlen + 16;++j) if (h2[j] != h[j]) return "crypto_hashblocks writes after output";
     for (j = 0;j < hlen;++j) m2[j] = h2[j];
-    if (crypto_hashblocks(h2,m2,mlen) != 0) return "crypto_hashblocks returns nonzero";
-    if (crypto_hashblocks(m2,m2,mlen) != 0) return "crypto_hashblocks returns nonzero";
+    if (crypto_hashblocks(h2,m2,mlen) != mlen % crypto_hashblocks_BLOCKBYTES) return "crypto_hashblocks returns wrong remaining length";
+    if (crypto_hashblocks(m2,m2,mlen) != mlen % crypto_hashblocks_BLOCKBYTES) return "crypto_hashblocks returns wrong remaining length";
     for (j = 0;j < hlen;++j) if (m2[j] != h2[j]) return "crypto_hashblocks does not handle overlap";
     for (j = 0;j < mlen;++j) m[j] ^= h[j % hlen];
     m[mlen] = h[0];
   }
-  if (crypto_hashblocks(h,m,CHECKSUM_BYTES) != 0) return "crypto_hashblocks returns nonzero";
+  if (crypto_hashblocks(h,m,CHECKSUM_BYTES) != CHECKSUM_BYTES % crypto_hashblocks_BLOCKBYTES) return "crypto_hashblocks returns wrong remaining length";
 
   for (i = 0;i < crypto_hashblocks_STATEBYTES;++i) {
     checksum[2 * i] = "0123456789abcdef"[15 & (h[i] >> 4)];
