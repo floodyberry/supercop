@@ -1,5 +1,5 @@
 /*
- * crypto_encrypt/try.c version 20090118
+ * crypto_encrypt/try.c version 20110504
  * D. J. Bernstein
  * Public domain.
  */
@@ -42,12 +42,12 @@ void predoit(void)
   crypto_encrypt_keypair(pk,sk);
   mlen = TUNE_BYTES;
   clen = 0;
-  randombytes(m,mlen);
-  crypto_encrypt(c,&clen,m,mlen,pk);
 }
 
 void doit(void)
 {
+  randombytes(m,mlen);
+  crypto_encrypt(c,&clen,m,mlen,pk);
   crypto_encrypt_open(t,&tlen,c,clen,sk);
 }
 

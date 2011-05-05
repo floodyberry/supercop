@@ -1,5 +1,5 @@
 /*
- * crypto_dh/try.c version 20090118
+ * crypto_dh/try.c version 20110504
  * D. J. Bernstein
  * Public domain.
  */
@@ -37,12 +37,12 @@ void allocate(void)
 
 void predoit(void)
 {
-  crypto_dh_keypair(pk1,sk1);
-  crypto_dh_keypair(pk2,sk2);
 }
 
 void doit(void)
 {
+  crypto_dh_keypair(pk1,sk1);
+  crypto_dh_keypair(pk2,sk2);
   crypto_dh(s1,pk2,sk1);
   crypto_dh(s2,pk1,sk2);
 }

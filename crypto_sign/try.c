@@ -1,5 +1,5 @@
 /*
- * crypto_sign/try.c version 20090118
+ * crypto_sign/try.c version 20110504
  * D. J. Bernstein
  * Public domain.
  */
@@ -42,12 +42,12 @@ void predoit(void)
   crypto_sign_keypair(pk,sk);
   mlen = TUNE_BYTES;
   smlen = 0;
-  randombytes(m,mlen);
-  crypto_sign(sm,&smlen,m,mlen,sk);
 }
 
 void doit(void)
 {
+  randombytes(m,mlen);
+  crypto_sign(sm,&smlen,m,mlen,sk);
   crypto_sign_open(t,&tlen,sm,smlen,pk);
 }
 

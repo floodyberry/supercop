@@ -61,14 +61,26 @@ echo "=== `date` === /usr/sbin/lsattr -El proc0"
 /usr/sbin/lsattr -El proc0 || :
 echo "=== `date` === cat /proc/cpuinfo"
 cat /proc/cpuinfo || :
-echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq || :
-echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq"
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq || :
-echo "=== `date` === cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"
-cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq || :
-echo "=== `date` === cat /sys/devices/system/cpu/cpu0/clock_tick"
-cat /sys/devices/system/cpu/cpu0/clock_tick || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/topology/physical_package_id"
+grep . /dev/null /sys/devices/system/cpu/cpu*/topology/physical_package_id || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/topology/core_id"
+grep . /dev/null /sys/devices/system/cpu/cpu*/topology/core_id || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/topology/thread_siblings_list"
+grep . /dev/null /sys/devices/system/cpu/cpu*/topology/thread_siblings_list || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/online"
+grep . /dev/null /sys/devices/system/cpu/cpu*/online || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_min_freq"
+grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_min_freq || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_max_freq"
+grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_max_freq || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
+grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/scaling_setspeed"
+grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/scaling_setspeed || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq"
+grep . /dev/null /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq || :
+echo "=== `date` === grep . /dev/null /sys/devices/system/cpu/cpu*/clock_tick"
+grep . /dev/null /sys/devices/system/cpu/cpu*/clock_tick || :
 echo "=== `date` === sysctl hw.model"
 sysctl hw.model || :
 echo "=== `date` === sysctl machdep.tsc_freq"
