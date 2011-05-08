@@ -823,10 +823,10 @@ gcc -mcpu=cortex-a5 -O3 -fomit-frame-pointer
 gcc -mcpu=cortex-a5 -Os -fomit-frame-pointer
 gcc -mcpu=cortex-a5 -O2 -fomit-frame-pointer
 gcc -mcpu=cortex-a5 -O -fomit-frame-pointer
-gcc -mcpu=cortex-a8 -mfpu=neon -O3 -fomit-frame-pointer
-gcc -mcpu=cortex-a8 -mfpu=neon -Os -fomit-frame-pointer
-gcc -mcpu=cortex-a8 -mfpu=neon -O2 -fomit-frame-pointer
-gcc -mcpu=cortex-a8 -mfpu=neon -O -fomit-frame-pointer
+gcc -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -O3 -fomit-frame-pointer
+gcc -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -Os -fomit-frame-pointer
+gcc -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -O2 -fomit-frame-pointer
+gcc -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -O -fomit-frame-pointer
 gcc -mcpu=cortex-a9 -O3 -fomit-frame-pointer
 gcc -mcpu=cortex-a9 -Os -fomit-frame-pointer
 gcc -mcpu=cortex-a9 -O2 -fomit-frame-pointer
