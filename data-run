@@ -191,6 +191,10 @@ do
 	do
 	  /bin/echo "$f" `adequatechecksum < $f`
 	done >&8
+	for f in "$t2/try.c" "$t2/measure.c"
+	do
+	  /bin/echo "$f" `adequatechecksum < $f`
+	done >&8
       fi
     fi
   )
