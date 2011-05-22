@@ -59,3 +59,4 @@
 ) | gzip -9 > "$top/data.gz.tmp"
 
 mv "$top/data.gz.tmp" "$top/data.gz"
+touch "$top/done-$version"

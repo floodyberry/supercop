@@ -28,10 +28,14 @@ static long long timebase(void)
   unsigned long low;
   unsigned long newhigh;
   unsigned long long result;
-  asm volatile(
-    "7:mftbu %0;mftb %1;mftbu %2;cmpw %0,%2;bne 7b"
-    : "=r" (high), "=r" (low), "=r" (newhigh)
-  );
+
+  do {
+    asm volatile(
+      "mftbu %0; mftb %1; mftbu %2"
+      : "=r" (high), "=r" (low), "=r" (newhigh)
+    );
+  } while (newhigh != high);
+
   result = high;
   result <<= 32;
   result |= low;
