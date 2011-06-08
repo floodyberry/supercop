@@ -1,0 +1,4 @@
+#define crypto_encrypt_3HFE_ref_SECRETKEYBYTES 5184
+#define crypto_encrypt_3HFE_ref_PUBLICKEYBYTES 7616
+#define crypto_encrypt_3HFE_ref_BYTES 67
+
