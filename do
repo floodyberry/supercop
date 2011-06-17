@@ -6,7 +6,7 @@
 
 version=`cat version`
 project=supercop
-shorthostname=`hostname | sed 's/\..*//' | tr -cd '[a-z][A-Z][0-9]'`
+shorthostname=`hostname | sed 's/\..*//' | tr -cd '[a-z][A-Z][0-9]' | tr '[A-Z]' '[a-z]'`
 
 top="`pwd`/bench/$shorthostname"
 bin="$top/bin"

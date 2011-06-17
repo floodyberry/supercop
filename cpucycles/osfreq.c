@@ -4,6 +4,13 @@ static double osfreq(void)
   double result;
   int s;
 
+  f = fopen("/etc/cpucyclespersecond", "r");
+  if (f) {
+    s = fscanf(f,"%lf",&result);
+    fclose(f);
+    if (s > 0) return result;
+  }
+
   f = fopen("/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", "r");
   if (f) {
     s = fscanf(f,"%lf",&result);
@@ -40,6 +47,13 @@ static double osfreq(void)
     }
     fclose(f);
     if (result) return 1000000.0 * result;
+  }
+
+  f = popen("sysctl hw.cpufrequency 2>/dev/null","r");
+  if (f) {
+    s = fscanf(f,"hw.cpufrequency: %lf",&result);
+    pclose(f);
+    if (s > 0) if (result > 0) return result;
   }
 
   f = popen("/usr/sbin/lsattr -E -l proc0 -a frequency 2>/dev/null","r");
