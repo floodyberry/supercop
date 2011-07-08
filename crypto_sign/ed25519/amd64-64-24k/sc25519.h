@@ -16,6 +16,7 @@
 #define sc25519_mul              crypto_sign_ed25519_amd64_64_24k_batch_sc25519_mul
 #define sc25519_mul_shortsc      crypto_sign_ed25519_amd64_64_24k_batch_sc25519_mul_shortsc
 #define sc25519_window4          crypto_sign_ed25519_amd64_64_24k_batch_sc25519_window4
+#define sc25519_slide          crypto_sign_ed25519_amd64_64_24k_batch_sc25519_slide
 #define sc25519_2interleave2     crypto_sign_ed25519_amd64_64_24k_batch_sc25519_2interleave2
 #define sc25519_barrett crypto_sign_ed25519_amd64_64_24k_batch_sc25519_barrett
 
@@ -55,6 +56,8 @@ void sc25519_mul_shortsc(sc25519 *r, const sc25519 *x, const shortsc25519 *y);
  * with r[i] in {-8,...,7}
  */
 void sc25519_window4(signed char r[85], const sc25519 *s);
+
+void sc25519_slide(signed char r[256], const sc25519 *s, int swindowsize);
 
 void sc25519_2interleave2(unsigned char r[127], const sc25519 *s1, const sc25519 *s2);
 

@@ -27,7 +27,7 @@ int crypto_sign_open(
 
   sc25519_from32bytes(&scs, sm+32);
 
-  ge25519_double_scalarmult_vartime(&get2, &get1, &schram, &ge25519_base, &scs);
+  ge25519_double_scalarmult_vartime(&get2, &get1, &schram, &scs);
   ge25519_pack(t2, &get2);
 
   if (!crypto_verify_32(sm, t2))

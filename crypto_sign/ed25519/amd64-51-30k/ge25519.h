@@ -62,8 +62,8 @@ typedef struct
   fe25519 t2d;
 } ge25519_niels;
 
-extern void ge25519_p1p1_to_p2(ge25519_p2 *r, ge25519_p1p1 *p);
-extern void ge25519_p1p1_to_p3(ge25519_p3 *r, ge25519_p1p1 *p);
+extern void ge25519_p1p1_to_p2(ge25519_p2 *r, const ge25519_p1p1 *p);
+extern void ge25519_p1p1_to_p3(ge25519_p3 *r, const ge25519_p1p1 *p);
 extern void ge25519_add_p1p1(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_p3 *q);
 extern void ge25519_dbl_p1p1(ge25519_p1p1 *r, const ge25519_p2 *p);
 extern void choose_t(ge25519_niels *t, unsigned long long pos, signed long long b, const ge25519_niels *base_multiples);

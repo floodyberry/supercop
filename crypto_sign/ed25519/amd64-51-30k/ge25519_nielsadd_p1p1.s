@@ -3069,31 +3069,6 @@ sub  %r10,%r12
 # asm 2: sub  <c4=%r11,<f4=%rsi
 sub  %r11,%rsi
 
-# qhasm: g0_stack = g0
-# asm 1: movq <g0=int64#11,>g0_stack=stack64#8
-# asm 2: movq <g0=%r13,>g0_stack=56(%rsp)
-movq %r13,56(%rsp)
-
-# qhasm: g1_stack = g1
-# asm 1: movq <g1=int64#12,>g1_stack=stack64#9
-# asm 2: movq <g1=%r14,>g1_stack=64(%rsp)
-movq %r14,64(%rsp)
-
-# qhasm: g2_stack = g2
-# asm 1: movq <g2=int64#13,>g2_stack=stack64#10
-# asm 2: movq <g2=%r15,>g2_stack=72(%rsp)
-movq %r15,72(%rsp)
-
-# qhasm: g3_stack = g3
-# asm 1: movq <g3=int64#14,>g3_stack=stack64#11
-# asm 2: movq <g3=%rbx,>g3_stack=80(%rsp)
-movq %rbx,80(%rsp)
-
-# qhasm: g4_stack = g4
-# asm 1: movq <g4=int64#15,>g4_stack=stack64#12
-# asm 2: movq <g4=%rbp,>g4_stack=88(%rsp)
-movq %rbp,88(%rsp)
-
 # qhasm: *(uint64 *)(rp + 40) = g0
 # asm 1: movq   <g0=int64#11,40(<rp=int64#1)
 # asm 2: movq   <g0=%r13,40(<rp=%rdi)
