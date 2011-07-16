@@ -9,7 +9,7 @@ freely distributed only for TESTING AND RESEARCH PURPOSES. The author is reservi
 code, but any ideas about improving the code are welcomed and will be recognized if implemented.
 
 If you are interested in testing the code, in research collaborations for possible security holes in the method, or in any
-other information please contact the author at <george.anescu@scgen.com>.
+other information please contact the author at <george.anescu@sc-gen.com>.
 
 Test Samples code for Version 2.1.0 (09 December 2010):
 

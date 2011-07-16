@@ -5,7 +5,7 @@
 //****************************************************************************
 //
 // The OCELOT2 stream ciphering method, Version 2.1.0 (09 December 2010)
-// Copyright (C) 2009-2010, George Anescu, www.scgen.com
+// Copyright (C) 2009-2010, George Anescu, www.sc-gen.com
 // All right reserved.
 //
 //****************************************************************************

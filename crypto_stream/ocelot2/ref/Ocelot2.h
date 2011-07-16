@@ -15,7 +15,7 @@ class Ocelot2
 //****************************************************************************
 //
 // The OCELOT2 stream ciphering method, Version 2.1.0 (09 December 2010)
-// Copyright (C) 2009-2010, George Anescu, www.scgen.com
+// Copyright (C) 2009-2010, George Anescu, www.sc-gen.com
 // All right reserved.
 //
 // This is the C++ implementation of a new stream ciphering method called OCELOT2. It is accepting any practical key size and can
