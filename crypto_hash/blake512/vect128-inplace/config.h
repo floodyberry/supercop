@@ -1,0 +1,2 @@
+#define COMPILE_512
+#define PERM_INPLACE

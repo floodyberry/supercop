@@ -1,0 +1,7 @@
+BLAKE-256 vectorized implementation
+author: Gaëtan Leurent <gaetan.leurent@uni.lu>
+
+This implementation assumes that no salt is used.
+
+Level of copyright protection: 0
+Level of patent protection: 0
