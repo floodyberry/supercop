@@ -1,4 +1,4 @@
-/* $Id: jh.c 227 2010-06-16 17:28:38Z tp $ */
+/* $Id: jh.c 255 2011-06-07 19:50:20Z tp $ */
 /*
  * JH implementation.
  *
@@ -194,7 +194,19 @@ static const sph_u64 C[] = {
 	C64e(0xd2c9f2e3009bd20c), C64e(0x5faace30b7d40c30),
 	C64e(0x742a5116f2e03298), C64e(0x0deb30d8e3cef89a),
 	C64e(0x4bc59e7bb5f17992), C64e(0xff51e66e048668d3),
-	C64e(0x9b234d57e6966731), C64e(0xcce6a6f3170a7505)
+	C64e(0x9b234d57e6966731), C64e(0xcce6a6f3170a7505),
+	C64e(0xb17681d913326cce), C64e(0x3c175284f805a262),
+	C64e(0xf42bcbb378471547), C64e(0xff46548223936a48),
+	C64e(0x38df58074e5e6565), C64e(0xf2fc7c89fc86508e),
+	C64e(0x31702e44d00bca86), C64e(0xf04009a23078474e),
+	C64e(0x65a0ee39d1f73883), C64e(0xf75ee937e42c3abd),
+	C64e(0x2197b2260113f86f), C64e(0xa344edd1ef9fdee7),
+	C64e(0x8ba0df15762592d9), C64e(0x3c85f7f612dc42be),
+	C64e(0xd8a7ec7cab27b07e), C64e(0x538d7ddaaa3ea8de),
+	C64e(0xaa25ce93bd0269d8), C64e(0x5af643fd1a7308f9),
+	C64e(0xc05fefda174a19a5), C64e(0x974d66334cfd216a),
+	C64e(0x35b49831db411570), C64e(0xea1e0fbbedcd549b),
+	C64e(0x9ad063a151974072), C64e(0xf6759dbf91476fe2)
 };
 
 #define Ceven_hi(r)   (C[((r) << 2) + 0])
@@ -305,47 +317,47 @@ static const sph_u64 C[] = {
 	h7l ^= m3l;
 
 static const sph_u64 IV224[] = {
-	C64e(0x82c270e00bed0230), C64e(0x8d0c3a9e31ce34b1),
-	C64e(0x8f0c942fba46cd87), C64e(0x1ec4d80afc7971c4),
-	C64e(0x61e01abb69962d7b), C64e(0xaf71893de13d8697),
-	C64e(0xd2520460f7c9c094), C64e(0xc76349ca3da5799c),
-	C64e(0xfd8b551fbdbceb9f), C64e(0x0834bd5bb442f8bf),
-	C64e(0xba515c35b9c7999e), C64e(0x55a44e6271cc13b3),
-	C64e(0x85725793c185f725), C64e(0x45366b69005025d2),
-	C64e(0x3390ebdb27dd1edf), C64e(0xccbaade17e603de9)
+	C64e(0x2dfedd62f99a98ac), C64e(0xae7cacd619d634e7),
+	C64e(0xa4831005bc301216), C64e(0xb86038c6c9661494),
+	C64e(0x66d9899f2580706f), C64e(0xce9ea31b1d9b1adc),
+	C64e(0x11e8325f7b366e10), C64e(0xf994857f02fa06c1),
+	C64e(0x1b4f1b5cd8c840b3), C64e(0x97f6a17f6e738099),
+	C64e(0xdcdf93a5adeaa3d3), C64e(0xa431e8dec9539a68),
+	C64e(0x22b4a98aec86a1e4), C64e(0xd574ac959ce56cf0),
+	C64e(0x15960deab5ab2bbf), C64e(0x9611dcf0dd64ea6e)
 };
 
 static const sph_u64 IV256[] = {
-	C64e(0xc968b8e2c53a596e), C64e(0x427e45ef1d7ae6e5),
-	C64e(0x6145b7d906711f7a), C64e(0x2fc7617806a92201),
-	C64e(0x7b2991c1b91929e2), C64e(0xc42b4ce18cc5a2d6),
-	C64e(0x6220beca901b5ddf), C64e(0xd3b205638ea7ac5f),
-	C64e(0x143e8cba6d313104), C64e(0xb0e7005490527271),
-	C64e(0x4cce321e075de510), C64e(0x1ba800ece2025178),
-	C64e(0x9f5772795fd104a5), C64e(0xf0b8b63425f5b238),
-	C64e(0x1670fa3e5f907f17), C64e(0xe28fc064e769ac90)
+	C64e(0xeb98a3412c20d3eb), C64e(0x92cdbe7b9cb245c1),
+	C64e(0x1c93519160d4c7fa), C64e(0x260082d67e508a03),
+	C64e(0xa4239e267726b945), C64e(0xe0fb1a48d41a9477),
+	C64e(0xcdb5ab26026b177a), C64e(0x56f024420fff2fa8),
+	C64e(0x71a396897f2e4d75), C64e(0x1d144908f77de262),
+	C64e(0x277695f776248f94), C64e(0x87d5b6574780296c),
+	C64e(0x5c5e272dac8e0d6c), C64e(0x518450c657057a0f),
+	C64e(0x7be4d367702412ea), C64e(0x89e3ab13d31cd769)
 };
 
 static const sph_u64 IV384[] = {
-	C64e(0x079c23ab64ab2d40), C64e(0x8cb51ce447dee98d),
-	C64e(0x8d9bb1627ec25269), C64e(0xbab62d2b002ffc80),
-	C64e(0xcbafbcef308c173a), C64e(0xad6fa3aa31194031),
-	C64e(0x898977423a6f4ce3), C64e(0xbf2e732b440ddb7d),
-	C64e(0xf2c43ecaa63a54e5), C64e(0x8a37b80afc4422c5),
-	C64e(0xa397c3bc04e9e091), C64e(0x37a80453e14860fa),
-	C64e(0x7131d33a5fd4bea6), C64e(0xdcda4af8f4338512),
-	C64e(0x6ec7f8f4c84958d0), C64e(0x8b9e94a34695b6a9)
+	C64e(0x481e3bc6d813398a), C64e(0x6d3b5e894ade879b),
+	C64e(0x63faea68d480ad2e), C64e(0x332ccb21480f8267),
+	C64e(0x98aec84d9082b928), C64e(0xd455ea3041114249),
+	C64e(0x36f555b2924847ec), C64e(0xc7250a93baf43ce1),
+	C64e(0x569b7f8a27db454c), C64e(0x9efcbd496397af0e),
+	C64e(0x589fc27d26aa80cd), C64e(0x80c08b8c9deb2eda),
+	C64e(0x8a7981e8f8d5373a), C64e(0xf43967adddd17a71),
+	C64e(0xa9b4d3bda475d394), C64e(0x976c3fba9842737f)
 };
 
 static const sph_u64 IV512[] = {
-	C64e(0x50ab6058c60942cc), C64e(0x4ce7a54cbdb9dc1b),
-	C64e(0xaf2e7afbd1a15e24), C64e(0xe5f44eabc4d5c0a1),
-	C64e(0x4cf243660c562073), C64e(0x999381ea9a8b3d18),
-	C64e(0xcf65d9fca940b6c7), C64e(0x9e831273befe3b66),
-	C64e(0x0f9a2f7e0a32d8e0), C64e(0x17d491558e0b1340),
-	C64e(0x05b5e4dec44e5f3f), C64e(0x8cbc5aee98fd1d32),
-	C64e(0x14081c25e46ce6c4), C64e(0x1b4b95bce1bd43db),
-	C64e(0x7f229ec243b68014), C64e(0x0a33b909333c0303)
+	C64e(0x6fd14b963e00aa17), C64e(0x636a2e057a15d543),
+	C64e(0x8a225e8d0c97ef0b), C64e(0xe9341259f2b3c361),
+	C64e(0x891da0c1536f801e), C64e(0x2aa9056bea2b6d80),
+	C64e(0x588eccdb2075baa6), C64e(0xa90f3a76baf83bf7),
+	C64e(0x0169e60541e34a69), C64e(0x46b58a8e2e6fe65a),
+	C64e(0x1047a7d0c1843c24), C64e(0x3b6e71b12d5ac199),
+	C64e(0xcf57f6ec9db1f856), C64e(0xa706887c5716b156),
+	C64e(0xe3c2fcdfe68517fb), C64e(0x545a4678cc8cdd4b)
 };
 
 #else
@@ -446,7 +458,23 @@ static const sph_u32 C[] = {
 	C32e(0x742a5116), C32e(0xf2e03298), C32e(0x0deb30d8),
 	C32e(0xe3cef89a), C32e(0x4bc59e7b), C32e(0xb5f17992),
 	C32e(0xff51e66e), C32e(0x048668d3), C32e(0x9b234d57),
-	C32e(0xe6966731), C32e(0xcce6a6f3), C32e(0x170a7505)
+	C32e(0xe6966731), C32e(0xcce6a6f3), C32e(0x170a7505),
+	C32e(0xb17681d9), C32e(0x13326cce), C32e(0x3c175284),
+	C32e(0xf805a262), C32e(0xf42bcbb3), C32e(0x78471547),
+	C32e(0xff465482), C32e(0x23936a48), C32e(0x38df5807),
+	C32e(0x4e5e6565), C32e(0xf2fc7c89), C32e(0xfc86508e),
+	C32e(0x31702e44), C32e(0xd00bca86), C32e(0xf04009a2),
+	C32e(0x3078474e), C32e(0x65a0ee39), C32e(0xd1f73883),
+	C32e(0xf75ee937), C32e(0xe42c3abd), C32e(0x2197b226),
+	C32e(0x0113f86f), C32e(0xa344edd1), C32e(0xef9fdee7),
+	C32e(0x8ba0df15), C32e(0x762592d9), C32e(0x3c85f7f6),
+	C32e(0x12dc42be), C32e(0xd8a7ec7c), C32e(0xab27b07e),
+	C32e(0x538d7dda), C32e(0xaa3ea8de), C32e(0xaa25ce93),
+	C32e(0xbd0269d8), C32e(0x5af643fd), C32e(0x1a7308f9),
+	C32e(0xc05fefda), C32e(0x174a19a5), C32e(0x974d6633),
+	C32e(0x4cfd216a), C32e(0x35b49831), C32e(0xdb411570),
+	C32e(0xea1e0fbb), C32e(0xedcd549b), C32e(0x9ad063a1),
+	C32e(0x51974072), C32e(0xf6759dbf), C32e(0x91476fe2)
 };
 
 #define Ceven_w3(r)   (C[((r) << 3) + 0])
@@ -639,59 +667,47 @@ static const sph_u32 C[] = {
 	h70 ^= m30;
 
 static const sph_u32 IV224[] = {
-	C32e(0x82c270e0), C32e(0x0bed0230), C32e(0x8d0c3a9e),
-	C32e(0x31ce34b1), C32e(0x8f0c942f), C32e(0xba46cd87),
-	C32e(0x1ec4d80a), C32e(0xfc7971c4), C32e(0x61e01abb),
-	C32e(0x69962d7b), C32e(0xaf71893d), C32e(0xe13d8697),
-	C32e(0xd2520460), C32e(0xf7c9c094), C32e(0xc76349ca),
-	C32e(0x3da5799c), C32e(0xfd8b551f), C32e(0xbdbceb9f),
-	C32e(0x0834bd5b), C32e(0xb442f8bf), C32e(0xba515c35),
-	C32e(0xb9c7999e), C32e(0x55a44e62), C32e(0x71cc13b3),
-	C32e(0x85725793), C32e(0xc185f725), C32e(0x45366b69),
-	C32e(0x005025d2), C32e(0x3390ebdb), C32e(0x27dd1edf),
-	C32e(0xccbaade1), C32e(0x7e603de9)
+	C32e(0x2dfedd62), C32e(0xf99a98ac), C32e(0xae7cacd6), C32e(0x19d634e7),
+	C32e(0xa4831005), C32e(0xbc301216), C32e(0xb86038c6), C32e(0xc9661494),
+	C32e(0x66d9899f), C32e(0x2580706f), C32e(0xce9ea31b), C32e(0x1d9b1adc),
+	C32e(0x11e8325f), C32e(0x7b366e10), C32e(0xf994857f), C32e(0x02fa06c1),
+	C32e(0x1b4f1b5c), C32e(0xd8c840b3), C32e(0x97f6a17f), C32e(0x6e738099),
+	C32e(0xdcdf93a5), C32e(0xadeaa3d3), C32e(0xa431e8de), C32e(0xc9539a68),
+	C32e(0x22b4a98a), C32e(0xec86a1e4), C32e(0xd574ac95), C32e(0x9ce56cf0),
+	C32e(0x15960dea), C32e(0xb5ab2bbf), C32e(0x9611dcf0), C32e(0xdd64ea6e)
 };
 
 static const sph_u32 IV256[] = {
-	C32e(0xc968b8e2), C32e(0xc53a596e), C32e(0x427e45ef),
-	C32e(0x1d7ae6e5), C32e(0x6145b7d9), C32e(0x06711f7a),
-	C32e(0x2fc76178), C32e(0x06a92201), C32e(0x7b2991c1),
-	C32e(0xb91929e2), C32e(0xc42b4ce1), C32e(0x8cc5a2d6),
-	C32e(0x6220beca), C32e(0x901b5ddf), C32e(0xd3b20563),
-	C32e(0x8ea7ac5f), C32e(0x143e8cba), C32e(0x6d313104),
-	C32e(0xb0e70054), C32e(0x90527271), C32e(0x4cce321e),
-	C32e(0x075de510), C32e(0x1ba800ec), C32e(0xe2025178),
-	C32e(0x9f577279), C32e(0x5fd104a5), C32e(0xf0b8b634),
-	C32e(0x25f5b238), C32e(0x1670fa3e), C32e(0x5f907f17),
-	C32e(0xe28fc064), C32e(0xe769ac90)
+	C32e(0xeb98a341), C32e(0x2c20d3eb), C32e(0x92cdbe7b), C32e(0x9cb245c1),
+	C32e(0x1c935191), C32e(0x60d4c7fa), C32e(0x260082d6), C32e(0x7e508a03),
+	C32e(0xa4239e26), C32e(0x7726b945), C32e(0xe0fb1a48), C32e(0xd41a9477),
+	C32e(0xcdb5ab26), C32e(0x026b177a), C32e(0x56f02442), C32e(0x0fff2fa8),
+	C32e(0x71a39689), C32e(0x7f2e4d75), C32e(0x1d144908), C32e(0xf77de262),
+	C32e(0x277695f7), C32e(0x76248f94), C32e(0x87d5b657), C32e(0x4780296c),
+	C32e(0x5c5e272d), C32e(0xac8e0d6c), C32e(0x518450c6), C32e(0x57057a0f),
+	C32e(0x7be4d367), C32e(0x702412ea), C32e(0x89e3ab13), C32e(0xd31cd769)
 };
 
 static const sph_u32 IV384[] = {
-	C32e(0x079c23ab), C32e(0x64ab2d40), C32e(0x8cb51ce4),
-	C32e(0x47dee98d), C32e(0x8d9bb162), C32e(0x7ec25269),
-	C32e(0xbab62d2b), C32e(0x002ffc80), C32e(0xcbafbcef),
-	C32e(0x308c173a), C32e(0xad6fa3aa), C32e(0x31194031),
-	C32e(0x89897742), C32e(0x3a6f4ce3), C32e(0xbf2e732b),
-	C32e(0x440ddb7d), C32e(0xf2c43eca), C32e(0xa63a54e5),
-	C32e(0x8a37b80a), C32e(0xfc4422c5), C32e(0xa397c3bc),
-	C32e(0x04e9e091), C32e(0x37a80453), C32e(0xe14860fa),
-	C32e(0x7131d33a), C32e(0x5fd4bea6), C32e(0xdcda4af8),
-	C32e(0xf4338512), C32e(0x6ec7f8f4), C32e(0xc84958d0),
-	C32e(0x8b9e94a3), C32e(0x4695b6a9)
+	C32e(0x481e3bc6), C32e(0xd813398a), C32e(0x6d3b5e89), C32e(0x4ade879b),
+	C32e(0x63faea68), C32e(0xd480ad2e), C32e(0x332ccb21), C32e(0x480f8267),
+	C32e(0x98aec84d), C32e(0x9082b928), C32e(0xd455ea30), C32e(0x41114249),
+	C32e(0x36f555b2), C32e(0x924847ec), C32e(0xc7250a93), C32e(0xbaf43ce1),
+	C32e(0x569b7f8a), C32e(0x27db454c), C32e(0x9efcbd49), C32e(0x6397af0e),
+	C32e(0x589fc27d), C32e(0x26aa80cd), C32e(0x80c08b8c), C32e(0x9deb2eda),
+	C32e(0x8a7981e8), C32e(0xf8d5373a), C32e(0xf43967ad), C32e(0xddd17a71),
+	C32e(0xa9b4d3bd), C32e(0xa475d394), C32e(0x976c3fba), C32e(0x9842737f)
 };
 
 static const sph_u32 IV512[] = {
-	C32e(0x50ab6058), C32e(0xc60942cc), C32e(0x4ce7a54c),
-	C32e(0xbdb9dc1b), C32e(0xaf2e7afb), C32e(0xd1a15e24),
-	C32e(0xe5f44eab), C32e(0xc4d5c0a1), C32e(0x4cf24366),
-	C32e(0x0c562073), C32e(0x999381ea), C32e(0x9a8b3d18),
-	C32e(0xcf65d9fc), C32e(0xa940b6c7), C32e(0x9e831273),
-	C32e(0xbefe3b66), C32e(0x0f9a2f7e), C32e(0x0a32d8e0),
-	C32e(0x17d49155), C32e(0x8e0b1340), C32e(0x05b5e4de),
-	C32e(0xc44e5f3f), C32e(0x8cbc5aee), C32e(0x98fd1d32),
-	C32e(0x14081c25), C32e(0xe46ce6c4), C32e(0x1b4b95bc),
-	C32e(0xe1bd43db), C32e(0x7f229ec2), C32e(0x43b68014),
-	C32e(0x0a33b909), C32e(0x333c0303)
+	C32e(0x6fd14b96), C32e(0x3e00aa17), C32e(0x636a2e05), C32e(0x7a15d543),
+	C32e(0x8a225e8d), C32e(0x0c97ef0b), C32e(0xe9341259), C32e(0xf2b3c361),
+	C32e(0x891da0c1), C32e(0x536f801e), C32e(0x2aa9056b), C32e(0xea2b6d80),
+	C32e(0x588eccdb), C32e(0x2075baa6), C32e(0xa90f3a76), C32e(0xbaf83bf7),
+	C32e(0x0169e605), C32e(0x41e34a69), C32e(0x46b58a8e), C32e(0x2e6fe65a),
+	C32e(0x1047a7d0), C32e(0xc1843c24), C32e(0x3b6e71b1), C32e(0x2d5ac199),
+	C32e(0xcf57f6ec), C32e(0x9db1f856), C32e(0xa706887c), C32e(0x5716b156),
+	C32e(0xe3c2fcdf), C32e(0xe68517fb), C32e(0x545a4678), C32e(0xcc8cdd4b)
 };
 
 #endif
@@ -719,7 +735,7 @@ static const sph_u32 IV512[] = {
 
 #define E8   do { \
 		unsigned r; \
-		for (r = 0; r < 35; r += 7) { \
+		for (r = 0; r < 42; r += 7) { \
 			SL(0); \
 			SL(1); \
 			SL(2); \
@@ -728,15 +744,13 @@ static const sph_u32 IV512[] = {
 			SL(5); \
 			SL(6); \
 		} \
-		S(h0, h2, h4, h6, Ceven_, 35); \
-		S(h1, h3, h5, h7, Codd_, 35); \
 	} while (0)
 
 #else
 
 #define E8   do { \
 		unsigned r, g; \
-		for (r = g = 0; r < 35; r ++) { \
+		for (r = g = 0; r < 42; r ++) { \
 			S(h0, h2, h4, h6, Ceven_, r); \
 			S(h1, h3, h5, h7, Codd_, r); \
 			L(h0, h2, h4, h6, h1, h3, h5, h7); \
@@ -787,8 +801,6 @@ static const sph_u32 IV512[] = {
 			if (++ g == 7) \
 				g = 0; \
 		} \
-		S(h0, h2, h4, h6, Ceven_, 35); \
-		S(h1, h3, h5, h7, Codd_, 35); \
 	} while (0)
 
 #endif
@@ -837,8 +849,13 @@ static const sph_u32 IV512[] = {
 		SLu(32, 4); \
 		SLu(33, 5); \
 		SLu(34, 6); \
-		S(h0, h2, h4, h6, Ceven_, 35); \
-		S(h1, h3, h5, h7, Codd_, 35); \
+		SLu(35, 0); \
+		SLu(36, 1); \
+		SLu(37, 2); \
+		SLu(38, 3); \
+		SLu(39, 4); \
+		SLu(40, 5); \
+		SLu(41, 6); \
 	} while (0)
 
 #else
@@ -851,7 +868,7 @@ static const sph_u32 IV512[] = {
 
 #define E8   do { \
 		unsigned r; \
-		for (r = 0; r < 35; r += 7) { \
+		for (r = 0; r < 42; r += 7) { \
 			SL(0); \
 			SL(1); \
 			SL(2); \
@@ -860,8 +877,6 @@ static const sph_u32 IV512[] = {
 			SL(5); \
 			SL(6); \
 		} \
-		S(h0, h2, h4, h6, Ceven_, 35); \
-		S(h1, h3, h5, h7, Codd_, 35); \
 	} while (0)
 
 #endif

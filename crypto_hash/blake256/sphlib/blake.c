@@ -1,10 +1,4 @@
-/* revised from
-$Id: blake.c 227 2010-06-16 17:28:38Z tp $ 
-by Jean-Philippe Aumasson on Jan 12 2011:
-revised the implementation according to the tweak of BLAKE,
-ie setting 14 rounds for blake256 instead of 10,
-and 16 rounds for blake512 instead of 14
-*/
+/* $Id: blake.c 252 2011-06-07 17:55:14Z tp $ */
 /*
  * BLAKE implementation.
  *
@@ -41,7 +35,6 @@ and 16 rounds for blake512 instead of 14
 #include <limits.h>
 
 #include "sph_blake.h"
-
 
 #if SPH_SMALL_FOOTPRINT && !defined SPH_SMALL_FOOTPRINT_BLAKE
 #define SPH_SMALL_FOOTPRINT_BLAKE   1
@@ -1117,43 +1110,3 @@ sph_blake512_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
 }
 
 #endif
-
-/*
-int main() {
-
-  int i, v;
-  unsigned char data[72], digest[32];
-  unsigned char test1[]= {0x0C, 0xE8, 0xD4, 0xEF, 0x4D, 0xD7, 0xCD, 0x8D, 
-	       0x62, 0xDF, 0xDE, 0xD9, 0xD4, 0xED, 0xB0, 0xA7, 
-	       0x74, 0xAE, 0x6A, 0x41, 0x92, 0x9A, 0x74, 0xDA, 
-	       0x23, 0x10, 0x9E, 0x8F, 0x11, 0x13, 0x9C, 0x87};
-  unsigned char test2[]= {0xD4, 0x19, 0xBA, 0xD3, 0x2D, 0x50, 0x4F, 0xB7, 
-	       0xD4, 0x4D, 0x46, 0x0C, 0x42, 0xC5, 0x59, 0x3F, 
-	       0xE5, 0x44, 0xFA, 0x4C, 0x13, 0x5D, 0xEC, 0x31, 
-	       0xE2, 0x1B, 0xD9, 0xAB, 0xDC, 0xC2, 0x2D, 0x41};
-
-  for(i=0; i<72; ++i) data[i]=0;  
-
-  crypto_hash( digest, data, 1 );    
-  v=0;
-  for(i=0; i<32; ++i) {
-    printf("%02X", digest[i]);
-    if ( digest[i] != test1[i]) v=1;
-  }
-  if (v) printf("\nerror\n");
-  else printf("\nok\n");
-
-  for(i=0; i<72; ++i) data[i]=0;  
-
-  crypto_hash( digest, data, 72 );    
-  v=0;
-  for(i=0; i<32; ++i) {
-    printf("%02X", digest[i]);
-    if ( digest[i] != test2[i]) v=1;
-  }
-  if (v) printf("\nerror\n");
-  else printf("\nok\n");
-
-  return 0;
-}
-*/

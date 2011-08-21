@@ -1,12 +1,9 @@
-/* $Id: sph_blake.h 216 2010-06-08 09:46:57Z tp $ */
+/* $Id: sph_blake.h 252 2011-06-07 17:55:14Z tp $ */
 /**
  * BLAKE interface. BLAKE is a family of functions which differ by their
  * output size; this implementation defines BLAKE for output sizes 224,
- * 256, 384 and 512 bits. In the BLAKE specification, they are called,
- * respectively, BLAKE-28, BLAKE-32, BLAKE-48 and BLAKE-64, using the
- * output size in bytes. For symmetry with the other SHA-3 candidates
- * implemented in this specification, we hereafter call these BLAKE
- * variants BLAKE-224, BLAKE-256, BLAKE-384 and BLAKE-512, respectively.
+ * 256, 384 and 512 bits. This implementation conforms to the "third
+ * round" specification.
  *
  * ==========================(LICENSE BEGIN)============================
  *

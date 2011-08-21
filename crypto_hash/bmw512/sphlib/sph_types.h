@@ -1,4 +1,4 @@
-/* $Id: sph_types.h 250 2010-09-10 20:23:02Z tp $ */
+/* $Id: sph_types.h 260 2011-07-21 01:02:38Z tp $ */
 /**
  * Basic type definitions.
  *
@@ -278,17 +278,16 @@
  *   - WHIRLPOOL-1: short name: <code>whirlpool1</code> (64)
  *   - WHIRLPOOL: short name: <code>whirlpool</code> (64)
  *
- * The fourteen second-round SHA-3 candidates are also implemented:
+ * The fourteen second-round SHA-3 candidates are also implemented;
+ * when applicable, the implementations follow the "final" specifications
+ * as published for the third round of the SHA-3 competition (BLAKE,
+ * Groestl, JH, Keccak and Skein have been tweaked for third round).
  *
  * - BLAKE family: file <code>sph_blake.h</code>
- *   - BLAKE-224 (nominally specified as BLAKE-28): short name:
- *     <code>blake224</code>
- *   - BLAKE-256 (nominally specified as BLAKE-32): short name:
- *     <code>blake256</code>
- *   - BLAKE-384 (nominally specified as BLAKE-48): short name:
- *     <code>blake384</code> (64)
- *   - BLAKE-512 (nominally specified as BLAKE-64): short name:
- *     <code>blake512</code> (64)
+ *   - BLAKE-224: short name: <code>blake224</code>
+ *   - BLAKE-256: short name: <code>blake256</code>
+ *   - BLAKE-384: short name: <code>blake384</code>
+ *   - BLAKE-512: short name: <code>blake512</code>
  * - BMW (Blue Midnight Wish) family: file <code>sph_bmw.h</code>
  *   - BMW-224: short name: <code>bmw224</code>
  *   - BMW-256: short name: <code>bmw256</code>
@@ -356,9 +355,9 @@
  *   - SIMD-384: short name: <code>simd384</code>
  *   - SIMD-512: short name: <code>simd512</code>
  * - Skein family: file <code>sph_skein.h</code>
- *   - Skein-224 (nominally specified as Skein-256-224): short name:
+ *   - Skein-224 (nominally specified as Skein-512-224): short name:
  *     <code>skein224</code> (64)
- *   - Skein-256 (nominally specified as Skein-256-256): short name:
+ *   - Skein-256 (nominally specified as Skein-512-256): short name:
  *     <code>skein256</code> (64)
  *   - Skein-384 (nominally specified as Skein-512-384): short name:
  *     <code>skein384</code> (64)

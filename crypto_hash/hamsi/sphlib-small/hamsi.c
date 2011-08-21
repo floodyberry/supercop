@@ -1,4 +1,4 @@
-/* $Id: hamsi.c 234 2010-06-18 15:30:27Z tp $ */
+/* $Id: hamsi.c 251 2010-10-19 14:31:51Z tp $ */
 /*
  * Hamsi implementation.
  *
@@ -108,7 +108,7 @@
 #pragma warning (disable: 4146)
 #endif
 
-#include "hamsi_helper.i"
+#include "hamsi_helper.c"
 
 static const sph_u32 IV224[] = {
 	SPH_C32(0xc3967a67), SPH_C32(0xc3bc6c20), SPH_C32(0x4bc3bcc3),
@@ -380,6 +380,7 @@ hamsi_small_core(sph_hamsi_small_context *sc, const void *data, size_t len)
 		} else {
 			memcpy(sc->partial + sc->partial_len, data, mlen);
 			len -= mlen;
+			data = (const unsigned char *)data + mlen;
 			hamsi_small(sc, sc->partial, 1);
 			sc->partial_len = 0;
 		}
@@ -682,6 +683,7 @@ hamsi_big_core(sph_hamsi_big_context *sc, const void *data, size_t len)
 		} else {
 			memcpy(sc->partial + sc->partial_len, data, mlen);
 			len -= mlen;
+			data = (const unsigned char *)data + mlen;
 			hamsi_big(sc, sc->partial, 1);
 			sc->partial_len = 0;
 		}
