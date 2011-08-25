@@ -12,7 +12,7 @@ http://creativecommons.org/publicdomain/zero/1.0/
 */
 
 #include "KeccakF-1600-interface.h"
-#include "KeccakNISTInterface.h"
+#include "KeccakSponge.h"
 #include <string.h>
 
 typedef unsigned char UINT8;

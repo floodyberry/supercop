@@ -1,0 +1,9 @@
+This implementation computes a key exchange based on CURVE2251.  
+High-level code comes from the RELIC cryptographic toolkit (http://http://code.google.com/p/relic-toolkit/).
+Field arithmetic requires the SSSE3 instruction set and closely follows the reference below:
+
+Diego F. Aranha, Julio López, Darrel Hankerson: Efficient Software Implementation of Binary Field Arithmetic Using Vector Instruction Sets. LATINCRYPT 2010: 144-161
+
+The code is distributed under an LGPL-2.1+ license, thus the distribution of this software does not infringe any copyright.
+Patents may apply to some of the algorithms, but the authors do not have any financial connection with them.
+

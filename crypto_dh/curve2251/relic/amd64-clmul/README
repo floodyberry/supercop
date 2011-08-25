@@ -1,0 +1,9 @@
+This implementation computes a key exchange based on CURVE2251. 
+High-level code comes from the RELIC cryptographic toolkit (http://http://code.google.com/p/relic-toolkit/).
+Field arithmetic requires the AES-NI/CLMUL instruction set and closely follows the reference below:
+
+Johnathan Taverne, Armando Faz-Hernández, Diego F. Aranha, Francisco Rodríguez-Henríquez, Darrel Hankerson, Julio López: Software implementation of binary elliptic curves: impact of the carry-less multiplier on scalar multiplication. CHES 2011: To appear.
+
+The code is distributed under an LGPL-2.1+ license, thus the distribution of this software does not infringe any copyright.
+Patents may apply to some of the algorithms, but the authors do not have any financial connection with them.
+

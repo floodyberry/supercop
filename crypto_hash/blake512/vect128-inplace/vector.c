@@ -163,7 +163,7 @@ void round256(v32* MM, v32* H,
     M2 = v32_lswap(MM[2]), M3 = v32_lswap(MM[3]);
 
 #ifdef __INTEL_COMPILER
-  __m64 mx0, mx1, mx2, mx3, mx4, mx5, mx6, mx7;
+  register __m64 mx0 __asm("%mm0"), mx1 __asm("%mm1"), mx2 __asm("%mm2"), mx3 __asm("%mm3"), mx4 __asm("%mm4"), mx5 __asm("%mm5"), mx6 __asm("%mm6"), mx7;
   u32 mx8, mx9, mx10, mx11, mx12, mx13, mx14, mx15;
 
 #define sse_to_mmx _mm_movepi64_pi64

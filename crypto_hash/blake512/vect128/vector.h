@@ -121,6 +121,18 @@ typedef v2di v64;
 #define v64_rotate(x,n)                                 \
   vec_or(v64_shift_l(x,n), v64_shift_r(x,64-(n)))
 
+#define v64_rotate_2(x,n) ({                            \
+      u64 t__, u__;                                     \
+      v64 y__, z1__, z2__;                              \
+      __asm("movq\t%1, %0": "=r"(t__): "x"(x));         \
+      t__ = (t__ << (n)) | (t__ >> (64-(n)));           \
+      __asm("movq\t%1, %0": "=x"(z1__): "r"(t__));      \
+      y__ = v64_swp(x);                                 \
+      __asm("movq\t%1, %0": "=r"(u__): "x"(y__));       \
+      u__ = (u__ << (n)) | (u__ >> (64-(n)));           \
+      __asm("movq\t%1, %0": "=x"(z2__): "r"(u__));      \
+      v64_interleavel(z1__, z2__);                      \
+    })
 
 /* XOR-based permutations used in the Feistel strucure
  */

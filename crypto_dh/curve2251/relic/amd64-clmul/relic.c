@@ -1,0 +1,7 @@
+#include "src/relic_core.c"
+#include "src/relic_util.c"
+#include "src/relic_bench.c"
+#include "src/relic_rand.c"
+#include "src/md/relic_md_sha1.c"
+#include "src/md/sha1.c"
+#include "src/dv/relic_dv_util.c"

@@ -1,0 +1,8 @@
+#include "src/eb/relic_eb_add.c"
+#include "src/eb/relic_eb_curve.c"
+#include "src/eb/relic_eb_dbl.c"
+#include "src/eb/relic_eb_mul.c"
+#include "src/eb/relic_eb_mul_fix.c"
+#include "src/eb/relic_eb_norm.c"
+#include "src/eb/relic_eb_util.c"
+#include "src/eb/relic_eb_tab.c"
