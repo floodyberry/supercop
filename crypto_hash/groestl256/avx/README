@@ -1,7 +1,7 @@
 This package contains an implementation of the Groestl-256 hash
-function optimized for the Intel AES-NI instructions.
+function optimized for the Intel AES and AVX instructions.
 
-The author is Günther A. Roland.
+Authors are Krystian Matusiewicz, Günther A. Roland, Martin Schläffer
 
 There are no known present or future claims by a copyright holder that
 the distribution of this software infringes the copyright. In

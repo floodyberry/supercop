@@ -1,10 +1,16 @@
-#ifndef __groestl_asm_h
-#define __groestl_asm_h
+/* hash.h     Aug 2011
+ *
+ * Groestl implementation for different versions.
+ * Author: Krystian Matusiewicz, Günther A. Roland, Martin Schläffer
+ *
+ * This code is placed in the public domain
+ */
+
+#ifndef __hash_h
+#define __hash_h
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "brg_endian.h"
 
 /* eBash API begin */
 #include "crypto_hash.h"
@@ -19,13 +25,16 @@ typedef crypto_uint64 u64;
 #endif
 /* eBash API end */
 
-//#ifndef crypto_hash_BYTES
+#include "brg_endian.h"
 #define NEED_UINT_64T
 #include "brg_types.h"
-//#endif
 
 #ifdef IACA_TRACE
   #include IACA_MARKS
+#endif
+
+#ifndef LENGTH
+#define LENGTH 256
 #endif
 
 /* some sizes (number of bytes) */
@@ -35,9 +44,18 @@ typedef crypto_uint64 u64;
 #define COLS1024 16
 #define SIZE512 (ROWS*COLS512)
 #define SIZE1024 (ROWS*COLS1024)
-
 #define ROUNDS512 10
 #define ROUNDS1024 14
+
+#if LENGTH<=256
+#define COLS COLS512
+#define SIZE SIZE512
+#define ROUNDS ROUNDS512
+#else
+#define COLS COLS1024
+#define SIZE SIZE1024
+#define ROUNDS ROUNDS1024
+#endif
 
 #define ROTL64(a,n) ((((a)<<(n))|((a)>>(64-(n))))&li_64(ffffffffffffffff))
 
@@ -62,9 +80,9 @@ typedef unsigned char BitSequence;
 typedef unsigned long long DataLength;
 typedef enum { SUCCESS = 0, FAIL = 1, BAD_HASHLEN = 2 } HashReturn;
 typedef struct {
-  u64 *chaining;            /* actual state */
+  __attribute__ ((aligned (32))) u64 chaining[SIZE/8];      /* actual state */
+  __attribute__ ((aligned (32))) BitSequence buffer[SIZE];  /* data buffer */
   u64 block_counter;        /* message block counter */
-  BitSequence *buffer;      /* data buffer */
   int buf_ptr;              /* data buffer pointer */
   int bits_in_last_byte;    /* no. of message bits in last byte of
                                data buffer */
@@ -79,4 +97,4 @@ HashReturn Final(hashState*, BitSequence*);
 HashReturn Hash(int, const BitSequence*, DataLength, BitSequence*);
 /* NIST API end   */
 
-#endif /* __groestl_asm_h */
+#endif /* __hash_h */

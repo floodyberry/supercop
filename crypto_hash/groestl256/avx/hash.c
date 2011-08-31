@@ -1,15 +1,11 @@
-/* groestl-asm.c     Feb 2011
+/* hash.c     Aug 2011
  *
  * Groestl implementation for different versions.
- * Author: Günther A. Roland
- *
- * Based on the inline assembly version by:
- * Krystian Matusiewicz
+ * Author: Krystian Matusiewicz, Günther A. Roland, Martin Schläffer
  *
  * This code is placed in the public domain
  */
 
-#include "hash.h"
 #include "groestl-version.h"
 
 #ifdef TASM
@@ -52,30 +48,15 @@ void Transform(hashState *ctx,
 	       const u8 *in, 
 	       unsigned long long len) {
 
-#if (LENGTH <= 256)
     /* increment block counter */
-    ctx->block_counter += len/SIZE512;
-    
-    /* digest message, one block at a time */
-    for (; len >= SIZE512; len -= SIZE512, in += SIZE512)
-#ifdef __x86_64    
-      TF512((u64*)in);
-#else
-      TF512((u32*)in);
-#endif
+    ctx->block_counter += len/SIZE;
 
-#endif
-#if (LENGTH > 256)
-    /* increment block counter */
-    ctx->block_counter += len/SIZE1024;
-    
     /* digest message, one block at a time */
-    for (; len >= SIZE1024; len -= SIZE1024, in += SIZE1024)
-#ifdef __x86_64    
-      TF1024((u64*)in);
+    for (; len >= SIZE; len -= SIZE, in += SIZE)
+#if LENGTH<=256
+      TF512((u64*)ctx->chaining, (u64*)in);
 #else
-      TF1024((u32*)in);
-#endif
+      TF1024((u64*)ctx->chaining, (u64*)in);
 #endif
 
     asm volatile ("emms");
@@ -83,14 +64,12 @@ void Transform(hashState *ctx,
 
 /* given state h, do h <- P(h)+h */
 void OutputTransformation(hashState *ctx) {
-  int j;
 
-  /* determine variant */
+    /* determine variant */
 #if (LENGTH <= 256)
-    OF512();
-#endif
-#if (LENGTH > 256)
-    OF1024();
+    OF512((u64*)ctx->chaining);
+#else
+    OF1024((u64*)ctx->chaining);
 #endif
 
     asm volatile ("emms");
@@ -107,33 +86,28 @@ HashReturn Init(hashState* ctx) {
 
   /* set number of state columns and state size depending on
      variant */
-  #if (LENGTH <= 256)
-    ctx->columns = COLS512;
-    ctx->statesize = SIZE512;
+  ctx->columns = COLS;
+  ctx->statesize = SIZE;
+#if (LENGTH <= 256)
     ctx->v = SHORT;
-  #endif
-  #if (LENGTH > 256)
-    ctx->columns = COLS1024;
-    ctx->statesize = SIZE1024;
+#else
     ctx->v = LONG;
-  #endif
+#endif
 
   SET_CONSTANTS();
 
-  /* allocate memory for state and data buffer */
-#ifdef __x86_64    
-  ctx->chaining = (u64*) GLOBAL_CV_PTR;
-#else
-  ctx->chaining = (u32*) GLOBAL_CV_PTR;
-#endif
-  ctx->buffer = malloc(ctx->statesize);
+  for (i=0; i<SIZE/8; i++)
+    ctx->chaining[i] = 0;
+  for (i=0; i<SIZE; i++)
+    ctx->buffer[i] = 0;
+
   if (ctx->chaining == NULL || ctx->buffer == NULL)
     return FAIL;
 
   /* set initial value */
   ctx->chaining[ctx->columns-1] = U64BIG((u64)LENGTH);
 
-  INIT_CV();
+  INIT(ctx->chaining);
 
   /* set other variables */
   ctx->buf_ptr = 0;
@@ -172,6 +146,7 @@ HashReturn Update(hashState* ctx,
 
     /* digest buffer */
     ctx->buf_ptr = 0;
+    printf("error\n");
     Transform(ctx, ctx->buffer, ctx->statesize);
   }
 
@@ -252,8 +227,8 @@ HashReturn Final(hashState* ctx,
   for (i = 0; i < ctx->statesize; i++) {
     ctx->buffer[i] = 0;
   }
-  //free(ctx->chaining);
-  free(ctx->buffer);
+//  free(ctx->chaining);
+//  free(ctx->buffer);
 
   return SUCCESS;
 }

@@ -1,31 +1,30 @@
-/* groestl-aes-ni.c     Feb 2011
+/* groestl-asm-vperm.h     Aug 2011
  *
- * Groestl implementation with inline assembly using (s)sse*
- * instructions.
- * Author: Günther A. Roland
+ * Groestl implementation with inline assembly using ssse3 instructions.
+ * Author: Günther A. Roland, Martin Schläffer, Krystian Matusiewicz
+ *
+ * Based on the vperm and aes_ni implementations of the hash function Groestl
+ * by Cagdas Calik <ccalik@metu.edu.tr> http://www.metu.edu.tr/~ccalik/
+ * Institute of Applied Mathematics, Middle East Technical University, Turkey
  *
  * This code is placed in the public domain
  */
 
-/* global variables  */
-__attribute__ ((aligned (16))) unsigned char GLOBAL_CV_PTR[8*16];
-__attribute__ ((aligned (16))) unsigned char ROUND_CONST_MUL[8];
+#include "hash.h"
+
+/* global constants  */
 __attribute__ ((aligned (16))) unsigned char ROUND_CONST_Lx[16];
 __attribute__ ((aligned (16))) unsigned char ROUND_CONST_L0[ROUNDS512*16];
 __attribute__ ((aligned (16))) unsigned char ROUND_CONST_L7[ROUNDS512*16];
 __attribute__ ((aligned (16))) unsigned char ROUND_CONST_P[ROUNDS1024*16];
 __attribute__ ((aligned (16))) unsigned char ROUND_CONST_Q[ROUNDS1024*16];
 __attribute__ ((aligned (16))) unsigned char TRANSP_MASK[16];
+__attribute__ ((aligned (16))) unsigned char SUBSH_MASK[8*16];
+__attribute__ ((aligned (16))) unsigned char ALL_0F[16];
+__attribute__ ((aligned (16))) unsigned char ALL_15[16];
 __attribute__ ((aligned (16))) unsigned char ALL_1B[16];
 __attribute__ ((aligned (16))) unsigned char ALL_63[16];
-__attribute__ ((aligned (16))) unsigned char ALL_0F[16];
 __attribute__ ((aligned (16))) unsigned char ALL_FF[16];
-__attribute__ ((aligned (16))) unsigned char SUBSH_MASK[8*16];
-__attribute__ ((aligned (16))) unsigned char TEMP[8*16];
-__attribute__ ((aligned (16))) unsigned char TMP_MUL1[8*16];
-__attribute__ ((aligned (16))) unsigned char TMP_MUL2[8*16];
-__attribute__ ((aligned (16))) unsigned char TMP_MUL4[16];
-__attribute__ ((aligned (16))) unsigned char QTEMP[8*16];
 __attribute__ ((aligned (16))) unsigned char VPERM_IPT[2*16];
 __attribute__ ((aligned (16))) unsigned char VPERM_OPT[2*16];
 __attribute__ ((aligned (16))) unsigned char VPERM_INV[2*16];
@@ -33,7 +32,13 @@ __attribute__ ((aligned (16))) unsigned char VPERM_SB1[2*16];
 __attribute__ ((aligned (16))) unsigned char VPERM_SB2[2*16];
 __attribute__ ((aligned (16))) unsigned char VPERM_SB4[2*16];
 __attribute__ ((aligned (16))) unsigned char VPERM_SBO[2*16];
-__attribute__ ((aligned (16))) unsigned char ALL_15[16];
+
+/* temporary variables  */
+__attribute__ ((aligned (16))) unsigned char TEMP_MUL1[8*16];
+__attribute__ ((aligned (16))) unsigned char TEMP_MUL2[8*16];
+__attribute__ ((aligned (16))) unsigned char TEMP_MUL4[1*16];
+__attribute__ ((aligned (16))) unsigned char QTEMP[8*16];
+__attribute__ ((aligned (16))) unsigned char TEMP[8*16];
 
 
 #define tos(a)    #a
@@ -249,59 +254,61 @@ __attribute__ ((aligned (16))) unsigned char ALL_15[16];
  * t*, c* = clobbers
  * outputs:
  * a0-a7 = state * 4
- * t2 = row4 * 1 -> b7
+ * c2 = row0 * 2 -> b0
+ * c1 = row7 * 2 -> b3
  * c0 = row7 * 1 -> b4
- * c1 = row7 * 2 -> b0
- * TMP_MUL1/2[i] in memory
+ * t2 = row4 * 1 -> b7
+ * TEMP_MUL1 = row(i) * 1
+ * TEMP_MUL2 = row(i) * 2
  *
- *      VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, b0, b3, b4, b7) */
+ * call:VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7) */
 #define VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t3, t4, c2, c1, c0, t2){\
   /* set Constants */\
   VPERM_Substitute_Core_Set_Const(c0, c1, c2);\
   /* row 1 */\
   VPERM_Substitute_Core(a1, t0, t1, t3, t4, c0, xmm##c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  asm ("movaps [TMP_MUL1+1*16], xmm"tostr(t2)"");\
+  asm ("movaps [TEMP_MUL1+1*16], xmm"tostr(t2)"");\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  asm ("movaps [TMP_MUL2+1*16], xmm"tostr(t3)"");\
+  asm ("movaps [TEMP_MUL2+1*16], xmm"tostr(t3)"");\
   VPERM_Lookup(t0, t1, VPERM_SB4, a1, t4);\
   /* --- */\
   /* row 2 */\
   VPERM_Substitute_Core(a2, t0, t1, t3, t4, c0, xmm##c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  asm ("movaps [TMP_MUL1+2*16], xmm"tostr(t2)"");\
+  asm ("movaps [TEMP_MUL1+2*16], xmm"tostr(t2)"");\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  asm ("movaps [TMP_MUL2+2*16], xmm"tostr(t3)"");\
+  asm ("movaps [TEMP_MUL2+2*16], xmm"tostr(t3)"");\
   VPERM_Lookup(t0, t1, VPERM_SB4, a2, t4);\
   /* --- */\
   /* row 3 */\
   VPERM_Substitute_Core(a3, t0, t1, t3, t4, c0, xmm##c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  asm ("movaps [TMP_MUL1+3*16], xmm"tostr(t2)"");\
+  asm ("movaps [TEMP_MUL1+3*16], xmm"tostr(t2)"");\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  asm ("movaps [TMP_MUL2+3*16], xmm"tostr(t3)"");\
+  asm ("movaps [TEMP_MUL2+3*16], xmm"tostr(t3)"");\
   VPERM_Lookup(t0, t1, VPERM_SB4, a3, t4);\
   /* --- */\
   /* row 5 */\
   VPERM_Substitute_Core(a5, t0, t1, t3, t4, c0, xmm##c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  asm ("movaps [TMP_MUL1+5*16], xmm"tostr(t2)"");\
+  asm ("movaps [TEMP_MUL1+5*16], xmm"tostr(t2)"");\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  asm ("movaps [TMP_MUL2+5*16], xmm"tostr(t3)"");\
+  asm ("movaps [TEMP_MUL2+5*16], xmm"tostr(t3)"");\
   VPERM_Lookup(t0, t1, VPERM_SB4, a5, t4);\
   /* --- */\
   /* row 6 */\
   VPERM_Substitute_Core(a6, t0, t1, t3, t4, c0, xmm##c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  asm ("movaps [TMP_MUL1+6*16], xmm"tostr(t2)"");\
+  asm ("movaps [TEMP_MUL1+6*16], xmm"tostr(t2)"");\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  asm ("movaps [TMP_MUL2+6*16], xmm"tostr(t3)"");\
+  asm ("movaps [TEMP_MUL2+6*16], xmm"tostr(t3)"");\
   VPERM_Lookup(t0, t1, VPERM_SB4, a6, t4);\
   /* --- */\
   /* row 7 */\
   VPERM_Substitute_Core(a7, t0, t1, t3, t4, c0, xmm##c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  asm ("movaps [TMP_MUL1+7*16], xmm"tostr(t2)"");\
+  asm ("movaps [TEMP_MUL1+7*16], xmm"tostr(t2)"");\
   VPERM_Lookup(t0, t1, VPERM_SB2, c1, t4); /*c1 -> b3*/\
   VPERM_Lookup(t0, t1, VPERM_SB4, a7, t4);\
   /* --- */\
@@ -309,14 +316,14 @@ __attribute__ ((aligned (16))) unsigned char ALL_15[16];
   VPERM_Substitute_Core(a4, t0, t1, t3, t4, c0, [VPERM_INV+0*16], c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4); /*t2 -> b7*/\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  asm ("movaps [TMP_MUL2+4*16], xmm"tostr(t3)"");\
+  asm ("movaps [TEMP_MUL2+4*16], xmm"tostr(t3)"");\
   VPERM_Lookup(t0, t1, VPERM_SB4, a4, t4);\
   /* --- */\
   /* row 0 */\
   VPERM_Substitute_Core(a0, t0, t1, t3, t4, c0, [VPERM_INV+0*16], c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, c0, t4); /*c0 -> b4*/\
   VPERM_Lookup(t0, t1, VPERM_SB2, c2, t4); /*c2 -> b0*/\
-  asm ("movaps [TMP_MUL2+0*16], xmm"tostr(c2)"");\
+  asm ("movaps [TEMP_MUL2+0*16], xmm"tostr(c2)"");\
   VPERM_Lookup(t0, t1, VPERM_SB4, a0, t4);\
   /* --- */\
 }/**/
@@ -325,107 +332,111 @@ __attribute__ ((aligned (16))) unsigned char ALL_15[16];
 /* Optimized MixBytes
  * inputs:
  * a0-a7 = (row0-row7) * 4
- * all * 1 / 2 values must be in TMP_MUL1/2
+ * b0 = row0 * 2
+ * b3 = row7 * 2
+ * b4 = row7 * 1
+ * b7 = row4 * 1
+ * all *1 and *2 values must also be in TEMP_MUL1, TEMP_MUL2
  * output: b0-b7
  * */
 #define MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
-    /* save one value */\
-    asm ("movaps [TMP_MUL4], xmm"tostr(a3)"");\
-    /* 1 */\
-    asm ("movdqa xmm"tostr(b1)", xmm"tostr(a0)"");\
-    asm ("pxor   xmm"tostr(b1)", xmm"tostr(a5)"");\
-    asm ("pxor   xmm"tostr(b1)", xmm"tostr(b4)""); /* -> helper! */\
-    asm ("pxor   xmm"tostr(b1)", [TMP_MUL2+3*16]");\
-    asm ("movdqa xmm"tostr(b2)", xmm"tostr(b1)"");\
-    \
-    /* 2 */\
-    asm ("movdqa xmm"tostr(b5)", xmm"tostr(a1)"");\
-    asm ("pxor   xmm"tostr(b5)", xmm"tostr(a4)"");\
-    asm ("pxor   xmm"tostr(b5)", xmm"tostr(b7)""); /* -> helper! */\
-    asm ("pxor   xmm"tostr(b5)", xmm"tostr(b3)""); /* -> helper! */\
-    asm ("movdqa xmm"tostr(b6)", xmm"tostr(b5)"");\
-    \
-    /* 4 */\
-    asm ("pxor   xmm"tostr(b7)", xmm"tostr(a6)"");\
-    /*asm ("pxor   xmm"tostr(b7)", [TMP_MUL1+4*16]"); -> helper! */\
-    asm ("pxor   xmm"tostr(b7)", [TMP_MUL1+6*16]");\
-    asm ("pxor   xmm"tostr(b7)", [TMP_MUL2+1*16]");\
-    asm ("pxor   xmm"tostr(b7)", xmm"tostr(b3)""); /* -> helper! */\
-    asm ("pxor   xmm"tostr(b2)", xmm"tostr(b7)"");\
-    \
-    /* 3 */\
-    asm ("pxor   xmm"tostr(b0)", xmm"tostr(a7)"");\
-    asm ("pxor   xmm"tostr(b0)", [TMP_MUL1+5*16]");\
-    asm ("pxor   xmm"tostr(b0)", [TMP_MUL1+7*16]");\
-    /*asm ("pxor   xmm"tostr(b0)", [TMP_MUL2+0*16]"); -> helper! */\
-    asm ("pxor   xmm"tostr(b0)", [TMP_MUL2+2*16]");\
-    asm ("movdqa xmm"tostr(b3)", xmm"tostr(b0)"");\
-    asm ("pxor   xmm"tostr(b1)", xmm"tostr(b0)"");\
-    asm ("pxor   xmm"tostr(b0)", xmm"tostr(b7)""); /* moved from 4 */\
-    \
-    /* 5 */\
-    asm ("pxor   xmm"tostr(b4)", xmm"tostr(a2)"");\
-    /*asm ("pxor   xmm"tostr(b4)", [TMP_MUL1+0*16]"); -> helper! */\
-    asm ("pxor   xmm"tostr(b4)", [TMP_MUL1+2*16]");\
-    asm ("pxor   xmm"tostr(b4)", [TMP_MUL2+3*16]");\
-    asm ("pxor   xmm"tostr(b4)", [TMP_MUL2+5*16]");\
-    asm ("pxor   xmm"tostr(b3)", xmm"tostr(b4)"");\
-    asm ("pxor   xmm"tostr(b6)", xmm"tostr(b4)"");\
-    \
-    /* 6 */\
-    asm ("pxor xmm"tostr(a3)", [TMP_MUL1+1*16]");\
-    asm ("pxor xmm"tostr(a3)", [TMP_MUL1+3*16]");\
-    asm ("pxor xmm"tostr(a3)", [TMP_MUL2+4*16]");\
-    asm ("pxor xmm"tostr(a3)", [TMP_MUL2+6*16]");\
-    asm ("pxor xmm"tostr(b4)", xmm"tostr(a3)"");\
-    asm ("pxor xmm"tostr(b5)", xmm"tostr(a3)"");\
-    asm ("pxor xmm"tostr(b7)", xmm"tostr(a3)"");\
-    \
-    /* 7 */\
-    asm ("pxor xmm"tostr(a1)", [TMP_MUL1+1*16]");\
-    asm ("pxor xmm"tostr(a1)", [TMP_MUL2+4*16]");\
-    asm ("pxor xmm"tostr(b2)", xmm"tostr(a1)"");\
-    asm ("pxor xmm"tostr(b3)", xmm"tostr(a1)"");\
-    \
-    /* 8 */\
-    asm ("pxor xmm"tostr(a5)", [TMP_MUL1+5*16]");\
-    asm ("pxor xmm"tostr(a5)", [TMP_MUL2+0*16]");\
-    asm ("pxor xmm"tostr(b6)", xmm"tostr(a5)"");\
-    asm ("pxor xmm"tostr(b7)", xmm"tostr(a5)"");\
-    \
-    /* 9 */\
-    asm ("movaps xmm"tostr(a3)", [TMP_MUL1+2*16]");\
-    asm ("pxor   xmm"tostr(a3)", [TMP_MUL2+5*16]");\
-    asm ("pxor   xmm"tostr(b0)", xmm"tostr(a3)"");\
-    asm ("pxor   xmm"tostr(b5)", xmm"tostr(a3)"");\
-    \
-    /* 10 */\
-    asm ("movaps xmm"tostr(a1)", [TMP_MUL1+6*16]");\
-    asm ("pxor   xmm"tostr(a1)", [TMP_MUL2+1*16]");\
-    asm ("pxor   xmm"tostr(b1)", xmm"tostr(a1)"");\
-    asm ("pxor   xmm"tostr(b4)", xmm"tostr(a1)"");\
-    \
-    /* 11 */\
-    asm ("movaps xmm"tostr(a5)", [TMP_MUL1+3*16]");\
-    asm ("pxor   xmm"tostr(a5)", [TMP_MUL2+6*16]");\
-    asm ("pxor   xmm"tostr(b1)", xmm"tostr(a5)"");\
-    asm ("pxor   xmm"tostr(b6)", xmm"tostr(a5)"");\
-    \
-    /* 12 */\
-    asm ("movaps xmm"tostr(a3)", [TMP_MUL1+7*16]");\
-    asm ("pxor   xmm"tostr(a3)", [TMP_MUL2+2*16]");\
-    asm ("pxor   xmm"tostr(b2)", xmm"tostr(a3)"");\
-    asm ("pxor   xmm"tostr(b5)", xmm"tostr(a3)"");\
-    \
-    /* 13 */\
-    asm ("pxor xmm"tostr(b0)", [TMP_MUL4]");\
-    asm ("pxor xmm"tostr(b0)", xmm"tostr(a4)"");\
-    asm ("pxor xmm"tostr(b1)", xmm"tostr(a4)"");\
-    asm ("pxor xmm"tostr(b3)", xmm"tostr(a6)"");\
-    asm ("pxor xmm"tostr(b4)", xmm"tostr(a0)"");\
-    asm ("pxor xmm"tostr(b4)", xmm"tostr(a7)"");\
-    asm ("pxor xmm"tostr(b5)", xmm"tostr(a0)"");\
-    asm ("pxor xmm"tostr(b7)", xmm"tostr(a2)"");\
+  /* save one value */\
+  asm ("movaps [TEMP_MUL4], xmm"tostr(a3)"");\
+  /* 1 */\
+  asm ("movdqa xmm"tostr(b1)", xmm"tostr(a0)"");\
+  asm ("pxor   xmm"tostr(b1)", xmm"tostr(a5)"");\
+  asm ("pxor   xmm"tostr(b1)", xmm"tostr(b4)""); /* -> helper! */\
+  asm ("pxor   xmm"tostr(b1)", [TEMP_MUL2+3*16]");\
+  asm ("movdqa xmm"tostr(b2)", xmm"tostr(b1)"");\
+  \
+  /* 2 */\
+  asm ("movdqa xmm"tostr(b5)", xmm"tostr(a1)"");\
+  asm ("pxor   xmm"tostr(b5)", xmm"tostr(a4)"");\
+  asm ("pxor   xmm"tostr(b5)", xmm"tostr(b7)""); /* -> helper! */\
+  asm ("pxor   xmm"tostr(b5)", xmm"tostr(b3)""); /* -> helper! */\
+  asm ("movdqa xmm"tostr(b6)", xmm"tostr(b5)"");\
+  \
+  /* 4 */\
+  asm ("pxor   xmm"tostr(b7)", xmm"tostr(a6)"");\
+  /*asm ("pxor   xmm"tostr(b7)", [TEMP_MUL1+4*16]"); -> helper! */\
+  asm ("pxor   xmm"tostr(b7)", [TEMP_MUL1+6*16]");\
+  asm ("pxor   xmm"tostr(b7)", [TEMP_MUL2+1*16]");\
+  asm ("pxor   xmm"tostr(b7)", xmm"tostr(b3)""); /* -> helper! */\
+  asm ("pxor   xmm"tostr(b2)", xmm"tostr(b7)"");\
+  \
+  /* 3 */\
+  asm ("pxor   xmm"tostr(b0)", xmm"tostr(a7)"");\
+  asm ("pxor   xmm"tostr(b0)", [TEMP_MUL1+5*16]");\
+  asm ("pxor   xmm"tostr(b0)", [TEMP_MUL1+7*16]");\
+  /*asm ("pxor   xmm"tostr(b0)", [TEMP_MUL2+0*16]"); -> helper! */\
+  asm ("pxor   xmm"tostr(b0)", [TEMP_MUL2+2*16]");\
+  asm ("movdqa xmm"tostr(b3)", xmm"tostr(b0)"");\
+  asm ("pxor   xmm"tostr(b1)", xmm"tostr(b0)"");\
+  asm ("pxor   xmm"tostr(b0)", xmm"tostr(b7)""); /* moved from 4 */\
+  \
+  /* 5 */\
+  asm ("pxor   xmm"tostr(b4)", xmm"tostr(a2)"");\
+  /*asm ("pxor   xmm"tostr(b4)", [TEMP_MUL1+0*16]"); -> helper! */\
+  asm ("pxor   xmm"tostr(b4)", [TEMP_MUL1+2*16]");\
+  asm ("pxor   xmm"tostr(b4)", [TEMP_MUL2+3*16]");\
+  asm ("pxor   xmm"tostr(b4)", [TEMP_MUL2+5*16]");\
+  asm ("pxor   xmm"tostr(b3)", xmm"tostr(b4)"");\
+  asm ("pxor   xmm"tostr(b6)", xmm"tostr(b4)"");\
+  \
+  /* 6 */\
+  asm ("pxor xmm"tostr(a3)", [TEMP_MUL1+1*16]");\
+  asm ("pxor xmm"tostr(a3)", [TEMP_MUL1+3*16]");\
+  asm ("pxor xmm"tostr(a3)", [TEMP_MUL2+4*16]");\
+  asm ("pxor xmm"tostr(a3)", [TEMP_MUL2+6*16]");\
+  asm ("pxor xmm"tostr(b4)", xmm"tostr(a3)"");\
+  asm ("pxor xmm"tostr(b5)", xmm"tostr(a3)"");\
+  asm ("pxor xmm"tostr(b7)", xmm"tostr(a3)"");\
+  \
+  /* 7 */\
+  asm ("pxor xmm"tostr(a1)", [TEMP_MUL1+1*16]");\
+  asm ("pxor xmm"tostr(a1)", [TEMP_MUL2+4*16]");\
+  asm ("pxor xmm"tostr(b2)", xmm"tostr(a1)"");\
+  asm ("pxor xmm"tostr(b3)", xmm"tostr(a1)"");\
+  \
+  /* 8 */\
+  asm ("pxor xmm"tostr(a5)", [TEMP_MUL1+5*16]");\
+  asm ("pxor xmm"tostr(a5)", [TEMP_MUL2+0*16]");\
+  asm ("pxor xmm"tostr(b6)", xmm"tostr(a5)"");\
+  asm ("pxor xmm"tostr(b7)", xmm"tostr(a5)"");\
+  \
+  /* 9 */\
+  asm ("movaps xmm"tostr(a3)", [TEMP_MUL1+2*16]");\
+  asm ("pxor   xmm"tostr(a3)", [TEMP_MUL2+5*16]");\
+  asm ("pxor   xmm"tostr(b0)", xmm"tostr(a3)"");\
+  asm ("pxor   xmm"tostr(b5)", xmm"tostr(a3)"");\
+  \
+  /* 10 */\
+  asm ("movaps xmm"tostr(a1)", [TEMP_MUL1+6*16]");\
+  asm ("pxor   xmm"tostr(a1)", [TEMP_MUL2+1*16]");\
+  asm ("pxor   xmm"tostr(b1)", xmm"tostr(a1)"");\
+  asm ("pxor   xmm"tostr(b4)", xmm"tostr(a1)"");\
+  \
+  /* 11 */\
+  asm ("movaps xmm"tostr(a5)", [TEMP_MUL1+3*16]");\
+  asm ("pxor   xmm"tostr(a5)", [TEMP_MUL2+6*16]");\
+  asm ("pxor   xmm"tostr(b1)", xmm"tostr(a5)"");\
+  asm ("pxor   xmm"tostr(b6)", xmm"tostr(a5)"");\
+  \
+  /* 12 */\
+  asm ("movaps xmm"tostr(a3)", [TEMP_MUL1+7*16]");\
+  asm ("pxor   xmm"tostr(a3)", [TEMP_MUL2+2*16]");\
+  asm ("pxor   xmm"tostr(b2)", xmm"tostr(a3)"");\
+  asm ("pxor   xmm"tostr(b5)", xmm"tostr(a3)"");\
+  \
+  /* 13 */\
+  asm ("pxor xmm"tostr(b0)", [TEMP_MUL4]");\
+  asm ("pxor xmm"tostr(b0)", xmm"tostr(a4)"");\
+  asm ("pxor xmm"tostr(b1)", xmm"tostr(a4)"");\
+  asm ("pxor xmm"tostr(b3)", xmm"tostr(a6)"");\
+  asm ("pxor xmm"tostr(b4)", xmm"tostr(a0)"");\
+  asm ("pxor xmm"tostr(b4)", xmm"tostr(a7)"");\
+  asm ("pxor xmm"tostr(b5)", xmm"tostr(a0)"");\
+  asm ("pxor xmm"tostr(b7)", xmm"tostr(a2)"");\
 }/**/
 
 #if (LENGTH <= 256)
@@ -450,10 +461,9 @@ __attribute__ ((aligned (16))) unsigned char ALL_15[16];
   ((u64*)SUBSH_MASK)[15] = 0x0d0c0b0a09080f0eULL;\
   for(i = 0; i < ROUNDS512; i++)\
   {\
-    ((u64*)ROUND_CONST_MUL)[0] = (u64) i * 0x0101010101010101ULL;\
     ((u64*)ROUND_CONST_L0)[i*2+1] = 0xffffffffffffffffULL;\
-    ((u64*)ROUND_CONST_L0)[i*2+0] = ((u64*)ROUND_CONST_MUL)[0]  ^ 0x7060504030201000ULL;\
-    ((u64*)ROUND_CONST_L7)[i*2+1] = ((u64*)ROUND_CONST_MUL)[0]  ^ 0x8f9fafbfcfdfefffULL;\
+    ((u64*)ROUND_CONST_L0)[i*2+0] = (i * 0x0101010101010101ULL)  ^ 0x7060504030201000ULL;\
+    ((u64*)ROUND_CONST_L7)[i*2+1] = (i * 0x0101010101010101ULL)  ^ 0x8f9fafbfcfdfefffULL;\
     ((u64*)ROUND_CONST_L7)[i*2+0] = 0x0000000000000000ULL;\
   }\
   ((u64*)ROUND_CONST_Lx)[1] = 0xffffffffffffffffULL;\
@@ -488,33 +498,32 @@ __attribute__ ((aligned (16))) unsigned char ALL_15[16];
  * b0-b7 = output rows
  */
 #define ROUND(i, a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
-    /* Add Round Constant */\
-    asm ("movaps xmm"tostr(b1)", [ROUND_CONST_Lx]");\
-    asm ("pxor   xmm"tostr(a0)", [ROUND_CONST_L0+"tostr(i)"*16]");\
-    asm ("pxor   xmm"tostr(a1)", xmm"tostr(b1)"");\
-    asm ("pxor   xmm"tostr(a2)", xmm"tostr(b1)"");\
-    asm ("pxor   xmm"tostr(a3)", xmm"tostr(b1)"");\
-    asm ("pshufb xmm"tostr(a0)", [SUBSH_MASK+0*16]");\
-    asm ("pshufb xmm"tostr(a1)", [SUBSH_MASK+1*16]");\
-    asm ("pxor   xmm"tostr(a4)", xmm"tostr(b1)"");\
-    asm ("pshufb xmm"tostr(a2)", [SUBSH_MASK+2*16]");\
-    asm ("pshufb xmm"tostr(a3)", [SUBSH_MASK+3*16]");\
-    asm ("pxor   xmm"tostr(a5)", xmm"tostr(b1)"");\
-    asm ("pxor   xmm"tostr(a6)", xmm"tostr(b1)"");\
-    asm ("pshufb xmm"tostr(a4)", [SUBSH_MASK+4*16]");\
-    asm ("pshufb xmm"tostr(a5)", [SUBSH_MASK+5*16]");\
-    asm ("pxor   xmm"tostr(a7)", [ROUND_CONST_L7+"tostr(i)"*16]");\
-    asm ("pshufb xmm"tostr(a6)", [SUBSH_MASK+6*16]");\
-    asm ("pshufb xmm"tostr(a7)", [SUBSH_MASK+7*16]");\
-\
-    /* SubBytes + Multiplication */\
-    VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7);\
-    /* MixBytes */\
-    MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
+  /* AddRoundConstant + ShiftBytes (interleaved) */\
+  asm ("movaps xmm"tostr(b1)", [ROUND_CONST_Lx]");\
+  asm ("pxor   xmm"tostr(a0)", [ROUND_CONST_L0+"tostr(i)"*16]");\
+  asm ("pxor   xmm"tostr(a1)", xmm"tostr(b1)"");\
+  asm ("pxor   xmm"tostr(a2)", xmm"tostr(b1)"");\
+  asm ("pxor   xmm"tostr(a3)", xmm"tostr(b1)"");\
+  asm ("pshufb xmm"tostr(a0)", [SUBSH_MASK+0*16]");\
+  asm ("pshufb xmm"tostr(a1)", [SUBSH_MASK+1*16]");\
+  asm ("pxor   xmm"tostr(a4)", xmm"tostr(b1)"");\
+  asm ("pshufb xmm"tostr(a2)", [SUBSH_MASK+2*16]");\
+  asm ("pshufb xmm"tostr(a3)", [SUBSH_MASK+3*16]");\
+  asm ("pxor   xmm"tostr(a5)", xmm"tostr(b1)"");\
+  asm ("pxor   xmm"tostr(a6)", xmm"tostr(b1)"");\
+  asm ("pshufb xmm"tostr(a4)", [SUBSH_MASK+4*16]");\
+  asm ("pshufb xmm"tostr(a5)", [SUBSH_MASK+5*16]");\
+  asm ("pxor   xmm"tostr(a7)", [ROUND_CONST_L7+"tostr(i)"*16]");\
+  asm ("pshufb xmm"tostr(a6)", [SUBSH_MASK+6*16]");\
+  asm ("pshufb xmm"tostr(a7)", [SUBSH_MASK+7*16]");\
+  /* SubBytes + Multiplication by 2 and 4 */\
+  VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7);\
+  /* MixBytes */\
+  MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
 }/**/
 
-/* 10 rounds */
-#define TRANSFORM(){\
+/* 10 rounds, P and Q in parallel */
+#define ROUNDS_P_Q(){\
   VPERM_Add_Constant(8, 9, 10, 11, 12, 13, 14, 15, ALL_15, 0);\
   ROUND(0, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);\
   ROUND(1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);\
@@ -684,95 +693,106 @@ __attribute__ ((aligned (16))) unsigned char ALL_15[16];
   VPERM_Transform_RoundConst_CNT2(8, 9);\
 }/**/
 
-void INIT_CV()
+void INIT(u64* h)
 {
+  /* __cdecl calling convention: */
+  /* chaining value CV in rdi    */
+
   asm (".intel_syntax noprefix");
   asm volatile ("emms");
 
+  /* transform round constants into VPERM mode */
   VPERM_Transform_RoundConst();
 
-  /* load CV (IV) into registers xmm12 - xmm15 */
-  asm ("movaps xmm12, [GLOBAL_CV_PTR+0*16]");
-  asm ("movaps xmm13, [GLOBAL_CV_PTR+1*16]");
-  asm ("movaps xmm14, [GLOBAL_CV_PTR+2*16]");
-  asm ("movaps xmm15, [GLOBAL_CV_PTR+3*16]");
-
-  VPERM_Transform_State(12, 13, 14, 15, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
-
-  /* transpose matrix to get one line of P AND Q in each xmm */
-  Matrix_Transpose_A(12, 13, 14, 15, 2, 6, 7, 0);
-
-  /* store transposed CV */
-  asm ("movaps [GLOBAL_CV_PTR+0*16], xmm12");
-  asm ("movaps [GLOBAL_CV_PTR+1*16], xmm2");
-  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm6");
-  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm7");
-
-  asm volatile ("emms");
-  asm (".att_syntax noprefix");
-}
-
-void TF512(u64* message)
-{
-  /*  Note : message is in rdi thanks to the  */
-  /*  __cdecl calling convention    */
-#ifdef IACA_TRACE
-  IACA_START;
-#endif
-  asm (".intel_syntax noprefix");
-  Push_All_Regs();
-
-  /* load message into registers xmm12 - xmm15 (Q = message) */
-  asm ("movaps xmm0,  [TRANSP_MASK]");
+  /* load IV into registers xmm12 - xmm15 */
   asm ("movaps xmm12, [rdi+0*16]");
   asm ("movaps xmm13, [rdi+1*16]");
   asm ("movaps xmm14, [rdi+2*16]");
   asm ("movaps xmm15, [rdi+3*16]");
 
+  /* transform chaining value from column ordering into row ordering */
+  /* we put two rows (64 bit) of the IV into one 128-bit XMM register */
   VPERM_Transform_State(12, 13, 14, 15, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
-
-  /* transpose message to get two rows in each xmm */
   Matrix_Transpose_A(12, 13, 14, 15, 2, 6, 7, 0);
 
-  /* load CV */
-  asm ("movaps xmm8, [GLOBAL_CV_PTR+0*16]"); //0
-  asm ("movaps xmm0, [GLOBAL_CV_PTR+1*16]"); //1
-  asm ("movaps xmm4, [GLOBAL_CV_PTR+2*16]"); //2
-  asm ("movaps xmm5, [GLOBAL_CV_PTR+3*16]"); //3
+  /* store transposed IV */
+  asm ("movaps [rdi+0*16], xmm12");
+  asm ("movaps [rdi+1*16], xmm2");
+  asm ("movaps [rdi+2*16], xmm6");
+  asm ("movaps [rdi+3*16], xmm7");
 
-  /* xor Q to P to get P = h ^ m */
+  asm volatile ("emms");
+  asm (".att_syntax noprefix");
+}
+
+void TF512(u64* h, u64* m)
+{
+  /* __cdecl calling convention: */
+  /* chaining value CV in rdi    */
+  /* message M in rsi            */
+
+#ifdef IACA_TRACE
+  IACA_START;
+#endif
+
+  asm (".intel_syntax noprefix");
+  Push_All_Regs();
+
+  /* load message into registers xmm12 - xmm15 (Q = message) */
+  asm ("movaps xmm12, [rsi+0*16]");
+  asm ("movaps xmm13, [rsi+1*16]");
+  asm ("movaps xmm14, [rsi+2*16]");
+  asm ("movaps xmm15, [rsi+3*16]");
+
+  /* transform message M from column ordering into row ordering */
+  /* we first put two rows (64 bit) of the message into one 128-bit xmm register */
+  VPERM_Transform_State(12, 13, 14, 15, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
+  Matrix_Transpose_A(12, 13, 14, 15, 2, 6, 7, 0);
+
+  /* load previous chaining value */
+  /* we first put two rows (64 bit) of the CV into one 128-bit xmm register */
+  asm ("movaps xmm8, [rdi+0*16]");
+  asm ("movaps xmm0, [rdi+1*16]");
+  asm ("movaps xmm4, [rdi+2*16]");
+  asm ("movaps xmm5, [rdi+3*16]");
+
+  /* xor message to CV get input of P */
+  /* result: CV+M in xmm8, xmm0, xmm4, xmm5 */
   asm ("pxor xmm8, xmm12");
   asm ("pxor xmm0, xmm2");
   asm ("pxor xmm4, xmm6");
   asm ("pxor xmm5, xmm7");
 
-  /* there are now 2 rows in each xmm
-   * unpack to get 1 row of P and Q in each xmm */
+  /* there are now 2 rows of the Groestl state (P and Q) in each xmm register */
+  /* unpack to get 1 row of P (64 bit) and Q (64 bit) into one xmm register */
+  /* result: the 8 rows of P and Q in xmm8 - xmm12 */
   Matrix_Transpose_B(8, 0, 4, 5, 12, 2, 6, 7, 9, 10, 11, 12, 13, 14, 15);
 
-  /* the real work: */
-  TRANSFORM();
+  /* compute the two permutations P and Q in parallel */
+  ROUNDS_P_Q();
 
-  /* transpose matrix to get back input format */
+  /* unpack again to get two rows of P or two rows of Q in one xmm register */
   Matrix_Transpose_B_INV(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3);
 
-  /* xor P and Q */
+  /* xor output of P and Q */
+  /* result: P(CV+M)+Q(M) in xmm0...xmm3 */
   asm ("pxor xmm0, xmm8");
   asm ("pxor xmm1, xmm10");
   asm ("pxor xmm2, xmm12");
   asm ("pxor xmm3, xmm14");
 
-  /* xor CV */
-  asm ("pxor xmm0, [GLOBAL_CV_PTR+0*16]");
-  asm ("pxor xmm1, [GLOBAL_CV_PTR+1*16]");
-  asm ("pxor xmm2, [GLOBAL_CV_PTR+2*16]");
-  asm ("pxor xmm3, [GLOBAL_CV_PTR+3*16]");
+  /* xor CV (feed-forward) */
+  /* result: P(CV+M)+Q(M)+CV in xmm0...xmm3 */
+  asm ("pxor xmm0, [rdi+0*16]");
+  asm ("pxor xmm1, [rdi+1*16]");
+  asm ("pxor xmm2, [rdi+2*16]");
+  asm ("pxor xmm3, [rdi+3*16]");
 
-  /* store finished CV */
-  asm ("movaps [GLOBAL_CV_PTR+0*16], xmm0");
-  asm ("movaps [GLOBAL_CV_PTR+1*16], xmm1");
-  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm2");
-  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm3");
+  /* store CV */
+  asm ("movaps [rdi+0*16], xmm0");
+  asm ("movaps [rdi+1*16], xmm1");
+  asm ("movaps [rdi+2*16], xmm2");
+  asm ("movaps [rdi+3*16], xmm3");
 
   Pop_All_Regs();
   asm (".att_syntax noprefix");
@@ -780,52 +800,58 @@ void TF512(u64* message)
 #ifdef IACA_TRACE
   IACA_END;
 #endif
+
   return;
 }
 
-void OF512() {
+void OF512(u64* h)
+{
+  /* __cdecl calling convention: */
+  /* chaining value CV in rdi    */
+
   asm (".intel_syntax noprefix");
   Push_All_Regs();
 
-  /* load CV into registers xmm8 - xmm11 (P = CV)*/
-  asm ("movaps xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("movaps xmm10, [GLOBAL_CV_PTR+1*16]");
-  asm ("movaps xmm12, [GLOBAL_CV_PTR+2*16]");
-  asm ("movaps xmm14, [GLOBAL_CV_PTR+3*16]");
+  /* load CV into registers xmm8, xmm10, xmm12, xmm14 */
+  asm ("movaps xmm8,  [rdi+0*16]");
+  asm ("movaps xmm10, [rdi+1*16]");
+  asm ("movaps xmm12, [rdi+2*16]");
+  asm ("movaps xmm14, [rdi+3*16]");
 
-  /* there are now 2 rows in each xmm
-   * unpack to get 1 row of P in each xmm */
+  /* there are now 2 rows of the CV in one xmm register */
+  /* unpack to get 1 row of P (64 bit) into one half of an xmm register */
+  /* result: the 8 input rows of P in xmm8 - xmm15 */
   Matrix_Transpose_O_B(8, 9, 10, 11, 12, 13, 14, 15, 0);
 
-  /* the real work: */
-  TRANSFORM();
+  /* compute the permutation P */
+  /* result: the output of P(CV) in xmm8 - xmm15 */
+  ROUNDS_P_Q();
 
-  /* transpose matrix to get back input format */
+  /* unpack again to get two rows of P in one xmm register */
+  /* result: P(CV) in xmm8, xmm10, xmm12, xmm14 */
   Matrix_Transpose_O_B_INV(8, 9, 10, 11, 12, 13, 14, 15);
 
-  /* xor CV */
-  asm ("pxor xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("pxor xmm10, [GLOBAL_CV_PTR+1*16]");
-  asm ("pxor xmm12, [GLOBAL_CV_PTR+2*16]");
-  asm ("pxor xmm14, [GLOBAL_CV_PTR+3*16]");
+  /* xor CV to P output (feed-forward) */
+  /* result: P(CV)+CV in xmm8, xmm10, xmm12, xmm14 */
+  asm ("pxor xmm8,  [rdi+0*16]");
+  asm ("pxor xmm10, [rdi+1*16]");
+  asm ("pxor xmm12, [rdi+2*16]");
+  asm ("pxor xmm14, [rdi+3*16]");
 
-  /* transpose output back to two columns per xmm */
+  /* transform state back from row ordering into column ordering */
+  /* result: final hash value in xmm9, xmm11 */
   Matrix_Transpose_A(8, 10, 12, 14, 4, 9, 11, 0);
-
-  //VPERM_Transform_State(8, 4, 9, 11, VPERM_OPT, 0, 1, 2, 3, 5, 6, 7);
   VPERM_Transform(9, 11, VPERM_OPT, 0, 1, 2, 3, 5, 6, 7);
 
-  /* store finished hash */
-  //asm ("movaps [GLOBAL_CV_PTR+0*16], xmm8");
-  //asm ("movaps [GLOBAL_CV_PTR+1*16], xmm4");
-  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm9");
-  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm11");
+  /* we only need to return the truncated half of the state */
+  asm ("movaps [rdi+2*16], xmm9");
+  asm ("movaps [rdi+3*16], xmm11");
 
   Pop_All_Regs();
   asm (".att_syntax noprefix");
 
   return;
-}//OF512()
+}
 
 #endif
 
@@ -853,11 +879,10 @@ void OF512() {
   ((u64*)SUBSH_MASK)[15] = 0x0a09080706050403ULL;\
   for(i = 0; i < ROUNDS1024; i++)\
   {\
-    ((u64*)ROUND_CONST_MUL)[0] = (u64) i * 0x0101010101010101ULL;\
-    ((u64*)ROUND_CONST_P)[2*i+1] = ((u64*)ROUND_CONST_MUL)[0]  ^ 0xf0e0d0c0b0a09080ULL;\
-    ((u64*)ROUND_CONST_P)[2*i+0] = ((u64*)ROUND_CONST_MUL)[0]  ^ 0x7060504030201000ULL;\
-    ((u64*)ROUND_CONST_Q)[2*i+1] = ((u64*)ROUND_CONST_MUL)[0]  ^ 0x0f1f2f3f4f5f6f7fULL;\
-    ((u64*)ROUND_CONST_Q)[2*i+0] = ((u64*)ROUND_CONST_MUL)[0]  ^ 0x8f9fafbfcfdfefffULL;\
+    ((u64*)ROUND_CONST_P)[2*i+1] = (i * 0x0101010101010101ULL)  ^ 0xf0e0d0c0b0a09080ULL;\
+    ((u64*)ROUND_CONST_P)[2*i+0] = (i * 0x0101010101010101ULL)  ^ 0x7060504030201000ULL;\
+    ((u64*)ROUND_CONST_Q)[2*i+1] = (i * 0x0101010101010101ULL)  ^ 0x0f1f2f3f4f5f6f7fULL;\
+    ((u64*)ROUND_CONST_Q)[2*i+0] = (i * 0x0101010101010101ULL)  ^ 0x8f9fafbfcfdfefffULL;\
   }\
 }/**/
 
@@ -877,103 +902,107 @@ void OF512() {
  * a0-a7 = input rows
  * b0-b7 = output rows
  */
-#define ROUND(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
-    /* SubBytes + Multiplication */\
-    VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7);\
-    /* MixBytes */\
-    MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
+#define SUBMIX(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
+  /* SubBytes + Multiplication */\
+  VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7);\
+  /* MixBytes */\
+  MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
 }/**/
 
 #define ROUNDS_P(){\
-    asm ("xor rax, rax");\
-    asm ("xor rbx, rbx");\
-    asm ("add bl, 2");\
-    asm ("1:");\
-    /* AddConstant */\
-    asm ("pxor xmm8, [ROUND_CONST_P+eax*8]");\
-    /* ShiftBytesWideP + pre-AESENCLAST */\
-    asm ("pshufb xmm8,  [SUBSH_MASK+0*16]");\
-    asm ("pshufb xmm9,  [SUBSH_MASK+1*16]");\
-    asm ("pshufb xmm10, [SUBSH_MASK+2*16]");\
-    asm ("pshufb xmm11, [SUBSH_MASK+3*16]");\
-    asm ("pshufb xmm12, [SUBSH_MASK+4*16]");\
-    asm ("pshufb xmm13, [SUBSH_MASK+5*16]");\
-    asm ("pshufb xmm14, [SUBSH_MASK+6*16]");\
-    asm ("pshufb xmm15, [SUBSH_MASK+7*16]");\
-    ROUND(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);\
-    VPERM_Add_Constant(0, 1, 2, 3, 4, 5, 6, 7, ALL_15, 8);\
-    /* AddConstant */\
-    asm ("pxor xmm0, [ROUND_CONST_P+ebx*8]");\
-    /* ShiftBytesWideP + pre-AESENCLAST */\
-    asm ("pshufb xmm0, [SUBSH_MASK+0*16]");\
-    asm ("pshufb xmm1, [SUBSH_MASK+1*16]");\
-    asm ("pshufb xmm2, [SUBSH_MASK+2*16]");\
-    asm ("pshufb xmm3, [SUBSH_MASK+3*16]");\
-    asm ("pshufb xmm4, [SUBSH_MASK+4*16]");\
-    asm ("pshufb xmm5, [SUBSH_MASK+5*16]");\
-    asm ("pshufb xmm6, [SUBSH_MASK+6*16]");\
-    asm ("pshufb xmm7, [SUBSH_MASK+7*16]");\
-    ROUND(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);\
-    VPERM_Add_Constant(8, 9, 10, 11, 12, 13, 14, 15, ALL_15, 0);\
-    asm ("add al, 4");\
-    asm ("add bl, 4");\
-    asm ("mov rcx, rax");\
-    asm ("sub cl, 28");\
-    asm ("jb 1b");\
+  asm ("xor rax, rax");\
+  asm ("xor rbx, rbx");\
+  asm ("add bl, 2");\
+  asm ("1:");\
+  /* AddRoundConstant P1024 */\
+  asm ("pxor xmm8, [ROUND_CONST_P+eax*8]");\
+  /* ShiftBytes P1024 + pre-AESENCLAST */\
+  asm ("pshufb xmm8,  [SUBSH_MASK+0*16]");\
+  asm ("pshufb xmm9,  [SUBSH_MASK+1*16]");\
+  asm ("pshufb xmm10, [SUBSH_MASK+2*16]");\
+  asm ("pshufb xmm11, [SUBSH_MASK+3*16]");\
+  asm ("pshufb xmm12, [SUBSH_MASK+4*16]");\
+  asm ("pshufb xmm13, [SUBSH_MASK+5*16]");\
+  asm ("pshufb xmm14, [SUBSH_MASK+6*16]");\
+  asm ("pshufb xmm15, [SUBSH_MASK+7*16]");\
+  /* SubBytes + MixBytes */\
+  SUBMIX(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);\
+  VPERM_Add_Constant(0, 1, 2, 3, 4, 5, 6, 7, ALL_15, 8);\
+  /* AddRoundConstant P1024 */\
+  asm ("pxor xmm0, [ROUND_CONST_P+ebx*8]");\
+  /* ShiftBytes P1024 + pre-AESENCLAST */\
+  asm ("pshufb xmm0, [SUBSH_MASK+0*16]");\
+  asm ("pshufb xmm1, [SUBSH_MASK+1*16]");\
+  asm ("pshufb xmm2, [SUBSH_MASK+2*16]");\
+  asm ("pshufb xmm3, [SUBSH_MASK+3*16]");\
+  asm ("pshufb xmm4, [SUBSH_MASK+4*16]");\
+  asm ("pshufb xmm5, [SUBSH_MASK+5*16]");\
+  asm ("pshufb xmm6, [SUBSH_MASK+6*16]");\
+  asm ("pshufb xmm7, [SUBSH_MASK+7*16]");\
+  /* SubBytes + MixBytes */\
+  SUBMIX(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);\
+  VPERM_Add_Constant(8, 9, 10, 11, 12, 13, 14, 15, ALL_15, 0);\
+  asm ("add al, 4");\
+  asm ("add bl, 4");\
+  asm ("mov rcx, rax");\
+  asm ("sub cl, 28");\
+  asm ("jb 1b");\
 }/**/
 
 #define ROUNDS_Q(){\
-    VPERM_Add_Constant(8, 9, 10, 11, 12, 13, 14, 15, ALL_15, 1);\
-    asm ("xor rax, rax");\
-    asm ("xor rbx, rbx");\
-    asm ("add bl, 2");\
-    asm ("2:");\
-    /* AddConstant */\
-    asm ("movaps xmm1,  [ALL_FF]");\
-    asm ("pxor xmm8,  xmm1");\
-    asm ("pxor xmm9,  xmm1");\
-    asm ("pxor xmm10, xmm1");\
-    asm ("pxor xmm11, xmm1");\
-    asm ("pxor xmm12, xmm1");\
-    asm ("pxor xmm13, xmm1");\
-    asm ("pxor xmm14, xmm1");\
-    asm ("pxor xmm15, [ROUND_CONST_Q+eax*8]");\
-    /* ShiftBytesWideQ + pre-AESENCLAST */\
-    asm ("pshufb xmm8,  [SUBSH_MASK+1*16]");\
-    asm ("pshufb xmm9,  [SUBSH_MASK+3*16]");\
-    asm ("pshufb xmm10, [SUBSH_MASK+5*16]");\
-    asm ("pshufb xmm11, [SUBSH_MASK+7*16]");\
-    asm ("pshufb xmm12, [SUBSH_MASK+0*16]");\
-    asm ("pshufb xmm13, [SUBSH_MASK+2*16]");\
-    asm ("pshufb xmm14, [SUBSH_MASK+4*16]");\
-    asm ("pshufb xmm15, [SUBSH_MASK+6*16]");\
-    ROUND(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);\
-    /* AddConstant */\
-    asm ("movaps xmm9,  [ALL_FF]");\
-    asm ("pxor xmm0,  xmm9");\
-    asm ("pxor xmm1,  xmm9");\
-    asm ("pxor xmm2,  xmm9");\
-    asm ("pxor xmm3,  xmm9");\
-    asm ("pxor xmm4,  xmm9");\
-    asm ("pxor xmm5,  xmm9");\
-    asm ("pxor xmm6,  xmm9");\
-    asm ("pxor xmm7,  [ROUND_CONST_Q+ebx*8]");\
-    /* ShiftBytesWideQ + pre-AESENCLAST */\
-    asm ("pshufb xmm0, [SUBSH_MASK+1*16]");\
-    asm ("pshufb xmm1, [SUBSH_MASK+3*16]");\
-    asm ("pshufb xmm2, [SUBSH_MASK+5*16]");\
-    asm ("pshufb xmm3, [SUBSH_MASK+7*16]");\
-    asm ("pshufb xmm4, [SUBSH_MASK+0*16]");\
-    asm ("pshufb xmm5, [SUBSH_MASK+2*16]");\
-    asm ("pshufb xmm6, [SUBSH_MASK+4*16]");\
-    asm ("pshufb xmm7, [SUBSH_MASK+6*16]");\
-    ROUND(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);\
-    asm ("add al, 4");\
-    asm ("add bl, 4");\
-    asm ("mov rcx, rax");\
-    asm ("sub cl, 28");\
-    asm ("jb 2b");\
-    VPERM_Add_Constant(8, 9, 10, 11, 12, 13, 14, 15, ALL_15, 1);\
+  VPERM_Add_Constant(8, 9, 10, 11, 12, 13, 14, 15, ALL_15, 1);\
+  asm ("xor rax, rax");\
+  asm ("xor rbx, rbx");\
+  asm ("add bl, 2");\
+  asm ("2:");\
+  /* AddRoundConstant Q1024 */\
+  asm ("movaps xmm1,  [ALL_FF]");\
+  asm ("pxor xmm8,  xmm1");\
+  asm ("pxor xmm9,  xmm1");\
+  asm ("pxor xmm10, xmm1");\
+  asm ("pxor xmm11, xmm1");\
+  asm ("pxor xmm12, xmm1");\
+  asm ("pxor xmm13, xmm1");\
+  asm ("pxor xmm14, xmm1");\
+  asm ("pxor xmm15, [ROUND_CONST_Q+eax*8]");\
+  /* ShiftBytes Q1024 + pre-AESENCLAST */\
+  asm ("pshufb xmm8,  [SUBSH_MASK+1*16]");\
+  asm ("pshufb xmm9,  [SUBSH_MASK+3*16]");\
+  asm ("pshufb xmm10, [SUBSH_MASK+5*16]");\
+  asm ("pshufb xmm11, [SUBSH_MASK+7*16]");\
+  asm ("pshufb xmm12, [SUBSH_MASK+0*16]");\
+  asm ("pshufb xmm13, [SUBSH_MASK+2*16]");\
+  asm ("pshufb xmm14, [SUBSH_MASK+4*16]");\
+  asm ("pshufb xmm15, [SUBSH_MASK+6*16]");\
+  /* SubBytes + MixBytes */\
+  SUBMIX(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);\
+  /* AddRoundConstant Q1024 */\
+  asm ("movaps xmm9,  [ALL_FF]");\
+  asm ("pxor xmm0,  xmm9");\
+  asm ("pxor xmm1,  xmm9");\
+  asm ("pxor xmm2,  xmm9");\
+  asm ("pxor xmm3,  xmm9");\
+  asm ("pxor xmm4,  xmm9");\
+  asm ("pxor xmm5,  xmm9");\
+  asm ("pxor xmm6,  xmm9");\
+  asm ("pxor xmm7,  [ROUND_CONST_Q+ebx*8]");\
+  /* ShiftBytes Q1024 + pre-AESENCLAST */\
+  asm ("pshufb xmm0, [SUBSH_MASK+1*16]");\
+  asm ("pshufb xmm1, [SUBSH_MASK+3*16]");\
+  asm ("pshufb xmm2, [SUBSH_MASK+5*16]");\
+  asm ("pshufb xmm3, [SUBSH_MASK+7*16]");\
+  asm ("pshufb xmm4, [SUBSH_MASK+0*16]");\
+  asm ("pshufb xmm5, [SUBSH_MASK+2*16]");\
+  asm ("pshufb xmm6, [SUBSH_MASK+4*16]");\
+  asm ("pshufb xmm7, [SUBSH_MASK+6*16]");\
+  /* SubBytes + MixBytes */\
+  SUBMIX(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);\
+  asm ("add al, 4");\
+  asm ("add bl, 4");\
+  asm ("mov rcx, rax");\
+  asm ("sub cl, 28");\
+  asm ("jb 2b");\
+  VPERM_Add_Constant(8, 9, 10, 11, 12, 13, 14, 15, ALL_15, 1);\
 }/**/
 
 
@@ -1155,52 +1184,18 @@ void OF512() {
 }/**/
 
 
-void INIT_CV()
+void INIT(u64* h)
 {
+  /* __cdecl calling convention: */
+  /* chaining value CV in rdi    */
+
   asm (".intel_syntax noprefix");
   asm volatile ("emms");
 
+  /* transform round constants into VPERM mode */
   VPERM_Transform_RoundConst();
 
-  /* load CV (IV) into registers xmm8 - xmm15 */
-  asm ("movaps xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("movaps xmm9,  [GLOBAL_CV_PTR+1*16]");
-  asm ("movaps xmm10, [GLOBAL_CV_PTR+2*16]");
-  asm ("movaps xmm11, [GLOBAL_CV_PTR+3*16]");
-  asm ("movaps xmm12, [GLOBAL_CV_PTR+4*16]");
-  asm ("movaps xmm13, [GLOBAL_CV_PTR+5*16]");
-  asm ("movaps xmm14, [GLOBAL_CV_PTR+6*16]");
-  asm ("movaps xmm15, [GLOBAL_CV_PTR+7*16]");
-
-  VPERM_Transform_State( 8,  9, 10, 11, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
-  VPERM_Transform_State(12, 13, 14, 15, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
-
-  Matrix_Transpose(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
-
-  asm ("movaps [GLOBAL_CV_PTR+0*16], xmm8");
-  asm ("movaps [GLOBAL_CV_PTR+1*16], xmm9");
-  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm10");
-  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm11");
-  asm ("movaps [GLOBAL_CV_PTR+4*16], xmm12");
-  asm ("movaps [GLOBAL_CV_PTR+5*16], xmm13");
-  asm ("movaps [GLOBAL_CV_PTR+6*16], xmm14");
-  asm ("movaps [GLOBAL_CV_PTR+7*16], xmm15");
-
-  asm volatile ("emms");
-  asm (".att_syntax noprefix");
-}
-
-void TF1024(u64* message)
-{
-  /*  Note : message is in rdi thanks to the  */
-  /*  __cdecl calling convention    */
-#ifdef IACA_TRACE
-  IACA_START;
-#endif
-  asm (".intel_syntax noprefix");
-  Push_All_Regs();
-
-  /* load message into registers xmm12 - xmm15 (Q = message) */
+  /* load IV into registers xmm8 - xmm15 */
   asm ("movaps xmm8,  [rdi+0*16]");
   asm ("movaps xmm9,  [rdi+1*16]");
   asm ("movaps xmm10, [rdi+2*16]");
@@ -1210,13 +1205,54 @@ void TF1024(u64* message)
   asm ("movaps xmm14, [rdi+6*16]");
   asm ("movaps xmm15, [rdi+7*16]");
 
+  /* transform chaining value from column ordering into row ordering */
   VPERM_Transform_State( 8,  9, 10, 11, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
   VPERM_Transform_State(12, 13, 14, 15, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
-
-  /* transpose message */
   Matrix_Transpose(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
 
-  /* store Q for later */
+  /* store transposed IV */
+  asm ("movaps [rdi+0*16], xmm8");
+  asm ("movaps [rdi+1*16], xmm9");
+  asm ("movaps [rdi+2*16], xmm10");
+  asm ("movaps [rdi+3*16], xmm11");
+  asm ("movaps [rdi+4*16], xmm12");
+  asm ("movaps [rdi+5*16], xmm13");
+  asm ("movaps [rdi+6*16], xmm14");
+  asm ("movaps [rdi+7*16], xmm15");
+
+  asm volatile ("emms");
+  asm (".att_syntax noprefix");
+}
+
+void TF1024(u64* h, u64* m)
+{
+  /* __cdecl calling convention: */
+  /* chaining value CV in rdi    */
+  /* message M in rsi            */
+
+#ifdef IACA_TRACE
+  IACA_START;
+#endif
+
+  asm (".intel_syntax noprefix");
+  Push_All_Regs();
+
+  /* load message into registers xmm8 - xmm15 (Q = message) */
+  asm ("movaps xmm8,  [rsi+0*16]");
+  asm ("movaps xmm9,  [rsi+1*16]");
+  asm ("movaps xmm10, [rsi+2*16]");
+  asm ("movaps xmm11, [rsi+3*16]");
+  asm ("movaps xmm12, [rsi+4*16]");
+  asm ("movaps xmm13, [rsi+5*16]");
+  asm ("movaps xmm14, [rsi+6*16]");
+  asm ("movaps xmm15, [rsi+7*16]");
+
+  /* transform message M from column ordering into row ordering */
+  VPERM_Transform_State( 8,  9, 10, 11, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
+  VPERM_Transform_State(12, 13, 14, 15, VPERM_IPT, 1, 2, 3, 4, 5, 6, 7);
+  Matrix_Transpose(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
+
+  /* store message M (Q input) for later */
   asm ("movaps [QTEMP+0*16], xmm8");
   asm ("movaps [QTEMP+1*16], xmm9");
   asm ("movaps [QTEMP+2*16], xmm10");
@@ -1226,38 +1262,43 @@ void TF1024(u64* message)
   asm ("movaps [QTEMP+6*16], xmm14");
   asm ("movaps [QTEMP+7*16], xmm15");
 
-  /* xor CV to get P */
-  asm ("pxor xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("pxor xmm9,  [GLOBAL_CV_PTR+1*16]");
-  asm ("pxor xmm10, [GLOBAL_CV_PTR+2*16]");
-  asm ("pxor xmm11, [GLOBAL_CV_PTR+3*16]");
-  asm ("pxor xmm12, [GLOBAL_CV_PTR+4*16]");
-  asm ("pxor xmm13, [GLOBAL_CV_PTR+5*16]");
-  asm ("pxor xmm14, [GLOBAL_CV_PTR+6*16]");
-  asm ("pxor xmm15, [GLOBAL_CV_PTR+7*16]");
+  /* xor CV to message to get P input */
+  /* result: CV+M in xmm8...xmm15 */
+  asm ("pxor xmm8,  [rdi+0*16]");
+  asm ("pxor xmm9,  [rdi+1*16]");
+  asm ("pxor xmm10, [rdi+2*16]");
+  asm ("pxor xmm11, [rdi+3*16]");
+  asm ("pxor xmm12, [rdi+4*16]");
+  asm ("pxor xmm13, [rdi+5*16]");
+  asm ("pxor xmm14, [rdi+6*16]");
+  asm ("pxor xmm15, [rdi+7*16]");
 
+  /* compute permutation P */
+  /* result: P(CV+M) in xmm8...xmm15 */
   ROUNDS_P();
 
-  /* XOR P to CV */
-  asm ("pxor xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("pxor xmm9,  [GLOBAL_CV_PTR+1*16]");
-  asm ("pxor xmm10, [GLOBAL_CV_PTR+2*16]");
-  asm ("pxor xmm11, [GLOBAL_CV_PTR+3*16]");
-  asm ("pxor xmm12, [GLOBAL_CV_PTR+4*16]");
-  asm ("pxor xmm13, [GLOBAL_CV_PTR+5*16]");
-  asm ("pxor xmm14, [GLOBAL_CV_PTR+6*16]");
-  asm ("pxor xmm15, [GLOBAL_CV_PTR+7*16]");
+  /* xor CV to P output (feed-forward) */
+  /* result: P(CV+M)+CV in xmm8...xmm15 */
+  asm ("pxor xmm8,  [rdi+0*16]");
+  asm ("pxor xmm9,  [rdi+1*16]");
+  asm ("pxor xmm10, [rdi+2*16]");
+  asm ("pxor xmm11, [rdi+3*16]");
+  asm ("pxor xmm12, [rdi+4*16]");
+  asm ("pxor xmm13, [rdi+5*16]");
+  asm ("pxor xmm14, [rdi+6*16]");
+  asm ("pxor xmm15, [rdi+7*16]");
 
-  asm ("movaps [GLOBAL_CV_PTR+0*16], xmm8");
-  asm ("movaps [GLOBAL_CV_PTR+1*16], xmm9");
-  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm10");
-  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm11");
-  asm ("movaps [GLOBAL_CV_PTR+4*16], xmm12");
-  asm ("movaps [GLOBAL_CV_PTR+5*16], xmm13");
-  asm ("movaps [GLOBAL_CV_PTR+6*16], xmm14");
-  asm ("movaps [GLOBAL_CV_PTR+7*16], xmm15");
+  /* store P(CV+M)+CV */
+  asm ("movaps [rdi+0*16], xmm8");
+  asm ("movaps [rdi+1*16], xmm9");
+  asm ("movaps [rdi+2*16], xmm10");
+  asm ("movaps [rdi+3*16], xmm11");
+  asm ("movaps [rdi+4*16], xmm12");
+  asm ("movaps [rdi+5*16], xmm13");
+  asm ("movaps [rdi+6*16], xmm14");
+  asm ("movaps [rdi+7*16], xmm15");
 
-  /* restore Q into xmm8-15 */
+  /* load message M (Q input) into xmm8-15 */
   asm ("movaps xmm8,  [QTEMP+0*16]");
   asm ("movaps xmm9,  [QTEMP+1*16]");
   asm ("movaps xmm10, [QTEMP+2*16]");
@@ -1267,26 +1308,30 @@ void TF1024(u64* message)
   asm ("movaps xmm14, [QTEMP+6*16]");
   asm ("movaps xmm15, [QTEMP+7*16]");
 
+  /* compute permutation Q */
+  /* result: Q(M) in xmm8...xmm15 */
   ROUNDS_Q();
 
-  /* XOR P to CV */
-  asm ("pxor xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("pxor xmm9,  [GLOBAL_CV_PTR+1*16]");
-  asm ("pxor xmm10, [GLOBAL_CV_PTR+2*16]");
-  asm ("pxor xmm11, [GLOBAL_CV_PTR+3*16]");
-  asm ("pxor xmm12, [GLOBAL_CV_PTR+4*16]");
-  asm ("pxor xmm13, [GLOBAL_CV_PTR+5*16]");
-  asm ("pxor xmm14, [GLOBAL_CV_PTR+6*16]");
-  asm ("pxor xmm15, [GLOBAL_CV_PTR+7*16]");
+  /* xor Q output */
+  /* result: P(CV+M)+CV+Q(M) in xmm8...xmm15 */
+  asm ("pxor xmm8,  [rdi+0*16]");
+  asm ("pxor xmm9,  [rdi+1*16]");
+  asm ("pxor xmm10, [rdi+2*16]");
+  asm ("pxor xmm11, [rdi+3*16]");
+  asm ("pxor xmm12, [rdi+4*16]");
+  asm ("pxor xmm13, [rdi+5*16]");
+  asm ("pxor xmm14, [rdi+6*16]");
+  asm ("pxor xmm15, [rdi+7*16]");
 
-  asm ("movaps [GLOBAL_CV_PTR+0*16], xmm8");
-  asm ("movaps [GLOBAL_CV_PTR+1*16], xmm9");
-  asm ("movaps [GLOBAL_CV_PTR+2*16], xmm10");
-  asm ("movaps [GLOBAL_CV_PTR+3*16], xmm11");
-  asm ("movaps [GLOBAL_CV_PTR+4*16], xmm12");
-  asm ("movaps [GLOBAL_CV_PTR+5*16], xmm13");
-  asm ("movaps [GLOBAL_CV_PTR+6*16], xmm14");
-  asm ("movaps [GLOBAL_CV_PTR+7*16], xmm15");
+  /* store CV */
+  asm ("movaps [rdi+0*16], xmm8");
+  asm ("movaps [rdi+1*16], xmm9");
+  asm ("movaps [rdi+2*16], xmm10");
+  asm ("movaps [rdi+3*16], xmm11");
+  asm ("movaps [rdi+4*16], xmm12");
+  asm ("movaps [rdi+5*16], xmm13");
+  asm ("movaps [rdi+6*16], xmm14");
+  asm ("movaps [rdi+7*16], xmm15");
 
   Pop_All_Regs();
   asm (".att_syntax noprefix");
@@ -1294,58 +1339,59 @@ void TF1024(u64* message)
 #ifdef IACA_TRACE
   IACA_END;
 #endif
+
   return;
 }
 
-void OF1024() {
+void OF1024(u64* h)
+{
+  /* __cdecl calling convention: */
+  /* chaining value CV in rdi    */
+
   asm (".intel_syntax noprefix");
   Push_All_Regs();
 
-  /* load CV into registers xmm8 - xmm11 (P = CV)*/
-  asm ("movaps xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("movaps xmm9,  [GLOBAL_CV_PTR+1*16]");
-  asm ("movaps xmm10, [GLOBAL_CV_PTR+2*16]");
-  asm ("movaps xmm11, [GLOBAL_CV_PTR+3*16]");
-  asm ("movaps xmm12, [GLOBAL_CV_PTR+4*16]");
-  asm ("movaps xmm13, [GLOBAL_CV_PTR+5*16]");
-  asm ("movaps xmm14, [GLOBAL_CV_PTR+6*16]");
-  asm ("movaps xmm15, [GLOBAL_CV_PTR+7*16]");
+  /* load CV into registers xmm8 - xmm15 */
+  asm ("movaps xmm8,  [rdi+0*16]");
+  asm ("movaps xmm9,  [rdi+1*16]");
+  asm ("movaps xmm10, [rdi+2*16]");
+  asm ("movaps xmm11, [rdi+3*16]");
+  asm ("movaps xmm12, [rdi+4*16]");
+  asm ("movaps xmm13, [rdi+5*16]");
+  asm ("movaps xmm14, [rdi+6*16]");
+  asm ("movaps xmm15, [rdi+7*16]");
 
+  /* compute permutation P */
+  /* result: P(CV) in xmm8...xmm15 */
   ROUNDS_P();
 
-  /* xor CV */
+  /* xor CV to P output (feed-forward) */
+  /* result: P(CV)+CV in xmm8...xmm15 */
+  asm ("pxor xmm8,  [rdi+0*16]");
+  asm ("pxor xmm9,  [rdi+1*16]");
+  asm ("pxor xmm10, [rdi+2*16]");
+  asm ("pxor xmm11, [rdi+3*16]");
+  asm ("pxor xmm12, [rdi+4*16]");
+  asm ("pxor xmm13, [rdi+5*16]");
+  asm ("pxor xmm14, [rdi+6*16]");
+  asm ("pxor xmm15, [rdi+7*16]");
 
-  asm ("pxor xmm8,  [GLOBAL_CV_PTR+0*16]");
-  asm ("pxor xmm9,  [GLOBAL_CV_PTR+1*16]");
-  asm ("pxor xmm10, [GLOBAL_CV_PTR+2*16]");
-  asm ("pxor xmm11, [GLOBAL_CV_PTR+3*16]");
-  asm ("pxor xmm12, [GLOBAL_CV_PTR+4*16]");
-  asm ("pxor xmm13, [GLOBAL_CV_PTR+5*16]");
-  asm ("pxor xmm14, [GLOBAL_CV_PTR+6*16]");
-  asm ("pxor xmm15, [GLOBAL_CV_PTR+7*16]");
-
-  /*  transpose state back to original format */
+  /* transpose CV back from row ordering to column ordering */
+  /* result: final hash value in xmm0, xmm6, xmm13, xmm15 */
   Matrix_Transpose_INV(8, 9, 10, 11, 12, 13, 14, 15, 4, 0, 6, 1, 2, 3, 5, 7);
-
-  //VPERM_Transform_State( 0,  4,  6,  8, VPERM_OPT, 1, 2, 3, 5, 7, 10, 12);
-  //VPERM_Transform_State( 9, 11, 13, 15, VPERM_OPT, 1, 2, 3, 5, 7, 10, 12);
   VPERM_Transform_State( 0, 6, 13, 15, VPERM_OPT, 1, 2, 3, 5, 7, 10, 12);
 
-  /* store finished hash */
-  //asm ("movaps [GLOBAL_CV_PTR+0*16], xmm8");
-  //asm ("movaps [GLOBAL_CV_PTR+1*16], xmm4");
-  //asm ("movaps [GLOBAL_CV_PTR+2*16], xmm9");
-  //asm ("movaps [GLOBAL_CV_PTR+3*16], xmm11");
-  asm ("movaps [GLOBAL_CV_PTR+4*16], xmm0");
-  asm ("movaps [GLOBAL_CV_PTR+5*16], xmm6");
-  asm ("movaps [GLOBAL_CV_PTR+6*16], xmm13");
-  asm ("movaps [GLOBAL_CV_PTR+7*16], xmm15");
+  /* we only need to return the truncated half of the state */
+  asm ("movaps [rdi+4*16], xmm0");
+  asm ("movaps [rdi+5*16], xmm6");
+  asm ("movaps [rdi+6*16], xmm13");
+  asm ("movaps [rdi+7*16], xmm15");
 
   Pop_All_Regs();
   asm (".att_syntax noprefix");
 
   return;
-}//OF1024()
+}
 
 #endif
 

@@ -1,36 +1,31 @@
-/* groestl-aes64.h     Feb 2011
+/* groestl-intr-vperm.h     Aug 2011
  *
- * Groestl implementation with inline assembly using (s)sse*
- * instructions.
- * Author: Günther A. Roland
+ * Groestl implementation with intrinsics using ssse3 instructions.
+ * Author: Günther A. Roland, Martin Schläffer
+ *
+ * Based on the vperm and aes_ni implementations of the hash function Groestl
+ * by Cagdas Calik <ccalik@metu.edu.tr> http://www.metu.edu.tr/~ccalik/
+ * Institute of Applied Mathematics, Middle East Technical University, Turkey
  *
  * This code is placed in the public domain
  */
 
 #include <tmmintrin.h>
+#include "hash.h"
 
-/* global variables  */
-__m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
-__m128i xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
-
-__m128i GLOBAL_CV_PTR[8];
-u32 ROUND_CONST_MUL;
+/* global constants  */
 __m128i ROUND_CONST_Lx;
 __m128i ROUND_CONST_L0[ROUNDS512];
 __m128i ROUND_CONST_L7[ROUNDS512];
 __m128i ROUND_CONST_P[ROUNDS1024];
 __m128i ROUND_CONST_Q[ROUNDS1024];
 __m128i TRANSP_MASK;
+__m128i SUBSH_MASK[8];
+__m128i ALL_0F;
+__m128i ALL_15;
 __m128i ALL_1B;
 __m128i ALL_63;
-__m128i ALL_0F;
 __m128i ALL_FF;
-__m128i SUBSH_MASK[8];
-__m128i TMP_MUL1[8];
-__m128i TMP_MUL2[8];
-__m128i TMP_MUL4;
-__m128i QTEMP[8];
-__m128i ALL_15;
 __m128i VPERM_IPT[2];
 __m128i VPERM_OPT[2];
 __m128i VPERM_INV[2];
@@ -232,59 +227,61 @@ __m128i VPERM_SBO[2];
  * t*, c* = clobbers
  * outputs:
  * a0-a7 = state * 4
- * t2 = row4 * 1 -> b7
+ * c2 = row0 * 2 -> b0
+ * c1 = row7 * 2 -> b3
  * c0 = row7 * 1 -> b4
- * c1 = row7 * 2 -> b0
- * TMP_MUL1/2(i) in memory
+ * t2 = row4 * 1 -> b7
+ * TEMP_MUL1 = row(i) * 1
+ * TEMP_MUL2 = row(i) * 2
  *
- *      VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t2, t3, b0, b3, b4, b7) */
+ * call:VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7) */
 #define VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, t0, t1, t3, t4, c2, c1, c0, t2){\
   /* set Constants */\
   VPERM_Substitute_Core_Set_Const(c0, c1, c2);\
   /* row 1 */\
   VPERM_Substitute_Core(a1, t0, t1, t3, t4, c0, c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  TMP_MUL1[1] = t2;\
+  TEMP_MUL1[1] = t2;\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  TMP_MUL2[1] = t3;\
+  TEMP_MUL2[1] = t3;\
   VPERM_Lookup(t0, t1, VPERM_SB4, a1, t4);\
   /* --- */\
   /* row 2 */\
   VPERM_Substitute_Core(a2, t0, t1, t3, t4, c0, c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  TMP_MUL1[2] = t2;\
+  TEMP_MUL1[2] = t2;\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  TMP_MUL2[2] = t3;\
+  TEMP_MUL2[2] = t3;\
   VPERM_Lookup(t0, t1, VPERM_SB4, a2, t4);\
   /* --- */\
   /* row 3 */\
   VPERM_Substitute_Core(a3, t0, t1, t3, t4, c0, c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  TMP_MUL1[3] = t2;\
+  TEMP_MUL1[3] = t2;\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  TMP_MUL2[3] = t3;\
+  TEMP_MUL2[3] = t3;\
   VPERM_Lookup(t0, t1, VPERM_SB4, a3, t4);\
   /* --- */\
   /* row 5 */\
   VPERM_Substitute_Core(a5, t0, t1, t3, t4, c0, c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  TMP_MUL1[5] = t2;\
+  TEMP_MUL1[5] = t2;\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  TMP_MUL2[5] = t3;\
+  TEMP_MUL2[5] = t3;\
   VPERM_Lookup(t0, t1, VPERM_SB4, a5, t4);\
   /* --- */\
   /* row 6 */\
   VPERM_Substitute_Core(a6, t0, t1, t3, t4, c0, c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  TMP_MUL1[6] = t2;\
+  TEMP_MUL1[6] = t2;\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  TMP_MUL2[6] = t3;\
+  TEMP_MUL2[6] = t3;\
   VPERM_Lookup(t0, t1, VPERM_SB4, a6, t4);\
   /* --- */\
   /* row 7 */\
   VPERM_Substitute_Core(a7, t0, t1, t3, t4, c0, c1, c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4);\
-  TMP_MUL1[7] = t2;\
+  TEMP_MUL1[7] = t2;\
   VPERM_Lookup(t0, t1, VPERM_SB2, c1, t4); /*c1 -> b3*/\
   VPERM_Lookup(t0, t1, VPERM_SB4, a7, t4);\
   /* --- */\
@@ -292,14 +289,14 @@ __m128i VPERM_SBO[2];
   VPERM_Substitute_Core(a4, t0, t1, t3, t4, c0, (VPERM_INV[0]), c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, t2, t4); /*t2 -> b7*/\
   VPERM_Lookup(t0, t1, VPERM_SB2, t3, t4);\
-  TMP_MUL2[4] = t3;\
+  TEMP_MUL2[4] = t3;\
   VPERM_Lookup(t0, t1, VPERM_SB4, a4, t4);\
   /* --- */\
   /* row 0 */\
   VPERM_Substitute_Core(a0, t0, t1, t3, t4, c0, (VPERM_INV[0]), c2);\
   VPERM_Lookup(t0, t1, VPERM_SB1, c0, t4); /*c0 -> b4*/\
   VPERM_Lookup(t0, t1, VPERM_SB2, c2, t4); /*c2 -> b0*/\
-  TMP_MUL2[0] = c2;\
+  TEMP_MUL2[0] = c2;\
   VPERM_Lookup(t0, t1, VPERM_SB4, a0, t4);\
   /* --- */\
 }/**/
@@ -308,107 +305,111 @@ __m128i VPERM_SBO[2];
 /* Optimized MixBytes
  * inputs:
  * a0-a7 = (row0-row7) * 4
- * all * 1 / 2 values must be in TMP_MUL1/2
+ * b0 = row0 * 2
+ * b3 = row7 * 2
+ * b4 = row7 * 1
+ * b7 = row4 * 1
+ * all *1 and *2 values must also be in TEMP_MUL1, TEMP_MUL2
  * output: b0-b7
  * */
 #define MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
-    /* save one value */\
-    TMP_MUL4 = a3;\
-    /* 1 */\
-    b1 = a0;\
-    b1 = _mm_xor_si128(b1, a5);\
-    b1 = _mm_xor_si128(b1, b4); /* -> helper! */\
-    b1 = _mm_xor_si128(b1, (TMP_MUL2[3]));\
-    b2 = b1;\
-    \
-    /* 2 */\
-    b5 = a1;\
-    b5 = _mm_xor_si128(b5, a4);\
-    b5 = _mm_xor_si128(b5, b7); /* -> helper! */\
-    b5 = _mm_xor_si128(b5, b3); /* -> helper! */\
-    b6 = b5;\
-    \
-    /* 4 */\
-    b7 = _mm_xor_si128(b7, a6);\
-    /*b7 = _mm_xor_si128(b7, (TMP_MUL1[4])); -> helper! */\
-    b7 = _mm_xor_si128(b7, (TMP_MUL1[6]));\
-    b7 = _mm_xor_si128(b7, (TMP_MUL2[1]));\
-    b7 = _mm_xor_si128(b7, b3); /* -> helper! */\
-    b2 = _mm_xor_si128(b2, b7);\
-    \
-    /* 3 */\
-    b0 = _mm_xor_si128(b0, a7);\
-    b0 = _mm_xor_si128(b0, (TMP_MUL1[5]));\
-    b0 = _mm_xor_si128(b0, (TMP_MUL1[7]));\
-    /*b0 = _mm_xor_si128(b0, (TMP_MUL2[0])); -> helper! */\
-    b0 = _mm_xor_si128(b0, (TMP_MUL2[2]));\
-    b3 = b0;\
-    b1 = _mm_xor_si128(b1, b0);\
-    b0 = _mm_xor_si128(b0, b7); /* moved from 4 */\
-    \
-    /* 5 */\
-    b4 = _mm_xor_si128(b4, a2);\
-    /*b4 = _mm_xor_si128(b4, (TMP_MUL1[0])); -> helper! */\
-    b4 = _mm_xor_si128(b4, (TMP_MUL1[2]));\
-    b4 = _mm_xor_si128(b4, (TMP_MUL2[3]));\
-    b4 = _mm_xor_si128(b4, (TMP_MUL2[5]));\
-    b3 = _mm_xor_si128(b3, b4);\
-    b6 = _mm_xor_si128(b6, b4);\
-    \
-    /* 6 */\
-    a3 = _mm_xor_si128(a3, (TMP_MUL1[1]));\
-    a3 = _mm_xor_si128(a3, (TMP_MUL1[3]));\
-    a3 = _mm_xor_si128(a3, (TMP_MUL2[4]));\
-    a3 = _mm_xor_si128(a3, (TMP_MUL2[6]));\
-    b4 = _mm_xor_si128(b4, a3);\
-    b5 = _mm_xor_si128(b5, a3);\
-    b7 = _mm_xor_si128(b7, a3);\
-    \
-    /* 7 */\
-    a1 = _mm_xor_si128(a1, (TMP_MUL1[1]));\
-    a1 = _mm_xor_si128(a1, (TMP_MUL2[4]));\
-    b2 = _mm_xor_si128(b2, a1);\
-    b3 = _mm_xor_si128(b3, a1);\
-    \
-    /* 8 */\
-    a5 = _mm_xor_si128(a5, (TMP_MUL1[5]));\
-    a5 = _mm_xor_si128(a5, (TMP_MUL2[0]));\
-    b6 = _mm_xor_si128(b6, a5);\
-    b7 = _mm_xor_si128(b7, a5);\
-    \
-    /* 9 */\
-    a3 = TMP_MUL1[2];\
-    a3 = _mm_xor_si128(a3, (TMP_MUL2[5]));\
-    b0 = _mm_xor_si128(b0, a3);\
-    b5 = _mm_xor_si128(b5, a3);\
-    \
-    /* 10 */\
-    a1 = TMP_MUL1[6];\
-    a1 = _mm_xor_si128(a1, (TMP_MUL2[1]));\
-    b1 = _mm_xor_si128(b1, a1);\
-    b4 = _mm_xor_si128(b4, a1);\
-    \
-    /* 11 */\
-    a5 = TMP_MUL1[3];\
-    a5 = _mm_xor_si128(a5, (TMP_MUL2[6]));\
-    b1 = _mm_xor_si128(b1, a5);\
-    b6 = _mm_xor_si128(b6, a5);\
-    \
-    /* 12 */\
-    a3 = TMP_MUL1[7];\
-    a3 = _mm_xor_si128(a3, (TMP_MUL2[2]));\
-    b2 = _mm_xor_si128(b2, a3);\
-    b5 = _mm_xor_si128(b5, a3);\
-    \
-    /* 13 */\
-    b0 = _mm_xor_si128(b0, (TMP_MUL4));\
-    b0 = _mm_xor_si128(b0, a4);\
-    b1 = _mm_xor_si128(b1, a4);\
-    b3 = _mm_xor_si128(b3, a6);\
-    b4 = _mm_xor_si128(b4, a0);\
-    b4 = _mm_xor_si128(b4, a7);\
-    b5 = _mm_xor_si128(b5, a0);\
-    b7 = _mm_xor_si128(b7, a2);\
+  /* save one value */\
+  TEMP_MUL4 = a3;\
+  /* 1 */\
+  b1 = a0;\
+  b1 = _mm_xor_si128(b1, a5);\
+  b1 = _mm_xor_si128(b1, b4); /* -> helper! */\
+  b1 = _mm_xor_si128(b1, (TEMP_MUL2[3]));\
+  b2 = b1;\
+  \
+  /* 2 */\
+  b5 = a1;\
+  b5 = _mm_xor_si128(b5, a4);\
+  b5 = _mm_xor_si128(b5, b7); /* -> helper! */\
+  b5 = _mm_xor_si128(b5, b3); /* -> helper! */\
+  b6 = b5;\
+  \
+  /* 4 */\
+  b7 = _mm_xor_si128(b7, a6);\
+  /*b7 = _mm_xor_si128(b7, (TEMP_MUL1[4])); -> helper! */\
+  b7 = _mm_xor_si128(b7, (TEMP_MUL1[6]));\
+  b7 = _mm_xor_si128(b7, (TEMP_MUL2[1]));\
+  b7 = _mm_xor_si128(b7, b3); /* -> helper! */\
+  b2 = _mm_xor_si128(b2, b7);\
+  \
+  /* 3 */\
+  b0 = _mm_xor_si128(b0, a7);\
+  b0 = _mm_xor_si128(b0, (TEMP_MUL1[5]));\
+  b0 = _mm_xor_si128(b0, (TEMP_MUL1[7]));\
+  /*b0 = _mm_xor_si128(b0, (TEMP_MUL2[0])); -> helper! */\
+  b0 = _mm_xor_si128(b0, (TEMP_MUL2[2]));\
+  b3 = b0;\
+  b1 = _mm_xor_si128(b1, b0);\
+  b0 = _mm_xor_si128(b0, b7); /* moved from 4 */\
+  \
+  /* 5 */\
+  b4 = _mm_xor_si128(b4, a2);\
+  /*b4 = _mm_xor_si128(b4, (TEMP_MUL1[0])); -> helper! */\
+  b4 = _mm_xor_si128(b4, (TEMP_MUL1[2]));\
+  b4 = _mm_xor_si128(b4, (TEMP_MUL2[3]));\
+  b4 = _mm_xor_si128(b4, (TEMP_MUL2[5]));\
+  b3 = _mm_xor_si128(b3, b4);\
+  b6 = _mm_xor_si128(b6, b4);\
+  \
+  /* 6 */\
+  a3 = _mm_xor_si128(a3, (TEMP_MUL1[1]));\
+  a3 = _mm_xor_si128(a3, (TEMP_MUL1[3]));\
+  a3 = _mm_xor_si128(a3, (TEMP_MUL2[4]));\
+  a3 = _mm_xor_si128(a3, (TEMP_MUL2[6]));\
+  b4 = _mm_xor_si128(b4, a3);\
+  b5 = _mm_xor_si128(b5, a3);\
+  b7 = _mm_xor_si128(b7, a3);\
+  \
+  /* 7 */\
+  a1 = _mm_xor_si128(a1, (TEMP_MUL1[1]));\
+  a1 = _mm_xor_si128(a1, (TEMP_MUL2[4]));\
+  b2 = _mm_xor_si128(b2, a1);\
+  b3 = _mm_xor_si128(b3, a1);\
+  \
+  /* 8 */\
+  a5 = _mm_xor_si128(a5, (TEMP_MUL1[5]));\
+  a5 = _mm_xor_si128(a5, (TEMP_MUL2[0]));\
+  b6 = _mm_xor_si128(b6, a5);\
+  b7 = _mm_xor_si128(b7, a5);\
+  \
+  /* 9 */\
+  a3 = TEMP_MUL1[2];\
+  a3 = _mm_xor_si128(a3, (TEMP_MUL2[5]));\
+  b0 = _mm_xor_si128(b0, a3);\
+  b5 = _mm_xor_si128(b5, a3);\
+  \
+  /* 10 */\
+  a1 = TEMP_MUL1[6];\
+  a1 = _mm_xor_si128(a1, (TEMP_MUL2[1]));\
+  b1 = _mm_xor_si128(b1, a1);\
+  b4 = _mm_xor_si128(b4, a1);\
+  \
+  /* 11 */\
+  a5 = TEMP_MUL1[3];\
+  a5 = _mm_xor_si128(a5, (TEMP_MUL2[6]));\
+  b1 = _mm_xor_si128(b1, a5);\
+  b6 = _mm_xor_si128(b6, a5);\
+  \
+  /* 12 */\
+  a3 = TEMP_MUL1[7];\
+  a3 = _mm_xor_si128(a3, (TEMP_MUL2[2]));\
+  b2 = _mm_xor_si128(b2, a3);\
+  b5 = _mm_xor_si128(b5, a3);\
+  \
+  /* 13 */\
+  b0 = _mm_xor_si128(b0, (TEMP_MUL4));\
+  b0 = _mm_xor_si128(b0, a4);\
+  b1 = _mm_xor_si128(b1, a4);\
+  b3 = _mm_xor_si128(b3, a6);\
+  b4 = _mm_xor_si128(b4, a0);\
+  b4 = _mm_xor_si128(b4, a7);\
+  b5 = _mm_xor_si128(b5, a0);\
+  b7 = _mm_xor_si128(b7, a2);\
 }/**/
 
 #if (LENGTH <= 256)
@@ -425,9 +426,8 @@ __m128i VPERM_SBO[2];
   SUBSH_MASK[7] = _mm_set_epi32(0x0d0c0b0a, 0x09080f0e, 0x06050403, 0x02010007);\
   for(i = 0; i < ROUNDS512; i++)\
   {\
-    ROUND_CONST_MUL = i * 0x01010101;\
-    ROUND_CONST_L0[i] = _mm_set_epi32(0xffffffff, 0xffffffff, 0x70605040 ^ ROUND_CONST_MUL, 0x30201000 ^ ROUND_CONST_MUL);\
-    ROUND_CONST_L7[i] = _mm_set_epi32(0x8f9fafbf ^ ROUND_CONST_MUL, 0xcfdfefff ^ ROUND_CONST_MUL, 0x00000000, 0x00000000);\
+    ROUND_CONST_L0[i] = _mm_set_epi32(0xffffffff, 0xffffffff, 0x70605040 ^ (i * 0x01010101), 0x30201000 ^ (i * 0x01010101));\
+    ROUND_CONST_L7[i] = _mm_set_epi32(0x8f9fafbf ^ (i * 0x01010101), 0xcfdfefff ^ (i * 0x01010101), 0x00000000, 0x00000000);\
   }\
   ROUND_CONST_Lx = _mm_set_epi32(0xffffffff, 0xffffffff, 0x00000000, 0x00000000);\
 }/**/
@@ -445,33 +445,32 @@ __m128i VPERM_SBO[2];
  * b0-b7 = output rows
  */
 #define ROUND(i, a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
-    /* Add Round Constant */\
-    b1 = ROUND_CONST_Lx;\
-    a0 = _mm_xor_si128(a0, (ROUND_CONST_L0[i]));\
-    a1 = _mm_xor_si128(a1, b1);\
-    a2 = _mm_xor_si128(a2, b1);\
-    a3 = _mm_xor_si128(a3, b1);\
-    a0 = _mm_shuffle_epi8(a0, (SUBSH_MASK[0]));\
-    a1 = _mm_shuffle_epi8(a1, (SUBSH_MASK[1]));\
-    a4 = _mm_xor_si128(a4, b1);\
-    a2 = _mm_shuffle_epi8(a2, (SUBSH_MASK[2]));\
-    a3 = _mm_shuffle_epi8(a3, (SUBSH_MASK[3]));\
-    a5 = _mm_xor_si128(a5, b1);\
-    a6 = _mm_xor_si128(a6, b1);\
-    a4 = _mm_shuffle_epi8(a4, (SUBSH_MASK[4]));\
-    a5 = _mm_shuffle_epi8(a5, (SUBSH_MASK[5]));\
-    a7 = _mm_xor_si128(a7, (ROUND_CONST_L7[i]));\
-    a6 = _mm_shuffle_epi8(a6, (SUBSH_MASK[6]));\
-    a7 = _mm_shuffle_epi8(a7, (SUBSH_MASK[7]));\
-\
-    /* SubBytes + Multiplication */\
-    VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7);\
-    /* MixBytes */\
-    MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
+  /* AddRoundConstant + ShiftBytes (interleaved) */\
+  b1 = ROUND_CONST_Lx;\
+  a0 = _mm_xor_si128(a0, (ROUND_CONST_L0[i]));\
+  a1 = _mm_xor_si128(a1, b1);\
+  a2 = _mm_xor_si128(a2, b1);\
+  a3 = _mm_xor_si128(a3, b1);\
+  a0 = _mm_shuffle_epi8(a0, (SUBSH_MASK[0]));\
+  a1 = _mm_shuffle_epi8(a1, (SUBSH_MASK[1]));\
+  a4 = _mm_xor_si128(a4, b1);\
+  a2 = _mm_shuffle_epi8(a2, (SUBSH_MASK[2]));\
+  a3 = _mm_shuffle_epi8(a3, (SUBSH_MASK[3]));\
+  a5 = _mm_xor_si128(a5, b1);\
+  a6 = _mm_xor_si128(a6, b1);\
+  a4 = _mm_shuffle_epi8(a4, (SUBSH_MASK[4]));\
+  a5 = _mm_shuffle_epi8(a5, (SUBSH_MASK[5]));\
+  a7 = _mm_xor_si128(a7, (ROUND_CONST_L7[i]));\
+  a6 = _mm_shuffle_epi8(a6, (SUBSH_MASK[6]));\
+  a7 = _mm_shuffle_epi8(a7, (SUBSH_MASK[7]));\
+  /* SubBytes + Multiplication by 2 and 4 */\
+  VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7);\
+  /* MixBytes */\
+  MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
 }/**/
 
-/* 10 rounds */
-#define TRANSFORM(){\
+/* 10 rounds, P and Q in parallel */
+#define ROUNDS_P_Q(){\
   VPERM_Add_Constant(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, ALL_15, xmm0);\
   ROUND(0, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
   ROUND(1, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
@@ -641,126 +640,153 @@ __m128i VPERM_SBO[2];
   VPERM_Transform_RoundConst_CNT2(8, 9);\
 }/**/
 
-void INIT_CV()
+void INIT(u64* h)
 {
+  __m128i* const chaining = (__m128i*) h;
+  static __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
+  static __m128i xmm8, xmm9, xmm10, /*xmm11,*/ xmm12, xmm13, xmm14, xmm15;
+
+  /* transform round constants into VPERM mode */
   VPERM_Transform_RoundConst();
 
-  /* load CV (IV) into registers xmm12 - xmm15 */
-  xmm12 = GLOBAL_CV_PTR[0];
-  xmm13 = GLOBAL_CV_PTR[1];
-  xmm14 = GLOBAL_CV_PTR[2];
-  xmm15 = GLOBAL_CV_PTR[3];
+  /* load IV into registers xmm12 - xmm15 */
+  xmm12 = chaining[0];
+  xmm13 = chaining[1];
+  xmm14 = chaining[2];
+  xmm15 = chaining[3];
 
+  /* transform chaining value from column ordering into row ordering */
+  /* we put two rows (64 bit) of the IV into one 128-bit XMM register */
   VPERM_Transform_State(xmm12, xmm13, xmm14, xmm15, VPERM_IPT, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);
-
-  /* transpose matrix to get one line of P AND Q in each xmm */
   Matrix_Transpose_A(xmm12, xmm13, xmm14, xmm15, xmm2, xmm6, xmm7, xmm0);
 
-  /* store transposed CV */
-  GLOBAL_CV_PTR[0] = xmm12;
-  GLOBAL_CV_PTR[1] = xmm2;
-  GLOBAL_CV_PTR[2] = xmm6;
-  GLOBAL_CV_PTR[3] = xmm7;
+  /* store transposed IV */
+  chaining[0] = xmm12;
+  chaining[1] = xmm2;
+  chaining[2] = xmm6;
+  chaining[3] = xmm7;
 }
 
-void TF512(u64* message)
+void TF512(u64* h, u64* m)
 {
-  /*  Note : message is in rdi thanks to the  */
-  /*  __cdecl calling convention    */
+  __m128i* const chaining = (__m128i*) h;
+  __m128i* const message = (__m128i*) m;
+  static __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
+  static __m128i xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
+  static __m128i TEMP_MUL1[8];
+  static __m128i TEMP_MUL2[8];
+  static __m128i TEMP_MUL4;
+
 #ifdef IACA_TRACE
   IACA_START;
 #endif
-  /* load message into registers xmm12 - xmm15 (Q = message) */
-  xmm12 = _mm_set_epi32((message)[2*0+1] >> 32, (message)[2*0+1], (message)[2*0+0] >> 32, (message)[2*0+0]);
-  xmm13 = _mm_set_epi32((message)[2*1+1] >> 32, (message)[2*1+1], (message)[2*1+0] >> 32, (message)[2*1+0]);
-  xmm14 = _mm_set_epi32((message)[2*2+1] >> 32, (message)[2*2+1], (message)[2*2+0] >> 32, (message)[2*2+0]);
-  xmm15 = _mm_set_epi32((message)[2*3+1] >> 32, (message)[2*3+1], (message)[2*3+0] >> 32, (message)[2*3+0]);
 
+  /* load message into registers xmm12 - xmm15 */
+  xmm12 = message[0];
+  xmm13 = message[1];
+  xmm14 = message[2];
+  xmm15 = message[3];
+
+  /* transform message M from column ordering into row ordering */
+  /* we first put two rows (64 bit) of the message into one 128-bit xmm register */
   VPERM_Transform_State(xmm12, xmm13, xmm14, xmm15, VPERM_IPT, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);
-
-  /* transpose message to get two rows in each xmm */
   Matrix_Transpose_A(xmm12, xmm13, xmm14, xmm15, xmm2, xmm6, xmm7, xmm0);
 
-  /* load CV */
-  xmm8 = GLOBAL_CV_PTR[0]; //0
-  xmm0 = GLOBAL_CV_PTR[1]; //1
-  xmm4 = GLOBAL_CV_PTR[2]; //2
-  xmm5 = GLOBAL_CV_PTR[3]; //3
+  /* load previous chaining value */
+  /* we first put two rows (64 bit) of the CV into one 128-bit xmm register */
+  xmm8 = chaining[0];
+  xmm0 = chaining[1];
+  xmm4 = chaining[2];
+  xmm5 = chaining[3];
 
-  /* xor Q to P to get P = h ^ m */
+  /* xor message to CV get input of P */
+  /* result: CV+M in xmm8, xmm0, xmm4, xmm5 */
   xmm8 = _mm_xor_si128(xmm8, xmm12);
   xmm0 = _mm_xor_si128(xmm0, xmm2);
   xmm4 = _mm_xor_si128(xmm4, xmm6);
   xmm5 = _mm_xor_si128(xmm5, xmm7);
 
-  /* there are now 2 rows in each xmm
-   * unpack to get 1 row of P and Q in each xmm */
+  /* there are now 2 rows of the Groestl state (P and Q) in each xmm register */
+  /* unpack to get 1 row of P (64 bit) and Q (64 bit) into one xmm register */
+  /* result: the 8 rows of P and Q in xmm8 - xmm12 */
   Matrix_Transpose_B(xmm8, xmm0, xmm4, xmm5, xmm12, xmm2, xmm6, xmm7, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);
 
-  /* the real work: */
-  TRANSFORM();
+  /* compute the two permutations P and Q in parallel */
+  ROUNDS_P_Q();
 
-  /* transpose matrix to get back input format */
+  /* unpack again to get two rows of P or two rows of Q in one xmm register */
   Matrix_Transpose_B_INV(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3);
 
-  /* xor P and Q */
+  /* xor output of P and Q */
+  /* result: P(CV+M)+Q(M) in xmm0...xmm3 */
   xmm0 = _mm_xor_si128(xmm0, xmm8);
   xmm1 = _mm_xor_si128(xmm1, xmm10);
   xmm2 = _mm_xor_si128(xmm2, xmm12);
   xmm3 = _mm_xor_si128(xmm3, xmm14);
 
-  /* xor CV */
-  xmm0 = _mm_xor_si128(xmm0, (GLOBAL_CV_PTR[0]));
-  xmm1 = _mm_xor_si128(xmm1, (GLOBAL_CV_PTR[1]));
-  xmm2 = _mm_xor_si128(xmm2, (GLOBAL_CV_PTR[2]));
-  xmm3 = _mm_xor_si128(xmm3, (GLOBAL_CV_PTR[3]));
+  /* xor CV (feed-forward) */
+  /* result: P(CV+M)+Q(M)+CV in xmm0...xmm3 */
+  xmm0 = _mm_xor_si128(xmm0, (chaining[0]));
+  xmm1 = _mm_xor_si128(xmm1, (chaining[1]));
+  xmm2 = _mm_xor_si128(xmm2, (chaining[2]));
+  xmm3 = _mm_xor_si128(xmm3, (chaining[3]));
 
-  /* store finished CV */
-  GLOBAL_CV_PTR[0] = xmm0;
-  GLOBAL_CV_PTR[1] = xmm1;
-  GLOBAL_CV_PTR[2] = xmm2;
-  GLOBAL_CV_PTR[3] = xmm3;
+  /* store CV */
+  chaining[0] = xmm0;
+  chaining[1] = xmm1;
+  chaining[2] = xmm2;
+  chaining[3] = xmm3;
 
 #ifdef IACA_TRACE
   IACA_END;
 #endif
+
   return;
 }
 
-void OF512() {
-  /* load CV into registers xmm8 - xmm11 (P = CV)*/
-  xmm8 = GLOBAL_CV_PTR[0];
-  xmm10 = GLOBAL_CV_PTR[1];
-  xmm12 = GLOBAL_CV_PTR[2];
-  xmm14 = GLOBAL_CV_PTR[3];
+void OF512(u64* h)
+{
+  __m128i* const chaining = (__m128i*) h;
+  static __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
+  static __m128i xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
+  static __m128i TEMP_MUL1[8];
+  static __m128i TEMP_MUL2[8];
+  static __m128i TEMP_MUL4;
 
-  /* there are now 2 rows in each xmm
-   * unpack to get 1 row of P in each xmm */
+  /* load CV into registers xmm8, xmm10, xmm12, xmm14 */
+  xmm8 = chaining[0];
+  xmm10 = chaining[1];
+  xmm12 = chaining[2];
+  xmm14 = chaining[3];
+
+  /* there are now 2 rows of the CV in one xmm register */
+  /* unpack to get 1 row of P (64 bit) into one half of an xmm register */
+  /* result: the 8 input rows of P in xmm8 - xmm15 */
   Matrix_Transpose_O_B(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0);
 
-  /* the real work: */
-  TRANSFORM();
+  /* compute the permutation P */
+  /* result: the output of P(CV) in xmm8 - xmm15 */
+  ROUNDS_P_Q();
 
-  /* transpose matrix to get back input format */
+  /* unpack again to get two rows of P in one xmm register */
+  /* result: P(CV) in xmm8, xmm10, xmm12, xmm14 */
   Matrix_Transpose_O_B_INV(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);
 
-  /* xor CV */
-  xmm8 = _mm_xor_si128(xmm8,  (GLOBAL_CV_PTR[0]));
-  xmm10 = _mm_xor_si128(xmm10, (GLOBAL_CV_PTR[1]));
-  xmm12 = _mm_xor_si128(xmm12, (GLOBAL_CV_PTR[2]));
-  xmm14 = _mm_xor_si128(xmm14, (GLOBAL_CV_PTR[3]));
+  /* xor CV to P output (feed-forward) */
+  /* result: P(CV)+CV in xmm8, xmm10, xmm12, xmm14 */
+  xmm8 = _mm_xor_si128(xmm8,  (chaining[0]));
+  xmm10 = _mm_xor_si128(xmm10, (chaining[1]));
+  xmm12 = _mm_xor_si128(xmm12, (chaining[2]));
+  xmm14 = _mm_xor_si128(xmm14, (chaining[3]));
 
-  /* transpose output back to two columns per xmm */
+  /* transform state back from row ordering into column ordering */
+  /* result: final hash value in xmm9, xmm11 */
   Matrix_Transpose_A(xmm8, xmm10, xmm12, xmm14, xmm4, xmm9, xmm11, xmm0);
-
-  //VPERM_Transform_State(xmm8, xmm4, xmm9, xmm11, VPERM_OPT, xmm0, xmm1, xmm2, xmm3, xmm5, xmm6, xmm7);
   VPERM_Transform(xmm9, xmm11, VPERM_OPT, xmm0, xmm1, xmm2, xmm3, xmm5, xmm6, xmm7);
 
-  /* store finished hash */
-  //GLOBAL_CV_PTR[0] = xmm8;
-  //GLOBAL_CV_PTR[1] = xmm4;
-  GLOBAL_CV_PTR[2] = xmm9;
-  GLOBAL_CV_PTR[3] = xmm11;
+  /* we only need to return the truncated half of the state */
+  chaining[2] = xmm9;
+  chaining[3] = xmm11;
 
   return;
 }//OF512()
@@ -782,9 +808,8 @@ void OF512() {
   SUBSH_MASK[7] = _mm_set_epi32(0x0a090807, 0x06050403, 0x0201000f, 0x0e0d0c0b);\
   for(i = 0; i < ROUNDS1024; i++)\
   {\
-    ROUND_CONST_MUL = i * 0x01010101;\
-    ROUND_CONST_P[i] = _mm_set_epi32(0xf0e0d0c0 ^ ROUND_CONST_MUL, 0xb0a09080 ^ ROUND_CONST_MUL, 0x70605040 ^ ROUND_CONST_MUL, 0x30201000 ^ ROUND_CONST_MUL);\
-    ROUND_CONST_Q[i] = _mm_set_epi32(0x0f1f2f3f ^ ROUND_CONST_MUL, 0x4f5f6f7f ^ ROUND_CONST_MUL, 0x8f9fafbf ^ ROUND_CONST_MUL, 0xcfdfefff ^ ROUND_CONST_MUL);\
+    ROUND_CONST_P[i] = _mm_set_epi32(0xf0e0d0c0 ^ (i * 0x01010101), 0xb0a09080 ^ (i * 0x01010101), 0x70605040 ^ (i * 0x01010101), 0x30201000 ^ (i * 0x01010101));\
+    ROUND_CONST_Q[i] = _mm_set_epi32(0x0f1f2f3f ^ (i * 0x01010101), 0x4f5f6f7f ^ (i * 0x01010101), 0x8f9fafbf ^ (i * 0x01010101), 0xcfdfefff ^ (i * 0x01010101));\
   }\
 }/**/
 
@@ -792,92 +817,97 @@ void OF512() {
  * a0-a7 = input rows
  * b0-b7 = output rows
  */
-#define ROUND(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
-    /* SubBytes + Multiplication */\
-    VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7);\
-    /* MixBytes */\
-    MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
+#define SUBMIX(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
+  /* SubBytes + Multiplication */\
+  VPERM_SUB_MULTIPLY(a0, a1, a2, a3, a4, a5, a6, a7, b1, b2, b5, b6, b0, b3, b4, b7);\
+  /* MixBytes */\
+  MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
 }/**/
 
 #define ROUNDS_P(){\
-    u8 round_counter = 0;\
-    for(round_counter = 0; round_counter < 14; round_counter+=2) {\
-      /* AddConstant */\
-      xmm8 = _mm_xor_si128(xmm8, (ROUND_CONST_P[round_counter]));\
-      /* ShiftBytesWideP + pre-AESENCLAST */\
-      xmm8 = _mm_shuffle_epi8(xmm8,  (SUBSH_MASK[0]));\
-      xmm9 = _mm_shuffle_epi8(xmm9,  (SUBSH_MASK[1]));\
-      xmm10 = _mm_shuffle_epi8(xmm10, (SUBSH_MASK[2]));\
-      xmm11 = _mm_shuffle_epi8(xmm11, (SUBSH_MASK[3]));\
-      xmm12 = _mm_shuffle_epi8(xmm12, (SUBSH_MASK[4]));\
-      xmm13 = _mm_shuffle_epi8(xmm13, (SUBSH_MASK[5]));\
-      xmm14 = _mm_shuffle_epi8(xmm14, (SUBSH_MASK[6]));\
-      xmm15 = _mm_shuffle_epi8(xmm15, (SUBSH_MASK[7]));\
-      ROUND(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
-      VPERM_Add_Constant(xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, ALL_15, xmm8);\
-      /* AddConstant */\
-      xmm0 = _mm_xor_si128(xmm0, (ROUND_CONST_P[round_counter+1]));\
-      /* ShiftBytesWideP + pre-AESENCLAST */\
-      xmm0 = _mm_shuffle_epi8(xmm0, (SUBSH_MASK[0]));\
-      xmm1 = _mm_shuffle_epi8(xmm1, (SUBSH_MASK[1]));\
-      xmm2 = _mm_shuffle_epi8(xmm2, (SUBSH_MASK[2]));\
-      xmm3 = _mm_shuffle_epi8(xmm3, (SUBSH_MASK[3]));\
-      xmm4 = _mm_shuffle_epi8(xmm4, (SUBSH_MASK[4]));\
-      xmm5 = _mm_shuffle_epi8(xmm5, (SUBSH_MASK[5]));\
-      xmm6 = _mm_shuffle_epi8(xmm6, (SUBSH_MASK[6]));\
-      xmm7 = _mm_shuffle_epi8(xmm7, (SUBSH_MASK[7]));\
-      ROUND(xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
-      VPERM_Add_Constant(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, ALL_15, xmm0);\
-    }\
+  u8 round_counter = 0;\
+  for(round_counter = 0; round_counter < 14; round_counter+=2) {\
+    /* AddRoundConstant P1024 */\
+    xmm8 = _mm_xor_si128(xmm8, (ROUND_CONST_P[round_counter]));\
+    /* ShiftBytes P1024 + pre-AESENCLAST */\
+    xmm8 = _mm_shuffle_epi8(xmm8,  (SUBSH_MASK[0]));\
+    xmm9 = _mm_shuffle_epi8(xmm9,  (SUBSH_MASK[1]));\
+    xmm10 = _mm_shuffle_epi8(xmm10, (SUBSH_MASK[2]));\
+    xmm11 = _mm_shuffle_epi8(xmm11, (SUBSH_MASK[3]));\
+    xmm12 = _mm_shuffle_epi8(xmm12, (SUBSH_MASK[4]));\
+    xmm13 = _mm_shuffle_epi8(xmm13, (SUBSH_MASK[5]));\
+    xmm14 = _mm_shuffle_epi8(xmm14, (SUBSH_MASK[6]));\
+    xmm15 = _mm_shuffle_epi8(xmm15, (SUBSH_MASK[7]));\
+    /* SubBytes + MixBytes */\
+    SUBMIX(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
+    VPERM_Add_Constant(xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, ALL_15, xmm8);\
+    \
+    /* AddRoundConstant P1024 */\
+    xmm0 = _mm_xor_si128(xmm0, (ROUND_CONST_P[round_counter+1]));\
+    /* ShiftBytes P1024 + pre-AESENCLAST */\
+    xmm0 = _mm_shuffle_epi8(xmm0, (SUBSH_MASK[0]));\
+    xmm1 = _mm_shuffle_epi8(xmm1, (SUBSH_MASK[1]));\
+    xmm2 = _mm_shuffle_epi8(xmm2, (SUBSH_MASK[2]));\
+    xmm3 = _mm_shuffle_epi8(xmm3, (SUBSH_MASK[3]));\
+    xmm4 = _mm_shuffle_epi8(xmm4, (SUBSH_MASK[4]));\
+    xmm5 = _mm_shuffle_epi8(xmm5, (SUBSH_MASK[5]));\
+    xmm6 = _mm_shuffle_epi8(xmm6, (SUBSH_MASK[6]));\
+    xmm7 = _mm_shuffle_epi8(xmm7, (SUBSH_MASK[7]));\
+    /* SubBytes + MixBytes */\
+    SUBMIX(xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
+    VPERM_Add_Constant(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, ALL_15, xmm0);\
+  }\
 }/**/
 
 #define ROUNDS_Q(){\
-    VPERM_Add_Constant(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, ALL_15, xmm1);\
-\
-    u8 round_counter = 0;\
-    for(round_counter = 0; round_counter < 14; round_counter+=2) {\
-      /* AddConstant */\
-      xmm1 = ALL_FF;\
-      xmm8 = _mm_xor_si128(xmm8,  xmm1);\
-      xmm9 = _mm_xor_si128(xmm9,  xmm1);\
-      xmm10 = _mm_xor_si128(xmm10, xmm1);\
-      xmm11 = _mm_xor_si128(xmm11, xmm1);\
-      xmm12 = _mm_xor_si128(xmm12, xmm1);\
-      xmm13 = _mm_xor_si128(xmm13, xmm1);\
-      xmm14 = _mm_xor_si128(xmm14, xmm1);\
-      xmm15 = _mm_xor_si128(xmm15, (ROUND_CONST_Q[round_counter]));\
-      /* ShiftBytesWideQ + pre-AESENCLAST */\
-      xmm8 = _mm_shuffle_epi8(xmm8,  (SUBSH_MASK[1]));\
-      xmm9 = _mm_shuffle_epi8(xmm9,  (SUBSH_MASK[3]));\
-      xmm10 = _mm_shuffle_epi8(xmm10, (SUBSH_MASK[5]));\
-      xmm11 = _mm_shuffle_epi8(xmm11, (SUBSH_MASK[7]));\
-      xmm12 = _mm_shuffle_epi8(xmm12, (SUBSH_MASK[0]));\
-      xmm13 = _mm_shuffle_epi8(xmm13, (SUBSH_MASK[2]));\
-      xmm14 = _mm_shuffle_epi8(xmm14, (SUBSH_MASK[4]));\
-      xmm15 = _mm_shuffle_epi8(xmm15, (SUBSH_MASK[6]));\
-      ROUND(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
-      /* AddConstant */\
-      xmm9 = ALL_FF;\
-      xmm0 = _mm_xor_si128(xmm0,  xmm9);\
-      xmm1 = _mm_xor_si128(xmm1,  xmm9);\
-      xmm2 = _mm_xor_si128(xmm2,  xmm9);\
-      xmm3 = _mm_xor_si128(xmm3,  xmm9);\
-      xmm4 = _mm_xor_si128(xmm4,  xmm9);\
-      xmm5 = _mm_xor_si128(xmm5,  xmm9);\
-      xmm6 = _mm_xor_si128(xmm6,  xmm9);\
-      xmm7 = _mm_xor_si128(xmm7,  (ROUND_CONST_Q[round_counter+1]));\
-      /* ShiftBytesWideQ + pre-AESENCLAST */\
-      xmm0 = _mm_shuffle_epi8(xmm0, (SUBSH_MASK[1]));\
-      xmm1 = _mm_shuffle_epi8(xmm1, (SUBSH_MASK[3]));\
-      xmm2 = _mm_shuffle_epi8(xmm2, (SUBSH_MASK[5]));\
-      xmm3 = _mm_shuffle_epi8(xmm3, (SUBSH_MASK[7]));\
-      xmm4 = _mm_shuffle_epi8(xmm4, (SUBSH_MASK[0]));\
-      xmm5 = _mm_shuffle_epi8(xmm5, (SUBSH_MASK[2]));\
-      xmm6 = _mm_shuffle_epi8(xmm6, (SUBSH_MASK[4]));\
-      xmm7 = _mm_shuffle_epi8(xmm7, (SUBSH_MASK[6]));\
-      ROUND(xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
-    }\
-    VPERM_Add_Constant(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, ALL_15, xmm1);\
+  VPERM_Add_Constant(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, ALL_15, xmm1);\
+  u8 round_counter = 0;\
+  for(round_counter = 0; round_counter < 14; round_counter+=2) {\
+    /* AddRoundConstant Q1024 */\
+    xmm1 = ALL_FF;\
+    xmm8 = _mm_xor_si128(xmm8, xmm1);\
+    xmm9 = _mm_xor_si128(xmm9, xmm1);\
+    xmm10 = _mm_xor_si128(xmm10, xmm1);\
+    xmm11 = _mm_xor_si128(xmm11, xmm1);\
+    xmm12 = _mm_xor_si128(xmm12, xmm1);\
+    xmm13 = _mm_xor_si128(xmm13, xmm1);\
+    xmm14 = _mm_xor_si128(xmm14, xmm1);\
+    xmm15 = _mm_xor_si128(xmm15, (ROUND_CONST_Q[round_counter]));\
+    /* ShiftBytes Q1024 + pre-AESENCLAST */\
+    xmm8 = _mm_shuffle_epi8(xmm8, (SUBSH_MASK[1]));\
+    xmm9 = _mm_shuffle_epi8(xmm9, (SUBSH_MASK[3]));\
+    xmm10 = _mm_shuffle_epi8(xmm10, (SUBSH_MASK[5]));\
+    xmm11 = _mm_shuffle_epi8(xmm11, (SUBSH_MASK[7]));\
+    xmm12 = _mm_shuffle_epi8(xmm12, (SUBSH_MASK[0]));\
+    xmm13 = _mm_shuffle_epi8(xmm13, (SUBSH_MASK[2]));\
+    xmm14 = _mm_shuffle_epi8(xmm14, (SUBSH_MASK[4]));\
+    xmm15 = _mm_shuffle_epi8(xmm15, (SUBSH_MASK[6]));\
+    /* SubBytes + MixBytes */\
+    SUBMIX(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
+    \
+    /* AddRoundConstant Q1024 */\
+    xmm9 = ALL_FF;\
+    xmm0 = _mm_xor_si128(xmm0, xmm9);\
+    xmm1 = _mm_xor_si128(xmm1, xmm9);\
+    xmm2 = _mm_xor_si128(xmm2, xmm9);\
+    xmm3 = _mm_xor_si128(xmm3, xmm9);\
+    xmm4 = _mm_xor_si128(xmm4, xmm9);\
+    xmm5 = _mm_xor_si128(xmm5, xmm9);\
+    xmm6 = _mm_xor_si128(xmm6, xmm9);\
+    xmm7 = _mm_xor_si128(xmm7, (ROUND_CONST_Q[round_counter+1]));\
+    /* ShiftBytes Q1024 + pre-AESENCLAST */\
+    xmm0 = _mm_shuffle_epi8(xmm0, (SUBSH_MASK[1]));\
+    xmm1 = _mm_shuffle_epi8(xmm1, (SUBSH_MASK[3]));\
+    xmm2 = _mm_shuffle_epi8(xmm2, (SUBSH_MASK[5]));\
+    xmm3 = _mm_shuffle_epi8(xmm3, (SUBSH_MASK[7]));\
+    xmm4 = _mm_shuffle_epi8(xmm4, (SUBSH_MASK[0]));\
+    xmm5 = _mm_shuffle_epi8(xmm5, (SUBSH_MASK[2]));\
+    xmm6 = _mm_shuffle_epi8(xmm6, (SUBSH_MASK[4]));\
+    xmm7 = _mm_shuffle_epi8(xmm7, (SUBSH_MASK[6]));\
+    /* SubBytes + MixBytes*/ \
+    SUBMIX(xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
+  }\
+  VPERM_Add_Constant(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, ALL_15, xmm1);\
 }/**/
 
 
@@ -1059,59 +1089,72 @@ void OF512() {
 }/**/
 
 
-void INIT_CV()
+void INIT(u64* h)
 {
+   __m128i* const chaining = (__m128i*) h;
+  static __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
+  static __m128i xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
+
+  /* transform round constants into VPERM mode */
   VPERM_Transform_RoundConst();
 
-  /* load CV (IV) into registers xmm8 - xmm15 */
-  xmm8 = GLOBAL_CV_PTR[0];
-  xmm9 = GLOBAL_CV_PTR[1];
-  xmm10 = GLOBAL_CV_PTR[2];
-  xmm11 = GLOBAL_CV_PTR[3];
-  xmm12 = GLOBAL_CV_PTR[4];
-  xmm13 = GLOBAL_CV_PTR[5];
-  xmm14 = GLOBAL_CV_PTR[6];
-  xmm15 = GLOBAL_CV_PTR[7];
+  /* load IV into registers xmm8 - xmm15 */
+  xmm8 = chaining[0];
+  xmm9 = chaining[1];
+  xmm10 = chaining[2];
+  xmm11 = chaining[3];
+  xmm12 = chaining[4];
+  xmm13 = chaining[5];
+  xmm14 = chaining[6];
+  xmm15 = chaining[7];
 
+  /* transform chaining value from column ordering into row ordering */
   VPERM_Transform_State(xmm8, xmm9, xmm10, xmm11, VPERM_IPT, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);
   VPERM_Transform_State(xmm12, xmm13, xmm14, xmm15, VPERM_IPT, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);
-
   Matrix_Transpose(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);
 
-  GLOBAL_CV_PTR[0] = xmm8;
-  GLOBAL_CV_PTR[1] = xmm9;
-  GLOBAL_CV_PTR[2] = xmm10;
-  GLOBAL_CV_PTR[3] = xmm11;
-  GLOBAL_CV_PTR[4] = xmm12;
-  GLOBAL_CV_PTR[5] = xmm13;
-  GLOBAL_CV_PTR[6] = xmm14;
-  GLOBAL_CV_PTR[7] = xmm15;
+  /* store transposed IV */
+  chaining[0] = xmm8;
+  chaining[1] = xmm9;
+  chaining[2] = xmm10;
+  chaining[3] = xmm11;
+  chaining[4] = xmm12;
+  chaining[5] = xmm13;
+  chaining[6] = xmm14;
+  chaining[7] = xmm15;
 }
 
-void TF1024(u64* message)
+void TF1024(u64* h, u64* m)
 {
-  /*  Note : message is in rdi thanks to the  */
-  /*  __cdecl calling convention    */
+  __m128i* const chaining = (__m128i*) h;
+  __m128i* const message = (__m128i*) m;
+  static __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
+  static __m128i xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
+  static __m128i TEMP_MUL1[8];
+  static __m128i TEMP_MUL2[8];
+  static __m128i TEMP_MUL4;
+  static __m128i QTEMP[8];
+
 #ifdef IACA_TRACE
   IACA_START;
 #endif
-  /* load message into registers xmm12 - xmm15 (Q = message) */
-  xmm8  = _mm_set_epi32((message)[2*0+1] >> 32, (message)[2*0+1], (message)[2*0+0] >> 32, (message)[2*0+0]);
-  xmm9  = _mm_set_epi32((message)[2*1+1] >> 32, (message)[2*1+1], (message)[2*1+0] >> 32, (message)[2*1+0]);
-  xmm10 = _mm_set_epi32((message)[2*2+1] >> 32, (message)[2*2+1], (message)[2*2+0] >> 32, (message)[2*2+0]);
-  xmm11 = _mm_set_epi32((message)[2*3+1] >> 32, (message)[2*3+1], (message)[2*3+0] >> 32, (message)[2*3+0]);
-  xmm12 = _mm_set_epi32((message)[2*4+1] >> 32, (message)[2*4+1], (message)[2*4+0] >> 32, (message)[2*4+0]);
-  xmm13 = _mm_set_epi32((message)[2*5+1] >> 32, (message)[2*5+1], (message)[2*5+0] >> 32, (message)[2*5+0]);
-  xmm14 = _mm_set_epi32((message)[2*6+1] >> 32, (message)[2*6+1], (message)[2*6+0] >> 32, (message)[2*6+0]);
-  xmm15 = _mm_set_epi32((message)[2*7+1] >> 32, (message)[2*7+1], (message)[2*7+0] >> 32, (message)[2*7+0]);
 
+  /* load message into registers xmm8 - xmm15 (Q = message) */
+  xmm8 = message[0];
+  xmm9 = message[1];
+  xmm10 = message[2];
+  xmm11 = message[3];
+  xmm12 = message[4];
+  xmm13 = message[5];
+  xmm14 = message[6];
+  xmm15 = message[7];
+
+  /* transform message M from column ordering into row ordering */
   VPERM_Transform_State(xmm8, xmm9, xmm10, xmm11, VPERM_IPT, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);
   VPERM_Transform_State(xmm12, xmm13, xmm14, xmm15, VPERM_IPT, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);
-
-  /* transpose message */
   Matrix_Transpose(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);
 
-  /* store Q for later */
+  /* store message M (Q input) for later */
   QTEMP[0] = xmm8;
   QTEMP[1] = xmm9;
   QTEMP[2] = xmm10;
@@ -1121,38 +1164,43 @@ void TF1024(u64* message)
   QTEMP[6] = xmm14;
   QTEMP[7] = xmm15;
 
-  /* xor CV to get P */
-  xmm8 = _mm_xor_si128(xmm8,  (GLOBAL_CV_PTR[0]));
-  xmm9 = _mm_xor_si128(xmm9,  (GLOBAL_CV_PTR[1]));
-  xmm10 = _mm_xor_si128(xmm10, (GLOBAL_CV_PTR[2]));
-  xmm11 = _mm_xor_si128(xmm11, (GLOBAL_CV_PTR[3]));
-  xmm12 = _mm_xor_si128(xmm12, (GLOBAL_CV_PTR[4]));
-  xmm13 = _mm_xor_si128(xmm13, (GLOBAL_CV_PTR[5]));
-  xmm14 = _mm_xor_si128(xmm14, (GLOBAL_CV_PTR[6]));
-  xmm15 = _mm_xor_si128(xmm15, (GLOBAL_CV_PTR[7]));
+  /* xor CV to message to get P input */
+  /* result: CV+M in xmm8...xmm15 */
+  xmm8 = _mm_xor_si128(xmm8,  (chaining[0]));
+  xmm9 = _mm_xor_si128(xmm9,  (chaining[1]));
+  xmm10 = _mm_xor_si128(xmm10, (chaining[2]));
+  xmm11 = _mm_xor_si128(xmm11, (chaining[3]));
+  xmm12 = _mm_xor_si128(xmm12, (chaining[4]));
+  xmm13 = _mm_xor_si128(xmm13, (chaining[5]));
+  xmm14 = _mm_xor_si128(xmm14, (chaining[6]));
+  xmm15 = _mm_xor_si128(xmm15, (chaining[7]));
 
+  /* compute permutation P */
+  /* result: P(CV+M) in xmm8...xmm15 */
   ROUNDS_P();
 
-  /* XOR P to CV */
-  xmm8 = _mm_xor_si128(xmm8,  (GLOBAL_CV_PTR[0]));
-  xmm9 = _mm_xor_si128(xmm9,  (GLOBAL_CV_PTR[1]));
-  xmm10 = _mm_xor_si128(xmm10, (GLOBAL_CV_PTR[2]));
-  xmm11 = _mm_xor_si128(xmm11, (GLOBAL_CV_PTR[3]));
-  xmm12 = _mm_xor_si128(xmm12, (GLOBAL_CV_PTR[4]));
-  xmm13 = _mm_xor_si128(xmm13, (GLOBAL_CV_PTR[5]));
-  xmm14 = _mm_xor_si128(xmm14, (GLOBAL_CV_PTR[6]));
-  xmm15 = _mm_xor_si128(xmm15, (GLOBAL_CV_PTR[7]));
+  /* xor CV to P output (feed-forward) */
+  /* result: P(CV+M)+CV in xmm8...xmm15 */
+  xmm8 = _mm_xor_si128(xmm8,  (chaining[0]));
+  xmm9 = _mm_xor_si128(xmm9,  (chaining[1]));
+  xmm10 = _mm_xor_si128(xmm10, (chaining[2]));
+  xmm11 = _mm_xor_si128(xmm11, (chaining[3]));
+  xmm12 = _mm_xor_si128(xmm12, (chaining[4]));
+  xmm13 = _mm_xor_si128(xmm13, (chaining[5]));
+  xmm14 = _mm_xor_si128(xmm14, (chaining[6]));
+  xmm15 = _mm_xor_si128(xmm15, (chaining[7]));
 
-  GLOBAL_CV_PTR[0] = xmm8;
-  GLOBAL_CV_PTR[1] = xmm9;
-  GLOBAL_CV_PTR[2] = xmm10;
-  GLOBAL_CV_PTR[3] = xmm11;
-  GLOBAL_CV_PTR[4] = xmm12;
-  GLOBAL_CV_PTR[5] = xmm13;
-  GLOBAL_CV_PTR[6] = xmm14;
-  GLOBAL_CV_PTR[7] = xmm15;
+  /* store P(CV+M)+CV */
+  chaining[0] = xmm8;
+  chaining[1] = xmm9;
+  chaining[2] = xmm10;
+  chaining[3] = xmm11;
+  chaining[4] = xmm12;
+  chaining[5] = xmm13;
+  chaining[6] = xmm14;
+  chaining[7] = xmm15;
 
-  /* restore Q into xmm8-15 */
+  /* load message M (Q input) into xmm8-15 */
   xmm8 = QTEMP[0];
   xmm9 = QTEMP[1];
   xmm10 = QTEMP[2];
@@ -1162,76 +1210,85 @@ void TF1024(u64* message)
   xmm14 = QTEMP[6];
   xmm15 = QTEMP[7];
 
+  /* compute permutation Q */
+  /* result: Q(M) in xmm8...xmm15 */
   ROUNDS_Q();
 
-  /* XOR P to CV */
-  xmm8 = _mm_xor_si128(xmm8,  (GLOBAL_CV_PTR[0]));
-  xmm9 = _mm_xor_si128(xmm9,  (GLOBAL_CV_PTR[1]));
-  xmm10 = _mm_xor_si128(xmm10, (GLOBAL_CV_PTR[2]));
-  xmm11 = _mm_xor_si128(xmm11, (GLOBAL_CV_PTR[3]));
-  xmm12 = _mm_xor_si128(xmm12, (GLOBAL_CV_PTR[4]));
-  xmm13 = _mm_xor_si128(xmm13, (GLOBAL_CV_PTR[5]));
-  xmm14 = _mm_xor_si128(xmm14, (GLOBAL_CV_PTR[6]));
-  xmm15 = _mm_xor_si128(xmm15, (GLOBAL_CV_PTR[7]));
+  /* xor Q output */
+  /* result: P(CV+M)+CV+Q(M) in xmm8...xmm15 */
+  xmm8 = _mm_xor_si128(xmm8,  (chaining[0]));
+  xmm9 = _mm_xor_si128(xmm9,  (chaining[1]));
+  xmm10 = _mm_xor_si128(xmm10, (chaining[2]));
+  xmm11 = _mm_xor_si128(xmm11, (chaining[3]));
+  xmm12 = _mm_xor_si128(xmm12, (chaining[4]));
+  xmm13 = _mm_xor_si128(xmm13, (chaining[5]));
+  xmm14 = _mm_xor_si128(xmm14, (chaining[6]));
+  xmm15 = _mm_xor_si128(xmm15, (chaining[7]));
 
-  GLOBAL_CV_PTR[0] = xmm8;
-  GLOBAL_CV_PTR[1] = xmm9;
-  GLOBAL_CV_PTR[2] = xmm10;
-  GLOBAL_CV_PTR[3] = xmm11;
-  GLOBAL_CV_PTR[4] = xmm12;
-  GLOBAL_CV_PTR[5] = xmm13;
-  GLOBAL_CV_PTR[6] = xmm14;
-  GLOBAL_CV_PTR[7] = xmm15;
+  /* store CV */
+  chaining[0] = xmm8;
+  chaining[1] = xmm9;
+  chaining[2] = xmm10;
+  chaining[3] = xmm11;
+  chaining[4] = xmm12;
+  chaining[5] = xmm13;
+  chaining[6] = xmm14;
+  chaining[7] = xmm15;
 
 #ifdef IACA_TRACE
   IACA_END;
 #endif
+
   return;
 }
 
-void OF1024() {
-  /* load CV into registers xmm8 - xmm11 (P = CV)*/
-  xmm8 = GLOBAL_CV_PTR[0];
-  xmm9 = GLOBAL_CV_PTR[1];
-  xmm10 = GLOBAL_CV_PTR[2];
-  xmm11 = GLOBAL_CV_PTR[3];
-  xmm12 = GLOBAL_CV_PTR[4];
-  xmm13 = GLOBAL_CV_PTR[5];
-  xmm14 = GLOBAL_CV_PTR[6];
-  xmm15 = GLOBAL_CV_PTR[7];
+void OF1024(u64* h)
+{
+  __m128i* const chaining = (__m128i*) h;
+  static __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7;
+  static __m128i xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15;
+  static __m128i TEMP_MUL1[8];
+  static __m128i TEMP_MUL2[8];
+  static __m128i TEMP_MUL4;
 
+  /* load CV into registers xmm8 - xmm15 */
+  xmm8 = chaining[0];
+  xmm9 = chaining[1];
+  xmm10 = chaining[2];
+  xmm11 = chaining[3];
+  xmm12 = chaining[4];
+  xmm13 = chaining[5];
+  xmm14 = chaining[6];
+  xmm15 = chaining[7];
+
+  /* compute permutation P */
+  /* result: P(CV) in xmm8...xmm15 */
   ROUNDS_P();
 
-  /* xor CV */
+  /* xor CV to P output (feed-forward) */
+  /* result: P(CV)+CV in xmm8...xmm15 */
+  xmm8 = _mm_xor_si128(xmm8,  (chaining[0]));
+  xmm9 = _mm_xor_si128(xmm9,  (chaining[1]));
+  xmm10 = _mm_xor_si128(xmm10, (chaining[2]));
+  xmm11 = _mm_xor_si128(xmm11, (chaining[3]));
+  xmm12 = _mm_xor_si128(xmm12, (chaining[4]));
+  xmm13 = _mm_xor_si128(xmm13, (chaining[5]));
+  xmm14 = _mm_xor_si128(xmm14, (chaining[6]));
+  xmm15 = _mm_xor_si128(xmm15, (chaining[7]));
 
-  xmm8 = _mm_xor_si128(xmm8,  (GLOBAL_CV_PTR[0]));
-  xmm9 = _mm_xor_si128(xmm9,  (GLOBAL_CV_PTR[1]));
-  xmm10 = _mm_xor_si128(xmm10, (GLOBAL_CV_PTR[2]));
-  xmm11 = _mm_xor_si128(xmm11, (GLOBAL_CV_PTR[3]));
-  xmm12 = _mm_xor_si128(xmm12, (GLOBAL_CV_PTR[4]));
-  xmm13 = _mm_xor_si128(xmm13, (GLOBAL_CV_PTR[5]));
-  xmm14 = _mm_xor_si128(xmm14, (GLOBAL_CV_PTR[6]));
-  xmm15 = _mm_xor_si128(xmm15, (GLOBAL_CV_PTR[7]));
-
-  /*  transpose state back to original format */
+  /* transpose CV back from row ordering to column ordering */
+  /* result: final hash value in xmm0, xmm6, xmm13, xmm15 */
   Matrix_Transpose_INV(xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm4, xmm0, xmm6, xmm1, xmm2, xmm3, xmm5, xmm7);
-
-  //VPERM_Transform_State(xmm0, xmm 4, xmm 6, xmm 8, VPERM_OPT, xmm1, xmm2, xmm3, xmm5, xmm7, xmm10, xmm12);
-  //VPERM_Transform_State(xmm9, xmm11, xmm13, xmm15, VPERM_OPT, xmm1, xmm2, xmm3, xmm5, xmm7, xmm10, xmm12);
   VPERM_Transform_State(xmm0, xmm6, xmm13, xmm15, VPERM_OPT, xmm1, xmm2, xmm3, xmm5, xmm7, xmm10, xmm12);
 
-  /* store finished hash */
-  //GLOBAL_CV_PTR[0] = xmm8;
-  //GLOBAL_CV_PTR[1] = xmm4;
-  //GLOBAL_CV_PTR[2] = xmm9;
-  //GLOBAL_CV_PTR[3] = xmm11;
-  GLOBAL_CV_PTR[4] = xmm0;
-  GLOBAL_CV_PTR[5] = xmm6;
-  GLOBAL_CV_PTR[6] = xmm13;
-  GLOBAL_CV_PTR[7] = xmm15;
+  /* we only need to return the truncated half of the state */
+  chaining[4] = xmm0;
+  chaining[5] = xmm6;
+  chaining[6] = xmm13;
+  chaining[7] = xmm15;
 
   return;
-}//OF1024()
+}
 
 #endif
 
