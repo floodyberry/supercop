@@ -1,1 +1,1 @@
-BLAKE-512: BLAKE with 64-bit words, 16 rounds, and 512-bit output
+BLAKE-512: BLAKE with 64-bit words, 16 rounds, and 512-bit output; BLAKE team's final submission for SHA-3-512

@@ -1,1 +1,1 @@
-Keccak[r=1152,c=448,nr=24] with 224-bit output; padding tweaked starting in supercop-20110426
+Keccak[r=1152,c=448,nr=24] with 224-bit output; padding tweaked starting in supercop-20110426; Keccak team's final submission for SHA-3-224
