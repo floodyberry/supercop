@@ -16,6 +16,7 @@
 #define fe25519_mul          crypto_sign_ed25519_amd64_51_30k_batch_fe25519_mul
 #define fe25519_mul121666    crypto_sign_ed25519_amd64_51_30k_batch_fe25519_mul121666
 #define fe25519_square       crypto_sign_ed25519_amd64_51_30k_batch_fe25519_square
+#define fe25519_nsquare       crypto_sign_ed25519_amd64_51_30k_batch_fe25519_nsquare
 #define fe25519_invert       crypto_sign_ed25519_amd64_51_30k_batch_fe25519_invert
 #define fe25519_pow2523      crypto_sign_ed25519_amd64_51_30k_batch_fe25519_pow2523
 
@@ -54,6 +55,8 @@ void fe25519_mul(fe25519 *r, const fe25519 *x, const fe25519 *y);
 void fe25519_mul121666(fe25519 *r, const fe25519 *x);
 
 void fe25519_square(fe25519 *r, const fe25519 *x);
+
+void fe25519_nsquare(fe25519 *r, unsigned long long n);
 
 void fe25519_invert(fe25519 *r, const fe25519 *x);
 

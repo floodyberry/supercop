@@ -21,6 +21,7 @@
 #define choose_t           crypto_sign_ed25519_amd64_64_24k_batch_choose_t
 #define ge25519_nielsadd2  crypto_sign_ed25519_amd64_64_24k_batch_ge25519_nielsadd2
 #define ge25519_nielsadd_p1p1  crypto_sign_ed25519_amd64_64_24k_batch_ge25519_nielsadd_p1p1
+#define ge25519_pnielsadd_p1p1  crypto_sign_ed25519_amd64_64_24k_batch_ge25519_pnielsadd_p1p1
 
 
 #define ge25519_p3 ge25519
@@ -55,6 +56,14 @@ typedef struct
   fe25519 t2d;
 } ge25519_niels;
 
+typedef struct
+{
+  fe25519 ysubx;
+  fe25519 xaddy;
+  fe25519 z;
+  fe25519 t2d;
+} ge25519_pniels;
+
 extern void ge25519_p1p1_to_p2(ge25519_p2 *r, const ge25519_p1p1 *p);
 extern void ge25519_p1p1_to_p3(ge25519_p3 *r, const ge25519_p1p1 *p);
 extern void ge25519_add_p1p1(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_p3 *q);
@@ -62,6 +71,7 @@ extern void ge25519_dbl_p1p1(ge25519_p1p1 *r, const ge25519_p2 *p);
 extern void choose_t(ge25519_niels *t, unsigned long long pos, signed long long b, const ge25519_niels *base_multiples);
 extern void ge25519_nielsadd2(ge25519_p3 *r, const ge25519_niels *q);
 extern void ge25519_nielsadd_p1p1(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_niels *q);
+extern void ge25519_pnielsadd_p1p1(ge25519_p1p1 *r, const ge25519_p3 *p, const ge25519_pniels *q);
 
 extern const ge25519 ge25519_base;
 

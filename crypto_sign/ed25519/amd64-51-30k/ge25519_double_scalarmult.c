@@ -11,6 +11,8 @@ ge25519_niels pre2[PRE2_SIZE] = {
 #include "ge25519_base_slide_multiples.data"
 };
 
+static const fe25519 ec2d = {{1859910466990425, 932731440258426, 1072319116312658, 1815898335770999, 633789495995903}};
+
 static void setneutral(ge25519 *r)
 {
   fe25519_setint(&r->x,0);
@@ -23,9 +25,9 @@ static void setneutral(ge25519 *r)
 void ge25519_double_scalarmult_vartime(ge25519_p3 *r, const ge25519_p3 *p1, const sc25519 *s1, const sc25519 *s2)
 {
   signed char slide1[256], slide2[256];
-  ge25519_p3 pre1[PRE1_SIZE], d1;
+  ge25519_pniels pre1[PRE1_SIZE], neg;
+  ge25519_p3 d1;
   ge25519_p1p1 t;
-  ge25519_p3 neg;
   ge25519_niels nneg;
   fe25519 d;
   int i;
@@ -34,12 +36,17 @@ void ge25519_double_scalarmult_vartime(ge25519_p3 *r, const ge25519_p3 *p1, cons
   sc25519_slide(slide2, s2, S2_SWINDOWSIZE);
 
   /* precomputation */
-  pre1[0] = *p1;                                                                         
+  pre1[0] = *(ge25519_pniels *)p1;                                                                         
   ge25519_dbl_p1p1(&t,(ge25519_p2 *)pre1);      ge25519_p1p1_to_p3(&d1, &t);
+  /* Convert pre[0] to projective Niels representation */
+  d = pre1[0].ysubx;
+  fe25519_sub(&pre1[0].ysubx, &pre1[0].xaddy, &pre1[0].ysubx);
+  fe25519_add(&pre1[0].xaddy, &pre1[0].xaddy, &d);
+  fe25519_mul(&pre1[0].t2d, &pre1[0].t2d, &ec2d);
 
   for(i=0;i<PRE1_SIZE-1;i++)
   {
-    ge25519_add_p1p1(&t, &pre1[i], &d1);      ge25519_p1p1_to_p3(&pre1[i+1], &t);
+    ge25519_pnielsadd_p1p1(&t, &d1, &pre1[i]);  ge25519_p1p1_to_pniels(&pre1[i+1], &t);
   }
 
   setneutral(r);
@@ -56,15 +63,17 @@ void ge25519_double_scalarmult_vartime(ge25519_p3 *r, const ge25519_p3 *p1, cons
     if(slide1[i]>0)
     {
       ge25519_p1p1_to_p3(r, &t);
-      ge25519_add_p1p1(&t, r, &pre1[slide1[i]/2]);
+      ge25519_pnielsadd_p1p1(&t, r, &pre1[slide1[i]/2]);
     }
     else if(slide1[i]<0)
     {
       ge25519_p1p1_to_p3(r, &t);
       neg = pre1[-slide1[i]/2];
-      fe25519_neg(&neg.x, &neg.x);
-      fe25519_neg(&neg.t, &neg.t);
-      ge25519_add_p1p1(&t, r, &neg);
+      d = neg.ysubx;
+      neg.ysubx = neg.xaddy;
+      neg.xaddy = d;
+      fe25519_neg(&neg.t2d, &neg.t2d);
+      ge25519_pnielsadd_p1p1(&t, r, &neg);
     }
 
     if(slide2[i]>0)
