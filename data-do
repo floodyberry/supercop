@@ -1,14 +1,23 @@
 #!/bin/sh
 
 cores=${1-1}
-cccc=`awk 'BEGIN{for(i=1;i<='$cores';++i)print i;exit}'`
+cccc=`awk 'BEGIN{for(i=0;i<'$cores';++i)print i;exit}'`
 
 sh data-init
 
 for x in $cccc
 do
-  sh data-run &
+  if taskset -c $x echo $x >/dev/null 2>&1
+  then
+    taskset -c $x sh data-run &
+  elif cpuset -l $x echo $x >/dev/null 2>&1
+  then
+    cpuset -l $x sh data-run &
+  else
+    sh data-run &
+  fi
 done
+
 wait
 
 sh data-summarize

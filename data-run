@@ -107,7 +107,7 @@ do
 
       if [ "$t1" = gmp ]
       then
-        echo "gmp 5.0.1" >&8
+        echo "gmp 5.0.2" >&8
       fi
   
       if [ "$t1" = cryptopp ]
@@ -227,7 +227,7 @@ do
 	    echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"
 	    rm -rf "$top/$target/work"
 	    mkdir -p "$top/$target/work"
-	    cp -pr gmp-5.0.1/* "$top/$target/work"
+	    cp -pr gmp-5.0.2/* "$top/$target/work"
 	    ( cd "$top/$target/work" \
 	      && ./configure --enable-cxx \
 	         ABI="$gmpabi" \
