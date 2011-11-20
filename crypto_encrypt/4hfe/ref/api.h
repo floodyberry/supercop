@@ -1,4 +1,4 @@
-#define crypto_encrypt_4HFE_ref_SECRETKEYBYTES 8480
-#define crypto_encrypt_4HFE_ref_PUBLICKEYBYTES 23040
-#define crypto_encrypt_4HFE_ref_BYTES 68
+#define CRYPTO_SECRETKEYBYTES 8480
+#define CRYPTO_PUBLICKEYBYTES 23040
+#define CRYPTO_BYTES 68
 

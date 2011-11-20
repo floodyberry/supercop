@@ -1,3 +1,3 @@
-#define crypto_encrypt_mceliece_ref_SECRETKEYBYTES 137282
-#define crypto_encrypt_mceliece_ref_PUBLICKEYBYTES 81408
-#define crypto_encrypt_mceliece_ref_BYTES 256
+#define CRYPTO_SECRETKEYBYTES 137282
+#define CRYPTO_PUBLICKEYBYTES 81408
+#define CRYPTO_BYTES 256
