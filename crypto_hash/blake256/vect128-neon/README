@@ -1,0 +1,38 @@
+BLAKE-256 vectorized implementation
+Author: Gaëtan Leurent <gaetan.leurent@uni.lu>
+Padding and API borrowed from reference code by Jean-Philippe Aumasson
+
+This implementation assumes that no salt is used.
+
+
+Level of copyright protection: 0
+
+  There are no known present or future claims by a copyright holder that
+  the distribution of this software infringes the copyright. In
+  particular, the author of the software is not making such claims and
+  does not intend to make such claims.
+
+Level of patent protection: 0
+
+  There are no known present or future claims by a patent holder that
+  the use of this software infringes the patent. In particular, the
+  author of the software is not making such claims and does not intend
+  to make such claims.
+
+
+Remarks:
+
+Compiled from C with LLVM-3.0:
+
+clang -v -D__ARM_NEON__ -DCOMPILE_256 -DSUPERCOP_API -march=cortex-a8 -c -emit-llvm vector.c -O9
+llc -O3 -mcpu=cortex-a8 vector.o -asm-verbose -post-RA-scheduler -max-sched-reorder=128 -pre-RA-sched=source -schedule-spills
+
+Post-processed with:
+
+#! /usr/bin/perl -pi
+
+s/align\t2/align\t4/;
+s/vldmia\t([a-z0-9]+), (\{[^,]*,[^,]*\})/vld1.16\t\2, [\1, :128]/;
+s/vstmia\t([a-z0-9]+), (\{[^,]*,[^,]*\})/vst1.16\t\2, [\1, :128]/;
+s/vext.32\tq([0-9]+), q\1, q\1, #2/"vswp\td".($1*2).", d".($1*2+1)/e;
+s/vmov\ts([0-9]+), ([^,]*)$/"vmov.i32\td".($1>>1)."[".($1%2)."], ".$2/e;

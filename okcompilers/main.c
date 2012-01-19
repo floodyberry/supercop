@@ -4,6 +4,9 @@ extern long long shr32(long long);
 extern double double5(void);
 extern int longbytes(void);
 extern int intbytes(void);
+extern int rand1(int *);
+
+int x[12];
 
 int main(int argc,char **argv)
 {
@@ -20,6 +23,9 @@ int main(int argc,char **argv)
 
   /* on pentium 1, gcc -march=prescott produces SIGILL for double comparison */
   if (double5() < 0) return 100;
+
+  /* gcc 4.6.1 -m64 -march=core2 -msse4 -O3 sometimes generates pinsrd */
+  rand1(x);
 
   return 0;
 }

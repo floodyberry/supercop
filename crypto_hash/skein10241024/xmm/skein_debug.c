@@ -7,9 +7,9 @@
 ** This algorithm and source code is released to the public domain.
 **
 ************************************************************************/
-#include <stdio.h>
 
 #ifdef SKEIN_DEBUG  /* only instantiate this code if SKEIN_DEBUG is on */
+#include <stdio.h>
 #include "skein.h"
 
 static const char INDENT[] =  "    ";  /* how much to indent on new line */
