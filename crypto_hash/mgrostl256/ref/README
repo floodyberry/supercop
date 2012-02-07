@@ -1,0 +1,10 @@
+Files
+
+api.h				-- indicating that software produces a 32-byte hash output.  
+hash.c				-- as per requiement
+nist.c				-- as per requiement
+Groestl-opt-mod.h	-- Header file included by Groestl-opt-final.c
+Groestl-opt-final.c	-- function definitions included by Groestl-opt-main.c
+Groestl-opt-main.c	-- main file to crete hash of given file
+f1					-- test input file
+h1					-- hash value of f1

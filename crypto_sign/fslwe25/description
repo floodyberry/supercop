@@ -1,0 +1,3 @@
+A signature function based on lattices, based on
+"Fiat-Shamir with aborts: Applications to lattices and factoring-based signatures" 
+at Asiacrypt'09 from Vadim Lyubashevsky. 
