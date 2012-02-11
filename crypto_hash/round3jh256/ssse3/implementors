@@ -1,0 +1,2 @@
+based on: sse2
+SSSE3 tweaks from: Daniel J. Bernstein

@@ -1,4 +1,5 @@
-/* Groestl-opt-final.c     
+/* 
+ * Groestl-opt-final.c     
  * ANSI C code optimised for 32-bit machines
  * Authors: Soeren S. Thomsen
  *          Krystian Matusiewicz
@@ -9,7 +10,7 @@
  
 #include <stdlib.h>
 #include<time.h>
-#include "Groestl-opt-mod.h"
+#include "mGroestl.h"
 #include "tables.h"
 
 /* compute one new state column */
@@ -285,18 +286,6 @@ void F512(u32 *h, const u32 *m, u32 *c) {
   RND512P(z, y, U32BIG((u32)0x08000000u));
   RND512P(y, Ptmp, U32BIG((u32)0x09000000u));
 
-  /* compute Q(P(h+ml) + Q(h+mr)) 
-  RND512Q(Qtmp, y, U32BIG((u32)0x00000000u));
-  RND512Q(y, z, U32BIG((u32)0x00000001u));
-  RND512Q(z, y, U32BIG((u32)0x00000002u));
-  RND512Q(y, z, U32BIG((u32)0x00000003u));
-  RND512Q(z, y, U32BIG((u32)0x00000004u));
-  RND512Q(y, z, U32BIG((u32)0x00000005u));
-  RND512Q(z, y, U32BIG((u32)0x00000006u));
-  RND512Q(y, z, U32BIG((u32)0x00000007u));
-  RND512Q(z, y, U32BIG((u32)0x00000008u));
-  RND512Q(y, Qtmp, U32BIG((u32)0x00000009u));
-*/
   /* compute P(P(h+ml) + Q(h+mr)) + Q(h+mr) + h */
   for (i = 0; i < 2*COLS512; i++) {
     h[i] ^= Ptmp[i]^Qtmp[i];

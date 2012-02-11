@@ -1,12 +1,18 @@
-/* Groestl-opt-mod1.c     October 2011
+/*
+ * hash.h
+ *
+ *  Created on: 06.02.2012
  * ANSI C code optimised for 32-bit machines
  * Authors: Soeren S. Thomsen
  *          Krystian Matusiewicz
+ *
  * Modified Grostle Author: Gurpreet Kaur
+ *							October 2011
  */
+ 
 #include <stdlib.h>
 #include<time.h>
-#include "Groestl-opt-mod.h"
+#include "mGroestl.h"
 #include "tables.h"
 
 /* compute one new state column */
@@ -218,12 +224,11 @@ void F512(u32 *h, const u32 *m, u32 *c) {
   u32 y[2*COLS512];
   u32 z[2*COLS512];
 
-//ADDED
+//ADDED By Gurpreet
   u32 ml[2*COLS512];		//msg_left
   u32 mr[2*COLS512];		//msg_right
-    /**/
-printf("\ninput_F512_u32:");
-    printf("\n");
+   
+   /*divide msg into two 512 blocks*/
       for (i = 0; i < 2*COLS1024; i++) {		//modified
 	if(i<COLS1024)
     		ml[i] = m[i];
@@ -231,40 +236,14 @@ printf("\ninput_F512_u32:");
 		mr[j] = m[i];j++;
 	     }
       }
-    printf("\n");
- 
-printf("\ninput_ml:\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",ml[i]);
-  }
-    printf("\n");
-printf("\ninput_mr:\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",mr[i]);
-  }
-    printf("\n");
-printf("\ncounter:\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",c[i]);
-  }
-    printf("\n");
-//-----
-
-  for (i = 0; i < 2*COLS512; i++) {
+//-------------
+  /* compute c+ml 
+             h+mr */
+  for (i = 0; i < 2*COLS512; i++) {			//modified
     Ptmp[i] = c[i]^ml[i];
-    z[i] = h[i]^mr[i];
+    z[i] = h[i]^mr[i];			
   }
-/**/
-printf("\nPtmp:\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",Ptmp[i]);
-  }
-    printf("\n");
-printf("\nz:\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",z[i]);
-  }
-    printf("\n");
+
   /* compute Q(h+mr) */
   RND512Q(z, y, U32BIG((u32)0x00000000u));
   RND512Q(y, z, U32BIG((u32)0x00000001u));
@@ -288,27 +267,15 @@ printf("\nz:\n");
   RND512P(y, z, U32BIG((u32)0x07000000u));
   RND512P(z, y, U32BIG((u32)0x08000000u));
   RND512P(y, Ptmp, U32BIG((u32)0x09000000u));
-/*
-printf("\nPtmp:\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",Ptmp[i]);
-  }
-    printf("\n");
-printf("\nQtmp:\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",Qtmp[i]);
-  }
-    printf("\n");*/
-  /* compute P(h+ml) + Q(h+mr) */
+
+
+  /* compute P(c+ml) + Q(h+mr) */
   for (i = 0; i < 2*COLS512; i++) {
     Ptmp[i] = Ptmp[i]^Qtmp[i];
   }
-  /*
-printf("\nPtmp(after xor):\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",Ptmp[i]);
-  }
-    printf("\n");*/
+
+//ADDED by GURPREET 
+
   /* compute P(P(h+ml) + Q(h+mr)) */
   RND512P(Ptmp, y, U32BIG((u32)0x00000000u));
   RND512P(y, z, U32BIG((u32)0x01000000u));
@@ -320,22 +287,19 @@ printf("\nPtmp(after xor):\n");
   RND512P(y, z, U32BIG((u32)0x07000000u));
   RND512P(z, y, U32BIG((u32)0x08000000u));
   RND512P(y, Ptmp, U32BIG((u32)0x09000000u));
-  /*
-printf("\nPtmp(after computation):\n");
+
+  /* compute P(P(h+ml) + Q(h+mr)) + Q(h+mr) + h */
   for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",Ptmp[i]);
+    h[i] ^= Ptmp[i]^Qtmp[i];
   }
-    printf("\n");*/
-  /* compute P(P(h+ml) + Q(h+mr)) + h */
+
+
+  /* compute P(P(h+ml) + Q(h+mr)) + Q(P(h+ml) + Q(h+mr)) + h 
   for (i = 0; i < 2*COLS512; i++) {
     h[i] ^= Ptmp[i];
-  }
-/**/
-printf("\nhash(after xor):\n");
-  for (i = 0; i < 2*COLS512; i++) {
-	printf("%2X ",h[i]);
-  }
-    printf("\n");
+  }*/
+//-----------
+
 }
 
 /* compute compression function (long variants) */
@@ -391,62 +355,25 @@ void F1024(u32 *h, const u32 *m, u32 *c) {
 void Transform(hashState *ctx, 
 	       const u8 *input, 
 	       int msglen) {
-	printf("\n--------Transform---------\n");//-- oct3,2011
+
   /* determine variant, SHORT or LONG, and select underlying
      compression function based on the variant */
   void (*F)(u32*,const u32*,u32*);	//modified oct28
 //MODIFIED BY GURPREET -- oct3,2011
  switch ( ctx->v ) {
-  case SHORT : F = &F512; printf("\nF512"); break;
-  case LONG  : printf("\nLONG");break;
-  default    : F = &F1024; printf("\nF1024"); break;
+  case SHORT : F = &F512; break;
+  case LONG  : break;
+  default    : F = &F1024; break;
   }
-//-------------------------
-
-//ADDED bY GURPREET -- oct25,2011
-int i,j;
-printf("\n---initail values\nmsglen: %d",msglen);
-printf("\nstatesize : %d",ctx->statesize );
-printf("\ninput:");
-    for (i = 0; i < ROWS; i++) {
-    printf("\n");
-      for (j = 0; j < COLS1024; j++) {		//modified
-	printf("%2X ",input[j*ROWS+i]);
-      }
-    }
-
-printf("\nblock_counter1: %d",ctx->block_counter1);
-//printf("\nblock_counter2: %d",ctx->block_counter2);
-printf("\n");
-      printf("\n chaining_init_f512s: ");
-
-printf("\n");
-    for (j = 0; j <= 2*ctx->columns-1; j++) {
-       if(j==ctx->columns) 
-	     printf("\n");
-      printf("%2X ",ctx->chaining[j]);
-    }
-printf("\n");
-//----------
 
 //ADDED BY GURPREET 
   ctx->cnt_buf_ptr = ctx->statesize;
-	printf("\ncnt_buf_ptr: %d",ctx->cnt_buf_ptr);
-	printf("\nblock_counter1: %ld",ctx->block_counter1);
 
   /*for block counter*/
   while (ctx->cnt_buf_ptr > 0) {
     ctx->counter[--ctx->cnt_buf_ptr] = (u8)ctx->cnt_block;
     ctx->cnt_block >>= 8;
   }
-	printf("\ncnt_buf_ptr: %d",ctx->cnt_buf_ptr);
-	printf("\nblock_counter1: %ld",ctx->block_counter1);
-	//printf("\nblock_counter2: %ld",ctx->block_counter2);
-	printf("\ncnt_block: %ld",ctx->cnt_block);
-		printf("\ncounter:");
-	for(i=0;i<ctx->statesize;i++)
-		printf(" %2X",ctx->counter[i]);
-	printf("\n");
 //-------
 
 
@@ -455,87 +382,30 @@ printf("\n");
   for (; msglen >= ctx->blocksize; 
        msglen -= ctx->blocksize, input += ctx->blocksize) {
 
-//ADDED BY GURPREET 
-printf("\n--INSIDE FOR-\n");
-
-	printf("\nbuf_ptr: %d",ctx->cnt_buf_ptr);
-	printf("\nblock_counter1: %ld",ctx->block_counter1);
-	//printf("\nblock_counter2: %ld",ctx->block_counter2);
-	printf("\ncnt_block: %ld",ctx->cnt_block);
-		printf("\ncounter:");
-	for(i=0;i<ctx->statesize;i++)
-		printf(" %2X",ctx->counter[i]);
-	printf("\n");
-//-----------
 
     F(ctx->chaining,(u32*)input,(u32*)ctx->counter);//modified oct28
 
     /* increment block counter */
     ctx->block_counter1++;
-//ADDSED bY GURPREET-- oct12,2011
-printf("\nblock_counter1: %lu",ctx->block_counter1);
-printf("\ncnt_buf_ptr: %d",ctx->cnt_buf_ptr);
-
-printf("\n");
-//----------
     //if (ctx->block_counter1 == 0) ctx->block_counter2++;
 
 
 //ADDED BY GURPREET 
     //reset to last position
     ctx->cnt_buf_ptr = ctx->statesize;
-printf("\ncnt_buf_ptr: %d",ctx->cnt_buf_ptr);
-	printf("\ncnt_block: %ld",ctx->cnt_block);
+
     //set to same as block counter
     ctx->cnt_block=ctx->block_counter1+1;
 
-	printf("\ncnt_buf_ptr: %d",ctx->cnt_buf_ptr);
-	printf("\nblock_counter1: %ld",ctx->block_counter1);
-	//printf("\nblock_counter2: %ld",ctx->block_counter2);
-	printf("\ncnt_block: %ld",ctx->cnt_block);
     /*for counter*/
    while (ctx->cnt_buf_ptr > 0) {
      ctx->counter[--ctx->cnt_buf_ptr] = (u8)ctx->cnt_block;
      ctx->cnt_block >>= 8;
+//-----
    }
-		printf("\ncounter:");
-	for(i=0;i<ctx->statesize;i++)
-		printf(" %2X",ctx->counter[i]);
-	printf("\n");
-	printf("\nbuf_ptr: %d",ctx->cnt_buf_ptr);
-	printf("\nblock_counter1: %ld",ctx->block_counter1);
-	//printf("\nblock_counter2: %ld",ctx->block_counter2);
-	printf("\ncnt_block: %ld",ctx->cnt_block);
-//----
-printf("\n--INSIDE FOR-EXIT\n");
+
   }
 
-
-printf("\n---Final values\nmsglen: %d",msglen);
-printf("\nstatesize : %d",ctx->statesize );
-printf("\ninput:");
-    for (i = 0; i < ROWS; i++) {
-    printf("\n");
-      for (j = 0; j < COLS1024; j++) {		//modified
-	printf("%2X ",input[j*ROWS+i]);
-      }
-    }
-
-printf("\nblock_counter1: %d",ctx->block_counter1);
-//printf("\nblock_counter2: %d",ctx->block_counter2);
-printf("\n");
-      printf("\n chaining_init_f512s: ");
-
-printf("\n");
-    for (j = 0; j <= 2*ctx->columns-1; j++) {
-       if(j==ctx->columns) 
-	     printf("\n");
-      printf("%2X ",ctx->chaining[j]);
-    }
-printf("\n");
-//----------
-
-printf("\n------------------exit Transform-----------\n");
 }
 
 
@@ -547,7 +417,6 @@ printf("\n------------------exit Transform-----------\n");
 
 /* given state h, do h <- P(h)+h */
 void OutputTransformation(hashState *ctx) {
-	printf("\n--------Output Transform---------\n");//-- oct3,2011
   int j;
   u32 *temp, *y, *z;
   temp = malloc(2*ctx->columns*sizeof(u32));
@@ -589,18 +458,10 @@ void OutputTransformation(hashState *ctx) {
     }
     break;
   }
-int i;
-//ADDED bY GURPREET -- oct27,2011
-printf("\n chaining1: \n");
-for (j = 0; j <= 2*ctx->columns-1; j++) {
-       if(j==ctx->columns) 
-	     printf("\n");
-      printf("%2X ",ctx->chaining[j]);
-    }
+
   free(temp);
   free(y);
   free(z);
-printf("\n------------------exit outputTransform-----------\n");
 }
 
 
@@ -639,18 +500,6 @@ HashReturn Init(hashState* ctx,
 
   /* set initial value */
   ctx->chaining[2*ctx->columns-1] = U32BIG((u32)hashbitlen);
-
-//ADDED BY GURPREET 
-int i,j;
-printf("\n");
-      printf("\n chaining_init: ");
-
-printf("\n");
-    for (j = 0; j <= 2*ctx->columns-1; j++) {
-      printf("%2X ",ctx->chaining[j]);
-    }
-printf("\n");
-//----
 
   /* set other variables */
   ctx->hashbitlen = hashbitlen;
@@ -742,23 +591,11 @@ HashReturn Final(hashState* ctx,
 		 BitSequence* output) {
 
 
-	printf("\n--------Final---------\n");
-
   int i, j = 0, hashbytelen = ctx->hashbitlen/8;
   u8 *s = (BitSequence*)ctx->chaining;
 
 u64 kbyts=0,kbits;	//ADDED
 
-//ADDSED bY GURPREET-- oct27,2011
-	//int i;
-	printf("\nBILB: %d",BILB);
-	printf("\nbuf_ptr: %d",ctx->buf_ptr);
-	printf("\nbits_in_last_byte: %d",ctx->bits_in_last_byte);
-		printf("\nbuffer:");
-	for(i=0;i<=ctx->buf_ptr;i++)
-		printf(" %2X",ctx->buffer[i]);
-	printf("\n");
-//-------
 
   /* pad with '1'-bit and first few '0'-bits */
   if (BILB) {
@@ -769,22 +606,11 @@ u64 kbyts=0,kbits;	//ADDED
   else ctx->buffer[(int)ctx->buf_ptr++] = 0x80;
 
 
-//ADDSED bY GURPREET-- oct27,2011
-	printf("\nbuf_ptr: %d",ctx->buf_ptr);
-		printf("\nbuffer:");
-	for(i=0;i<ctx->buf_ptr;i++)
-		printf(" %2X",ctx->buffer[i]);
-	printf("\n");
-//-------
-
   /* pad with '0'-bits */
 //modified :1 byte for r value & 8 bytes for length
 
   if (ctx->buf_ptr > ctx->blocksize-LENGTHFIELDLEN-1) { //1 byte for r value & 8 bytes for length
-    
-	//ADDSED bY GURPREET-- oct27,2011
-	printf("\n--inside if (ctx->buf_ptr > 128-8-1(119)) --\n");
-	//----------
+
 
     /* padding requires two blocks */
     while (ctx->buf_ptr < ctx->blocksize) {
@@ -792,13 +618,7 @@ u64 kbyts=0,kbits;	//ADDED
 	kbyts++; 		//ADDED: no of zeros appended
     }
 
-	//ADDSED bY GURPREET-- oct27,2011
-	printf("\n---after while ptr<blocksize---\nbuf_ptr: %d",ctx->buf_ptr);
-		printf("\nbuffer:\n");
-	for(i=0;i<ctx->buf_ptr;i++)
-		printf(" %2X",ctx->buffer[i]);
-	printf("\n");
-	//-------
+
 
     /* digest first padding block */
     Transform(ctx, ctx->buffer, ctx->blocksize);	//Modified
@@ -806,76 +626,39 @@ u64 kbyts=0,kbits;	//ADDED
   }
 
 //ADDSED bY GURPREET-- oct27,2011
-	printf("\nbuf_ptr: %d",ctx->buf_ptr);
-	printf("\n");
-	//-------
 
-printf("\nkbyts=%d \n",kbyts);
 //for k zeros
   while (ctx->buf_ptr < ctx->blocksize-LENGTHFIELDLEN-1) {
     ctx->buffer[(int)ctx->buf_ptr++] = 0;
 	kbyts++; 		//no of zeros appended
   }
 
-printf("\nkbyts(after while)=%d \n",kbyts);
-	//ADDSED bY GURPREET-- oct27,2011
-	printf("\n---after while ptr<blocksize---\nbuf_ptr: %d",ctx->buf_ptr);
-		printf("\nbuffer:\n");
-	for(i=0;i<ctx->buf_ptr;i++)
-		printf(" %2X",ctx->buffer[i]);
-	printf("\n");
-	//-------
     //ADDED BY gurpreet FOR R-BYTES
 	kbits=(kbyts*8)+ctx->bits_in_last_byte;
-
-printf("\nkbits=%d \n",kbits);
-kbits+=8;		//7bits as 10000000 & added 1 bit as space is 7bits for rbytes
-printf("\nkbits=%d \n",kbits);
+	kbits+=8;		//7bits as 10000000 & added 1 bit as space is 7bits for rbytes
 	int r_bytes;
 	// for 7 bit r_bytes padding
 
 	r_bytes=(952-kbits)%1024;
-printf("\nr_bytes=%d \n",r_bytes);
 	while (r_bytes<0)
 	   {r_bytes+=1024;}		// convert -vr to +ve mod value
-
-printf("\nr_bytes=%d \n",r_bytes);
 	r_bytes/=8;			// convert it into bytes
-printf("\nr_bytes=%d \n",r_bytes);
-printf("\nbuf_ptr=%d \n",ctx->buf_ptr);
-printf("\nctx->blocksize-LENGTHFIELDLEN-1=%d \n",ctx->blocksize-LENGTHFIELDLEN-1);
+
 	//for 7bit r_bytes value
 	 while (ctx->buf_ptr >= ctx->blocksize-LENGTHFIELDLEN-1) {
 	    ctx->buffer[ctx->buf_ptr--] = (u8)r_bytes;
 	    r_bytes >>= 8;
 	  } 
 
-	//ADDSED bY GURPREET-- oct8,2011
-	printf("\nbuf_ptr: %d",ctx->buf_ptr);
-	printf("\nblock_counter1: %ld",ctx->block_counter1);
-	//printf("\nblock_counter2: %ld",ctx->block_counter2);
-		printf("\nbuffer:\n");
-	for(i=0;i<ctx->blocksize-LENGTHFIELDLEN;i++)
-		printf(" %2X",ctx->buffer[i]);
-	printf("\n");
-	printf("\n");
-	//-------
-
     //-----
 
   /* length padding */
   ctx->block_counter1++;
-
-	printf("\nlength padding---block_counter1: %ld\n",ctx->block_counter1);
-
  // if (ctx->block_counter1 == 0) ctx->block_counter2++;
   ctx->buf_ptr = ctx->blocksize;		//modified
+
 //ADDED
-printf("\ncnt_buf_ptr: %d",ctx->cnt_buf_ptr);
-printf("\ncnt_block: %ld",ctx->cnt_block);
-ctx->cnt_block=ctx->block_counter1;
-printf("\ncnt_buf_ptr: %d",ctx->cnt_buf_ptr);
-printf("\ncnt_block: %ld",ctx->cnt_block);
+   ctx->cnt_block=ctx->block_counter1;
 //------
 
 /*for padding block counter*/
@@ -890,16 +673,6 @@ printf("\ncnt_block: %ld",ctx->cnt_block);
     ctx->buffer[(int)--ctx->buf_ptr] = (u8)ctx->block_counter2;
     ctx->block_counter2 >>= 8;
   }*/
-
-	//ADDSED bY GURPREET-- oct8,2011
-	printf("\nbuf_ptr: %d",ctx->buf_ptr);
-	printf("\nblock_counter1: %ld",ctx->block_counter1);
-	//printf("\nblock_counter2: %ld",ctx->block_counter2);
-		printf("\nbuffer:\n");
-	for(i=0;i<ctx->blocksize;i++)
-		printf(" %2X",ctx->buffer[i]);
-	printf("\n");
-	//-------
 
   /* digest final padding block */
   Transform(ctx, ctx->buffer, ctx->blocksize);
@@ -955,81 +728,11 @@ void PrintHash(const BitSequence* hash,
   printf("\n");
 }
 
-
-/* 
-int main() {
-
-clock_t start;
-clock_t diff;
-clock_t finish;
-
-  FILE * pFile;
-  DataLength lSize;
-  BitSequence * data;
-  BitSequence hash[64];
-  size_t result;
-
-  pFile = fopen ( "test3.PPT" , "rb" );
-  if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
-
-  // obtain file size:
-  fseek (pFile , 0 , SEEK_END);
-  lSize = ftell (pFile);
-  rewind (pFile);
-
-  printf ("Size of file: %lld bytes.\n",lSize);
-  lSize*=8;	//convert into bits
-  printf ("Size of file: %lld bits.\n",lSize);
-
-
-  // allocate memory to contain the whole file:
-  data = (unsigned char*) malloc (sizeof(unsigned char)*lSize);
-  if (data == NULL) {fputs ("Memory error",stderr); exit (2);}
-
-  // copy the file into the buffer:
-  result = fread (data,1,lSize,pFile);
-  if (result != lSize/8) {fputs ("Reading error",stderr); exit (3);}
-
- // the whole file is now loaded in the memory buffer. */
-
-  // terminate
-
-/*
- printf("\ntwo-block message:\n");
-  printf("\n-------------------\n");
-int i;
-
-  start= clock();
-
-  printf("\nGROESTL-256\n");
-  Hash(256, data, lSize, hash ); //256,576   
-
-  finish= clock();
-  printf("Time elapsed: %f\n", ((double)finish - start) / CLOCKS_PER_SEC);
-
-  for(i=0; i<32; ++i)
-    printf("%02X", hash[i]);
-  printf("\n");
-  printf("\nGROESTL-224\n");
-  Hash( 224, data, 576, hash );    
-  for(i=0; i<28; ++i)
-    printf("%02X", hash[i]);
-  printf("\n");
-  printf("\nGROESTL-512\n");
-  Hash( 512, data, 1152, hash );    
-  for(i=0; i<64; ++i)
-    printf("%02X", hash[i]);
-  printf("\n");
-  printf("\nGROESTL-384\n");
-  Hash( 384, data, 1152, hash );    
-  for(i=0; i<48; ++i)
-    printf("%02X", hash[i]);
-  printf("\n");
-
-
-
-  fclose (pFile);
-  free (data);
-  return 0;
-
-}*/
+/* eBash API */
+#ifdef crypto_hash_BYTES
+int crypto_hash(unsigned char *out, const unsigned char *in, unsigned long long inlen)
+{
+  if (Hash(crypto_hash_BYTES * 8, in, inlen * 8,out) == SUCCESS) return 0;
+  return -1;
+}
+#endif

@@ -1,4 +1,4 @@
-This package contains reference C implementation of the mGroestl256
+This package contains a 32-bit C implementation of the mGroestl256
 hash function.
 
 Files

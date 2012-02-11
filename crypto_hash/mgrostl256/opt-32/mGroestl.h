@@ -1,7 +1,4 @@
-#ifndef __groestl_opt_h
-#define __groestl_opt_h
-
-/* Groestl-opt-mod.c     
+/* mGroestl.h 
  * ANSI C code optimised for 32-bit machines
  * Authors: Soeren S. Thomsen
  *          Krystian Matusiewicz
@@ -9,11 +6,33 @@
  * Modified Grostle Author: Gurpreet Kaur
  *							October 2011
  */
+
+
+#ifndef __mgroestl_h
+#define __mgroestl_h
+
+
  
 #include <stdio.h>
 #include <stdlib.h>
 #include "brg_endian.h"
+
+/* eBash API begin */
+#include "crypto_hash.h"
+#ifdef crypto_hash_BYTES
+#include <crypto_uint8.h>
+#include <crypto_uint32.h>
+#include <crypto_uint64.h>
+typedef crypto_uint8 u8;
+typedef crypto_uint32 u32;
+typedef crypto_uint64 u64;
+#endif
+/* eBash API end */
+
+#ifndef crypto_hash_BYTES
 #include "brg_types.h"
+#endif
+
 
 /* some sizes (number of bytes) */
 #define ROWS 8
@@ -84,4 +103,4 @@ void PrintHash(const BitSequence*, int);
 void PrintInit(hashState*, int);
 //------------
 
-#endif /* __groestl_opt_h */
+#endif /* __mgroestl_h */
