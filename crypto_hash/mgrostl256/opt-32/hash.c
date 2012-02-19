@@ -3,11 +3,11 @@
  *
  *  Created on: 06.02.2012
  * ANSI C code optimised for 32-bit machines
- * Authors: Soeren S. Thomsen
- *          Krystian Matusiewicz
+ * 		Authors: Soeren S. Thomsen
+ *          	Krystian Matusiewicz
  *
  * Modified Grostle Author: Gurpreet Kaur
- *							October 2011
+ *							Feb 2012
  */
  
 #include <stdlib.h>

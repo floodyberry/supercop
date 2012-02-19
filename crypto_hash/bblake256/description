@@ -1,1 +1,1 @@
-BBLAKE-256: BLAKE-256(BLAKE-256(0,m0,m2,m4,...),BLAKE-256(1,m1,m3,m5,...))
+BBLAKE-256: BLAKE-256(BLAKE-256(0,m0,m2,m4,...),BLAKE-256(1,m1,m3,m5,...)) where m0,m1,m2,... are 64-byte blocks

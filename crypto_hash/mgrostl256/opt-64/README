@@ -1,0 +1,10 @@
+This package contains a 64-bit C implementation of the mGroestl256
+hash function.
+
+Files
+
+api.h			-- indicating that software produces a 32-byte hash output.  
+hash.c			-- function definitions
+mGroest.h		-- Header file included by hash.c
+
+

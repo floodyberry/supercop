@@ -1,5 +1,5 @@
 /* 
- * Groestl-opt-final.c     
+ * mGroestl.c     
  * ANSI C code optimised for 32-bit machines
  * Authors: Soeren S. Thomsen
  *          Krystian Matusiewicz
