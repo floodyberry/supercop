@@ -107,6 +107,9 @@ int crypto_sign_open(
   sc25519 schram, scs;
   unsigned char hram[crypto_hash_sha512_BYTES];
 
+  *mlen = (unsigned long long) -1;
+  if (smlen < 64) return -1;
+
   if (ge25519_unpackneg_vartime(&get1, pk)) return -1;
 
   get_hram(hram,sm,pk,m,smlen);
@@ -130,7 +133,6 @@ int crypto_sign_open(
   {
     for(i=0;i<smlen-64;i++)
       m[i] = 0;
-    *mlen = (unsigned long long) -1;
   }
   return ret;
 }

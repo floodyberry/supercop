@@ -203,6 +203,10 @@ do
   if cmp "$top/$target/sources.new" "$top/$target/sources" >/dev/null 2>/dev/null
   then
     echo "=== `date` === $target is up to date"
+    exec 5>&-
+    exec 8>&-
+    rm "$top/$target/sources.new"
+    rm "$top/$target/data.new"
     rm "$top/$target/BUILD"
     rm "$top/$target/LOCKED"
     continue

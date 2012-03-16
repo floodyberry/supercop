@@ -1,0 +1,2 @@
+based on: ssse3
+switching to NEON intrinsics: Daniel J. Bernstein
