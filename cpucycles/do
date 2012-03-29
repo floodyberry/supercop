@@ -68,6 +68,7 @@ okabi | (
       echo sgi
       echo cortex
       echo dev4ns
+      echo perfevent
       echo monotoniccpuinfo
       echo monotonic
       echo gettimeofday

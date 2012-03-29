@@ -1,5 +1,5 @@
 /*
- * measure-anything.c version 20090223
+ * measure-anything.c version 20120328
  * D. J. Bernstein
  * Public domain.
  */
@@ -215,6 +215,8 @@ void limits()
 
 int main()
 {
+  cyclespersecond = cpucycles();
+  cyclespersecond = cpucycles();
   cyclespersecond = cpucycles_persecond();
   preallocate();
   limits();

@@ -23,7 +23,6 @@ int crypto_dh_keypair(unsigned char *pk, unsigned char *sk) {
 	bn_new(k);
 	bn_new(n);
 
-
 	n->used = 4;
 	n->dp[0] = 0x00BEF3B9ABB767E1;
 	n->dp[1] = 0xF3E3AA131A2E1A82;
@@ -34,10 +33,7 @@ int crypto_dh_keypair(unsigned char *pk, unsigned char *sk) {
 	fb_zero(a);
 	fb_set_dig(b, 0x2387);
 
-	//bench_reset();
-	//bench_before();
 	eb_curve_set_ordin(a, b, &(gen_tab[1]), n, k);
-	//eb_param_set(EBACS_B251);
 
 #ifdef MAIN
 	rand_bytes(sk, SK_BYTES);
@@ -45,11 +41,10 @@ int crypto_dh_keypair(unsigned char *pk, unsigned char *sk) {
 	randombytes(sk, SK_BYTES);
 #endif
 	bn_read_bin(k, sk, SK_BYTES);
-	bn_div_rem(NULL, k, k, n);
+	if (bn_cmp(k, n) != CMP_LT) {
+		bn_sub(k, k, n);
+	}
 
-	//bench_after();
-	//bench_compute(1);
-	//bench_print();
 	eb_mul_fix(p, (eb_t *)gen_tab, k);
 		
 	bn_read_raw(k, p->x, FB_DIGS);
@@ -109,65 +104,22 @@ int main(int argc, char *argv[]) {
 	}
 	printf("\n");
 
-#if 0
-	eb_t *tab = eb_curve_get_tab();
-	printf("eb_st tab[%d] = {\n", EB_TABLE);
-	for (int i = 0; i < EB_TABLE; i++) {
-		printf("\t{\n");
-
-		printf("\t\t{");
-		for (int k = 0; k < FB_DIGS; k++) {
-			util_print("0x%.*lX, ", (int)(2 * sizeof(dig_t)), (unsigned long int)tab[i]->x[k]);
-		}
-		printf("},\n");
-
-		printf("\t\t{");
-		for (int k = 0; k < FB_DIGS; k++) {
-			util_print("0x%.*lX, ", (int)(2 * sizeof(dig_t)), (unsigned long int)tab[i]->y[k]);
-		}
-		printf("},\n");
-
-		printf("\t\t{");
-		for (int k = 0; k < FB_DIGS; k++) {
-			util_print("0x%.*lX, ", (int)(2 * sizeof(dig_t)), (unsigned long int)tab[i]->z[k]);
-		}
-		printf("},\n");
-
-		printf("\t\t1\n\t},\n");
-	}
-	printf("};\n");
-
-	int chain;
-	fb_poly_get_chain(&chain);
-	printf("fb_st inv_tab[%d][FB_TABLE] = {\n", chain);
-	for (int i = 0; i < chain; i++) {
-		printf("\t{\n");
-		fb_st *tab = fb_poly_tab_sqr(i);
-		for (int j = 0; j < FB_TABLE; j++) {
-			printf("\t\t{");
-			for (int k = 0; k < FB_DIGS; k++) {
-				util_print("0x%.*lX, ", (int)(2 * sizeof(dig_t)), (unsigned long int)tab[j][k]);
-			}
-			printf("},\n");
-		}
-		printf("\t},\n");
-	}
-	printf("};\n");
-
-#endif
-
 	eb_curve_get_ord(n);
 	eb_curve_get_gen(p);
 
 	BENCH_BEGIN("eb_mul_fix") {
 		bn_rand(k, BN_POS, bn_bits(n));
-		bn_div_rem(NULL, k, k, n);
+		if (bn_cmp(k, n) != CMP_LT) {
+			bn_sub(k, k, n);
+		}
 		BENCH_ADD(eb_mul_fix(p, (eb_t *)gen_tab, k));
 	} BENCH_END;
 
 	BENCH_BEGIN("eb_mul") {
 		bn_rand(k, BN_POS, bn_bits(n));
-		bn_div_rem(NULL, k, k, n);
+		if (bn_cmp(k, n) != CMP_LT) {
+			bn_sub(k, k, n);
+		}
 		BENCH_ADD(eb_mul(q, p, k));
 	} BENCH_END;
 

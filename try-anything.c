@@ -1,5 +1,5 @@
 /*
- * try-anything.c version 20090215
+ * try-anything.c version 20120328
  * D. J. Bernstein
  * Public domain.
  */
@@ -134,6 +134,8 @@ int main()
   long long cyclespersecond;
   const char *problem;
 
+  cycles[0] = cpucycles();
+  cycles[1] = cpucycles();
   cyclespersecond = cpucycles_persecond();
   preallocate();
   limits();

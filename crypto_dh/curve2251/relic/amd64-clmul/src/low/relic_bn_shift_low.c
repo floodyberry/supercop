@@ -1,6 +1,6 @@
 /*
  * RELIC is an Efficient LIbrary for Cryptography
- * Copyright (C) 2007-2011 RELIC Authors
+ * Copyright (C) 2007-2012 RELIC Authors
  *
  * This file is part of RELIC. RELIC is legal property of its developers,
  * whose names are not listed here. Please refer to the COPYRIGHT file
@@ -25,14 +25,9 @@
  *
  * Implementation of the low-level multiple precision bit shifting functions.
  *
- * @version $Id: relic_bn_shift_low.c,v 1.1 2011/08/12 19:27:15 diego Exp $
+ * @version $Id: relic_bn_shift_low.c 677 2011-03-05 22:19:43Z dfaranha $
  * @ingroup bn
  */
-
-#include <gmp.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 #include "relic.h"
 
@@ -41,11 +36,37 @@
 /*============================================================================*/
 
 dig_t bn_lsh1_low(dig_t *c, dig_t *a, int size) {
-	return mpn_lshift(c, a, size, 1);
+	int i;
+	dig_t r, carry;
+
+	carry = 0;
+	for (i = 0; i < size; i++, a++, c++) {
+		/* Get the most significant bit. */
+		r = *a >> (BN_DIGIT - 1);
+		/* Shift the operand and insert the carry, */
+		*c = (*a << 1) | carry;
+		/* Update the carry. */
+		carry = r;
+	}
+	return carry;
 }
 
 dig_t bn_lshb_low(dig_t *c, dig_t *a, int size, int bits) {
-	return mpn_lshift(c, a, size, bits);
+	int i;
+	dig_t r, carry, shift, mask;
+
+	shift = BN_DIGIT - bits;
+	carry = 0;
+	mask = MASK(bits);
+	for (i = 0; i < size; i++, a++, c++) {
+		/* Get the needed least significant bits. */
+		r = ((*a) >> shift) & mask;
+		/* Shift left the operand. */
+		*c = ((*a) << bits) | carry;
+		/* Update the carry. */
+		carry = r;
+	}
+	return carry;
 }
 
 void bn_lshd_low(dig_t *c, dig_t *a, int size, int digits) {
@@ -64,11 +85,43 @@ void bn_lshd_low(dig_t *c, dig_t *a, int size, int digits) {
 }
 
 dig_t bn_rsh1_low(dig_t *c, dig_t *a, int size) {
-	return mpn_rshift(c, a, size, 1);
+	int i;
+	dig_t r, carry;
+
+	c += size - 1;
+	a += size - 1;
+	carry = 0;
+	for (i = size - 1; i >= 0; i--, a--, c--) {
+		/* Get the least significant bit. */
+		r = *a & 0x01;
+		/* Shift the operand and insert the carry. */
+		carry <<= BN_DIGIT - 1;
+		*c = (*a >> 1) | carry;
+		/* Update the carry. */
+		carry = r;
+	}
+	return carry;
 }
 
 dig_t bn_rshb_low(dig_t *c, dig_t *a, int size, int bits) {
-	return mpn_rshift(c, a, size, bits);
+	int i;
+	dig_t r, carry, shift, mask;
+
+	c += size - 1;
+	a += size - 1;
+	/* Prepare the bit mask. */
+	shift = BN_DIGIT - bits;
+	carry = 0;
+	mask = MASK(bits);
+	for (i = size - 1; i >= 0; i--, a--, c--) {
+		/* Get the needed least significant bits. */
+		r = (*a) & mask;
+		/* Shift left the operand. */
+		*c = ((*a) >> bits) | (carry << shift);
+		/* Update the carry. */
+		carry = r;
+	}
+	return carry;
 }
 
 void bn_rshd_low(dig_t *c, dig_t *a, int size, int digits) {

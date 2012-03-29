@@ -1,22 +1,23 @@
 /*
- * Copyright (C) 2011 BACKEND Authors
+ * RELIC is an Efficient LIbrary for Cryptography
+ * Copyright (C) 2007-2012 RELIC Authors
  *
- * This code is legal property of its developers, whose names are not
- * listed here. Please refer to the COPYRIGHT file for contact
- * information.
+ * This file is part of RELIC. RELIC is legal property of its developers,
+ * whose names are not listed here. Please refer to the COPYRIGHT file
+ * for contact information.
  *
- * This code is free software; you can redistribute it and/or
+ * RELIC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
- * This code is distributed in the hope that it will be useful,
+ * RELIC is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this code. If not, see <http://www.gnu.org/licenses/>.
+ * along with RELIC. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -24,11 +25,9 @@
  *
  * Implementation of the low-level binary field bit shifting functions.
  *
- * @version $Id: relic_fb_shift_low.c,v 1.1 2011/08/13 04:38:38 diego Exp $
- * @ingroup bn
+ * @version $Id: relic_fb_shift_low.c 677 2011-03-05 22:19:43Z dfaranha $
+ * @ingroup fb
  */
-
-#include <gmp.h>
 
 #include "relic.h"
 
@@ -37,11 +36,39 @@
 /*============================================================================*/
 
 dig_t fb_lsh1_low(dig_t *c, dig_t *a) {
-	return mpn_lshift(c, a, FB_DIGS, 1);
+	int i;
+	dig_t r, carry;
+
+	/* Prepare the bit mask. */
+	carry = 0;
+	for (i = 0; i < FB_DIGS; i++, a++, c++) {
+		/* Get the most significant bit. */
+		r = *a >> (FB_DIGIT - 1);
+		/* Shift the operand and insert the carry, */
+		*c = (*a << 1) | carry;
+		/* Update the carry. */
+		carry = r;
+	}
+	return carry;
 }
 
 dig_t fb_lshb_low(dig_t *c, dig_t *a, int bits) {
-	return mpn_lshift(c, a, FB_DIGS, bits);
+	int i;
+	dig_t r, carry, mask, shift;
+
+	/* Prepare the bit mask. */
+	shift = FB_DIGIT - bits;
+	carry = 0;
+	mask = MASK(bits);
+	for (i = 0; i < FB_DIGS; i++, a++, c++) {
+		/* Get the needed least significant bits. */
+		r = ((*a) >> shift) & mask;
+		/* Shift left the operand. */
+		*c = ((*a) << bits) | carry;
+		/* Update the carry. */
+		carry = r;
+	}
+	return carry;
 }
 
 void fb_lshd_low(dig_t *c, dig_t *a, int digits) {
@@ -60,11 +87,43 @@ void fb_lshd_low(dig_t *c, dig_t *a, int digits) {
 }
 
 dig_t fb_rsh1_low(dig_t *c, dig_t *a) {
-	return mpn_rshift(c, a, FB_DIGS, 1);
+	int i;
+	dig_t r, carry;
+
+	c += FB_DIGS - 1;
+	a += FB_DIGS - 1;
+	carry = 0;
+	for (i = FB_DIGS - 1; i >= 0; i--, a--, c--) {
+		/* Get the least significant bit. */
+		r = *a & 0x01;
+		/* Shift the operand and insert the carry. */
+		carry <<= FB_DIGIT - 1;
+		*c = (*a >> 1) | carry;
+		/* Update the carry. */
+		carry = r;
+	}
+	return carry;
 }
 
 dig_t fb_rshb_low(dig_t *c, dig_t *a, int bits) {
-	return mpn_rshift(c, a, FB_DIGS, bits);
+	int i;
+	dig_t r, carry, mask, shift;
+
+	c += FB_DIGS - 1;
+	a += FB_DIGS - 1;
+	/* Prepare the bit mask. */
+	shift = FB_DIGIT - bits;
+	carry = 0;
+	mask = MASK(bits);
+	for (i = FB_DIGS - 1; i >= 0; i--, a--, c--) {
+		/* Get the needed least significant bits. */
+		r = (*a) & mask;
+		/* Shift left the operand. */
+		*c = ((*a) >> bits) | (carry << shift);
+		/* Update the carry. */
+		carry = r;
+	}
+	return carry;
 }
 
 void fb_rshd_low(dig_t *c, dig_t *a, int digits) {

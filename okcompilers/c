@@ -859,10 +859,22 @@ gcc -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -O3 -fomit-frame-pointer
 gcc -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -Os -fomit-frame-pointer
 gcc -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -O2 -fomit-frame-pointer
 gcc -mcpu=cortex-a8 -mfloat-abi=softfp -mfpu=neon -O -fomit-frame-pointer
+gcc -mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon -O3 -fomit-frame-pointer
+gcc -mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon -Os -fomit-frame-pointer
+gcc -mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon -O2 -fomit-frame-pointer
+gcc -mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon -O -fomit-frame-pointer
 gcc -mcpu=cortex-a9 -O3 -fomit-frame-pointer
 gcc -mcpu=cortex-a9 -Os -fomit-frame-pointer
 gcc -mcpu=cortex-a9 -O2 -fomit-frame-pointer
 gcc -mcpu=cortex-a9 -O -fomit-frame-pointer
+gcc -mcpu=cortex-a9 -mfloat-abi=softfp -mfpu=neon -O3 -fomit-frame-pointer
+gcc -mcpu=cortex-a9 -mfloat-abi=softfp -mfpu=neon -Os -fomit-frame-pointer
+gcc -mcpu=cortex-a9 -mfloat-abi=softfp -mfpu=neon -O2 -fomit-frame-pointer
+gcc -mcpu=cortex-a9 -mfloat-abi=softfp -mfpu=neon -O -fomit-frame-pointer
+gcc -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -O3 -fomit-frame-pointer
+gcc -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -Os -fomit-frame-pointer
+gcc -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -O2 -fomit-frame-pointer
+gcc -mcpu=cortex-a9 -mfloat-abi=hard -mfpu=neon -O -fomit-frame-pointer
 gcc -mcpu=cortex-r4 -O3 -fomit-frame-pointer
 gcc -mcpu=cortex-r4 -Os -fomit-frame-pointer
 gcc -mcpu=cortex-r4 -O2 -fomit-frame-pointer

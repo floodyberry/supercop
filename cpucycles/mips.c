@@ -18,7 +18,7 @@ static void readticks(unsigned int *result)
 {
   struct timeval t;
   unsigned int cc;
-  asm volatile(".byte 59; .byte 16; .byte 2; .byte 124; move %0,$2" : "=r"(cc) : : "$2");
+  asm volatile(".long 2080510011; move %0,$2" : "=r"(cc) : : "$2");
   gettimeofday(&t,(struct timezone *) 0);
   result[0] = cc;
   result[1] = t.tv_usec;
