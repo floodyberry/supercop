@@ -1,1 +1,1 @@
-BBLAKE-512
+BBLAKE-512: BLAKE-512(BLAKE-512(0,m0,m2,m4,...),BLAKE-512(1,m1,m3,m5,...)) where m0,m1,m2,... are 128-byte blocks

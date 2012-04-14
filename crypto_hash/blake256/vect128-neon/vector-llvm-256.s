@@ -1,17 +1,6 @@
 	.syntax unified
 	.cpu cortex-a8
-	.eabi_attribute 6, 10
-	.eabi_attribute 7, 65
-	.eabi_attribute 8, 1
-	.eabi_attribute 9, 2
 	.fpu neon
-	.eabi_attribute 10, 3
-	.eabi_attribute 12, 1
-	.eabi_attribute 20, 1
-	.eabi_attribute 21, 1
-	.eabi_attribute 23, 3
-	.eabi_attribute 24, 1
-	.eabi_attribute 25, 1
 	.file	"vector-llvm.o"
 	.text
 	.globl	v16_broadcast_cst_128
