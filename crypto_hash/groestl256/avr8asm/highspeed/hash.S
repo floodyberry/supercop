@@ -271,9 +271,8 @@
   ldd ZL, Y+54 ; r6 = sbox[read[54] ^ 0xFF];
   com ZL
   ld r6, Z
-  ldd r7, Y+7  ; r7 = sbox[read[7] ^ 0xFF ^ round];
-  ldi ZL, 0xff
-  eor ZL, r7
+  ldd ZL, Y+7  ; r7 = sbox[read[7] ^ 0xFF ^ round];
+  com ZL
   eor ZL, r19
   ld r7, Z
   mixBytes
@@ -772,7 +771,7 @@ crypto_hash_groestl256_avr8asm_highspeed:
       movw ZL, ARG2_L
 
       loop_blocks_if:
-        lpm r0, Z+
+        ld r0, Z+
         st X+, r0
         dec YL
       brne loop_blocks_if
@@ -797,7 +796,7 @@ crypto_hash_groestl256_avr8asm_highspeed:
       ; Copy the remaining message from ARG2 to buffer
       movw ZL, ARG2_L
       loop_blocks_elsif1:
-        lpm r0, Z+
+        ld r0, Z+
         st X+, r0
         dec ARG3_L
       brne loop_blocks_elsif1

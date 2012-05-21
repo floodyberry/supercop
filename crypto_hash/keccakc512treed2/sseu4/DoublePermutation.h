@@ -14,13 +14,14 @@ http://creativecommons.org/publicdomain/zero/1.0/
 #ifndef _DoublePermutation_h_
 #define _DoublePermutation_h_
 
-#include <emmintrin.h>
+#include <x86intrin.h>
 typedef __m128i V128;
 
 void KeccakDoublePermutationOnWords(V128 *state);
 void KeccakDoublePermutationOnWordsAfterXoring2x512bits(V128 *state, const V128 *input);
 void KeccakDoublePermutationOnWordsAfterXoring2x1024bits(V128 *state, const V128 *input);
 void KeccakDoublePermutationOnWordsAfterXoring2x1088bits(V128 *state, const V128 *input);
+void KeccakDoublePermutationOnWordsAfterXoring2x1344bits(V128 *state, const V128 *input);
 void KeccakInitializeDoubleState(V128 *state);
 
 #define KeccakPermutationSize 1600

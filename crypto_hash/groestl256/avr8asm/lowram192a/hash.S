@@ -19,8 +19,8 @@
 #define ARG3_L r20
 #define ARG3_H r21
 
-; Only crypto_hash_groestl256_avr8asm_lowram is callable externally
-.global crypto_hash_groestl256_avr8asm_lowram
+; Only crypto_hash_groestl256_avr8asm_lowram192a is callable externally
+.global crypto_hash_groestl256_avr8asm_lowram192a
 
 .text
 
@@ -74,157 +74,206 @@
   ldi ZL, 0x9f
   eor r7, ZL
   eor r7, r19
+  ld ZL, Y     ; read[59] = read[0];
+  std Y+59, ZL
+  ldd ZL, Y+1  ; read[42] = read[1];
+  std Y+42, ZL
+  ldd ZL, Y+2  ; read[25] = read[2];
+  std Y+25, ZL
+  ldd ZL, Y+3  ; read[8]  = read[3];
+  std Y+8, ZL
+  ldd ZL, Y+5  ; read[55] = read[5];
+  std Y+55, ZL
+  ldd ZL, Y+6  ; read[38] = read[6];
+  std Y+38, ZL
+  ldd ZL, Y+7  ; read[21] = read[7];
+  std Y+21, ZL
   rcall mixBytes
 
-  ldd r0, Y+16 ; r0 = read[16] ^ 0xFF;
+  ldd r0, Y+8  ; r0 = read[8] ^ 0xFF;
   com r0
-  ldd r1, Y+33 ; r1 = read[33] ^ 0xFF;
+  ldd r1, Y+25 ; r1 = read[25] ^ 0xFF;
   com r1
-  ldd r2, Y+50 ; r2 = read[50] ^ 0xFF;
+  ldd r2, Y+42 ; r2 = read[42] ^ 0xFF;
   com r2
-  ldd r3, Y+3  ; r3 = read[3] ^ 0xFF;
+  ldd r3, Y+0  ; r3 = read[0] ^ 0xFF;
   com r3
-  ldd r4, Y+12 ; r4 = read[12] ^ 0xFF;
+  ldd r4, Y+4  ; r4 = read[4] ^ 0xFF;
   com r4
-  ldd r5, Y+29 ; r5 = read[29] ^ 0xFF;
+  ldd r5, Y+21 ; r5 = read[21] ^ 0xFF;
   com r5
-  ldd r6, Y+46 ; r6 = read[46] ^ 0xFF;
+  ldd r6, Y+38 ; r6 = read[38] ^ 0xFF;
   com r6
-  ldd r7, Y+63 ; r7 = read[63] ^ 0x8F ^ round;
+  ldd r7, Y+55 ; r7 = read[55] ^ 0x8F ^ round;
   ldi ZL, 0x8f
   eor r7, ZL
   eor r7, r19
+  ldd ZL, Y+1  ; read[42] = read[1];
+  std Y+42, ZL
+  ldd ZL, Y+2  ; read[25] = read[2];
+  std Y+25, ZL
+  ldd ZL, Y+3  ; read[8] = read[3];
+  std Y+8, ZL
+  ldd ZL, Y+5  ; read[55] = read[5];
+  std Y+55, ZL
+  ldd ZL, Y+6  ; read[38] = read[6];
+  std Y+38, ZL
+  ldd ZL, Y+7  ; read[21] = read[7];
+  std Y+21, ZL
   rcall mixBytes
 
-  ldd r0, Y+24 ; r0 = read[24] ^ 0xFF;
+  ldd r0, Y+8  ; r0 = read[8] ^ 0xFF;
   com r0
-  ldd r1, Y+41 ; r1 = read[41] ^ 0xFF;
+  ldd r1, Y+25 ; r1 = read[25] ^ 0xFF;
   com r1
-  ldd r2, Y+58 ; r2 = read[58] ^ 0xFF;
+  ldd r2, Y+42 ; r2 = read[42] ^ 0xFF;
   com r2
-  ldd r3, Y+11 ; r3 = read[11] ^ 0xFF;
+  ldd r3, Y+0  ; r3 = read[0] ^ 0xFF;
   com r3
-  ldd r4, Y+20 ; r4 = read[20] ^ 0xFF;
+  ldd r4, Y+4  ; r4 = read[4] ^ 0xFF;
   com r4
-  ldd r5, Y+37 ; r5 = read[37] ^ 0xFF;
+  ldd r5, Y+21 ; r5 = read[21] ^ 0xFF;
   com r5
-  ldd r6, Y+54 ; r6 = read[54] ^ 0xFF;
+  ldd r6, Y+38 ; r6 = read[38] ^ 0xFF;
   com r6
-  ldd r7, Y+7  ; r7 = read[7] ^ 0xFF ^ round;
-  ldi ZL, 0xff
-  eor r7, ZL
+  ldd r7, Y+5  ; r7 = read[5] ^ 0xFF ^ round;
+  com r7
   eor r7, r19
+  ldd ZL, Y+1  ; read[42] = read[1];
+  std Y+42, ZL
+  ldd ZL, Y+2  ; read[25] = read[2];
+  std Y+25, ZL
+  ldd ZL, Y+3  ; read[8] = read[3];
+  std Y+8, ZL
+  ldd ZL, Y+6  ; read[38] = read[6];
+  std Y+38, ZL
+  ldd ZL, Y+7  ; read[21] = read[7];
+  std Y+21, ZL
   rcall mixBytes
 
-  ldd r0, Y+32 ; r0 = read[32] ^ 0xFF;
+  ldd r0, Y+8  ; r0 = read[8] ^ 0xFF;
   com r0
-  ldd r1, Y+49 ; r1 = read[49] ^ 0xFF;
+  ldd r1, Y+25 ; r1 = read[25] ^ 0xFF;
   com r1
-  ldd r2, Y+2  ; r2 = read[2] ^ 0xFF;
+  ldd r2, Y+1  ; r2 = read[1] ^ 0xFF;
   com r2
-  ldd r3, Y+19 ; r3 = read[19] ^ 0xFF;
+  ldd r3, Y+0  ; r3 = read[0] ^ 0xFF;
   com r3
-  ldd r4, Y+28 ; r4 = read[28] ^ 0xFF;
+  ldd r4, Y+4  ; r4 = read[4] ^ 0xFF;
   com r4
-  ldd r5, Y+45 ; r5 = read[45] ^ 0xFF;
+  ldd r5, Y+21 ; r5 = read[21] ^ 0xFF;
   com r5
-  ldd r6, Y+62 ; r6 = read[62] ^ 0xFF;
+  ldd r6, Y+38 ; r6 = read[38] ^ 0xFF;
   com r6
-  ldd r7, Y+15 ; r7 = read[15] ^ 0xEF ^ round;
+  ldd r7, Y+5  ; r7 = read[5] ^ 0xEF ^ round;
   ldi ZL, 0xef
   eor r7, ZL
   eor r7, r19
+  ldd ZL, Y+2  ; read[25] = read[2];
+  std Y+25, ZL
+  ldd ZL, Y+3  ; read[32] = read[3];
+  std Y+8, ZL
+  ldd ZL, Y+6  ; read[38] = read[6];
+  std Y+38, ZL
+  ldd ZL, Y+7  ; read[21] = read[7];
+  std Y+21, ZL
   rcall mixBytes
 
-  ldd r0, Y+40 ; r0 = read[40] ^ 0xFF;
+  ldd r0, Y+8  ; r0 = read[8] ^ 0xFF;
   com r0
-  ldd r1, Y+57 ; r1 = read[57] ^ 0xFF;
+  ldd r1, Y+25 ; r1 = read[25] ^ 0xFF;
   com r1
-  ldd r2, Y+10 ; r2 = read[10] ^ 0xFF;
+  ldd r2, Y+1  ; r2 = read[1] ^ 0xFF;
   com r2
-  ldd r3, Y+27 ; r3 = read[27] ^ 0xFF;
+  ldd r3, Y+0  ; r3 = read[0] ^ 0xFF;
   com r3
-  ldd r4, Y+36 ; r4 = read[36] ^ 0xFF;
+  ldd r4, Y+4  ; r4 = read[4] ^ 0xFF;
   com r4
-  ldd r5, Y+53 ; r5 = read[53] ^ 0xFF;
+  ldd r5, Y+21 ; r5 = read[21] ^ 0xFF;
   com r5
   ldd r6, Y+6  ; r6 = read[6] ^ 0xFF;
   com r6
-  ldd r7, Y+23 ; r7 = read[23] ^ 0xDF ^ round;
+  ldd r7, Y+5  ; r7 = read[5] ^ 0xDF ^ round;
   ldi ZL, 0xdf
   eor r7, ZL
   eor r7, r19
+  ldd ZL, Y+2  ; read[25] = read[2];
+  std Y+25, ZL
+  ldd ZL, Y+3  ; read[8] = read[3];
+  std Y+8, ZL
+  ldd ZL, Y+7  ; read[21] = read[7];
+  std Y+21, ZL
   rcall mixBytes
 
-  ldd r0, Y+48 ; r0 = read[48] ^ 0xFF;
+  ldd r0, Y+8  ; r0 = read[8] ^ 0xFF;
   com r0
-  ldd r1, Y+1  ; r1 = read[1] ^ 0xFF;
+  ldd r1, Y+2  ; r1 = read[2] ^ 0xFF;
   com r1
-  ldd r2, Y+18 ; r2 = read[18] ^ 0xFF;
+  ldd r2, Y+1  ; r2 = read[1] ^ 0xFF;
   com r2
-  ldd r3, Y+35 ; r3 = read[35] ^ 0xFF;
+  ldd r3, Y+0  ; r3 = read[0] ^ 0xFF;
   com r3
-  ldd r4, Y+44 ; r4 = read[44] ^ 0xFF;
+  ldd r4, Y+4  ; r4 = read[4] ^ 0xFF;
   com r4
-  ldd r5, Y+61 ; r5 = read[61] ^ 0xFF;
+  ldd r5, Y+21 ; r5 = read[21] ^ 0xFF;
   com r5
-  ldd r6, Y+14 ; r6 = read[14] ^ 0xFF;
+  ldd r6, Y+6  ; r6 = read[6] ^ 0xFF;
   com r6
-  ldd r7, Y+31 ; r7 = read[31] ^ 0xCF ^ round;
+  ldd r7, Y+5  ; r7 = read[5] ^ 0xCF ^ round;
   ldi ZL, 0xcf
   eor r7, ZL
   eor r7, r19
+  ldd ZL, Y+3  ; read[8] = read[3];
+  std Y+8, ZL
+  ldd ZL, Y+7  ; read[21] = read[7];
+  std Y+21, ZL
   rcall mixBytes
 
-  ldd r0, Y+56 ; r0 = read[56] ^ 0xFF;
+  ldd r0, Y+8  ; r0 = read[8] ^ 0xFF;
   com r0
-  ldd r1, Y+9  ; r1 = read[9] ^ 0xFF;
+  ldd r1, Y+2  ; r1 = read[2] ^ 0xFF;
   com r1
-  ldd r2, Y+26 ; r2 = read[26] ^ 0xFF;
+  ldd r2, Y+1  ; r2 = read[1] ^ 0xFF;
   com r2
-  ldd r3, Y+43 ; r3 = read[43] ^ 0xFF;
+  ldd r3, Y+0  ; r3 = read[0] ^ 0xFF;
   com r3
-  ldd r4, Y+52 ; r4 = read[52] ^ 0xFF;
+  ldd r4, Y+4  ; r4 = read[4] ^ 0xFF;
   com r4
-  ldd r5, Y+5  ; r5 = read[5] ^ 0xFF;
+  ldd r5, Y+7  ; r5 = read[7] ^ 0xFF;
   com r5
-  ldd r6, Y+22 ; r6 = read[22] ^ 0xFF;
+  ldd r6, Y+6  ; r6 = read[6] ^ 0xFF;
   com r6
-  ldd r7, Y+39 ; r7 = read[39] ^ 0xBF ^ round;
+  ldd r7, Y+5  ; r7 = read[5] ^ 0xBF ^ round;
   ldi ZL, 0xbf
   eor r7, ZL
   eor r7, r19
+  ldd ZL, Y+3  ; read[8] = read[3];
+  std Y+8, ZL
   rcall mixBytes
 
-  ld r0, Y     ; r0 = read[0] ^ 0xFF;
+  ldd r0, Y+3  ; r0 = read[3] ^ 0xFF;
   com r0
-  ldd r1, Y+17 ; r1 = read[17] ^ 0xFF;
+  ldd r1, Y+2  ; r1 = read[2] ^ 0xFF;
   com r1
-  ldd r2, Y+34 ; r2 = read[34] ^ 0xFF;
+  ldd r2, Y+1  ; r2 = read[1] ^ 0xFF;
   com r2
-  ldd r3, Y+51 ; r3 = read[51] ^ 0xFF;
+  ldd r3, Y+0  ; r3 = read[0] ^ 0xFF;
   com r3
-  ldd r4, Y+60 ; r4 = read[60] ^ 0xFF;
+  ldd r4, Y+4  ; r4 = read[4] ^ 0xFF;
   com r4
-  ldd r5, Y+13 ; r5 = read[13] ^ 0xFF;
+  ldd r5, Y+7  ; r5 = read[7] ^ 0xFF;
   com r5
-  ldd r6, Y+30 ; r6 = read[30] ^ 0xFF;
+  ldd r6, Y+6  ; r6 = read[6] ^ 0xFF;
   com r6
-  ldd r7, Y+47 ; r7 = read[47] ^ 0xAF ^ round;
+  ldd r7, Y+5  ; r7 = read[5] ^ 0xAF ^ round;
   ldi ZL, 0xaf
   eor r7, ZL
   eor r7, r19
   rcall mixBytes
 
-  ; The temp_state pointer reaches the end, so it's reset:
-  subi XL, 64
-  sbci XH, 0
-
-  ; After each round, Y and X need to be swapped. This is done using
-  ; the XOR swap algorithm in order to evade a temporary variable.
-  eor YL, XL
-  eor XL, YL
-  eor YL, XL
+  ; The buffer pointer reaches the end, so it's reset:
+  subi YL, 64
+  sbci YH, 0
 .endm
 
 /**
@@ -233,7 +282,7 @@
  * Performs the permQ iteration for one round
  */
 .macro permP_Iteration
-  ld r0, Y     ; r0 = read[0] ^ round;
+  ldd r0, Y+0  ; r0 = read[0] ^ round;
   eor r0, r19
   ldd r1, Y+9  ; r1 = read[9];
   ldd r2, Y+18 ; r2 = read[18];
@@ -242,108 +291,158 @@
   ldd r5, Y+45 ; r5 = read[45];
   ldd r6, Y+54 ; r6 = read[54];
   ldd r7, Y+63 ; r7 = read[63];
+  ldd ZL, Y+1  ; read[63] = read[1];
+  std Y+63, ZL
+  ldd ZL, Y+2  ; read[54] = read[2];
+  std Y+54, ZL
+  ldd ZL, Y+3  ; read[45] = read[3];
+  std Y+45, ZL
+  ldd ZL, Y+4  ; read[36] = read[4];
+  std Y+36, ZL
+  ldd ZL, Y+5  ; read[27] = read[5];
+  std Y+27, ZL
+  ldd ZL, Y+6  ; read[18] = read[6];
+  std Y+18, ZL
+  ldd ZL, Y+7  ; read[9]  = read[7];
+  std Y+9, ZL
   rcall mixBytes
 
-  ldd r0, Y+8  ; r0 = read[8] ^ 0x10 ^ round;
+  ldd r0, Y+0  ; r0 = read[0] ^ 0x10 ^ round;
   ldi ZL, 0x10
   eor r0, ZL
   eor r0, r19
-  ldd r1, Y+17 ; r1 = read[17];
-  ldd r2, Y+26 ; r2 = read[26];
-  ldd r3, Y+35 ; r3 = read[35];
-  ldd r4, Y+44 ; r4 = read[44];
-  ldd r5, Y+53 ; r5 = read[53];
-  ldd r6, Y+62 ; r6 = read[62];
-  ldd r7, Y+7  ; r7 = read[7];
+  ldd r1, Y+9  ; r1 = read[9];
+  ldd r2, Y+18 ; r2 = read[18];
+  ldd r3, Y+27 ; r3 = read[27];
+  ldd r4, Y+36 ; r4 = read[36];
+  ldd r5, Y+45 ; r5 = read[45];
+  ldd r6, Y+54 ; r6 = read[54];
+  ldd r7, Y+1  ; r7 = read[1];
+  ldd ZL, Y+2  ; read[54] = read[2];
+  std Y+54, ZL
+  ldd ZL, Y+3  ; read[45] = read[3];
+  std Y+45, ZL
+  ldd ZL, Y+4  ; read[36] = read[4];
+  std Y+36, ZL
+  ldd ZL, Y+5  ; read[27] = read[5];
+  std Y+27, ZL
+  ldd ZL, Y+6  ; read[18] = read[6];
+  std Y+18, ZL
+  ldd ZL, Y+7  ; read[9] = read[7];
+  std Y+9, ZL
   rcall mixBytes
 
-  ldd r0, Y+16 ; r0 = read[16] ^ 0x20 ^ round;
+  ldd r0, Y+0  ; r0 = read[0] ^ 0x20 ^ round;
   ldi ZL, 0x20
   eor r0, ZL
   eor r0, r19
-  ldd r1, Y+25 ; r1 = read[25];
-  ldd r2, Y+34 ; r2 = read[34];
-  ldd r3, Y+43 ; r3 = read[43];
-  ldd r4, Y+52 ; r4 = read[52];
-  ldd r5, Y+61 ; r5 = read[61];
-  ldd r6, Y+6  ; r6 = read[6];
-  ldd r7, Y+15 ; r7 = read[15];
+  ldd r1, Y+9  ; r1 = read[9];
+  ldd r2, Y+18 ; r2 = read[18];
+  ldd r3, Y+27 ; r3 = read[27];
+  ldd r4, Y+36 ; r4 = read[36];
+  ldd r5, Y+45 ; r5 = read[45];
+  ldd r6, Y+2  ; r6 = read[2];
+  ldd r7, Y+1  ; r7 = read[1];
+  ldd ZL, Y+3  ; read[45] = read[3];
+  std Y+45, ZL
+  ldd ZL, Y+4  ; read[36] = read[4];
+  std Y+36, ZL
+  ldd ZL, Y+5  ; read[27] = read[5];
+  std Y+27, ZL
+  ldd ZL, Y+6  ; read[18] = read[6];
+  std Y+18, ZL
+  ldd ZL, Y+7  ; read[9] = read[7];
+  std Y+9, ZL
   rcall mixBytes
 
-  ldd r0, Y+24 ; r0 = read[24] ^ 0x30 ^ round;
+  ldd r0, Y+0  ; r0 = read[0] ^ 0x30 ^ round;
   ldi ZL, 0x30
   eor r0, ZL
   eor r0, r19
-  ldd r1, Y+33 ; r1 = read[33];
-  ldd r2, Y+42 ; r2 = read[42];
-  ldd r3, Y+51 ; r3 = read[51];
-  ldd r4, Y+60 ; r4 = read[60];
-  ldd r5, Y+5  ; r5 = read[5];
-  ldd r6, Y+14 ; r6 = read[14];
-  ldd r7, Y+23 ; r7 = read[23];
+  ldd r1, Y+9  ; r1 = read[9];
+  ldd r2, Y+18 ; r2 = read[18];
+  ldd r3, Y+27 ; r3 = read[27];
+  ldd r4, Y+36 ; r4 = read[36];
+  ldd r5, Y+3  ; r5 = read[3];
+  ldd r6, Y+2  ; r6 = read[2];
+  ldd r7, Y+1  ; r7 = read[1];
+  ldd ZL, Y+4  ; read[36] = read[4];
+  std Y+36, ZL
+  ldd ZL, Y+5  ; read[27] = read[5];
+  std Y+27, ZL
+  ldd ZL, Y+6  ; read[18] = read[6];
+  std Y+18, ZL
+  ldd ZL, Y+7  ; read[9] = read[7];
+  std Y+9, ZL
   rcall mixBytes
 
-  ldd r0, Y+32  ; r0 = read[32] ^ 0x40 ^ round;
+  ldd r0, Y+0  ; r0 = read[0] ^ 0x40 ^ round;
   ldi ZL, 0x40
   eor r0, ZL
   eor r0, r19
-  ldd r1, Y+41 ; r1 = read[41];
-  ldd r2, Y+50 ; r2 = read[50];
-  ldd r3, Y+59 ; r3 = read[59];
+  ldd r1, Y+9  ; r1 = read[9];
+  ldd r2, Y+18 ; r2 = read[18];
+  ldd r3, Y+27 ; r3 = read[27];
   ldd r4, Y+4  ; r4 = read[4];
-  ldd r5, Y+13 ; r5 = read[13];
-  ldd r6, Y+22 ; r6 = read[22];
-  ldd r7, Y+31 ; r7 = read[31];
+  ldd r5, Y+3  ; r5 = read[3];
+  ldd r6, Y+2  ; r6 = read[2];
+  ldd r7, Y+1  ; r7 = read[1];
+  ldd ZL, Y+5  ; read[27] = read[5];
+  std Y+27, ZL
+  ldd ZL, Y+6  ; read[18] = read[6];
+  std Y+18, ZL
+  ldd ZL, Y+7  ; read[9] = read[7];
+  std Y+9, ZL
   rcall mixBytes
 
-  ldd r0, Y+40 ; r0 = read[40] ^ 0x50 ^ round;
+  ldd r0, Y+0  ; r0 = read[0] ^ 0x50 ^ round;
   ldi ZL, 0x50
   eor r0, ZL
   eor r0, r19
-  ldd r1, Y+49 ; r1 = read[49];
-  ldd r2, Y+58 ; r2 = read[58];
-  ldd r3, Y+3  ; r3 = read[3];
-  ldd r4, Y+12 ; r4 = read[12];
-  ldd r5, Y+21 ; r5 = read[21];
-  ldd r6, Y+30 ; r6 = read[30];
-  ldd r7, Y+39 ; r7 = read[39];
+  ldd r1, Y+9  ; r1 = read[9];
+  ldd r2, Y+18 ; r2 = read[18];
+  ldd r3, Y+5  ; r3 = read[5];
+  ldd r4, Y+4  ; r4 = read[4];
+  ldd r5, Y+3  ; r5 = read[3];
+  ldd r6, Y+2  ; r6 = read[2];
+  ldd r7, Y+1  ; r7 = read[1];
+  ldd ZL, Y+6  ; read[18] = read[6];
+  std Y+18, ZL
+  ldd ZL, Y+7  ; read[9] = read[7];
+  std Y+9, ZL
   rcall mixBytes
 
-  ldd r0, Y+48 ; r0 = read[48] ^ 0x60 ^ round;
+  ldd r0, Y+0  ; r0 = read[0] ^ 0x60 ^ round;
   ldi ZL, 0x60
   eor r0, ZL
   eor r0, r19
-  ldd r1, Y+57 ; r1 = read[57];
-  ldd r2, Y+2  ; r2 = read[2];
-  ldd r3, Y+11 ; r3 = read[11];
-  ldd r4, Y+20 ; r4 = read[20];
-  ldd r5, Y+29 ; r5 = read[29];
-  ldd r6, Y+38 ; r6 = read[38];
-  ldd r7, Y+47 ; r7 = read[47];
+  ldd r1, Y+9  ; r1 = read[9];
+  ldd r2, Y+6  ; r2 = read[6];
+  ldd r3, Y+5  ; r3 = read[5];
+  ldd r4, Y+4  ; r4 = read[4];
+  ldd r5, Y+3  ; r5 = read[3];
+  ldd r6, Y+2  ; r6 = read[2];
+  ldd r7, Y+1  ; r7 = read[1];
+  ldd ZL, Y+7  ; read[9] = read[7];
+  std Y+9, ZL
   rcall mixBytes
 
-  ldd r0, Y+56  ; r0 = read[56] ^ 0x70 ^ round;
+  ldd r0, Y+0  ; r0 = read[0] ^ 0x70 ^ round;
   ldi ZL, 0x70
   eor r0, ZL
   eor r0, r19
-  ldd r1, Y+1  ; r1 = read[1];
-  ldd r2, Y+10 ; r2 = read[10];
-  ldd r3, Y+19 ; r3 = read[19];
-  ldd r4, Y+28 ; r4 = read[28];
-  ldd r5, Y+37 ; r5 = read[37];
-  ldd r6, Y+46 ; r6 = read[46];
-  ldd r7, Y+55 ; r7 = read[55];
+  ldd r1, Y+7 ; r1 = read[7];
+  ldd r2, Y+6 ; r2 = read[6];
+  ldd r3, Y+5 ; r3 = read[5];
+  ldd r4, Y+4 ; r4 = read[4];
+  ldd r5, Y+3 ; r5 = read[3];
+  ldd r6, Y+2 ; r6 = read[2];
+  ldd r7, Y+1 ; r7 = read[1];
   rcall mixBytes
 
-  ; The temp_state pointer reaches the end, so it's reset:
-  subi XL, 64
-  sbci XH, 0
-
-  ; After each round, Y and X need to be swapped. This is done using
-  ; the XOR swap algorithm in order to evade a temporary variable.
-  eor YL, XL
-  eor XL, YL
-  eor YL, XL
+  ; The buffer pointer reaches the end, so it's reset:
+  subi YL, 64
+  sbci YH, 0
 .endm
 
 /**
@@ -429,7 +528,7 @@ mixBytes:
   brcc .+2
   eor r11, r17
   eor r11, r2
-  st X+, r11
+  st Y+, r11
 
   add r12, r12 ; output[1] = xtime(xtime(t4) ^ y0) ^ y5;
   brcc .+2
@@ -439,7 +538,7 @@ mixBytes:
   brcc .+2
   eor r12, r17
   eor r12, r3
-  st X+, r12
+  st Y+, r12
 
   add r13, r13 ; output[2] = xtime(xtime(t5) ^ y1) ^ y6;
   brcc .+2
@@ -449,7 +548,7 @@ mixBytes:
   brcc .+2
   eor r13, r17
   eor r13, r4
-  st X+, r13
+  st Y+, r13
 
   add r14, r14 ; output[3] = xtime(xtime(t6) ^ y2) ^ y7;
   brcc .+2
@@ -459,7 +558,7 @@ mixBytes:
   brcc .+2
   eor r14, r17
   eor r14, r5
-  st X+, r14
+  st Y+, r14
 
   add r15, r15 ; output[4] = xtime(xtime(t7) ^ y3) ^ y0;
   brcc .+2
@@ -469,7 +568,7 @@ mixBytes:
   brcc .+2
   eor r15, r17
   eor r15, r6
-  st X+, r15
+  st Y+, r15
 
   add r8, r8   ; output[5] = xtime(xtime(t0) ^ y4) ^ y1;
   brcc .+2
@@ -479,7 +578,7 @@ mixBytes:
   brcc .+2
   eor r8, r17
   eor r8, r7
-  st X+, r8
+  st Y+, r8
 
   add r9, r9   ; output[6] = xtime(xtime(t1) ^ y5) ^ y2;
   brcc .+2
@@ -489,7 +588,7 @@ mixBytes:
   brcc .+2
   eor r9, r17
   eor r9, r0
-  st X+, r9
+  st Y+, r9
 
   add r10, r10 ; output[7] = xtime(xtime(t2) ^ y6) ^ y3;
   brcc .+2
@@ -499,7 +598,7 @@ mixBytes:
   brcc .+2
   eor r10, r17
   eor r10, r1
-  st X+, r10
+  st Y+, r10
 
   ret
 
@@ -511,7 +610,7 @@ mixBytes:
  * Handed-over registers:
  * r17: irreducible polynomial
  * r19: permP loop/round counter
- * Y: holds the input and the output after execution (due to swapping)
+ * Y: holds the input and the output after execution
  *
  * Used registers:
  * r0-r8: the input for mixBytes
@@ -519,8 +618,6 @@ mixBytes:
  * Z: temporary variable and register for sbox lookups
  */
 permP:
-  ldi XH, hi8(temp_state)
-  ldi XL, lo8(temp_state)
   ldi ZH, hi8(sbox)
 
   ; Note: the round counter in r19 starts with 0
@@ -541,23 +638,19 @@ permP:
  * permQ:
  *
  * Permutes Q with input from buffer.
- * After execution, buffer also holds the desired output (due to swapping).
+ * After execution, buffer also holds the desired output.
  *
  * Handed-over registers:
  * r17: irreducible polynomial
- * X: every time permQ is called, X already holds temp_state,
- *    so it doesn't need to be loaded in again
+ * Y: holds the input and the output after execution
  * Z: pointer to sbox (already held due to the former permP execution)
  *
  * Used registers:
  * r0-r8: the input for mixBytes
  * r19: permQ loop/round counter
- * Y: buffer, holds the input and after execution the output
  * Z: temporary variable and register for sbox lookups
  */
 permQ:
-  ldi YH, hi8(buffer)
-  ldi YL, lo8(buffer)
 
   ldi r19, 0
   loop_permQ:
@@ -574,7 +667,7 @@ permQ:
   ret
 
 /**
- * crypto_hash_groestl256_avr8asm_lowram:
+ * crypto_hash_groestl256_avr8asm_lowram192a:
  *
  * Handed-over registers:
  * ARG1: pointer to output
@@ -589,7 +682,7 @@ permQ:
  * r19: temporary register for loop comparison
  * X, Y, Z: holding buffer, h_state, p_state or temporary calculations
  */
-crypto_hash_groestl256_avr8asm_lowram:
+crypto_hash_groestl256_avr8asm_lowram192a:
   ; Push all call-saved registers
   push_registers 0,17
   push YL
@@ -663,7 +756,7 @@ crypto_hash_groestl256_avr8asm_lowram:
       movw ZL, ARG2_L
 
       loop_blocks_if:
-        lpm r0, Z+
+        ld r0, Z+
         st X+, r0
         dec YL
       brne loop_blocks_if
@@ -688,7 +781,7 @@ crypto_hash_groestl256_avr8asm_lowram:
       ; Copy the remaining message from ARG2 to buffer
       movw ZL, ARG2_L
       loop_blocks_elsif1:
-        lpm r0, Z+
+        ld r0, Z+
         st X+, r0
         dec ARG3_L
       brne loop_blocks_elsif1
@@ -771,6 +864,9 @@ crypto_hash_groestl256_avr8asm_lowram:
     ldi YH, hi8(p_state)
     ldi YL, lo8(p_state)
     rcall permP ; permP(pin, p_state);
+
+    ldi YH, hi8(buffer)
+    ldi YL, lo8(buffer)
     rcall permQ ; permQ(buffer, q_state);
 
     ; Update h_state by XOR-ing (Note: q_state is already in Y!)
@@ -861,13 +957,10 @@ sbox:
 
 ; Four tables (in RAM) need not to be initialized, so they belong to .bss
 .section .bss
-.balign 256
 
 buffer:
 .fill 64, 1, 0
 h_state:
 .fill 64, 1, 0
 p_state:
-.fill 64, 1, 0
-temp_state:
 .fill 64, 1, 0

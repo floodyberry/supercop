@@ -14,11 +14,7 @@ http://creativecommons.org/publicdomain/zero/1.0/
 #include <string.h>
 #include "crypto_hash.h"
 #include "DoublePermutation.h"
-
-#define rate 1088
-#define rateInBytes (rate/8)
-#define C 512
-#define CinBytes (C/8)
+#include "Keccakc512TreeD2.h"
 
 int crypto_hash(unsigned char *out, const unsigned char *in, unsigned long long inlen)
 {

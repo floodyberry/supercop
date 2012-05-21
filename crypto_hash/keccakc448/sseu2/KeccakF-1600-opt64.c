@@ -19,8 +19,16 @@ http://creativecommons.org/publicdomain/zero/1.0/
 typedef unsigned char UINT8;
 typedef unsigned long long int UINT64;
 
+#if defined(__GNUC__)
+#define ALIGN __attribute__ ((aligned(32)))
+#elif defined(_MSC_VER)
+#define ALIGN __declspec(align(32))
+#else
+#define ALIGN
+#endif
+
 #if defined(UseSSE)
-    #include <emmintrin.h>
+    #include <x86intrin.h>
     typedef __m128i V64;
     typedef __m128i V128;
     typedef union {
@@ -35,17 +43,19 @@ typedef unsigned long long int UINT64;
     #define STORE64(a, b)       _mm_storel_epi64((V64 *)&(a), b)
     #define XOR64(a, b)         _mm_xor_si128(a, b)
     #define XOReq64(a, b)       a = _mm_xor_si128(a, b)
+    #define SHUFFLEBYTES128(a, b)   _mm_shuffle_epi8(a, b)
 
     #define ANDnu128(a, b)      _mm_andnot_si128(a, b)
     #define LOAD6464(a, b)      _mm_set_epi64((__m64)(a), (__m64)(b))
+    #define CONST128(a)         _mm_load_si128((const V128 *)&(a))
     #define LOAD128(a)          _mm_load_si128((const V128 *)&(a))
     #define LOAD128u(a)         _mm_loadu_si128((const V128 *)&(a))
     #define ROL64in128(a, o)    _mm_or_si128(_mm_slli_epi64(a, o), _mm_srli_epi64(a, 64-(o)))
     #define STORE128(a, b)      _mm_store_si128((V128 *)&(a), b)
     #define XOR128(a, b)        _mm_xor_si128(a, b)
     #define XOReq128(a, b)      a = _mm_xor_si128(a, b)
-    #define GET64LO(a, b)       _mm_unpacklo_epi64(a, b)
-    #define GET64HI(a, b)       _mm_unpackhi_epi64(a, b)
+    #define GET64LOLO(a, b)     _mm_unpacklo_epi64(a, b)
+    #define GET64HIHI(a, b)     _mm_unpackhi_epi64(a, b)
     #define COPY64HI2LO(a)      _mm_shuffle_epi32(a, 0xEE)
     #define COPY64LO2HI(a)      _mm_shuffle_epi32(a, 0x44)
     #define ZERO128()           _mm_setzero_si128()
@@ -53,11 +63,74 @@ typedef unsigned long long int UINT64;
     #ifdef UseOnlySIMD64
     #include "KeccakF-1600-simd64.macros"
     #else
+ALIGN const UINT64 rho8_56[2] = {0x0605040302010007, 0x080F0E0D0C0B0A09};
     #include "KeccakF-1600-simd128.macros"
     #endif
 
     #ifdef UseBebigokimisa
     #error "UseBebigokimisa cannot be used in combination with UseSSE"
+    #endif
+#elif defined(UseXOP)
+    #include <x86intrin.h>
+    typedef __m128i V64;
+    typedef __m128i V128;
+   
+    #define LOAD64(a)           _mm_loadl_epi64((const V64 *)&(a))
+    #define CONST64(a)          _mm_loadl_epi64((const V64 *)&(a))
+    #define STORE64(a, b)       _mm_storel_epi64((V64 *)&(a), b)
+    #define XOR64(a, b)         _mm_xor_si128(a, b)
+    #define XOReq64(a, b)       a = _mm_xor_si128(a, b)
+
+    #define ANDnu128(a, b)      _mm_andnot_si128(a, b)
+    #define LOAD6464(a, b)      _mm_set_epi64((__m64)(a), (__m64)(b))
+    #define CONST128(a)         _mm_load_si128((const V128 *)&(a))
+    #define LOAD128(a)          _mm_load_si128((const V128 *)&(a))
+    #define LOAD128u(a)         _mm_loadu_si128((const V128 *)&(a))
+    #define STORE128(a, b)      _mm_store_si128((V128 *)&(a), b)
+    #define XOR128(a, b)        _mm_xor_si128(a, b)
+    #define XOReq128(a, b)      a = _mm_xor_si128(a, b)
+    #define ZERO128()           _mm_setzero_si128()
+
+    #define SWAP64(a)           _mm_shuffle_epi32(a, 0x4E)
+    #define GET64LOLO(a, b)     _mm_unpacklo_epi64(a, b)
+    #define GET64HIHI(a, b)     _mm_unpackhi_epi64(a, b)
+    #define GET64LOHI(a, b)     ((__m128i)_mm_blend_pd((__m128d)a, (__m128d)b, 2))
+    #define GET64HILO(a, b)     SWAP64(GET64LOHI(b, a))
+    #define COPY64HI2LO(a)      _mm_shuffle_epi32(a, 0xEE)
+    #define COPY64LO2HI(a)      _mm_shuffle_epi32(a, 0x44)
+ 
+    #define ROL6464same(a, o)   _mm_roti_epi64(a, o)
+    #define ROL6464(a, r1, r2)  _mm_rot_epi64(a, CONST128( rot_##r1##_##r2 ))
+ALIGN const UINT64 rot_0_20[2]  = { 0, 20};
+ALIGN const UINT64 rot_44_3[2]  = {44,  3};
+ALIGN const UINT64 rot_43_45[2] = {43, 45};
+ALIGN const UINT64 rot_21_61[2] = {21, 61};
+ALIGN const UINT64 rot_14_28[2] = {14, 28};
+ALIGN const UINT64 rot_1_36[2]  = { 1, 36};
+ALIGN const UINT64 rot_6_10[2]  = { 6, 10};
+ALIGN const UINT64 rot_25_15[2] = {25, 15};
+ALIGN const UINT64 rot_8_56[2]  = { 8, 56};
+ALIGN const UINT64 rot_18_27[2] = {18, 27};
+ALIGN const UINT64 rot_62_55[2] = {62, 55};
+ALIGN const UINT64 rot_39_41[2] = {39, 41};
+
+#if defined(UseSimulatedXOP)
+    // For debugging purposes, when XOP is not available
+    #undef ROL6464
+    #undef ROL6464same
+    #define ROL6464same(a, o)   _mm_or_si128(_mm_slli_epi64(a, o), _mm_srli_epi64(a, 64-(o)))
+    V128 ROL6464(V128 a, int r0, int r1)
+    {
+        V128 a0 = ROL64(a, r0);
+        V128 a1 = COPY64HI2LO(ROL64(a, r1));
+        return GET64LOLO(a0, a1);
+    }
+#endif
+    
+    #include "KeccakF-1600-xop.macros"
+
+    #ifdef UseBebigokimisa
+    #error "UseBebigokimisa cannot be used in combination with UseXOP"
     #endif
 #elif defined(UseMMX)
     #include <mmintrin.h>
@@ -85,6 +158,13 @@ typedef unsigned long long int UINT64;
 #else
     #if defined(_MSC_VER)
     #define ROL64(a, offset) _rotl64(a, offset)
+    #elif defined(UseSHLD)
+      #define ROL64(x,N) ({ \
+        register UINT64 __out; \
+        register UINT64 __in = x; \
+        __asm__ ("shld %2,%0,%0" : "=r"(__out) : "0"(__in), "i"(N)); \
+        __out; \
+      })
     #else
     #define ROL64(a, offset) ((((UINT64)a) << offset) ^ (((UINT64)a) >> (64-offset)))
     #endif

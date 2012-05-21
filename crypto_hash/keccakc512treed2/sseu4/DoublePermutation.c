@@ -14,6 +14,7 @@ http://creativecommons.org/publicdomain/zero/1.0/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <x86intrin.h>
 #include "DoublePermutation.h"
 
 #include "DoublePermutation-config.h"
@@ -24,18 +25,21 @@ typedef unsigned char UINT8;
 typedef unsigned long long int UINT64;
 
 #if defined(UseSSE)
-    #include <emmintrin.h>
-    typedef __m128i V64;
-    typedef union {
-        V128 v128;
-        UINT64 v64[2];
-    } V6464;
-
     #define ANDnu128(a, b)      _mm_andnot_si128(a, b)
     #define CONST128(a)         _mm_load_si128((const V128 *)&(a))
     #define LOAD128(a)          _mm_load_si128((const V128 *)&(a))
     #define LOAD128u(a)         _mm_loadu_si128((const V128 *)&(a))
-    #define ROL64in128(a, o)    _mm_or_si128(_mm_slli_epi64(a, o), _mm_srli_epi64(a, 64-(o)))
+    #if defined(UseXOP)
+        #define ROL64in128(a, o)    _mm_roti_epi64(a, o)
+        #define ROL64in128_8(a)     ROL64in128(a, 8)
+        #define ROL64in128_56(a)    ROL64in128(a, 56)
+    #else
+        #define ROL64in128(a, o)    _mm_or_si128(_mm_slli_epi64(a, o), _mm_srli_epi64(a, 64-(o)))
+        #define ROL64in128_8(a)     _mm_shuffle_epi8(a, CONST128(rho8))
+        #define ROL64in128_56(a)    _mm_shuffle_epi8(a, CONST128(rho56))
+const UINT64 rho8[2] = {0x0605040302010007, 0x0E0D0C0B0A09080F};
+const UINT64 rho56[2] = {0x0007060504030201, 0x080F0E0D0C0B0A09};
+    #endif
     #define STORE128(a, b)      _mm_store_si128((V128 *)&(a), b)
     #define XOR128(a, b)        _mm_xor_si128(a, b)
     #define XOReq128(a, b)      a = _mm_xor_si128(a, b)
@@ -129,7 +133,7 @@ typedef unsigned long long int UINT64;
     E##ka = XOR128(Bka, ANDnu128(Bke, Bki)); \
     XOReq128(Ca, E##ka); \
     XOReq128(A##mu, Du); \
-    Bko = ROL64in128(A##mu, 8); \
+    Bko = ROL64in128_8(A##mu); \
     E##ke = XOR128(Bke, ANDnu128(Bki, Bko)); \
     XOReq128(Ce, E##ke); \
     XOReq128(A##sa, Da); \
@@ -154,7 +158,7 @@ typedef unsigned long long int UINT64;
     E##me = XOR128(Bme, ANDnu128(Bmi, Bmo)); \
     XOReq128(Ce, E##me); \
     XOReq128(A##so, Do); \
-    Bmu = ROL64in128(A##so, 56); \
+    Bmu = ROL64in128_56(A##so); \
     E##mi = XOR128(Bmi, ANDnu128(Bmo, Bmu)); \
     XOReq128(Ci, E##mi); \
     E##mo = XOR128(Bmo, ANDnu128(Bmu, Bma)); \
@@ -234,7 +238,7 @@ typedef unsigned long long int UINT64;
     Bki = ROL64in128(A##ko, 25); \
     E##ka = XOR128(Bka, ANDnu128(Bke, Bki)); \
     XOReq128(A##mu, Du); \
-    Bko = ROL64in128(A##mu, 8); \
+    Bko = ROL64in128_8(A##mu); \
     E##ke = XOR128(Bke, ANDnu128(Bki, Bko)); \
     XOReq128(A##sa, Da); \
     Bku = ROL64in128(A##sa, 18); \
@@ -253,7 +257,7 @@ typedef unsigned long long int UINT64;
     Bmo = ROL64in128(A##mi, 15); \
     E##me = XOR128(Bme, ANDnu128(Bmi, Bmo)); \
     XOReq128(A##so, Do); \
-    Bmu = ROL64in128(A##so, 56); \
+    Bmu = ROL64in128_56(A##so); \
     E##mi = XOR128(Bmi, ANDnu128(Bmo, Bmu)); \
     E##mo = XOR128(Bmo, ANDnu128(Bmu, Bma)); \
     E##mu = XOR128(Bmu, ANDnu128(Bma, Bme)); \
@@ -300,6 +304,33 @@ ALIGN const UINT64 KeccakF1600DoubleRoundConstants[48] = {
     0x8000000000008080ULL, 0x8000000000008080ULL,
     0x0000000080000001ULL, 0x0000000080000001ULL,
     0x8000000080008008ULL, 0x8000000080008008ULL };
+
+#define copyFromStateAndXor1344bits(X, state, input) \
+    X##ba = XOR128(LOAD128(state[ 0]), LOAD128(input[ 0])); \
+    X##be = XOR128(LOAD128(state[ 1]), LOAD128(input[ 1])); \
+    X##bi = XOR128(LOAD128(state[ 2]), LOAD128(input[ 2])); \
+    X##bo = XOR128(LOAD128(state[ 3]), LOAD128(input[ 3])); \
+    X##bu = XOR128(LOAD128(state[ 4]), LOAD128(input[ 4])); \
+    X##ga = XOR128(LOAD128(state[ 5]), LOAD128(input[ 5])); \
+    X##ge = XOR128(LOAD128(state[ 6]), LOAD128(input[ 6])); \
+    X##gi = XOR128(LOAD128(state[ 7]), LOAD128(input[ 7])); \
+    X##go = XOR128(LOAD128(state[ 8]), LOAD128(input[ 8])); \
+    X##gu = XOR128(LOAD128(state[ 9]), LOAD128(input[ 9])); \
+    X##ka = XOR128(LOAD128(state[10]), LOAD128(input[10])); \
+    X##ke = XOR128(LOAD128(state[11]), LOAD128(input[11])); \
+    X##ki = XOR128(LOAD128(state[12]), LOAD128(input[12])); \
+    X##ko = XOR128(LOAD128(state[13]), LOAD128(input[13])); \
+    X##ku = XOR128(LOAD128(state[14]), LOAD128(input[14])); \
+    X##ma = XOR128(LOAD128(state[15]), LOAD128(input[15])); \
+    X##me = XOR128(LOAD128(state[16]), LOAD128(input[16])); \
+    X##mi = XOR128(LOAD128(state[17]), LOAD128(input[17])); \
+    X##mo = XOR128(LOAD128(state[18]), LOAD128(input[18])); \
+    X##mu = XOR128(LOAD128(state[19]), LOAD128(input[19])); \
+    X##sa = XOR128(LOAD128(state[20]), LOAD128(input[20])); \
+    X##se = LOAD128(state[21]); \
+    X##si = LOAD128(state[22]); \
+    X##so = LOAD128(state[23]); \
+    X##su = LOAD128(state[24]); \
 
 #define copyFromStateAndXor1088bits(X, state, input) \
     X##ba = XOR128(LOAD128(state[ 0]), LOAD128(input[ 0])); \
@@ -463,7 +494,7 @@ ALIGN const UINT64 KeccakF1600DoubleRoundConstants[48] = {
     X##so = Y##so; \
     X##su = Y##su; \
 
-#include "KeccakPermutationOptimized.macros"
+#include "KeccakF-1600-unrolling.macros"
 
 void KeccakDoublePermutationOnWords(V128 *state)
 {
@@ -515,6 +546,20 @@ void KeccakDoublePermutationOnWordsAfterXoring2x1088bits(V128 *state, const V128
 #endif
 
     copyFromStateAndXor1088bits(A, state, input)
+    rounds
+#if defined(UseMMX)
+    _mm_empty();
+#endif
+}
+
+void KeccakDoublePermutationOnWordsAfterXoring2x1344bits(V128 *state, const V128 *input)
+{
+    declareABCDE
+#if (Unrolling != 24)
+    unsigned int i;
+#endif
+
+    copyFromStateAndXor1344bits(A, state, input)
     rounds
 #if defined(UseMMX)
     _mm_empty();

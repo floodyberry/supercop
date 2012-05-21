@@ -1,0 +1,1 @@
+Tree hashing layer on top of Keccak[r=1344,c=256] with height H=1, leaf interleaving, block size B=64 bits, C=8*ceil(c/8)=256, D=2 leaves (see ePrint 2009/210 Section 7.2), and 1344-bit output

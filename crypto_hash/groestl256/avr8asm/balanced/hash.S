@@ -111,8 +111,7 @@
   ldd r6, Y+54 ; r6 = read[54] ^ 0xFF;
   com r6
   ldd r7, Y+7  ; r7 = read[7] ^ 0xFF ^ round;
-  ldi ZL, 0xff
-  eor r7, ZL
+  com r7
   eor r7, r19
   rcall mixBytes
 
@@ -663,7 +662,7 @@ crypto_hash_groestl256_avr8asm_balanced:
       movw ZL, ARG2_L
 
       loop_blocks_if:
-        lpm r0, Z+
+        ld r0, Z+
         st X+, r0
         dec YL
       brne loop_blocks_if
@@ -688,7 +687,7 @@ crypto_hash_groestl256_avr8asm_balanced:
       ; Copy the remaining message from ARG2 to buffer
       movw ZL, ARG2_L
       loop_blocks_elsif1:
-        lpm r0, Z+
+        ld r0, Z+
         st X+, r0
         dec ARG3_L
       brne loop_blocks_elsif1
