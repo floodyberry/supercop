@@ -386,45 +386,42 @@ do
             echo "#endif"
           ) > "$op.h"
   
-          ok=1
+	  touch OK
           for f in $cfiles $sfiles $ccfiles $cppfiles
           do
-            if [ "$ok" = 1 ]
+            if [ -f OK ]
             then
-              $compiler \
-                -I. -I"$top/$abi/include" \
-                -c "$f" >../errors 2>&1 || ok=0
-              ( if [ `wc -l < ../errors` -lt 25 ]
-                then
-                  cat ../errors
-                else
-                  head ../errors
-                  echo ...
-                  tail ../errors
-                fi
-              ) \
-              | while read err
-              do
-                echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword $f $err" >&5
-              done
+	      (
+                killafter 300 \
+		$compiler \
+                  -I. -I"$top/$abi/include" \
+                  -c "$f" 2>&1 || rm -f OK
+	      ) | awk -v PREFIX="$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword $f" '
+	        {
+		  if (NR > 25) { print PREFIX,"..."; exit }
+		  print PREFIX,$0
+		}
+	      ' >&5
             fi
           done
   
-          [ "$ok" = 1 ] || exit 0
+          [ -f OK ] || exit 0
           okar-$abi cr "$op.a" *.o || exit 0
           ( ranlib "$op.a" || : )
   
-          killafter 300 \
-          $compiler \
-            -I. -I"$top/$abi/include" \
-            -o try try.$language try-anything.$language \
-            "$op.a" $libs >../errors 2>&1 || ok=0
-          cat ../errors \
-          | while read err
-          do
-            echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword try.$language $err" >&5
-          done
-          [ "$ok" = 1 ] || exit 0
+	  (
+            killafter 300 \
+            $compiler \
+              -I. -I"$top/$abi/include" \
+              -o try try.$language try-anything.$language \
+              "$op.a" $libs 2>&1 || rm -f OK
+	  ) | awk -v PREFIX="$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword try.$language" '
+	    {
+	      if (NR > 25) { print PREFIX,"..."; exit }
+	      print PREFIX,$0
+	    }
+	  ' >&5
+          [ -f OK ] || exit 0
   
           if sh -c 'killafter 3600 ./try || exit $?' >../errors 2>&1
           then
@@ -449,18 +446,20 @@ do
           echo "$version $shorthostname $abi $startdate $o $p try $checksum $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
           [ "$checksumok" = fails ] && exit 0
   
-          killafter 3600 \
-          $compiler -D'COMPILER="'"$compiler"'"' \
-            -DSUPERCOP -DLOOPS=1 \
-            -I. -I"$top/$abi/include" \
-            -o measure measure.$language measure-anything.$language \
-            "$op.a" $libs >../errors 2>&1 || ok=0
-          cat ../errors \
-          | while read err
-          do
-            echo "$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword measure.$language $err" >&5
-          done
-          [ "$ok" = 1 ] || exit 0
+	  (
+            killafter 3600 \
+            $compiler -D'COMPILER="'"$compiler"'"' \
+              -DSUPERCOP -DLOOPS=1 \
+              -I. -I"$top/$abi/include" \
+              -o measure measure.$language measure-anything.$language \
+              "$op.a" $libs 2>&1 || rm -f OK
+	  ) | awk -v PREFIX="$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword measure.$language" '
+	    {
+	      if (NR > 25) { print PREFIX,"..."; exit }
+	      print PREFIX,$0
+	    }
+	  ' >&5
+          [ -f OK ] || exit 0
 
 	  rm -rf ../compiled || exit 0
 	  mkdir ../compiled || exit 0
