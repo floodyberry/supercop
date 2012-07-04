@@ -42,7 +42,6 @@
 # qhasm: reg128 caller_q7
 
 # qhasm: startcode
-.fpu neon
 .text
 
 # qhasm: int32 Aba0

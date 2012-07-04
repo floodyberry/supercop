@@ -986,4 +986,8 @@ pgCC -tp x64 -fast
 pgCC -tp core2-32 -O2
 pgCC -tp core2-32 -O3
 pgCC -tp core2-32 -fast
+clang++ -O3 -march=native -mtune=native
+clang++ -O3 -march=native -mtune=native -mavx
+clang++ -O3 -march=native -mtune=native -mcpu=cortex-a8 -mfpu=neon
+clang++ -O3 -march=native -mtune=native -mcpu=cortex-a9 -mfpu=neon
 CC
