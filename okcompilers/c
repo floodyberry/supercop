@@ -1656,8 +1656,10 @@ opt-MIPSpro-bin-cc -n32 -Ofast
 opt-MIPSpro-bin-cc -n32
 opt-MIPSpro-bin-cc -Ofast
 opt-MIPSpro-bin-cc
-clang -O3 -march=native -mtune=native
-clang -O3 -march=native -mtune=native -mavx
-clang -O3 -march=native -mtune=native -mcpu=cortex-a8 -mfpu=neon
-clang -O3 -march=native -mtune=native -mcpu=cortex-a9 -mfpu=neon
+clang -O3
+clang -O3 -mavx
+clang -O3 -march=armv7-a -mfloat-abi=hard -mfpu=neon -fomit-frame-pointer
+clang -O3 -march=armv7-a -mfloat-abi=softfp -mfpu=neon -fomit-frame-pointer
+clang -O3 -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -fomit-frame-pointer
+clang -O3 -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fomit-frame-pointer
 cc
