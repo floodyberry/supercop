@@ -1,6 +1,6 @@
 /* Chacha implementation by Ted Krovetz (ted@krovetz.net). Public domain.   */
 /* Assumes 32-bit int, 64-bit long long.              Modified: 2012.07.05. */
-#include "api.h"              /* Defines CRYPTO_KEYBYTES, CRYPTO_NONCEBYTES */
+#include "crypto_stream.h"
 #include <string.h>
 
 /* Chacha is an improvement on the stream cipher Salsa, described at
@@ -106,7 +106,7 @@ typedef unsigned long long vec64 __attribute__ ((vector_size (16)));
 *(vec *)(op + d +  8) = REVV_BE(v2);    \
 *(vec *)(op + d + 12) = REVV_BE(v3);
 
-int crypto_stream_chacha8_krovetz_xor(
+int crypto_stream_xor(
         unsigned char *out,
         const unsigned char *in,
         unsigned long long inlen,
@@ -265,7 +265,7 @@ int crypto_stream_chacha8_krovetz_xor(
     return 0;
 }
 
-int crypto_stream_chacha8_krovetz(
+int crypto_stream(
                                   unsigned char *out,
                                   unsigned long long outlen,
                                   const unsigned char *n,
@@ -273,5 +273,5 @@ int crypto_stream_chacha8_krovetz(
                                   )
 {
     memset(out,0,outlen);
-    return crypto_stream_chacha8_krovetz_xor(out,out,outlen,n,k);
+    return crypto_stream_xor(out,out,outlen,n,k);
 }

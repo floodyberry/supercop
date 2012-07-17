@@ -84,106 +84,99 @@ __m256d ALL_1B;
    This implementation costs 7.7 c/b giving total speed on SNB: 10.7c/b.
    K. Matusiewicz, 2011/05/29 */
 #define MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
-  /* xmm"tostr(8..xmm"tostr(15 = a2 a3... a0 a1 */\
-  b0 = a2;\
-  b1 = a3;\
-  b2 = a4;\
-  b3 = a5;\
-  b4 = a6;\
-  b5 = a7;\
-  b6 = a0;\
-  b7 = a1;\
-  \
   /* t_i = a_i + a_{i+1} */\
-  a0 = _mm_xor_si128(a0, a1);\
-  a1 = _mm_xor_si128(a1, a2);\
-  a2 = _mm_xor_si128(a2, a3);\
-  a3 = _mm_xor_si128(a3, a4);\
-  a4 = _mm_xor_si128(a4, a5);\
-  a5 = _mm_xor_si128(a5, a6);\
-  a6 = _mm_xor_si128(a6, a7);\
-  a7 = _mm_xor_si128(a7, b6);\
+  b0 = _mm_xor_si128(a0, a1);\
+  b1 = _mm_xor_si128(a1, a2);\
+  b2 = _mm_xor_si128(a2, a3);\
+  b3 = _mm_xor_si128(a3, a4);\
+  b4 = _mm_xor_si128(a4, a5);\
+  b5 = _mm_xor_si128(a5, a6);\
+  b6 = _mm_xor_si128(a6, a7);\
+  b7 = _mm_xor_si128(a7, a0);\
   \
-  /* build y4 y5 y6 ... in regs xmm8, xmm9, xmm10 by adding t_i*/\
-  b0 = _mm_xor_si128(b0, a4);\
-  b1 = _mm_xor_si128(b1, a5);\
-  b2 = _mm_xor_si128(b2, a6);\
-  b3 = _mm_xor_si128(b3, a7);\
-  b4 = _mm_xor_si128(b4, a0);\
-  b5 = _mm_xor_si128(b5, a1);\
-  b6 = _mm_xor_si128(b6, a2);\
-  b7 = _mm_xor_si128(b7, a3);\
+  /* y_i = a_{i+6} + t_i (where y_i is stored in a{i+6}) */\
+  a2 = _mm_xor_si128(a2, b4);\
+  a3 = _mm_xor_si128(a3, b5);\
+  a4 = _mm_xor_si128(a4, b6);\
+  a5 = _mm_xor_si128(a5, b7);\
+  a6 = _mm_xor_si128(a6, b0);\
+  a7 = _mm_xor_si128(a7, b1);\
+  a0 = _mm_xor_si128(a0, b2);\
+  a1 = _mm_xor_si128(a1, b3);\
   \
-  b0 = _mm_xor_si128(b0, a6);\
-  b1 = _mm_xor_si128(b1, a7);\
-  b2 = _mm_xor_si128(b2, a0);\
-  b3 = _mm_xor_si128(b3, a1);\
-  b4 = _mm_xor_si128(b4, a2);\
-  b5 = _mm_xor_si128(b5, a3);\
-  b6 = _mm_xor_si128(b6, a4);\
-  b7 = _mm_xor_si128(b7, a5);\
+  /* y_i = y_i + t_{i+2} */\
+  a2 = _mm_xor_si128(a2, b6);\
+  a3 = _mm_xor_si128(a3, b7);\
+  a4 = _mm_xor_si128(a4, b0);\
+  a5 = _mm_xor_si128(a5, b1);\
+  a6 = _mm_xor_si128(a6, b2);\
+  a7 = _mm_xor_si128(a7, b3);\
+  a0 = _mm_xor_si128(a0, b4);\
+  a1 = _mm_xor_si128(a1, b5);\
   \
-  /* spill values y_4, y_5 to memory */\
+  /* spill values t0,t1,t2 to memory */\
   TEMP0 = b0;\
   TEMP1 = b1;\
   TEMP2 = b2;\
   \
-  /* save values t0, t1, t2 to xmm8, xmm9 and memory */\
-  b0 = a0;\
-  b1 = a1;\
-  TEMP3 = a2;\
+  /* spill values y2,y3,y4 to memory */\
+  TEMP3 = a0;\
+  TEMP4 = a1;\
+  TEMP5 = a2;\
   \
-  /* compute x_i = t_i + t_{i+3} */\
-  a0 = _mm_xor_si128(a0, a3);\
-  a1 = _mm_xor_si128(a1, a4);\
-  a2 = _mm_xor_si128(a2, a5);\
-  a3 = _mm_xor_si128(a3, a6);\
-  a4 = _mm_xor_si128(a4, a7);\
-  a5 = _mm_xor_si128(a5, b0);\
-  a6 = _mm_xor_si128(a6, b1);\
-  a7 = _mm_xor_si128(a7, TEMP3);\
+  /* prepare registers for VMUL2 */\
+  a1 = ALL_1B;\
+  a2 = _mm_xor_si128(a2, a2);\
   \
-  /*compute z_i : double x_i using temp xmm8 and 1B xmm9 */\
-  b1 = ALL_1B;\
-  b2 = _mm_xor_si128(b2, b2);\
-  VMUL2(a7, b0, b1, b2);\
-  VMUL2(a6, b0, b1, b2);\
-  VMUL2(a5, b0, b1, b2);\
-  VMUL2(a4, b0, b1, b2);\
-  VMUL2(a3, b0, b1, b2);\
-  VMUL2(a2, b0, b1, b2);\
-  VMUL2(a1, b0, b1, b2);\
-  VMUL2(a0, b0, b1, b2);\
+  /* x_i = t_i + t_{i+3} */\
+  b0 = _mm_xor_si128(b0, b3);\
+  b1 = _mm_xor_si128(b1, b4);\
+  b2 = _mm_xor_si128(b2, b5);\
+  b3 = _mm_xor_si128(b3, b6);\
+  b4 = _mm_xor_si128(b4, b7);\
+  b5 = _mm_xor_si128(b5, TEMP0);\
+  b6 = _mm_xor_si128(b6, TEMP1);\
+  b7 = _mm_xor_si128(b7, TEMP2);\
   \
-  /* compute w_i :  add y_{i+4} */\
-  a0 = _mm_xor_si128(a0, TEMP0);\
-  a1 = _mm_xor_si128(a1, TEMP1);\
-  a2 = _mm_xor_si128(a2, TEMP2);\
-  a3 = _mm_xor_si128(a3, b3);\
-  a4 = _mm_xor_si128(a4, b4);\
-  a5 = _mm_xor_si128(a5, b5);\
-  a6 = _mm_xor_si128(a6, b6);\
-  a7 = _mm_xor_si128(a7, b7);\
+  /* z_i = 02 * x_i using temp a0, 0x1B in a1, and 0x00 in a2 */\
+  VMUL2(b0, a0, a1, a2);\
+  VMUL2(b1, a0, a1, a2);\
+  VMUL2(b2, a0, a1, a2);\
+  VMUL2(b3, a0, a1, a2);\
+  VMUL2(b4, a0, a1, a2);\
+  VMUL2(b5, a0, a1, a2);\
+  VMUL2(b6, a0, a1, a2);\
+  VMUL2(b7, a0, a1, a2);\
   \
-  /*compute v_i: double w_i */\
-  VMUL2(a0, b0, b1, b2);\
-  VMUL2(a1, b0, b1, b2);\
-  VMUL2(a2, b0, b1, b2);\
-  VMUL2(a3, b0, b1, b2);\
-  VMUL2(a4, b0, b1, b2);\
-  VMUL2(a5, b0, b1, b2);\
-  VMUL2(a6, b0, b1, b2);\
-  VMUL2(a7, b0, b1, b2);\
+  /* w_i = z_i + y_{i+4} */\
+  b0 = _mm_xor_si128(b0, TEMP5);\
+  b1 = _mm_xor_si128(b1, a3);\
+  b2 = _mm_xor_si128(b2, a4);\
+  b3 = _mm_xor_si128(b3, a5);\
+  b4 = _mm_xor_si128(b4, a6);\
+  b5 = _mm_xor_si128(b5, a7);\
+  b6 = _mm_xor_si128(b6, TEMP3);\
+  b7 = _mm_xor_si128(b7, TEMP4);\
   \
-  /* add to y_4 y_5 .. v3, v4, ... */\
-  b0 = _mm_xor_si128(a3, TEMP0);\
-  b1 = _mm_xor_si128(a4, TEMP1);\
-  b2 = _mm_xor_si128(a5, TEMP2);\
-  b3 = _mm_xor_si128(b3, a6);\
-  b4 = _mm_xor_si128(b4, a7);\
-  b5 = _mm_xor_si128(b5, a0);\
-  b6 = _mm_xor_si128(b6, a1);\
-  b7 = _mm_xor_si128(b7, a2);\
+  /* v_i = 02 * w_i using temp a0, 0x1B in a1, and 0x00 in a2 */\
+  VMUL2(b0, a0, a1, a2);\
+  VMUL2(b1, a0, a1, a2);\
+  VMUL2(b2, a0, a1, a2);\
+  VMUL2(b3, a0, a1, a2);\
+  VMUL2(b4, a0, a1, a2);\
+  VMUL2(b5, a0, a1, a2);\
+  VMUL2(b6, a0, a1, a2);\
+  VMUL2(b7, a0, a1, a2);\
+  \
+  /* b_i = v_{i+3} + y_{i+4} */\
+  a0 = _mm_xor_si128(b3, TEMP5);\
+  a1 = _mm_xor_si128(b4, a3);\
+  a2 = _mm_xor_si128(b5, a4);\
+  a3 = _mm_xor_si128(b6, a5);\
+  a4 = _mm_xor_si128(b7, a6);\
+  a5 = _mm_xor_si128(b0, a7);\
+  a6 = _mm_xor_si128(b1, TEMP3);\
+  a7 = _mm_xor_si128(b2, TEMP4);\
 }/*MixBytes*/
 
 /* one round
@@ -193,34 +186,34 @@ __m256d ALL_1B;
  */
 #define ROUND(i, a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7){\
   /* Add Round Constant */\
-  b1 = ROUND_CONST_Lx;\
+  b3 = ROUND_CONST_Lx;\
   a0 = _mm_xor_si128(a0, (ROUND_CONST_L0[i]));\
-  a1 = _mm_xor_si128(a1, b1);\
-  a2 = _mm_xor_si128(a2, b1);\
-  a3 = _mm_xor_si128(a3, b1);\
-  a4 = _mm_xor_si128(a4, b1);\
-  a5 = _mm_xor_si128(a5, b1);\
-  a6 = _mm_xor_si128(a6, b1);\
+  a1 = _mm_xor_si128(a1, b3);\
+  a2 = _mm_xor_si128(a2, b3);\
+  a3 = _mm_xor_si128(a3, b3);\
+  a4 = _mm_xor_si128(a4, b3);\
+  a5 = _mm_xor_si128(a5, b3);\
+  a6 = _mm_xor_si128(a6, b3);\
   a7 = _mm_xor_si128(a7, (ROUND_CONST_L7[i]));\
   \
   /* ShiftBytes + SubBytes (interleaved) */\
-  b0 = _mm_xor_si128(b0,  b0);\
+  b7 = _mm_xor_si128(b7,  b7);\
   a0 = _mm_shuffle_epi8(a0, (SUBSH_MASK[0]));\
-  a0 = _mm_aesenclast_si128(a0, b0);\
+  a0 = _mm_aesenclast_si128(a0, b7);\
   a1 = _mm_shuffle_epi8(a1, (SUBSH_MASK[1]));\
-  a1 = _mm_aesenclast_si128(a1, b0);\
+  a1 = _mm_aesenclast_si128(a1, b7);\
   a2 = _mm_shuffle_epi8(a2, (SUBSH_MASK[2]));\
-  a2 = _mm_aesenclast_si128(a2, b0);\
+  a2 = _mm_aesenclast_si128(a2, b7);\
   a3 = _mm_shuffle_epi8(a3, (SUBSH_MASK[3]));\
-  a3 = _mm_aesenclast_si128(a3, b0);\
+  a3 = _mm_aesenclast_si128(a3, b7);\
   a4 = _mm_shuffle_epi8(a4, (SUBSH_MASK[4]));\
-  a4 = _mm_aesenclast_si128(a4, b0);\
+  a4 = _mm_aesenclast_si128(a4, b7);\
   a5 = _mm_shuffle_epi8(a5, (SUBSH_MASK[5]));\
-  a5 = _mm_aesenclast_si128(a5, b0);\
+  a5 = _mm_aesenclast_si128(a5, b7);\
   a6 = _mm_shuffle_epi8(a6, (SUBSH_MASK[6]));\
-  a6 = _mm_aesenclast_si128(a6, b0);\
+  a6 = _mm_aesenclast_si128(a6, b7);\
   a7 = _mm_shuffle_epi8(a7, (SUBSH_MASK[7]));\
-  a7 = _mm_aesenclast_si128(a7, b0);\
+  a7 = _mm_aesenclast_si128(a7, b7);\
   \
   /* MixBytes */\
   MixBytes(a0, a1, a2, a3, a4, a5, a6, a7, b0, b1, b2, b3, b4, b5, b6, b7);\
@@ -229,15 +222,15 @@ __m256d ALL_1B;
 /* 10 rounds, P and Q in parallel */
 #define ROUNDS_P_Q(){\
   ROUND(0, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
-  ROUND(1, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
+  ROUND(1, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
   ROUND(2, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
-  ROUND(3, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
+  ROUND(3, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
   ROUND(4, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
-  ROUND(5, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
+  ROUND(5, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
   ROUND(6, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
-  ROUND(7, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
+  ROUND(7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
   ROUND(8, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
-  ROUND(9, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15);\
+  ROUND(9, xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15, xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm6, xmm7);\
 }
 
 /* Matrix Transpose Step 1
@@ -376,6 +369,8 @@ void TF512(u64* h, u64* m)
   static __m128i TEMP1;
   static __m128i TEMP2;
   static __m128i TEMP3;
+  static __m128i TEMP4;
+  static __m128i TEMP5;
 
 #ifdef IACA_TRACE
   IACA_START;
@@ -445,6 +440,8 @@ void OF512(u64* h)
   static __m128i TEMP1;
   static __m128i TEMP2;
   static __m128i TEMP3;
+  static __m128i TEMP4;
+  static __m128i TEMP5;
 
   /* load CV into registers xmm8, xmm10, xmm12, xmm14 */
   xmm8 = chaining[0];

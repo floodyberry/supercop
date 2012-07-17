@@ -13,21 +13,19 @@
 #include <stdlib.h>
 
 /* eBash API begin */
-#include "crypto_hash.h"
-#ifdef crypto_hash_BYTES
-#define LENGTH (crypto_hash_BYTES*8)
-#include <crypto_uint8.h>
-#include <crypto_uint32.h>
-#include <crypto_uint64.h>
-typedef crypto_uint8 u8;
-typedef crypto_uint32 u32;
-typedef crypto_uint64 u64;
+#include "api.h"
+#ifdef CRYPTO_BYTES
+#define LENGTH (CRYPTO_BYTES*8)
 #endif
 /* eBash API end */
 
 #include "brg_endian.h"
 #define NEED_UINT_64T
 #include "brg_types.h"
+
+typedef uint8_t u8;
+typedef uint32_t u32;
+typedef uint64_t u64;
 
 #ifdef IACA_TRACE
   #include IACA_MARKS

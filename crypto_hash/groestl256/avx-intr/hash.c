@@ -6,42 +6,7 @@
  * This code is placed in the public domain
  */
 
-#include "groestl-version.h"
-
-#ifdef TASM
-  #ifdef VAES
-    #include "groestl-asm-aes.h"
-  #else
-    #ifdef VAVX
-      #include "groestl-asm-avx.h"
-    #else
-      #ifdef VVPERM
-        #include "groestl-asm-vperm.h"
-      #else
-        #error NO VERSION SPECIFIED (-DV[AES/AVX/VVPERM])
-      #endif
-    #endif
-  #endif
-#else
-  #ifdef TINTR
-    #ifdef VAES
-      #include "groestl-intr-aes.h"
-    #else
-      #ifdef VAVX
-        #include "groestl-intr-avx.h"
-      #else
-        #ifdef VVPERM
-          #include "groestl-intr-vperm.h"
-        #else
-          #error NO VERSION SPECIFIED (-DV[AES/AVX/VVPERM])
-        #endif
-      #endif
-    #endif
-  #else
-    #error NO TYPE SPECIFIED (-DT[ASM/INTR])
-  #endif
-#endif
-
+#include "groestl-intr-avx.h"
 
 /* digest up to len bytes of input (full blocks only) */
 void Transform(hashState *ctx,
@@ -256,10 +221,10 @@ HashReturn Hash(int hashbitlen,
 }
 
 /* eBash API */
-#ifdef crypto_hash_BYTES
+#ifdef CRYPTO_BYTES
 int crypto_hash(unsigned char *out, const unsigned char *in, unsigned long long inlen)
 {
-  if (Hash(crypto_hash_BYTES * 8, in, inlen * 8,out) == SUCCESS) return 0;
+  if (Hash(CRYPTO_BYTES * 8, in, inlen * 8,out) == SUCCESS) return 0;
   return -1;
 }
 #endif
