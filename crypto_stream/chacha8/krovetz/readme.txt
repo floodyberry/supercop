@@ -8,20 +8,20 @@ http://cr.yp.to/highspeed/neoncrypto-20120320.pdf.
 Since most of Bernstein's implementations are either fast assembly or slow C, I
 decided to try to write a fast C version. I firmly believe that fast C is
 possible and much more practical than assembly. As of 2012.07.05 this C version
-is significantly faster than all submitted versions of Chacha reported at the
-SUPERCOP website (http://bench.cr.yp.to/results-stream.html).
+is significantly faster on target machines than all submitted versions of Chacha
+reported at the SUPERCOP website (http://bench.cr.yp.to/results-stream.html).
 
 Chacha20 4KiB encryption speeds reported at SUPERCOP on 2012.07.05 in cpb.
                      Mine   Previous best
-Intel Sandy Bridge   2.96   3.73
-PPC 7447             3.42   13.02
+Intel Sandy Bridge   2.62   3.73
+PPC 7447             3.33   13.02
 ARM Cortex-A9        7.65   17.29
 
 Chacha8 4KiB encryption speeds reported at SUPERCOP on 2012.07.05 in cpb.
                      Mine   Previous best
-Intel Sandy Bridge   1.31   1.79
+Intel Sandy Bridge   1.22   1.79
 PPC 7447             1.62   6.29
-ARM Cortex-A9        3.74   9.80
+ARM Cortex-A9        3.58   9.80
 
 Intellectual Property Notices
 -----------------------------
