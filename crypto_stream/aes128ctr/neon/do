@@ -1,0 +1,6 @@
+maq crypto_stream_afternm.pq > crypto_stream_afternm.q
+qhasm-arm-align < crypto_stream_afternm.q > crypto_stream_afternm.s
+maq crypto_stream_beforenm.pq > crypto_stream_beforenm.q
+qhasm-arm-align < crypto_stream_beforenm.q > crypto_stream_beforenm.s
+maq crypto_stream_xor_afternm.pq > crypto_stream_xor_afternm.q
+qhasm-arm-align < crypto_stream_xor_afternm.q > crypto_stream_xor_afternm.s
