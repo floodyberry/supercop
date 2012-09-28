@@ -1,5 +1,5 @@
 /**
- * Groestl implementation of the permutation P using ARM NEON.
+ * Groestl implementation of the output transformation using ARM NEON.
  *
  * @file     groestl_asm_outputtrans.h
  * @author   David Seywald  <d.seywald@student.tugraz.at>

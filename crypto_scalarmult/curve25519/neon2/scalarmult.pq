@@ -1384,7 +1384,7 @@ posh -= 32 ;\
 mem64[posh] aligned= h04[0] ;\
 
 
-qpushenter crypto_scalarmult_curve25519_neon2_scalarmult
+qpushenter crypto_scalarmult_curve25519_neon2
 
 stack64 stack_r45
 stack64 stack_r67

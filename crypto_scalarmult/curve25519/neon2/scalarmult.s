@@ -489,12 +489,12 @@
 
 # qhasm: reg128 one
 
-# qhasm: qpushenter crypto_scalarmult_curve25519_neon2_scalarmult
+# qhasm: qpushenter crypto_scalarmult_curve25519_neon2
 .align 4
-.global _crypto_scalarmult_curve25519_neon2_scalarmult
-.global crypto_scalarmult_curve25519_neon2_scalarmult
-_crypto_scalarmult_curve25519_neon2_scalarmult:
-crypto_scalarmult_curve25519_neon2_scalarmult:
+.global _crypto_scalarmult_curve25519_neon2
+.global crypto_scalarmult_curve25519_neon2
+_crypto_scalarmult_curve25519_neon2:
+crypto_scalarmult_curve25519_neon2:
 vpush {q4,q5,q6,q7}
 mov r12,sp
 sub sp,sp,#736
