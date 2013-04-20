@@ -1,0 +1,7 @@
+#define crypto_dh_hecfp128fkt_v02_varglv4_SECRETKEYBYTES 32
+#define crypto_dh_hecfp128fkt_v02_varglv4_PUBLICKEYBYTES 64
+#define crypto_dh_hecfp128fkt_v02_varglv4_BYTES 64
+
+#define SECRETKEY_BYTES crypto_dh_hecfp128fkt_v02_varglv4_SECRETKEYBYTES
+#define PUBLICKEY_BYTES crypto_dh_hecfp128fkt_v02_varglv4_PUBLICKEYBYTES
+#define SHAREDSECRET_BYTES crypto_dh_hecfp128fkt_v02_varglv4_BYTES

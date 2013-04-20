@@ -1,0 +1,113 @@
+/*
+ *  This file is part of Binary-library.
+ *
+ *  Binary-library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+void curves_domParam(Curve * c, curve_type type)
+{	
+	if(type == GLS254)
+	{
+		c->deg = DEGREE254;
+		c->type = type;
+		
+		//curve parameters a and b
+		c->a[3] = 0; c->a[2] = 0x1;
+		c->a[1] = 0; c->a[0] = 0;
+
+		c->b[3]= 0; c->b[2]= 0;
+		c->b[1]= 0x59c8202cb9e6e0ae; c->b[0]= 0x2e6d944fa54de7e5;
+			
+		//point generator
+		c->Gx[3]= 0x3703bc2465316c2a; c->Gx[2]= 0x84e0df4a9e499ccd;
+		c->Gx[1]= 0x30923d664e35dd35; c->Gx[0]= 0x71e2ef2b084a1f42;	
+				
+		c->Gy[3]= 0x35afad938be3f51e; c->Gy[2]= 0x8b35b31611582339;
+		c->Gy[1]= 0x0da7cb0e27609338; c->Gy[0]= 0xe10971b17a356c97;		
+	}
+}
+
+void AESkeyExp(u8 *key, u8 *expKey) {
+	__m128i k, t, tmp;
+
+	k = _mm_loadu_si128((__m128i*) key);
+	_mm_store_si128((__m128i *) &expKey[0], k);
+
+	STEP(k, t, tmp, 16*1, 0x01);
+	STEP(k, t, tmp, 16*2, 0x02);
+	STEP(k, t, tmp, 16*3, 0x04);
+	STEP(k, t, tmp, 16*4, 0x08);
+	STEP(k, t, tmp, 16*5, 0x10);
+	STEP(k, t, tmp, 16*6, 0x20);
+	STEP(k, t, tmp, 16*7, 0x40);
+	STEP(k, t, tmp, 16*8, 0x80);
+	STEP(k, t, tmp, 16*9, 0x1b);
+	STEP(k, t, tmp, 16*10, 0x36);
+}
+
+void AESenc(u8 *ptxt, u8 *expKey, u8 *ctxt) {
+	__m128i c, k;
+	int i;
+
+	c = _mm_loadu_si128((__m128i*) ptxt);
+	k = _mm_loadu_si128((__m128i*) &expKey[0]);
+	c = _mm_xor_si128(c, k);	
+
+	for (i=0;i<9;i++) {
+		k = _mm_loadu_si128((__m128i*) &expKey[16*(i+1)]);
+		c = _mm_aesenc_si128(c, k);
+	}
+
+	k = _mm_loadu_si128((__m128i*) &expKey[16*10]);
+	c = _mm_aesenclast_si128(c, k);
+	
+	_mm_storeu_si128((__m128i *) ctxt, c);
+}
+
+void gen253(u8 *k) {
+	u8 expkey[176];
+	u8 I[16], R[16];
+	u8 V[16] = {0x19, 0x5f,	0x15, 0x21, 0x4a, 0x0f,	0x2b, 0x43, 0x14, 0x2a, 0x20, 0x12, 0x02, 0x0b, 0x51, 0x47};
+	u8 key[16] = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};	
+	__m128i i, v, r;
+	int j;
+	
+	//INIT
+	AESkeyExp(key, expkey);
+
+	//128 bits I
+	for (j=0;j<16;j++) { I[j] = rand() % 256; }
+	i = _mm_loadu_si128((__m128i*) I);
+	v = _mm_loadu_si128((__m128i*) V);
+	i = _mm_xor_si128(i, v);
+	_mm_storeu_si128((__m128i *) I, i);
+	AESenc(I, expkey, &k[0]);
+	
+	//128 bits II
+	r = _mm_loadu_si128((__m128i*) &k[0]);
+	r = _mm_xor_si128(i, r);
+	_mm_storeu_si128((__m128i *) R, r);
+	AESenc(R, expkey, V);
+
+	for (j=0;j<16;j++) { I[j] = rand() % 256; }
+	i = _mm_loadu_si128((__m128i*) I);
+	v = _mm_loadu_si128((__m128i*) V);
+	i = _mm_xor_si128(i, v);
+	_mm_storeu_si128((__m128i *) I, i);
+	AESenc(I, expkey, &k[16]);
+	
+	//till 253-1
+	k[31] = k[31] & 0x1F;
+}
+

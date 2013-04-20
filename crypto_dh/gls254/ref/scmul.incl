@@ -1,0 +1,388 @@
+/*
+ *  This file is part of Binary-library.
+ *
+ *  Binary-library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+//#DIRECT RECODING#
+//k => k1, k2
+void scmul_direct_coding_doub(elt254 k, elt k1, elt k2, int *k1neg, int *k2neg) {
+	uint128_t h;
+	ui64 beta22;
+	ui64 b1[2], b2[2], b1t[3], b2t[2];
+	ui64 tmp, result[8];
+	int carry;
+
+	//Initialization
+	beta22 = 0xD792EA76691524E3;
+
+	//b1 (-k div 2^127)
+	b1[1] = (k[3] << 1) | (k[2] >> 63);
+	b1[0] = (k[2] << 1) | (k[1] >> 63);
+
+	//printf("b1 = %.16llx - %.16llx\n", b1[1], b1[0]);
+
+	//b2 (k*beta22 div 2^254)
+	SCHBOOKFULLh(h,result,beta22,k);
+	SCHBOOKSUMh(result,b2,carry,tmp);
+	b2[0] = (b2[0] >> 62) | (b2[1] << 2);
+
+	//printf("b2 = %.16llx\n", b2[0]);
+
+	//b1*t (t = beta22)
+	h = ((uint128_t) beta22*b1[0]);
+	b1t[0] = h; result[1] = h >> 64;
+	h = ((uint128_t) beta22*b1[1]);
+	result[2] = h; b1t[2] = h >> 64;
+	
+	carry = 0;
+	SUM64(b1t[1], result[1], result[2], carry);
+	b1t[2] = b1t[2] + carry;
+
+	//printf("b1*t = %.16llx - %.16llx - %.16llx\n", b1t[2], b1t[1], b1t[0]);
+
+	//b2*t (t = beta22)
+	h = ((uint128_t) beta22*b2[0]);
+	b2t[0] = h; b2t[1] = h >> 64;
+
+	//printf("b2*t = %.16llx - %.16llx\n", b2t[1], b2t[0]);
+
+	////k1
+	//b1*q (q = 2^127)
+	result[0] = 0;
+	result[1] = b1[0] << 63;
+
+	//b1q + b2t
+	carry = 0;
+	SUM64(result[4], result[0], b2t[0], carry);
+	result[5] = result[1] + b2t[1] + carry;
+
+	//b1q + b2t - b1
+	carry = 0;
+	SUB64(result[0], result[4], b1[0], carry);
+	result[1] = result[5] - b1[1] - carry;
+
+	//k1 sign
+	*k1neg = result[1] > k[1];
+
+	//final subtraction
+	if (*k1neg == 0) {
+		carry = 0;
+		SUB64(k1[0], k[0], result[0], carry);
+		SUB64(k1[1], k[1], result[1], carry);
+	} else {
+		carry = 0;
+		SUB64(k1[0], result[0], k[0], carry);
+		SUB64(k1[1], result[1], k[1], carry);
+	}
+
+	////k2
+	//b1t + b2
+	carry = 0;
+	SUM64(result[0], b1t[0], b2[0], carry);
+	result[1] = b1t[1] + carry;
+
+	//b2*q (q = 2^127)
+	result[3] = 0;
+	result[4] = b2[0] << 63;
+
+	//k2 sign
+	*k2neg = result[4] > result[1];
+
+	//final subtraction
+	if (*k2neg == 0) {
+		carry = 0;
+		SUB64(k2[0], result[0], result[3], carry);
+		SUB64(k2[1], result[1], result[4], carry);
+	} else {
+		carry = 0;
+		SUB64(k2[0], result[3], result[0], carry);
+		SUB64(k2[1], result[4], result[1], carry);
+	}	
+}
+
+//#RECODING HALVE-AND_ADD 2-GLV#
+void scmul_cvhalv_end(elt254 b, elt254 a) {
+	__m128i kpr[3], kh, tmp;	
+	ui64 nn[2][4];
+	ui64 kh64[4], kpr64[4], sum[4], sub[4], result[16];
+	uint128_t h;
+	int carry;
+
+	nn[0][3] = 0; nn[0][2] = 0; nn[0][1] = 0; nn[0][0] = 0;
+	nn[1][3] = 0x1FFFFFFFFFFFFFFF; nn[1][2] = 0xFFFFFFFFFFFFFFFF; nn[1][1] = 0xDAC40D1195270779; nn[1][0] = 0x877DABA2A44750A5;
+
+	//printf("k = %.16llx - %.16llx - %.16llx - %.16llx\n", a[3], a[2], a[1], a[0]);
+
+	//kpr = k * 2^(126)
+	kpr[2] = _mm_load_si128((__m128i *) &a[2]);
+	kpr[1] = _mm_load_si128((__m128i *) &a[0]);
+	kpr[0] = _mm_setzero_si128();
+
+	kpr[0] = _mm_alignr_epi8(kpr[1], kpr[0], 8);
+	kpr[0] = _mm_slli_epi64(kpr[0], 62);
+
+	tmp = _mm_alignr_epi8(kpr[2], kpr[1], 8);
+	tmp = _mm_slli_epi64(tmp, 62);
+	kpr[1] = _mm_srli_epi64(kpr[1], 2);
+	kpr[1] = _mm_xor_si128(kpr[1], tmp);
+
+	tmp = _mm_alignr_epi8(kpr[0], kpr[2], 8);
+	tmp = _mm_slli_epi64(tmp, 62);
+	kpr[2] = _mm_srli_epi64(kpr[2], 2);
+	kpr[2] = _mm_xor_si128(kpr[2], tmp);
+	
+	_mm_store_si128((__m128i *) &kpr64[0], kpr[0]);
+	_mm_store_si128((__m128i *) &kpr64[2], kpr[1]);
+
+	//I PHASE
+	//Extract K_h (kpr - 253 bits)	
+	tmp = _mm_alignr_epi8(kpr[2], kpr[1], 8);
+	tmp = _mm_srli_epi64(tmp, 61);
+	kh = _mm_slli_epi64(kpr[2], 3);
+	kh = _mm_xor_si128(kh, tmp);	
+	_mm_store_si128((__m128i *) &kh64[0], kh);
+	kh = _mm_srli_si128(kpr[2], 8);
+	kh = _mm_srli_epi64(kh, 61);
+	_mm_store_si128((__m128i *) &kh64[2], kh);
+
+	//printf("kh64 = %.16llx - %.16llx - %.16llx - %.16llx\n", kh64[3], kh64[2], kh64[1], kh64[0]);
+
+	//SCHOOLBOOK MULTIPLICATION
+	SCHBOOK(h,result,kh64,nn[1]);
+	SCHBOOKSUM(sum,result,carry);
+
+	//XTRA: kh can have more than 128 bits
+	carry = 0;
+	SUM64(sum[2], nn[kh64[2]][0], sum[2], carry);
+	SUM64(sum[3], nn[kh64[2]][1], sum[3], carry);
+
+	//printf("sum = %.16llx - %.16llx - %.16llx - %.16llx\n", sum[3], sum[2], sum[1], sum[0]);
+
+	//SUBTRACT: KPR-KH*N*2^0	
+	carry = 0;
+	SUB64(sub[0], kpr64[0], sum[0], carry);
+	SUB64(sub[1], kpr64[1], sum[1], carry);
+	SUB64(sub[2], kpr64[2], sum[2], carry);
+	SUB64(sub[3], kpr64[3], sum[3], carry);
+
+	//printf("kpr64 = %.16llx - %.16llx - %.16llx - %.16llx\n", sub[3], sub[2], sub[1], sub[0]);
+
+	//II PHASE
+	//Extract K_h (kp - 253 bits)
+	kh64[0] = sub[3] >> 61;
+
+	carry = 0;
+	SUB64(b[0], sub[0], nn[kh64[0]][0], carry);
+	SUB64(b[1], sub[1], nn[kh64[0]][1], carry);
+	SUB64(b[2], sub[2], nn[kh64[0]][2], carry);
+	SUB64(b[3], sub[3], nn[kh64[0]][3], carry);
+}
+
+unsigned char tbl4NAF[16] = {0, 1, 0, 3, 0, 5, 0, 7, 0, -7, 0, -5, 0, -3, 0, -1};
+
+//#4-NAF 2-GLV#
+void scmul_4wnafend(unsigned char *kwnaf, elt k) {
+	elt num, sum;
+	int idx, mod, tmp, carry;	
+
+	types_copy(num,k);
+	idx = 0;
+
+	while (types_isnotzero(num)) {
+		if (num[0] & 0x1 == 1) {
+			//odd number
+			mod = num[0] & 0xF;
+			tmp = tbl4NAF[mod];
+			kwnaf[idx++] = tmp;
+
+			carry = 0;
+
+			if (tmp >= 128) {
+				tmp = 256 - tmp;
+				SUMX64(sum[0], num[0], tmp, carry);
+				if (carry) { sum[1] = num[1] + carry; } else { sum[1] = num[1]; }
+			} else {				
+				SUBX64(sum[0], num[0], tmp, carry);
+				if (carry) { sum[1] = num[1] - carry; } else { sum[1] = num[1]; }
+			}
+
+			kwnaf[idx++] = 0;
+			kwnaf[idx++] = 0;
+			kwnaf[idx++] = 0;
+
+			num[0] = (sum[0] >> 4) ^ (sum[1] << 60);
+			num[1] = (sum[1] >> 4);
+		} else {
+			//even number
+			kwnaf[idx++] = 0;
+
+			num[0] = (num[0] >> 1) ^ (num[1] << 63);
+			num[1] = (num[1] >> 1);
+		}		
+	}	
+}
+
+//#HALVE_AND_ADD 2-GLV-GLS LAMBDA (direct recoding)#
+void scmul_end_halv_direct(elt254 x2, elt254 y2, elt254 x1, elt254 y1, elt254 k, Curve *c) {
+	elt254 Qx[4], Qm[4], Qz[4];
+	elt254 PXend, PMend, PX, PM, tmp, k_halving;
+	elt k1, k2;
+	ui64 k1_lm0, k2_lm0;
+	unsigned char k1wnaf[128], k2wnaf[128], idx;
+	int i, k1sign, k2sign, sign;
+
+	//Recoding
+	scmul_cvhalv_end(k_halving, k);
+	scmul_direct_coding_doub(k_halving, k1, k2, &k1sign, &k2sign);
+
+	memset(k1wnaf, 0, sizeof(unsigned char)*(128));
+	memset(k2wnaf, 0, sizeof(unsigned char)*(128));
+	
+	//NAF	
+	scmul_4wnafend(k1wnaf, k1);
+	scmul_4wnafend(k2wnaf, k2);
+
+	//determine how many 0 bits on the right
+	k1_lm0 = k1[0] ^ (k1[0] - 1);
+	k2_lm0 = k2[0] ^ (k2[0] - 1);
+	if (k2_lm0 < k1_lm0) { k1_lm0 = k2_lm0; }
+
+	switch (k1_lm0) {
+		case 0x01: k1_lm0 = 1; break;
+		case 0x03: k1_lm0 = 2; break;
+		case 0x07: k1_lm0 = 3; break;
+		case 0x0F: k1_lm0 = 4; break;
+		case 0x1F: k1_lm0 = 5; break;
+		case 0x3F: k1_lm0 = 6; break;
+		case 0x7F: k1_lm0 = 7; break;
+		case 0xFF: k1_lm0 = 8; break;
+		default: k1_lm0 = 8; break;
+	}	
+
+	//to lambda
+	ec_aff2lmb(PX, PM, x1, y1);
+	
+	//sign arrangements
+	if (k1sign) { PM[0] = PM[0] ^ 0x1; }
+	sign = (k1sign != k2sign);
+
+	//Initialize the Accumulators
+	for (i=0;i<4;i++) { types_setzero254(Qx[i]); types_setone254(Qm[i]); types_setzero254(Qz[i]); }
+	
+	//Check MSBs
+	if(k1wnaf[127] == 1 && k2wnaf[127] == 1) {
+		types_setone254(tmp); 
+		PSI_LAMBDA_ORG_SIGNED(PXend,PMend,PX,PM,sign);
+		ec_add_mix_lambda_opt(Qx[0], Qm[0], Qz[0], Qx[0], Qm[0], Qz[0], PX, PM, c);
+		ec_add_mix_lambda_opt(Qx[0], Qm[0], Qz[0], Qx[0], Qm[0], Qz[0], PXend, PMend, c);
+		ec_doub_lambda(Qx[0], Qm[0], Qz[0], Qx[0], Qm[0], Qz[0], c);
+	} else if (k1wnaf[127] == 1) { 
+		types_setone254(tmp); 
+		ec_doub_lambda(Qx[0], Qm[0], Qz[0], PX, PM, tmp, c);
+	} else if(k2wnaf[127] == 1) { 
+		types_setone254(tmp);
+		PSI_LAMBDA_ORG_SIGNED(PXend,PMend,PX,PM,sign);
+		ec_doub_lambda(Qx[0], Qm[0], Qz[0], PXend, PMend, tmp, c);
+	}
+
+	//Half-and-add
+	for(i=128-2; i>=9; i--) {
+		//Add Psi(P)
+		idx = k2wnaf[i];
+
+		if (idx) {
+			PSI_LAMBDA_ORG_SIGNED(PXend, PMend, PX, PM, sign);
+
+			if (idx >= 128) { idx = 256 - idx; PMend[0] = PMend[0] ^ 0x1; }
+			idx = idx >> 1;
+			ec_add_mix_lambda_opt(Qx[idx], Qm[idx], Qz[idx], Qx[idx], Qm[idx], Qz[idx], PXend, PMend, c);
+		}
+
+		//Add P
+		idx = k1wnaf[i];
+		types_copy254(tmp, PM);
+
+		if (idx) {
+			if (idx >= 128) { idx = 256 - idx; PM[0] = PM[0] ^ 0x1; }
+			idx = idx >> 1;
+			ec_add_mix_lambda_opt(Qx[idx], Qm[idx], Qz[idx], Qx[idx], Qm[idx], Qz[idx], PX, PM, c);
+		}
+
+		//Half
+		ec_halv_opt(PX, PM, PX, tmp, c);
+	}
+
+	for(i=8; i>=k1_lm0; i--) {
+		//Add Psi(P)
+		idx = k2wnaf[i];
+		
+		if (idx) {
+			PSI_LAMBDA_ORG_SIGNED(PXend, PMend, PX, PM, sign);
+
+			if (idx >= 128) { idx = 256 - idx; PMend[0] = PMend[0] ^ 0x1; }
+			idx = idx >> 1;
+			ec_add_mix_lambda_opt(Qx[idx], Qm[idx], Qz[idx], Qx[idx], Qm[idx], Qz[idx], PXend, PMend, c);
+		}
+
+		//Add P
+		idx = k1wnaf[i];
+		types_copy254(tmp, PM);
+
+		if (idx) {
+			if (idx >= 128) { idx = 256 - idx; PM[0] = PM[0] ^ 0x1; }
+			idx = idx >> 1;
+			ec_add_mix_lambda_opt(Qx[idx], Qm[idx], Qz[idx], Qx[idx], Qm[idx], Qz[idx], PX, PM, c);
+		}
+
+		//Half
+		ec_halv_opt(PX, PM, PX, tmp, c);
+	}
+	
+	//LAST ITERACTION (NO HALVING)
+	//Add Psi(P)
+	idx = k2wnaf[i];
+	if (idx) {
+		PSI_LAMBDA_ORG_SIGNED(PXend, PMend, PX, PM, sign);
+
+		if (idx >= 128) { idx = 256 - idx; PMend[0] = PMend[0] ^ 0x1; }
+		idx = idx >> 1;
+		ec_add_mix_lambda_opt(Qx[idx], Qm[idx], Qz[idx], Qx[idx], Qm[idx], Qz[idx], PXend, PMend, c);
+	}
+
+	//Add P
+	idx = k1wnaf[i];
+	if (idx) {	
+		if (idx >= 128) { idx = 256 - idx; PM[0] = PM[0] ^ 0x1; }
+		idx = idx >> 1;
+		ec_add_mix_lambda_opt(Qx[idx], Qm[idx], Qz[idx], Qx[idx], Qm[idx], Qz[idx], PX, PM, c);
+	}	
+	
+	//Accumulators 4-NAF
+	ec_add_full_lambda(Qx[2], Qm[2], Qz[2], Qx[2], Qm[2], Qz[2], Qx[3], Qm[3], Qz[3], c);
+	ec_add_full_lambda(Qx[1], Qm[1], Qz[1], Qx[1], Qm[1], Qz[1], Qx[2], Qm[2], Qz[2], c);
+	ec_add_full_lambda(Qx[0], Qm[0], Qz[0], Qx[0], Qm[0], Qz[0], Qx[1], Qm[1], Qz[1], c);
+
+	ec_add_full_lambda(Qx[3], Qm[3], Qz[3], Qx[3], Qm[3], Qz[3], Qx[2], Qm[2], Qz[2], c);
+	ec_add_full_lambda(Qx[3], Qm[3], Qz[3], Qx[3], Qm[3], Qz[3], Qx[1], Qm[1], Qz[1], c);
+
+	ec_doub_lambda(Qx[3], Qm[3], Qz[3], Qx[3], Qm[3], Qz[3], c);
+
+	ec_add_full_lambda(Qx[3], Qm[3], Qz[3], Qx[3], Qm[3], Qz[3], Qx[0], Qm[0], Qz[0], c);
+
+	//to affine
+	ec_pro2aff_lambda(PX, PM, Qx[3], Qm[3], Qz[3]);
+	ec_lmb2aff(x2, y2, PX, PM);	
+}
+

@@ -1,0 +1,169 @@
+/*
+ *  This file is part of Binary-library.
+ *
+ *  Binary-library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+//#HALVING OPTIMIZED#
+//y1 must be different from y3
+//input in lambda-affine representation
+//PS: for optimization matters, there is no check if the point is at infinity
+void ec_halv_opt(elt254 x3, elt254 y3, elt254 x1, elt254 y1, Curve *c) {
+	int trace;
+
+	low_htr254(y3, x1);
+
+	low_add254(y1, y1, y3);
+	low_add254(y1, y1, x1);
+	low_mul254(y1, y1, x1);
+
+	trace = low_tr254(y1);
+	
+	y3[0] = y3[0] ^ trace;
+
+	if (!trace) { low_add254(y1, y1, x1); }
+
+	low_sqrt254(x3, y1);
+}
+
+//#DOUBLE LAMBDA#
+//INF: (0:1:0)
+void ec_doub_lambda(elt254 x2, elt254 m2, elt254 z2, elt254 x1, elt254 m1, elt254 z1, Curve *c) {
+	elt254 t0, t1, t2, t3, t4;
+
+	if (types_iszero254(z1)) {
+		types_setzero254(x2);
+		types_setone254(m2);
+		types_setzero254(z2);
+	} else {
+		if (types_isone254(z1)) {
+			low_sq254(z2, m1);
+			low_add254(z2, z2, m1);
+			z2[2] = z2[2] ^ 0x1;
+			low_sq254(t3, x1);
+			low_sq254(x2, z2);			
+			low_mul254(t0, m1, z2);
+			low_add254(t0, t0, t3);
+			low_add254(t1, x2, z2);
+			low_add254(m2, t0, t1);
+		} else {
+			low_mul254(t0, z1, m1);
+			low_sq254(t1, m1);
+			low_sq254(t2, z1);
+			low_add254(t1, t0, t1);		
+			low_mul_a_2(t3,t2);
+			low_add254(t1, t1, t3);
+			low_mul254(t4, x1, z1);
+			low_sq254(x2, t1);
+			low_mul254(z2, t1, t2);
+			low_sq254(t3, t4);
+			low_mul254(m2, t0, t1);
+			low_add254(m2, m2, t3);
+			low_add254(m2, m2, x2);
+			low_add254(m2, m2, z2);
+		}
+	}
+}
+
+//#ADD_FULL LAMBDA#
+//INF: (0:1:0)
+void ec_add_full_lambda(elt254 x3, elt254 m3, elt254 z3, elt254 x2, elt254 m2, elt254 z2, elt254 x1, elt254 m1, elt254 z1, Curve *c) {
+	elt254 t0, t1, t2, t3, t4, t5;
+
+	if (types_iszero254(z1)) {
+		types_copy254(x3, x2);
+		types_copy254(m3, m2);
+		types_copy254(z3, z2);
+	} else if (types_iszero254(z2)) {
+		types_copy254(x3, x1);
+		types_copy254(m3, m1);
+		types_copy254(z3, z1);
+	} else {
+		low_mul254(t0, x1, z2);
+		low_mul254(t1, x2, z1);
+		low_add254(t4, t0, t1);
+		low_sq254(t4, t4);
+		low_mul254(t2, m1, z2);
+		low_mul254(t3, m2, z1);
+		low_add254(t2, t2, t3);		
+
+		if (types_iszero254(t4) && types_iszero254(t2)) {
+			ec_doub_lambda(x3, m3, z3, x1, m1, z1, c);
+		} else {
+			low_mul254(t3, t4, t2);
+			low_mul254(t3, t3, z2);
+			low_add254(t5, m1, z1);
+			low_mul254(z3, t3, z1);
+			low_mul254(t0, t0, t2);
+			low_mul254(t1, t1, t2);
+			low_mul254(x3, t0, t1);
+			low_add254(t1, t1, t4);
+			low_sq254(t1, t1);
+			low_mul254(t3, t3, t5);
+			low_add254(m3, t3, t1);			
+		}
+	}
+}
+
+//#ADD_MIX LAMBDA OPTIMIZED FOR HALVING#
+//Here we treat the case of z2 = 1
+//INF: (0:1:0)
+void ec_add_mix_lambda_opt(elt254 x3, elt254 m3, elt254 z3, elt254 x2, elt254 m2, elt254 z2, elt254 x1, elt254 m1, Curve *c) {
+	elt254 t0, t1, t2, t3, t4;
+	
+	if (types_iszero254(z2)) {
+		types_copy254(x3, x1);
+		types_copy254(m3, m1);
+		types_setone254(z3);
+	} else {
+		if (types_isone254(z2)) {
+			low_add254(t0, m2, m1);	//A
+			low_add254(t1, x2, x1); 
+			low_sq254(t1, t1);	//B
+
+			low_mul254(z3, t0, t1);	//Zr
+			
+			low_mul254(t2, x2, t0);	//XA
+			low_mul254(x3, x1, t0);	//xA
+			low_mul254(x3, x3, t2);	//Xr
+
+			low_add254(m3, t2, t1);
+			low_sq254(m3, m3);
+			low_mul254(t2, z3, m1);
+			low_add254(t2, t2, z3);
+			low_add254(m3, m3, t2);	//Lr
+		} else {
+			low_mul254(t0, z2, x1);
+			low_mul254(t1, z2, m1);
+			low_add254(t3, x2, t0);
+			low_add254(t2, m2, t1);			
+
+			low_sq254(t4, t3);
+			low_mul254(t3, t4, t2);
+			low_mul254(z3, t3, z2);
+
+			low_mul254(t0, t0, t2);
+			low_mul254(t1, x2, t2);
+			low_mul254(x3, t0, t1);
+
+			low_add254(t4, t1, t4);
+			low_sq254(t1, t4);
+
+			low_mul254(t2, z3, m1);
+			low_add254(t2, t2, z3);
+		
+			low_add254(m3, t1, t2);
+		}		
+	}
+}
