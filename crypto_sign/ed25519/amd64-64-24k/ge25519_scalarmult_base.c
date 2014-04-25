@@ -4,7 +4,11 @@
 
 /* Multiples of the base point in Niels' representation */
 static const ge25519_niels ge25519_base_multiples_niels[] = {
+#ifdef SMALLTABLES
 #include "ge25519_base_niels_smalltables.data"
+#else
+#include "ge25519_base_niels.data"
+#endif
 };
 
 /* d */
@@ -19,6 +23,7 @@ void ge25519_scalarmult_base(ge25519_p3 *r, const sc25519 *s)
 
   sc25519_window4(b,s);
 
+#ifdef SMALLTABLES
   ge25519_p1p1 tp1p1;
   choose_t((ge25519_niels *)r, 0, (signed long long) b[1], ge25519_base_multiples_niels);
   fe25519_sub(&d, &r->y, &r->x);
@@ -47,4 +52,17 @@ void ge25519_scalarmult_base(ge25519_p3 *r, const sc25519 *s)
     choose_t(&t, (unsigned long long) i/2, (signed long long) b[i], ge25519_base_multiples_niels);
     ge25519_nielsadd2(r, &t);
   }
+#else 
+  choose_t((ge25519_niels *)r, 0, (signed long long) b[0], ge25519_base_multiples_niels);
+  fe25519_sub(&d, &r->y, &r->x);
+  fe25519_add(&r->y, &r->y, &r->x);
+  r->x = d;
+  r->t = r->z;
+  fe25519_setint(&r->z,2);
+  for(i=1;i<64;i++)
+  {
+    choose_t(&t, (unsigned long long) i, (signed long long) b[i], ge25519_base_multiples_niels);
+    ge25519_nielsadd2(r, &t);
+  }
+#endif 
 }

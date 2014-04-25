@@ -1,23 +1,23 @@
 #ifndef FE25519_H
 #define FE25519_H
 
-#define fe25519                crypto_scalarmult_curve25519_amd64_51_fe25519
-#define fe25519_freeze         crypto_scalarmult_curve25519_amd64_51_fe25519_freeze
-#define fe25519_unpack         crypto_scalarmult_curve25519_amd64_51_fe25519_unpack
-#define fe25519_pack           crypto_scalarmult_curve25519_amd64_51_fe25519_pack
-#define fe25519_iszero_vartime crypto_scalarmult_curve25519_amd64_51_fe25519_iszero_vartime
-#define fe25519_iseq_vartime   crypto_scalarmult_curve25519_amd64_51_fe25519_iseq_vartime
-#define fe25519_cmov           crypto_scalarmult_curve25519_amd64_51_fe25519_cmov
-#define fe25519_setint         crypto_scalarmult_curve25519_amd64_51_fe25519_setint
-#define fe25519_neg            crypto_scalarmult_curve25519_amd64_51_fe25519_neg
-#define fe25519_getparity      crypto_scalarmult_curve25519_amd64_51_fe25519_getparity
-#define fe25519_add            crypto_scalarmult_curve25519_amd64_51_fe25519_add
-#define fe25519_sub            crypto_scalarmult_curve25519_amd64_51_fe25519_sub
-#define fe25519_mul            crypto_scalarmult_curve25519_amd64_51_fe25519_mul
-#define fe25519_mul121666      crypto_scalarmult_curve25519_amd64_51_fe25519_mul121666
-#define fe25519_square         crypto_scalarmult_curve25519_amd64_51_fe25519_square
-#define fe25519_invert         crypto_scalarmult_curve25519_amd64_51_fe25519_invert
-#define fe25519_pow2523        crypto_scalarmult_curve25519_amd64_51_fe25519_pow2523
+#define fe25519                crypto_scalarmult_curve25519_amd64_64_fe25519
+#define fe25519_freeze         crypto_scalarmult_curve25519_amd64_64_fe25519_freeze
+#define fe25519_unpack         crypto_scalarmult_curve25519_amd64_64_fe25519_unpack
+#define fe25519_pack           crypto_scalarmult_curve25519_amd64_64_fe25519_pack
+#define fe25519_iszero_vartime crypto_scalarmult_curve25519_amd64_64_fe25519_iszero_vartime
+#define fe25519_iseq_vartime   crypto_scalarmult_curve25519_amd64_64_fe25519_iseq_vartime
+#define fe25519_cmov           crypto_scalarmult_curve25519_amd64_64_fe25519_cmov
+#define fe25519_setint         crypto_scalarmult_curve25519_amd64_64_fe25519_setint
+#define fe25519_neg            crypto_scalarmult_curve25519_amd64_64_fe25519_neg
+#define fe25519_getparity      crypto_scalarmult_curve25519_amd64_64_fe25519_getparity
+#define fe25519_add            crypto_scalarmult_curve25519_amd64_64_fe25519_add
+#define fe25519_sub            crypto_scalarmult_curve25519_amd64_64_fe25519_sub
+#define fe25519_mul            crypto_scalarmult_curve25519_amd64_64_fe25519_mul
+#define fe25519_mul121666      crypto_scalarmult_curve25519_amd64_64_fe25519_mul121666
+#define fe25519_square         crypto_scalarmult_curve25519_amd64_64_fe25519_square
+#define fe25519_invert         crypto_scalarmult_curve25519_amd64_64_fe25519_invert
+#define fe25519_pow2523        crypto_scalarmult_curve25519_amd64_64_fe25519_pow2523
 
 typedef struct 
 {

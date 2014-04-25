@@ -1,13 +1,12 @@
 /*
- * crypto_verify/try.c version 20090118
+ * crypto_verify/try.c version 20140420
  * D. J. Bernstein
  * Public domain.
  */
 
-#include <stdlib.h>
 #include "crypto_verify.h"
-
-extern unsigned char *alignedcalloc(unsigned long long);
+#include "randombytes.h"
+#include "try.h"
 
 const char *primitiveimplementation = crypto_verify_IMPLEMENTATION;
 
@@ -33,43 +32,33 @@ void doit(void)
   crypto_verify(x,y);
 }
 
-static const char *check(void)
+static void check(void)
 {
   int r = crypto_verify(x,y);
   if (r == 0) {
-    if (memcmp(x,y,crypto_verify_BYTES)) return "different strings pass verify";
+    if (memcmp(x,y,crypto_verify_BYTES)) fail("different strings pass verify");
   } else if (r == -1) {
-    if (!memcmp(x,y,crypto_verify_BYTES)) return "equal strings fail verify";
+    if (!memcmp(x,y,crypto_verify_BYTES)) fail("equal strings fail verify");
   } else {
-    return "weird return value from verify";
+    fail("weird return value from verify");
   }
-  return 0;
 }
 
-char checksum[2];
-
-const char *checksum_compute(void)
+void test(void)
 {
   long long tests;
-  long long i;
-  long long j;
-  const char *c;
 
-  for (tests = 0;tests < 100000;++tests) {
-    for (i = 0;i < crypto_verify_BYTES;++i) x[i] = random();
-    for (i = 0;i < crypto_verify_BYTES;++i) y[i] = random();
-    c = check(); if (c) return c;
-    for (i = 0;i < crypto_verify_BYTES;++i) y[i] = x[i];
-    c = check(); if (c) return c;
-    y[random() % crypto_verify_BYTES] = random();
-    c = check(); if (c) return c;
-    y[random() % crypto_verify_BYTES] = random();
-    c = check(); if (c) return c;
-    y[random() % crypto_verify_BYTES] = random();
-    c = check(); if (c) return c;
+  for (tests = 0;tests < 1000000;++tests) {
+    randombytes(x,crypto_verify_BYTES);
+    randombytes(y,crypto_verify_BYTES);
+    check();
+    memcpy(y,x,crypto_verify_BYTES);
+    check();
+    y[myrandom() % crypto_verify_BYTES] = myrandom();
+    check();
+    y[myrandom() % crypto_verify_BYTES] = myrandom();
+    check();
+    y[myrandom() % crypto_verify_BYTES] = myrandom();
+    check();
   }
-
-  checksum[0] = '0';
-  checksum[1] = 0;
-  return 0;
 }

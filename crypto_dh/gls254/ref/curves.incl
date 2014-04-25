@@ -32,9 +32,15 @@ void curves_domParam(Curve * c, curve_type type)
 		//point generator
 		c->Gx[3]= 0x3703bc2465316c2a; c->Gx[2]= 0x84e0df4a9e499ccd;
 		c->Gx[1]= 0x30923d664e35dd35; c->Gx[0]= 0x71e2ef2b084a1f42;	
-				
-		c->Gy[3]= 0x35afad938be3f51e; c->Gy[2]= 0x8b35b31611582339;
-		c->Gy[1]= 0x0da7cb0e27609338; c->Gy[0]= 0xe10971b17a356c97;		
+
+		/* lambda */
+		c->Gy[3] = 0x5c6748a76924b561; c->Gy[2] = 0x39c5fd46dfc7190a;
+		c->Gy[1] = 0x1a03c12cb6aeb80e; c->Gy[0] = 0xa9d779edc1d425fe;
+
+		/* y */ 
+		/* c->Gy[3]= 0x35afad938be3f51e; c->Gy[2]= 0x8b35b31611582339;
+		c->Gy[1]= 0x0da7cb0e27609338; c->Gy[0]= 0xe10971b17a356c97; */
+		
 	}
 }
 

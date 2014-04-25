@@ -63,13 +63,13 @@
 
 # qhasm:   stack64 caller7_stack
 
-# qhasm: enter crypto_sign_ed25519_amd64_64_24k_batch_sc25519_add
+# qhasm: enter crypto_sign_ed25519_amd64_64_sc25519_add
 .text
 .p2align 5
-.globl _crypto_sign_ed25519_amd64_64_24k_batch_sc25519_add
-.globl crypto_sign_ed25519_amd64_64_24k_batch_sc25519_add
-_crypto_sign_ed25519_amd64_64_24k_batch_sc25519_add:
-crypto_sign_ed25519_amd64_64_24k_batch_sc25519_add:
+.globl _crypto_sign_ed25519_amd64_64_sc25519_add
+.globl crypto_sign_ed25519_amd64_64_sc25519_add
+_crypto_sign_ed25519_amd64_64_sc25519_add:
+crypto_sign_ed25519_amd64_64_sc25519_add:
 mov %rsp,%r11
 and $31,%r11
 add $32,%r11
@@ -150,25 +150,25 @@ mov  %r9,%r10
 # asm 2: mov  <r3=%rsi,>t3=%r14
 mov  %rsi,%r14
 
-# qhasm: carry? t0 -= *(uint64 *) &crypto_sign_ed25519_amd64_64_24k_batch_ORDER0
-# asm 1: sub  crypto_sign_ed25519_amd64_64_24k_batch_ORDER0,<t0=int64#3
-# asm 2: sub  crypto_sign_ed25519_amd64_64_24k_batch_ORDER0,<t0=%rdx
-sub  crypto_sign_ed25519_amd64_64_24k_batch_ORDER0,%rdx
+# qhasm: carry? t0 -= *(uint64 *) &crypto_sign_ed25519_amd64_64_ORDER0
+# asm 1: sub  crypto_sign_ed25519_amd64_64_ORDER0,<t0=int64#3
+# asm 2: sub  crypto_sign_ed25519_amd64_64_ORDER0,<t0=%rdx
+sub  crypto_sign_ed25519_amd64_64_ORDER0,%rdx
 
-# qhasm: carry? t1 -= *(uint64 *) &crypto_sign_ed25519_amd64_64_24k_batch_ORDER1 - carry
-# asm 1: sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER1,<t1=int64#7
-# asm 2: sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER1,<t1=%rax
-sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER1,%rax
+# qhasm: carry? t1 -= *(uint64 *) &crypto_sign_ed25519_amd64_64_ORDER1 - carry
+# asm 1: sbb  crypto_sign_ed25519_amd64_64_ORDER1,<t1=int64#7
+# asm 2: sbb  crypto_sign_ed25519_amd64_64_ORDER1,<t1=%rax
+sbb  crypto_sign_ed25519_amd64_64_ORDER1,%rax
 
-# qhasm: carry? t2 -= *(uint64 *) &crypto_sign_ed25519_amd64_64_24k_batch_ORDER2 - carry
-# asm 1: sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER2,<t2=int64#8
-# asm 2: sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER2,<t2=%r10
-sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER2,%r10
+# qhasm: carry? t2 -= *(uint64 *) &crypto_sign_ed25519_amd64_64_ORDER2 - carry
+# asm 1: sbb  crypto_sign_ed25519_amd64_64_ORDER2,<t2=int64#8
+# asm 2: sbb  crypto_sign_ed25519_amd64_64_ORDER2,<t2=%r10
+sbb  crypto_sign_ed25519_amd64_64_ORDER2,%r10
 
-# qhasm: unsigned<? t3 -= *(uint64 *) &crypto_sign_ed25519_amd64_64_24k_batch_ORDER3 - carry
-# asm 1: sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER3,<t3=int64#12
-# asm 2: sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER3,<t3=%r14
-sbb  crypto_sign_ed25519_amd64_64_24k_batch_ORDER3,%r14
+# qhasm: unsigned<? t3 -= *(uint64 *) &crypto_sign_ed25519_amd64_64_ORDER3 - carry
+# asm 1: sbb  crypto_sign_ed25519_amd64_64_ORDER3,<t3=int64#12
+# asm 2: sbb  crypto_sign_ed25519_amd64_64_ORDER3,<t3=%r14
+sbb  crypto_sign_ed25519_amd64_64_ORDER3,%r14
 
 # qhasm: r0 = t0 if !unsigned<
 # asm 1: cmovae <t0=int64#3,<r0=int64#4

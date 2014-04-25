@@ -368,6 +368,8 @@
 .align 2
 .global _keccakf
 .global keccakf
+.type _keccakf STT_FUNC
+.type keccakf STT_FUNC
 _keccakf:
 keccakf:
 sub sp,sp,#896

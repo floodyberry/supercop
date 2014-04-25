@@ -63,13 +63,13 @@
 
 # qhasm:   stack64 caller7_stack
 
-# qhasm: enter crypto_scalarmult_curve25519_amd64_51_fe25519_freeze
+# qhasm: enter crypto_scalarmult_curve25519_amd64_64_fe25519_freeze
 .text
 .p2align 5
-.globl _crypto_scalarmult_curve25519_amd64_51_fe25519_freeze
-.globl crypto_scalarmult_curve25519_amd64_51_fe25519_freeze
-_crypto_scalarmult_curve25519_amd64_51_fe25519_freeze:
-crypto_scalarmult_curve25519_amd64_51_fe25519_freeze:
+.globl _crypto_scalarmult_curve25519_amd64_64_fe25519_freeze
+.globl crypto_scalarmult_curve25519_amd64_64_fe25519_freeze
+_crypto_scalarmult_curve25519_amd64_64_fe25519_freeze:
+crypto_scalarmult_curve25519_amd64_64_fe25519_freeze:
 mov %rsp,%r11
 and $31,%r11
 add $64,%r11

@@ -178,6 +178,10 @@ gcc -m64 -march=core-avx-i -O3 -fomit-frame-pointer
 gcc -m64 -march=core-avx-i -Os -fomit-frame-pointer
 gcc -m64 -march=core-avx-i -O2 -fomit-frame-pointer
 gcc -m64 -march=core-avx-i -O -fomit-frame-pointer
+gcc -m64 -march=core-avx2 -O3 -fomit-frame-pointer
+gcc -m64 -march=core-avx2 -Os -fomit-frame-pointer
+gcc -m64 -march=core-avx2 -O2 -fomit-frame-pointer
+gcc -m64 -march=core-avx2 -O -fomit-frame-pointer
 gcc -m64 -march=k8 -O3 -fomit-frame-pointer
 gcc -m64 -march=k8 -Os -fomit-frame-pointer
 gcc -m64 -march=k8 -O2 -fomit-frame-pointer
@@ -406,6 +410,10 @@ gcc -m32 -march=core-avx-i -O3 -fomit-frame-pointer
 gcc -m32 -march=core-avx-i -Os -fomit-frame-pointer
 gcc -m32 -march=core-avx-i -O2 -fomit-frame-pointer
 gcc -m32 -march=core-avx-i -O -fomit-frame-pointer
+gcc -m32 -march=core-avx2 -O3 -fomit-frame-pointer
+gcc -m32 -march=core-avx2 -Os -fomit-frame-pointer
+gcc -m32 -march=core-avx2 -O2 -fomit-frame-pointer
+gcc -m32 -march=core-avx2 -O -fomit-frame-pointer
 gcc -m32 -march=k8 -O3 -fomit-frame-pointer
 gcc -m32 -march=k8 -Os -fomit-frame-pointer
 gcc -m32 -march=k8 -O2 -fomit-frame-pointer
@@ -1536,6 +1544,7 @@ spu-gcc -funroll-loops -mstdmain -march=cell -O3 -fomit-frame-pointer -Drandom=r
 spu-gcc -funroll-loops -mstdmain -march=cell -Os -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=cell -O2 -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
 spu-gcc -funroll-loops -mstdmain -march=cell -O -fomit-frame-pointer -Drandom=rand -Dsrandom=srand
+icc -fast
 icc -m64 -O3 -static -no-vec
 icc -m64 -Os -static -no-vec
 icc -m64 -O2 -static -no-vec
@@ -1658,6 +1667,7 @@ opt-MIPSpro-bin-cc -Ofast
 opt-MIPSpro-bin-cc
 clang -O3
 clang -O3 -mavx
+clang -O3 -mavx2
 clang -O3 -march=armv7-a -mfloat-abi=hard -mfpu=neon -fomit-frame-pointer
 clang -O3 -march=armv7-a -mfloat-abi=softfp -mfpu=neon -fomit-frame-pointer
 clang -O3 -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -fomit-frame-pointer

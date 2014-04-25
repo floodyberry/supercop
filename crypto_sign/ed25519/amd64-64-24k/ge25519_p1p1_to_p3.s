@@ -89,6 +89,8 @@
 
 # qhasm: int64 mulr7
 
+# qhasm: int64 mulr8
+
 # qhasm: int64 mulrax
 
 # qhasm: int64 mulrdx
@@ -107,13 +109,13 @@
 
 # qhasm: int64 muli38
 
-# qhasm: enter crypto_sign_ed25519_amd64_64_24k_batch_ge25519_p1p1_to_p3
+# qhasm: enter crypto_sign_ed25519_amd64_64_ge25519_p1p1_to_p3
 .text
 .p2align 5
-.globl _crypto_sign_ed25519_amd64_64_24k_batch_ge25519_p1p1_to_p3
-.globl crypto_sign_ed25519_amd64_64_24k_batch_ge25519_p1p1_to_p3
-_crypto_sign_ed25519_amd64_64_24k_batch_ge25519_p1p1_to_p3:
-crypto_sign_ed25519_amd64_64_24k_batch_ge25519_p1p1_to_p3:
+.globl _crypto_sign_ed25519_amd64_64_ge25519_p1p1_to_p3
+.globl crypto_sign_ed25519_amd64_64_ge25519_p1p1_to_p3
+_crypto_sign_ed25519_amd64_64_ge25519_p1p1_to_p3:
+crypto_sign_ed25519_amd64_64_ge25519_p1p1_to_p3:
 mov %rsp,%r11
 and $31,%r11
 add $64,%r11
@@ -664,132 +666,152 @@ adc %rdx,%r10
 # asm 2: mov  <mulr4=%rcx,>mulrax=%rax
 mov  %rcx,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? rx0 += mulrax
-# asm 1: add  <mulrax=int64#7,<rx0=int64#10
-# asm 2: add  <mulrax=%rax,<rx0=%r12
-add  %rax,%r12
-
-# qhasm:   carry? rx1 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rx1=int64#11
-# asm 2: adc <mulrdx=%rdx,<rx1=%r13
-adc %rdx,%r13
-
-# qhasm:   rx1 += 0 + carry
-# asm 1: adc $0,<rx1=int64#11
-# asm 2: adc $0,<rx1=%r13
-adc $0,%r13
+# qhasm:   mulr4 = mulrax
+# asm 1: mov  <mulrax=int64#7,>mulr4=int64#4
+# asm 2: mov  <mulrax=%rax,>mulr4=%rcx
+mov  %rax,%rcx
 
 # qhasm:   mulrax = mulr5
 # asm 1: mov  <mulr5=int64#5,>mulrax=int64#7
 # asm 2: mov  <mulr5=%r8,>mulrax=%rax
 mov  %r8,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr5 = mulrdx
+# asm 1: mov  <mulrdx=int64#3,>mulr5=int64#5
+# asm 2: mov  <mulrdx=%rdx,>mulr5=%r8
+mov  %rdx,%r8
 
-# qhasm:   carry? rx1 += mulrax
-# asm 1: add  <mulrax=int64#7,<rx1=int64#11
-# asm 2: add  <mulrax=%rax,<rx1=%r13
-add  %rax,%r13
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? rx2 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rx2=int64#12
-# asm 2: adc <mulrdx=%rdx,<rx2=%r14
-adc %rdx,%r14
-
-# qhasm:   rx2 += 0 + carry
-# asm 1: adc $0,<rx2=int64#12
-# asm 2: adc $0,<rx2=%r14
-adc $0,%r14
+# qhasm:   carry? mulr5 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr5=int64#5
+# asm 2: add  <mulrax=%rax,<mulr5=%r8
+add  %rax,%r8
 
 # qhasm:   mulrax = mulr6
 # asm 1: mov  <mulr6=int64#6,>mulrax=int64#7
 # asm 2: mov  <mulr6=%r9,>mulrax=%rax
 mov  %r9,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr6 = 0
+# asm 1: mov  $0,>mulr6=int64#6
+# asm 2: mov  $0,>mulr6=%r9
+mov  $0,%r9
 
-# qhasm:   carry? rx2 += mulrax
-# asm 1: add  <mulrax=int64#7,<rx2=int64#12
-# asm 2: add  <mulrax=%rax,<rx2=%r14
-add  %rax,%r14
+# qhasm:   mulr6 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr6=int64#6
+# asm 2: adc <mulrdx=%rdx,<mulr6=%r9
+adc %rdx,%r9
 
-# qhasm:   carry? rx3 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rx3=int64#13
-# asm 2: adc <mulrdx=%rdx,<rx3=%r15
-adc %rdx,%r15
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   rx3 += 0 + carry
-# asm 1: adc $0,<rx3=int64#13
-# asm 2: adc $0,<rx3=%r15
-adc $0,%r15
+# qhasm:   carry? mulr6 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr6=int64#6
+# asm 2: add  <mulrax=%rax,<mulr6=%r9
+add  %rax,%r9
 
 # qhasm:   mulrax = mulr7
 # asm 1: mov  <mulr7=int64#8,>mulrax=int64#7
 # asm 2: mov  <mulr7=%r10,>mulrax=%rax
 mov  %r10,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr7 = 0
+# asm 1: mov  $0,>mulr7=int64#8
+# asm 2: mov  $0,>mulr7=%r10
+mov  $0,%r10
 
-# qhasm:   carry? rx3 += mulrax
-# asm 1: add  <mulrax=int64#7,<rx3=int64#13
-# asm 2: add  <mulrax=%rax,<rx3=%r15
-add  %rax,%r15
+# qhasm:   mulr7 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr7=int64#8
+# asm 2: adc <mulrdx=%rdx,<mulr7=%r10
+adc %rdx,%r10
 
-# qhasm:   mulr4 = 0
-# asm 1: mov  $0,>mulr4=int64#4
-# asm 2: mov  $0,>mulr4=%rcx
-mov  $0,%rcx
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   mulr4 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<mulr4=int64#4
-# asm 2: adc <mulrdx=%rdx,<mulr4=%rcx
-adc %rdx,%rcx
+# qhasm:   carry? mulr7 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr7=int64#8
+# asm 2: add  <mulrax=%rax,<mulr7=%r10
+add  %rax,%r10
 
-# qhasm:   mulr4 *= 38
-# asm 1: imulq  $38,<mulr4=int64#4,>mulr4=int64#3
-# asm 2: imulq  $38,<mulr4=%rcx,>mulr4=%rdx
-imulq  $38,%rcx,%rdx
+# qhasm:   mulr8 = 0
+# asm 1: mov  $0,>mulr8=int64#7
+# asm 2: mov  $0,>mulr8=%rax
+mov  $0,%rax
+
+# qhasm:   mulr8 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr8=int64#7
+# asm 2: adc <mulrdx=%rdx,<mulr8=%rax
+adc %rdx,%rax
 
 # qhasm:   carry? rx0 += mulr4
-# asm 1: add  <mulr4=int64#3,<rx0=int64#10
-# asm 2: add  <mulr4=%rdx,<rx0=%r12
-add  %rdx,%r12
+# asm 1: add  <mulr4=int64#4,<rx0=int64#10
+# asm 2: add  <mulr4=%rcx,<rx0=%r12
+add  %rcx,%r12
 
-# qhasm:   carry? rx1 += 0 + carry
-# asm 1: adc $0,<rx1=int64#11
-# asm 2: adc $0,<rx1=%r13
-adc $0,%r13
+# qhasm:   carry? rx1 += mulr5 + carry
+# asm 1: adc <mulr5=int64#5,<rx1=int64#11
+# asm 2: adc <mulr5=%r8,<rx1=%r13
+adc %r8,%r13
 
-# qhasm:   carry? rx2 += 0 + carry
-# asm 1: adc $0,<rx2=int64#12
-# asm 2: adc $0,<rx2=%r14
-adc $0,%r14
+# qhasm:   carry? rx2 += mulr6 + carry
+# asm 1: adc <mulr6=int64#6,<rx2=int64#12
+# asm 2: adc <mulr6=%r9,<rx2=%r14
+adc %r9,%r14
 
-# qhasm:   carry? rx3 += 0 + carry
-# asm 1: adc $0,<rx3=int64#13
-# asm 2: adc $0,<rx3=%r15
-adc $0,%r15
+# qhasm:   carry? rx3 += mulr7 + carry
+# asm 1: adc <mulr7=int64#8,<rx3=int64#13
+# asm 2: adc <mulr7=%r10,<rx3=%r15
+adc %r10,%r15
 
 # qhasm:   mulzero = 0
 # asm 1: mov  $0,>mulzero=int64#3
 # asm 2: mov  $0,>mulzero=%rdx
 mov  $0,%rdx
 
-# qhasm:   muli38 = 38
-# asm 1: mov  $38,>muli38=int64#4
-# asm 2: mov  $38,>muli38=%rcx
-mov  $38,%rcx
+# qhasm:   mulr8 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<mulr8=int64#7
+# asm 2: adc <mulzero=%rdx,<mulr8=%rax
+adc %rdx,%rax
 
-# qhasm:   mulzero = muli38 if carry
-# asm 1: cmovc <muli38=int64#4,<mulzero=int64#3
-# asm 2: cmovc <muli38=%rcx,<mulzero=%rdx
-cmovc %rcx,%rdx
+# qhasm:   mulr8 *= 38
+# asm 1: imulq  $38,<mulr8=int64#7,>mulr8=int64#4
+# asm 2: imulq  $38,<mulr8=%rax,>mulr8=%rcx
+imulq  $38,%rax,%rcx
+
+# qhasm:   carry? rx0 += mulr8
+# asm 1: add  <mulr8=int64#4,<rx0=int64#10
+# asm 2: add  <mulr8=%rcx,<rx0=%r12
+add  %rcx,%r12
+
+# qhasm:   carry? rx1 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<rx1=int64#11
+# asm 2: adc <mulzero=%rdx,<rx1=%r13
+adc %rdx,%r13
+
+# qhasm:   carry? rx2 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<rx2=int64#12
+# asm 2: adc <mulzero=%rdx,<rx2=%r14
+adc %rdx,%r14
+
+# qhasm:   carry? rx3 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<rx3=int64#13
+# asm 2: adc <mulzero=%rdx,<rx3=%r15
+adc %rdx,%r15
+
+# qhasm:   mulzero += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<mulzero=int64#3
+# asm 2: adc <mulzero=%rdx,<mulzero=%rdx
+adc %rdx,%rdx
+
+# qhasm:   mulzero *= 38
+# asm 1: imulq  $38,<mulzero=int64#3,>mulzero=int64#3
+# asm 2: imulq  $38,<mulzero=%rdx,>mulzero=%rdx
+imulq  $38,%rdx,%rdx
 
 # qhasm:   rx0 += mulzero
 # asm 1: add  <mulzero=int64#3,<rx0=int64#10
@@ -1326,132 +1348,152 @@ adc %rdx,%r10
 # asm 2: mov  <mulr4=%rcx,>mulrax=%rax
 mov  %rcx,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? ry0 += mulrax
-# asm 1: add  <mulrax=int64#7,<ry0=int64#10
-# asm 2: add  <mulrax=%rax,<ry0=%r12
-add  %rax,%r12
-
-# qhasm:   carry? ry1 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<ry1=int64#11
-# asm 2: adc <mulrdx=%rdx,<ry1=%r13
-adc %rdx,%r13
-
-# qhasm:   ry1 += 0 + carry
-# asm 1: adc $0,<ry1=int64#11
-# asm 2: adc $0,<ry1=%r13
-adc $0,%r13
+# qhasm:   mulr4 = mulrax
+# asm 1: mov  <mulrax=int64#7,>mulr4=int64#4
+# asm 2: mov  <mulrax=%rax,>mulr4=%rcx
+mov  %rax,%rcx
 
 # qhasm:   mulrax = mulr5
 # asm 1: mov  <mulr5=int64#5,>mulrax=int64#7
 # asm 2: mov  <mulr5=%r8,>mulrax=%rax
 mov  %r8,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr5 = mulrdx
+# asm 1: mov  <mulrdx=int64#3,>mulr5=int64#5
+# asm 2: mov  <mulrdx=%rdx,>mulr5=%r8
+mov  %rdx,%r8
 
-# qhasm:   carry? ry1 += mulrax
-# asm 1: add  <mulrax=int64#7,<ry1=int64#11
-# asm 2: add  <mulrax=%rax,<ry1=%r13
-add  %rax,%r13
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? ry2 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<ry2=int64#12
-# asm 2: adc <mulrdx=%rdx,<ry2=%r14
-adc %rdx,%r14
-
-# qhasm:   ry2 += 0 + carry
-# asm 1: adc $0,<ry2=int64#12
-# asm 2: adc $0,<ry2=%r14
-adc $0,%r14
+# qhasm:   carry? mulr5 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr5=int64#5
+# asm 2: add  <mulrax=%rax,<mulr5=%r8
+add  %rax,%r8
 
 # qhasm:   mulrax = mulr6
 # asm 1: mov  <mulr6=int64#6,>mulrax=int64#7
 # asm 2: mov  <mulr6=%r9,>mulrax=%rax
 mov  %r9,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr6 = 0
+# asm 1: mov  $0,>mulr6=int64#6
+# asm 2: mov  $0,>mulr6=%r9
+mov  $0,%r9
 
-# qhasm:   carry? ry2 += mulrax
-# asm 1: add  <mulrax=int64#7,<ry2=int64#12
-# asm 2: add  <mulrax=%rax,<ry2=%r14
-add  %rax,%r14
+# qhasm:   mulr6 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr6=int64#6
+# asm 2: adc <mulrdx=%rdx,<mulr6=%r9
+adc %rdx,%r9
 
-# qhasm:   carry? ry3 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<ry3=int64#13
-# asm 2: adc <mulrdx=%rdx,<ry3=%r15
-adc %rdx,%r15
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   ry3 += 0 + carry
-# asm 1: adc $0,<ry3=int64#13
-# asm 2: adc $0,<ry3=%r15
-adc $0,%r15
+# qhasm:   carry? mulr6 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr6=int64#6
+# asm 2: add  <mulrax=%rax,<mulr6=%r9
+add  %rax,%r9
 
 # qhasm:   mulrax = mulr7
 # asm 1: mov  <mulr7=int64#8,>mulrax=int64#7
 # asm 2: mov  <mulr7=%r10,>mulrax=%rax
 mov  %r10,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr7 = 0
+# asm 1: mov  $0,>mulr7=int64#8
+# asm 2: mov  $0,>mulr7=%r10
+mov  $0,%r10
 
-# qhasm:   carry? ry3 += mulrax
-# asm 1: add  <mulrax=int64#7,<ry3=int64#13
-# asm 2: add  <mulrax=%rax,<ry3=%r15
-add  %rax,%r15
+# qhasm:   mulr7 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr7=int64#8
+# asm 2: adc <mulrdx=%rdx,<mulr7=%r10
+adc %rdx,%r10
 
-# qhasm:   mulr4 = 0
-# asm 1: mov  $0,>mulr4=int64#4
-# asm 2: mov  $0,>mulr4=%rcx
-mov  $0,%rcx
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   mulr4 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<mulr4=int64#4
-# asm 2: adc <mulrdx=%rdx,<mulr4=%rcx
-adc %rdx,%rcx
+# qhasm:   carry? mulr7 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr7=int64#8
+# asm 2: add  <mulrax=%rax,<mulr7=%r10
+add  %rax,%r10
 
-# qhasm:   mulr4 *= 38
-# asm 1: imulq  $38,<mulr4=int64#4,>mulr4=int64#3
-# asm 2: imulq  $38,<mulr4=%rcx,>mulr4=%rdx
-imulq  $38,%rcx,%rdx
+# qhasm:   mulr8 = 0
+# asm 1: mov  $0,>mulr8=int64#7
+# asm 2: mov  $0,>mulr8=%rax
+mov  $0,%rax
+
+# qhasm:   mulr8 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr8=int64#7
+# asm 2: adc <mulrdx=%rdx,<mulr8=%rax
+adc %rdx,%rax
 
 # qhasm:   carry? ry0 += mulr4
-# asm 1: add  <mulr4=int64#3,<ry0=int64#10
-# asm 2: add  <mulr4=%rdx,<ry0=%r12
-add  %rdx,%r12
+# asm 1: add  <mulr4=int64#4,<ry0=int64#10
+# asm 2: add  <mulr4=%rcx,<ry0=%r12
+add  %rcx,%r12
 
-# qhasm:   carry? ry1 += 0 + carry
-# asm 1: adc $0,<ry1=int64#11
-# asm 2: adc $0,<ry1=%r13
-adc $0,%r13
+# qhasm:   carry? ry1 += mulr5 + carry
+# asm 1: adc <mulr5=int64#5,<ry1=int64#11
+# asm 2: adc <mulr5=%r8,<ry1=%r13
+adc %r8,%r13
 
-# qhasm:   carry? ry2 += 0 + carry
-# asm 1: adc $0,<ry2=int64#12
-# asm 2: adc $0,<ry2=%r14
-adc $0,%r14
+# qhasm:   carry? ry2 += mulr6 + carry
+# asm 1: adc <mulr6=int64#6,<ry2=int64#12
+# asm 2: adc <mulr6=%r9,<ry2=%r14
+adc %r9,%r14
 
-# qhasm:   carry? ry3 += 0 + carry
-# asm 1: adc $0,<ry3=int64#13
-# asm 2: adc $0,<ry3=%r15
-adc $0,%r15
+# qhasm:   carry? ry3 += mulr7 + carry
+# asm 1: adc <mulr7=int64#8,<ry3=int64#13
+# asm 2: adc <mulr7=%r10,<ry3=%r15
+adc %r10,%r15
 
 # qhasm:   mulzero = 0
 # asm 1: mov  $0,>mulzero=int64#3
 # asm 2: mov  $0,>mulzero=%rdx
 mov  $0,%rdx
 
-# qhasm:   muli38 = 38
-# asm 1: mov  $38,>muli38=int64#4
-# asm 2: mov  $38,>muli38=%rcx
-mov  $38,%rcx
+# qhasm:   mulr8 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<mulr8=int64#7
+# asm 2: adc <mulzero=%rdx,<mulr8=%rax
+adc %rdx,%rax
 
-# qhasm:   mulzero = muli38 if carry
-# asm 1: cmovc <muli38=int64#4,<mulzero=int64#3
-# asm 2: cmovc <muli38=%rcx,<mulzero=%rdx
-cmovc %rcx,%rdx
+# qhasm:   mulr8 *= 38
+# asm 1: imulq  $38,<mulr8=int64#7,>mulr8=int64#4
+# asm 2: imulq  $38,<mulr8=%rax,>mulr8=%rcx
+imulq  $38,%rax,%rcx
+
+# qhasm:   carry? ry0 += mulr8
+# asm 1: add  <mulr8=int64#4,<ry0=int64#10
+# asm 2: add  <mulr8=%rcx,<ry0=%r12
+add  %rcx,%r12
+
+# qhasm:   carry? ry1 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<ry1=int64#11
+# asm 2: adc <mulzero=%rdx,<ry1=%r13
+adc %rdx,%r13
+
+# qhasm:   carry? ry2 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<ry2=int64#12
+# asm 2: adc <mulzero=%rdx,<ry2=%r14
+adc %rdx,%r14
+
+# qhasm:   carry? ry3 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<ry3=int64#13
+# asm 2: adc <mulzero=%rdx,<ry3=%r15
+adc %rdx,%r15
+
+# qhasm:   mulzero += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<mulzero=int64#3
+# asm 2: adc <mulzero=%rdx,<mulzero=%rdx
+adc %rdx,%rdx
+
+# qhasm:   mulzero *= 38
+# asm 1: imulq  $38,<mulzero=int64#3,>mulzero=int64#3
+# asm 2: imulq  $38,<mulzero=%rdx,>mulzero=%rdx
+imulq  $38,%rdx,%rdx
 
 # qhasm:   ry0 += mulzero
 # asm 1: add  <mulzero=int64#3,<ry0=int64#10
@@ -1988,132 +2030,152 @@ adc %rdx,%r10
 # asm 2: mov  <mulr4=%rcx,>mulrax=%rax
 mov  %rcx,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? rz0 += mulrax
-# asm 1: add  <mulrax=int64#7,<rz0=int64#10
-# asm 2: add  <mulrax=%rax,<rz0=%r12
-add  %rax,%r12
-
-# qhasm:   carry? rz1 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rz1=int64#11
-# asm 2: adc <mulrdx=%rdx,<rz1=%r13
-adc %rdx,%r13
-
-# qhasm:   rz1 += 0 + carry
-# asm 1: adc $0,<rz1=int64#11
-# asm 2: adc $0,<rz1=%r13
-adc $0,%r13
+# qhasm:   mulr4 = mulrax
+# asm 1: mov  <mulrax=int64#7,>mulr4=int64#4
+# asm 2: mov  <mulrax=%rax,>mulr4=%rcx
+mov  %rax,%rcx
 
 # qhasm:   mulrax = mulr5
 # asm 1: mov  <mulr5=int64#5,>mulrax=int64#7
 # asm 2: mov  <mulr5=%r8,>mulrax=%rax
 mov  %r8,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr5 = mulrdx
+# asm 1: mov  <mulrdx=int64#3,>mulr5=int64#5
+# asm 2: mov  <mulrdx=%rdx,>mulr5=%r8
+mov  %rdx,%r8
 
-# qhasm:   carry? rz1 += mulrax
-# asm 1: add  <mulrax=int64#7,<rz1=int64#11
-# asm 2: add  <mulrax=%rax,<rz1=%r13
-add  %rax,%r13
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? rz2 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rz2=int64#12
-# asm 2: adc <mulrdx=%rdx,<rz2=%r14
-adc %rdx,%r14
-
-# qhasm:   rz2 += 0 + carry
-# asm 1: adc $0,<rz2=int64#12
-# asm 2: adc $0,<rz2=%r14
-adc $0,%r14
+# qhasm:   carry? mulr5 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr5=int64#5
+# asm 2: add  <mulrax=%rax,<mulr5=%r8
+add  %rax,%r8
 
 # qhasm:   mulrax = mulr6
 # asm 1: mov  <mulr6=int64#6,>mulrax=int64#7
 # asm 2: mov  <mulr6=%r9,>mulrax=%rax
 mov  %r9,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr6 = 0
+# asm 1: mov  $0,>mulr6=int64#6
+# asm 2: mov  $0,>mulr6=%r9
+mov  $0,%r9
 
-# qhasm:   carry? rz2 += mulrax
-# asm 1: add  <mulrax=int64#7,<rz2=int64#12
-# asm 2: add  <mulrax=%rax,<rz2=%r14
-add  %rax,%r14
+# qhasm:   mulr6 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr6=int64#6
+# asm 2: adc <mulrdx=%rdx,<mulr6=%r9
+adc %rdx,%r9
 
-# qhasm:   carry? rz3 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rz3=int64#13
-# asm 2: adc <mulrdx=%rdx,<rz3=%r15
-adc %rdx,%r15
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   rz3 += 0 + carry
-# asm 1: adc $0,<rz3=int64#13
-# asm 2: adc $0,<rz3=%r15
-adc $0,%r15
+# qhasm:   carry? mulr6 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr6=int64#6
+# asm 2: add  <mulrax=%rax,<mulr6=%r9
+add  %rax,%r9
 
 # qhasm:   mulrax = mulr7
 # asm 1: mov  <mulr7=int64#8,>mulrax=int64#7
 # asm 2: mov  <mulr7=%r10,>mulrax=%rax
 mov  %r10,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr7 = 0
+# asm 1: mov  $0,>mulr7=int64#8
+# asm 2: mov  $0,>mulr7=%r10
+mov  $0,%r10
 
-# qhasm:   carry? rz3 += mulrax
-# asm 1: add  <mulrax=int64#7,<rz3=int64#13
-# asm 2: add  <mulrax=%rax,<rz3=%r15
-add  %rax,%r15
+# qhasm:   mulr7 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr7=int64#8
+# asm 2: adc <mulrdx=%rdx,<mulr7=%r10
+adc %rdx,%r10
 
-# qhasm:   mulr4 = 0
-# asm 1: mov  $0,>mulr4=int64#4
-# asm 2: mov  $0,>mulr4=%rcx
-mov  $0,%rcx
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   mulr4 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<mulr4=int64#4
-# asm 2: adc <mulrdx=%rdx,<mulr4=%rcx
-adc %rdx,%rcx
+# qhasm:   carry? mulr7 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr7=int64#8
+# asm 2: add  <mulrax=%rax,<mulr7=%r10
+add  %rax,%r10
 
-# qhasm:   mulr4 *= 38
-# asm 1: imulq  $38,<mulr4=int64#4,>mulr4=int64#3
-# asm 2: imulq  $38,<mulr4=%rcx,>mulr4=%rdx
-imulq  $38,%rcx,%rdx
+# qhasm:   mulr8 = 0
+# asm 1: mov  $0,>mulr8=int64#7
+# asm 2: mov  $0,>mulr8=%rax
+mov  $0,%rax
+
+# qhasm:   mulr8 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr8=int64#7
+# asm 2: adc <mulrdx=%rdx,<mulr8=%rax
+adc %rdx,%rax
 
 # qhasm:   carry? rz0 += mulr4
-# asm 1: add  <mulr4=int64#3,<rz0=int64#10
-# asm 2: add  <mulr4=%rdx,<rz0=%r12
-add  %rdx,%r12
+# asm 1: add  <mulr4=int64#4,<rz0=int64#10
+# asm 2: add  <mulr4=%rcx,<rz0=%r12
+add  %rcx,%r12
 
-# qhasm:   carry? rz1 += 0 + carry
-# asm 1: adc $0,<rz1=int64#11
-# asm 2: adc $0,<rz1=%r13
-adc $0,%r13
+# qhasm:   carry? rz1 += mulr5 + carry
+# asm 1: adc <mulr5=int64#5,<rz1=int64#11
+# asm 2: adc <mulr5=%r8,<rz1=%r13
+adc %r8,%r13
 
-# qhasm:   carry? rz2 += 0 + carry
-# asm 1: adc $0,<rz2=int64#12
-# asm 2: adc $0,<rz2=%r14
-adc $0,%r14
+# qhasm:   carry? rz2 += mulr6 + carry
+# asm 1: adc <mulr6=int64#6,<rz2=int64#12
+# asm 2: adc <mulr6=%r9,<rz2=%r14
+adc %r9,%r14
 
-# qhasm:   carry? rz3 += 0 + carry
-# asm 1: adc $0,<rz3=int64#13
-# asm 2: adc $0,<rz3=%r15
-adc $0,%r15
+# qhasm:   carry? rz3 += mulr7 + carry
+# asm 1: adc <mulr7=int64#8,<rz3=int64#13
+# asm 2: adc <mulr7=%r10,<rz3=%r15
+adc %r10,%r15
 
 # qhasm:   mulzero = 0
 # asm 1: mov  $0,>mulzero=int64#3
 # asm 2: mov  $0,>mulzero=%rdx
 mov  $0,%rdx
 
-# qhasm:   muli38 = 38
-# asm 1: mov  $38,>muli38=int64#4
-# asm 2: mov  $38,>muli38=%rcx
-mov  $38,%rcx
+# qhasm:   mulr8 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<mulr8=int64#7
+# asm 2: adc <mulzero=%rdx,<mulr8=%rax
+adc %rdx,%rax
 
-# qhasm:   mulzero = muli38 if carry
-# asm 1: cmovc <muli38=int64#4,<mulzero=int64#3
-# asm 2: cmovc <muli38=%rcx,<mulzero=%rdx
-cmovc %rcx,%rdx
+# qhasm:   mulr8 *= 38
+# asm 1: imulq  $38,<mulr8=int64#7,>mulr8=int64#4
+# asm 2: imulq  $38,<mulr8=%rax,>mulr8=%rcx
+imulq  $38,%rax,%rcx
+
+# qhasm:   carry? rz0 += mulr8
+# asm 1: add  <mulr8=int64#4,<rz0=int64#10
+# asm 2: add  <mulr8=%rcx,<rz0=%r12
+add  %rcx,%r12
+
+# qhasm:   carry? rz1 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<rz1=int64#11
+# asm 2: adc <mulzero=%rdx,<rz1=%r13
+adc %rdx,%r13
+
+# qhasm:   carry? rz2 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<rz2=int64#12
+# asm 2: adc <mulzero=%rdx,<rz2=%r14
+adc %rdx,%r14
+
+# qhasm:   carry? rz3 += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<rz3=int64#13
+# asm 2: adc <mulzero=%rdx,<rz3=%r15
+adc %rdx,%r15
+
+# qhasm:   mulzero += mulzero + carry
+# asm 1: adc <mulzero=int64#3,<mulzero=int64#3
+# asm 2: adc <mulzero=%rdx,<mulzero=%rdx
+adc %rdx,%rdx
+
+# qhasm:   mulzero *= 38
+# asm 1: imulq  $38,<mulzero=int64#3,>mulzero=int64#3
+# asm 2: imulq  $38,<mulzero=%rdx,>mulzero=%rdx
+imulq  $38,%rdx,%rdx
 
 # qhasm:   rz0 += mulzero
 # asm 1: add  <mulzero=int64#3,<rz0=int64#10
@@ -2650,132 +2712,152 @@ adc %rdx,%r10
 # asm 2: mov  <mulr4=%rcx,>mulrax=%rax
 mov  %rcx,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? rt0 += mulrax
-# asm 1: add  <mulrax=int64#7,<rt0=int64#10
-# asm 2: add  <mulrax=%rax,<rt0=%r12
-add  %rax,%r12
-
-# qhasm:   carry? rt1 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rt1=int64#11
-# asm 2: adc <mulrdx=%rdx,<rt1=%r13
-adc %rdx,%r13
-
-# qhasm:   rt1 += 0 + carry
-# asm 1: adc $0,<rt1=int64#11
-# asm 2: adc $0,<rt1=%r13
-adc $0,%r13
+# qhasm:   mulr4 = mulrax
+# asm 1: mov  <mulrax=int64#7,>mulr4=int64#2
+# asm 2: mov  <mulrax=%rax,>mulr4=%rsi
+mov  %rax,%rsi
 
 # qhasm:   mulrax = mulr5
 # asm 1: mov  <mulr5=int64#5,>mulrax=int64#7
 # asm 2: mov  <mulr5=%r8,>mulrax=%rax
 mov  %r8,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr5 = mulrdx
+# asm 1: mov  <mulrdx=int64#3,>mulr5=int64#4
+# asm 2: mov  <mulrdx=%rdx,>mulr5=%rcx
+mov  %rdx,%rcx
 
-# qhasm:   carry? rt1 += mulrax
-# asm 1: add  <mulrax=int64#7,<rt1=int64#11
-# asm 2: add  <mulrax=%rax,<rt1=%r13
-add  %rax,%r13
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? rt2 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rt2=int64#12
-# asm 2: adc <mulrdx=%rdx,<rt2=%r14
-adc %rdx,%r14
-
-# qhasm:   rt2 += 0 + carry
-# asm 1: adc $0,<rt2=int64#12
-# asm 2: adc $0,<rt2=%r14
-adc $0,%r14
+# qhasm:   carry? mulr5 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr5=int64#4
+# asm 2: add  <mulrax=%rax,<mulr5=%rcx
+add  %rax,%rcx
 
 # qhasm:   mulrax = mulr6
 # asm 1: mov  <mulr6=int64#6,>mulrax=int64#7
 # asm 2: mov  <mulr6=%r9,>mulrax=%rax
 mov  %r9,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr6 = 0
+# asm 1: mov  $0,>mulr6=int64#5
+# asm 2: mov  $0,>mulr6=%r8
+mov  $0,%r8
 
-# qhasm:   carry? rt2 += mulrax
-# asm 1: add  <mulrax=int64#7,<rt2=int64#12
-# asm 2: add  <mulrax=%rax,<rt2=%r14
-add  %rax,%r14
+# qhasm:   mulr6 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr6=int64#5
+# asm 2: adc <mulrdx=%rdx,<mulr6=%r8
+adc %rdx,%r8
 
-# qhasm:   carry? rt3 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<rt3=int64#13
-# asm 2: adc <mulrdx=%rdx,<rt3=%r15
-adc %rdx,%r15
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   rt3 += 0 + carry
-# asm 1: adc $0,<rt3=int64#13
-# asm 2: adc $0,<rt3=%r15
-adc $0,%r15
+# qhasm:   carry? mulr6 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr6=int64#5
+# asm 2: add  <mulrax=%rax,<mulr6=%r8
+add  %rax,%r8
 
 # qhasm:   mulrax = mulr7
 # asm 1: mov  <mulr7=int64#8,>mulrax=int64#7
 # asm 2: mov  <mulr7=%r10,>mulrax=%rax
 mov  %r10,%rax
 
-# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   mulr7 = 0
+# asm 1: mov  $0,>mulr7=int64#6
+# asm 2: mov  $0,>mulr7=%r9
+mov  $0,%r9
 
-# qhasm:   carry? rt3 += mulrax
-# asm 1: add  <mulrax=int64#7,<rt3=int64#13
-# asm 2: add  <mulrax=%rax,<rt3=%r15
-add  %rax,%r15
+# qhasm:   mulr7 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr7=int64#6
+# asm 2: adc <mulrdx=%rdx,<mulr7=%r9
+adc %rdx,%r9
 
-# qhasm:   mulr4 = 0
-# asm 1: mov  $0,>mulr4=int64#2
-# asm 2: mov  $0,>mulr4=%rsi
-mov  $0,%rsi
+# qhasm:   (uint128) mulrdx mulrax = mulrax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   mulr4 += mulrdx + carry
-# asm 1: adc <mulrdx=int64#3,<mulr4=int64#2
-# asm 2: adc <mulrdx=%rdx,<mulr4=%rsi
-adc %rdx,%rsi
+# qhasm:   carry? mulr7 += mulrax
+# asm 1: add  <mulrax=int64#7,<mulr7=int64#6
+# asm 2: add  <mulrax=%rax,<mulr7=%r9
+add  %rax,%r9
 
-# qhasm:   mulr4 *= 38
-# asm 1: imulq  $38,<mulr4=int64#2,>mulr4=int64#2
-# asm 2: imulq  $38,<mulr4=%rsi,>mulr4=%rsi
-imulq  $38,%rsi,%rsi
+# qhasm:   mulr8 = 0
+# asm 1: mov  $0,>mulr8=int64#7
+# asm 2: mov  $0,>mulr8=%rax
+mov  $0,%rax
+
+# qhasm:   mulr8 += mulrdx + carry
+# asm 1: adc <mulrdx=int64#3,<mulr8=int64#7
+# asm 2: adc <mulrdx=%rdx,<mulr8=%rax
+adc %rdx,%rax
 
 # qhasm:   carry? rt0 += mulr4
 # asm 1: add  <mulr4=int64#2,<rt0=int64#10
 # asm 2: add  <mulr4=%rsi,<rt0=%r12
 add  %rsi,%r12
 
-# qhasm:   carry? rt1 += 0 + carry
-# asm 1: adc $0,<rt1=int64#11
-# asm 2: adc $0,<rt1=%r13
-adc $0,%r13
+# qhasm:   carry? rt1 += mulr5 + carry
+# asm 1: adc <mulr5=int64#4,<rt1=int64#11
+# asm 2: adc <mulr5=%rcx,<rt1=%r13
+adc %rcx,%r13
 
-# qhasm:   carry? rt2 += 0 + carry
-# asm 1: adc $0,<rt2=int64#12
-# asm 2: adc $0,<rt2=%r14
-adc $0,%r14
+# qhasm:   carry? rt2 += mulr6 + carry
+# asm 1: adc <mulr6=int64#5,<rt2=int64#12
+# asm 2: adc <mulr6=%r8,<rt2=%r14
+adc %r8,%r14
 
-# qhasm:   carry? rt3 += 0 + carry
-# asm 1: adc $0,<rt3=int64#13
-# asm 2: adc $0,<rt3=%r15
-adc $0,%r15
+# qhasm:   carry? rt3 += mulr7 + carry
+# asm 1: adc <mulr7=int64#6,<rt3=int64#13
+# asm 2: adc <mulr7=%r9,<rt3=%r15
+adc %r9,%r15
 
 # qhasm:   mulzero = 0
 # asm 1: mov  $0,>mulzero=int64#2
 # asm 2: mov  $0,>mulzero=%rsi
 mov  $0,%rsi
 
-# qhasm:   muli38 = 38
-# asm 1: mov  $38,>muli38=int64#3
-# asm 2: mov  $38,>muli38=%rdx
-mov  $38,%rdx
+# qhasm:   mulr8 += mulzero + carry
+# asm 1: adc <mulzero=int64#2,<mulr8=int64#7
+# asm 2: adc <mulzero=%rsi,<mulr8=%rax
+adc %rsi,%rax
 
-# qhasm:   mulzero = muli38 if carry
-# asm 1: cmovc <muli38=int64#3,<mulzero=int64#2
-# asm 2: cmovc <muli38=%rdx,<mulzero=%rsi
-cmovc %rdx,%rsi
+# qhasm:   mulr8 *= 38
+# asm 1: imulq  $38,<mulr8=int64#7,>mulr8=int64#3
+# asm 2: imulq  $38,<mulr8=%rax,>mulr8=%rdx
+imulq  $38,%rax,%rdx
+
+# qhasm:   carry? rt0 += mulr8
+# asm 1: add  <mulr8=int64#3,<rt0=int64#10
+# asm 2: add  <mulr8=%rdx,<rt0=%r12
+add  %rdx,%r12
+
+# qhasm:   carry? rt1 += mulzero + carry
+# asm 1: adc <mulzero=int64#2,<rt1=int64#11
+# asm 2: adc <mulzero=%rsi,<rt1=%r13
+adc %rsi,%r13
+
+# qhasm:   carry? rt2 += mulzero + carry
+# asm 1: adc <mulzero=int64#2,<rt2=int64#12
+# asm 2: adc <mulzero=%rsi,<rt2=%r14
+adc %rsi,%r14
+
+# qhasm:   carry? rt3 += mulzero + carry
+# asm 1: adc <mulzero=int64#2,<rt3=int64#13
+# asm 2: adc <mulzero=%rsi,<rt3=%r15
+adc %rsi,%r15
+
+# qhasm:   mulzero += mulzero + carry
+# asm 1: adc <mulzero=int64#2,<mulzero=int64#2
+# asm 2: adc <mulzero=%rsi,<mulzero=%rsi
+adc %rsi,%rsi
+
+# qhasm:   mulzero *= 38
+# asm 1: imulq  $38,<mulzero=int64#2,>mulzero=int64#2
+# asm 2: imulq  $38,<mulzero=%rsi,>mulzero=%rsi
+imulq  $38,%rsi,%rsi
 
 # qhasm:   rt0 += mulzero
 # asm 1: add  <mulzero=int64#2,<rt0=int64#10

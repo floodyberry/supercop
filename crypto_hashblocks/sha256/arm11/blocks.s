@@ -216,6 +216,8 @@
 .align 2
 .global _crypto_hashblocks_sha256_arm11_core
 .global crypto_hashblocks_sha256_arm11_core
+.type _crypto_hashblocks_sha256_arm11_core STT_FUNC
+.type crypto_hashblocks_sha256_arm11_core STT_FUNC
 _crypto_hashblocks_sha256_arm11_core:
 crypto_hashblocks_sha256_arm11_core:
 sub sp,sp,#192

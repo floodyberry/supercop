@@ -1,6 +1,7 @@
 /*
- * try-anything.c version 20120328
+ * try-anything.c version 20140425
  * D. J. Bernstein
+ * Some portions adapted from TweetNaCl by Bernstein, Janssen, Lange, Schwabe.
  * Public domain.
  */
 
@@ -13,57 +14,193 @@
 #include <sys/types.h>
 #include <sys/resource.h>
 #include "cpucycles.h"
+#include "crypto_uint8.h"
+#include "crypto_uint32.h"
+#include "crypto_uint64.h"
+#include "try.h"
 
-typedef int uint32;
+typedef crypto_uint8 u8;
+typedef crypto_uint32 u32;
+typedef crypto_uint64 u64;
 
-static uint32 seed[32] = { 3,1,4,1,5,9,2,6,5,3,5,8,9,7,9,3,2,3,8,4,6,2,6,4,3,3,8,3,2,7,9,5 } ;
-static uint32 in[12];
-static uint32 out[8];
-static int outleft = 0;
+#define FOR(i,n) for (i = 0;i < n;++i)
 
-#define ROTATE(x,b) (((x) << (b)) | ((x) >> (32 - (b))))
-#define MUSH(i,b) x = t[i] += (((x ^ seed[i]) + sum) ^ ROTATE(x,b));
+static u32 L32(u32 x,int c) { return (x << c) | ((x&0xffffffff) >> (32 - c)); }
 
-static void surf(void)
+static u32 ld32(const u8 *x)
 {
-  uint32 t[12]; uint32 x; uint32 sum = 0;
-  int r; int i; int loop;
+  u32 u = x[3];
+  u = (u<<8)|x[2];
+  u = (u<<8)|x[1];
+  return (u<<8)|x[0];
+}
 
-  for (i = 0;i < 12;++i) t[i] = in[i] ^ seed[12 + i];
-  for (i = 0;i < 8;++i) out[i] = seed[24 + i];
-  x = t[11];
-  for (loop = 0;loop < 2;++loop) {
-    for (r = 0;r < 16;++r) {
-      sum += 0x9e3779b9;
-      MUSH(0,5) MUSH(1,7) MUSH(2,9) MUSH(3,13)
-      MUSH(4,5) MUSH(5,7) MUSH(6,9) MUSH(7,13)
-      MUSH(8,5) MUSH(9,7) MUSH(10,9) MUSH(11,13)
-    }
-    for (i = 0;i < 8;++i) out[i] ^= t[i + 4];
+static void st32(u8 *x,u32 u)
+{
+  int i;
+  FOR(i,4) { x[i] = u; u >>= 8; }
+}
+
+static const u8 sigma[17] = "expand 32-byte k";
+
+static void core(u8 *out,const u8 *in,const u8 *k)
+{
+  u32 w[16],x[16],y[16],t[4];
+  int i,j,m;
+
+  FOR(i,4) {
+    x[5*i] = ld32(sigma+4*i);
+    x[1+i] = ld32(k+4*i);
+    x[6+i] = ld32(in+4*i);
+    x[11+i] = ld32(k+16+4*i);
   }
+
+  FOR(i,16) y[i] = x[i];
+
+  FOR(i,20) {
+    FOR(j,4) {
+      FOR(m,4) t[m] = x[(5*j+4*m)%16];
+      t[1] ^= L32(t[0]+t[3], 7);
+      t[2] ^= L32(t[1]+t[0], 9);
+      t[3] ^= L32(t[2]+t[1],13);
+      t[0] ^= L32(t[3]+t[2],18);
+      FOR(m,4) w[4*j+(j+m)%4] = t[m];
+    }
+    FOR(m,16) x[m] = w[m];
+  }
+
+  FOR(i,16) st32(out + 4 * i,x[i] + y[i]);
+}
+
+static void salsa20(u8 *c,u64 b,const u8 *n,const u8 *k)
+{
+  u8 z[16],x[64];
+  u32 u,i;
+  if (!b) return;
+  FOR(i,16) z[i] = 0;
+  FOR(i,8) z[i] = n[i];
+  while (b >= 64) {
+    core(x,z,k);
+    FOR(i,64) c[i] = x[i];
+    u = 1;
+    for (i = 8;i < 16;++i) {
+      u += (u32) z[i];
+      z[i] = u;
+      u >>= 8;
+    }
+    b -= 64;
+    c += 64;
+  }
+  if (b) {
+    core(x,z,k);
+    FOR(i,b) c[i] = x[i];
+  }
+}
+
+static void increment(u8 *n)
+{
+  if (!++n[0])
+    if (!++n[1])
+      if (!++n[2])
+        if (!++n[3])
+          if (!++n[4])
+            if (!++n[5])
+              if (!++n[6])
+                if (!++n[7])
+                  ;
 }
 
 void randombytes(unsigned char *x,unsigned long long xlen)
 {
-  while (xlen > 0) {
-    if (!outleft) {
-      if (!++in[0]) if (!++in[1]) if (!++in[2]) ++in[3];
-      surf();
-      outleft = 8;
-    }
-    *x = out[--outleft];
-    ++x;
-    --xlen;
+  const static unsigned char randombytes_k[33] = "answer randombytes from crypto_*";
+  static unsigned char randombytes_n[8];
+  salsa20(x,xlen,randombytes_n,randombytes_k);
+  increment(randombytes_n);
+}
+
+static void testvector(unsigned char *x,unsigned long long xlen)
+{
+  const static unsigned char testvector_k[33] = "generate inputs for test vectors";
+  static unsigned char testvector_n[8];
+  salsa20(x,xlen,testvector_n,testvector_k);
+  increment(testvector_n);
+}
+
+unsigned long long myrandom(void)
+{
+  unsigned long long result;
+  testvector((unsigned char *) &result,sizeof(result));
+  return result;
+}
+
+static void canary(unsigned char *x,unsigned long long xlen)
+{
+  const static unsigned char canary_k[33] = "generate pad to catch overwrites";
+  static unsigned char canary_n[8];
+  salsa20(x,xlen,canary_n,canary_k);
+  increment(canary_n);
+}
+
+void double_canary(unsigned char *x2,unsigned char *x,unsigned long long xlen)
+{
+  canary(x - 16,16);
+  canary(x + xlen,16);
+  memcpy(x2 - 16,x - 16,16);
+  memcpy(x2 + xlen,x + xlen,16);
+}
+
+void input_prepare(unsigned char *x2,unsigned char *x,unsigned long long xlen)
+{
+  testvector(x,xlen);
+  canary(x - 16,16);
+  canary(x + xlen,16);
+  memcpy(x2 - 16,x - 16,xlen + 32);
+}
+
+void input_compare(const unsigned char *x2,const unsigned char *x,unsigned long long xlen,const char *fun)
+{
+  if (memcmp(x2 - 16,x - 16,xlen + 32)) {
+    printf("%s overwrites input\n",fun);
+    exit(111);
   }
 }
 
-extern void preallocate(void);
-extern void allocate(void);
-extern void predoit(void);
-extern void doit(void);
-extern char checksum[];
-extern const char *checksum_compute(void);
-extern const char *primitiveimplementation;
+void output_prepare(unsigned char *x2,unsigned char *x,unsigned long long xlen)
+{
+  canary(x - 16,xlen + 32);
+  memcpy(x2 - 16,x - 16,xlen + 32);
+}
+
+void output_compare(const unsigned char *x2,const unsigned char *x,unsigned long long xlen,const char *fun)
+{
+  if (memcmp(x2 - 16,x - 16,16)) {
+    printf("%s writes before output\n",fun);
+    exit(111);
+  }
+  if (memcmp(x2 + xlen,x + xlen,16)) {
+    printf("%s writes after output\n",fun);
+    exit(111);
+  }
+}
+
+static unsigned char checksum_state[64];
+static char checksum_hex[65];
+
+void checksum(const unsigned char *x,unsigned long long xlen)
+{
+  u8 block[16];
+  int i;
+  while (xlen >= 16) {
+    core(checksum_state,x,checksum_state);
+    x += 16;
+    xlen -= 16;
+  }
+  FOR(i,16) block[i] = 0;
+  FOR(i,xlen) block[i] = x[i];
+  block[xlen] = 1;
+  checksum_state[0] ^= 1;
+  core(checksum_state,block,checksum_state);
+}
 
 static void printword(const char *s)
 {
@@ -84,7 +221,7 @@ static void printnum(long long x)
   printf("%lld ",x);
 }
 
-static void fail(const char *why)
+void fail(const char *why)
 {
   printf("%s\n",why);
   exit(111);
@@ -132,11 +269,11 @@ int main()
   long long belowj;
   long long checksumcycles;
   long long cyclespersecond;
-  const char *problem;
 
   cycles[0] = cpucycles();
   cycles[1] = cpucycles();
   cyclespersecond = cpucycles_persecond();
+
   preallocate();
   limits();
 
@@ -144,7 +281,7 @@ int main()
   srandom(getpid());
 
   cycles[0] = cpucycles();
-  problem = checksum_compute(); if (problem) fail(problem);
+  test();
   cycles[1] = cpucycles();
   checksumcycles = cycles[1] - cycles[0];
 
@@ -165,7 +302,13 @@ int main()
     if (belowj * 2 < TIMINGS && abovej * 2 < TIMINGS) break;
   }
 
-  printword(checksum);
+  for (i = 0;i < 32;++i) {
+    checksum_hex[2 * i] = "0123456789abcdef"[15 & (checksum_state[i] >> 4)];
+    checksum_hex[2 * i + 1] = "0123456789abcdef"[15 & checksum_state[i]];
+  }
+  checksum_hex[2 * i] = 0;
+
+  printword(checksum_hex);
   printnum(cycles[j]);
   printnum(checksumcycles);
   printnum(cyclespersecond);

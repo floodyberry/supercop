@@ -36,7 +36,8 @@ okabi | (
               echo "#endif"
             ) > crypto_$target.h
             $c -o crypto_$target crypto_$target.c || continue
-            ./crypto_$target || continue
+            ./crypto_$target 1 0 || continue
+            echo "=== `date` === $abi found $source as $target" >&2
             mkdir -p include/$abi
             cp crypto_$target.h include/$abi/crypto_$target.h
 	  done

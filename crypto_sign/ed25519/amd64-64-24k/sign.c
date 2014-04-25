@@ -1,7 +1,7 @@
+#include <string.h>
 #include "crypto_sign.h"
 #include "crypto_hash_sha512.h"
 #include "ge25519.h"
-#include "hram.h"
 
 int crypto_sign(
     unsigned char *sm,unsigned long long *smlen,
@@ -9,48 +9,49 @@ int crypto_sign(
     const unsigned char *sk
     )
 {
+  unsigned char pk[32];
+  unsigned char az[64];
+  unsigned char nonce[64];
+  unsigned char hram[64];
   sc25519 sck, scs, scsk;
   ge25519 ger;
-  unsigned char r[32];
-  unsigned char s[32];
-  unsigned char extsk[64];
-  unsigned long long i;
-  unsigned char hmg[crypto_hash_sha512_BYTES];
-  unsigned char hram[crypto_hash_sha512_BYTES];
 
-  crypto_hash_sha512(extsk, sk, 32);
-  extsk[0] &= 248;
-  extsk[31] &= 127;
-  extsk[31] |= 64;
+  memmove(pk,sk + 32,32);
+  /* pk: 32-byte public key A */
 
-  *smlen = mlen+64;
-  for(i=0;i<mlen;i++)
-    sm[64 + i] = m[i];
-  for(i=0;i<32;i++)
-    sm[32 + i] = extsk[32+i];
+  crypto_hash_sha512(az,sk,32);
+  az[0] &= 248;
+  az[31] &= 127;
+  az[31] |= 64;
+  /* az: 32-byte scalar a, 32-byte randomizer z */
 
-  crypto_hash_sha512(hmg, sm+32, mlen+32); /* Generate k as h(extsk[32],...,extsk[63],m) */
+  *smlen = mlen + 64;
+  memmove(sm + 64,m,mlen);
+  memmove(sm + 32,az + 32,32);
+  /* sm: 32-byte uninit, 32-byte z, mlen-byte m */
 
-  /* Computation of R */
-  sc25519_from64bytes(&sck, hmg);
+  crypto_hash_sha512(nonce, sm+32, mlen+32);
+  /* nonce: 64-byte H(z,m) */
+
+  sc25519_from64bytes(&sck, nonce);
   ge25519_scalarmult_base(&ger, &sck);
-  ge25519_pack(r, &ger);
+  ge25519_pack(sm, &ger);
+  /* sm: 32-byte R, 32-byte z, mlen-byte m */
   
-  /* Computation of s */
-  for(i=0;i<32;i++)
-    sm[i] = r[i];
+  memmove(sm + 32,pk,32);
+  /* sm: 32-byte R, 32-byte A, mlen-byte m */
 
-  get_hram(hram, sm, sk+32, sm, mlen+64);
+  crypto_hash_sha512(hram,sm,mlen + 64);
+  /* hram: 64-byte H(R,A,m) */
 
   sc25519_from64bytes(&scs, hram);
-  sc25519_from32bytes(&scsk, extsk);
+  sc25519_from32bytes(&scsk, az);
   sc25519_mul(&scs, &scs, &scsk);
-  
   sc25519_add(&scs, &scs, &sck);
+  /* scs: S = nonce + H(R,A,m)a */
 
-  sc25519_to32bytes(s,&scs); /* cat s */
-  for(i=0;i<32;i++)
-    sm[32 + i] = s[i]; 
+  sc25519_to32bytes(sm + 32,&scs);
+  /* sm: 32-byte R, 32-byte S, mlen-byte m */
 
   return 0;
 }

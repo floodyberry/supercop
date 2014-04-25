@@ -298,6 +298,8 @@
 .align 2
 .global _Skein_512_Process_Block
 .global Skein_512_Process_Block
+.type _Skein_512_Process_Block STT_FUNC
+.type Skein_512_Process_Block STT_FUNC
 _Skein_512_Process_Block:
 Skein_512_Process_Block:
 sub sp,sp,#320

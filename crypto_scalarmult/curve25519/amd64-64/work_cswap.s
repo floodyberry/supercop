@@ -83,13 +83,13 @@
 
 # qhasm:   stack64 caller7_stack
 
-# qhasm: enter crypto_scalarmult_curve25519_amd64_51_work_cswap
+# qhasm: enter crypto_scalarmult_curve25519_amd64_64_work_cswap
 .text
 .p2align 5
-.globl _crypto_scalarmult_curve25519_amd64_51_work_cswap
-.globl crypto_scalarmult_curve25519_amd64_51_work_cswap
-_crypto_scalarmult_curve25519_amd64_51_work_cswap:
-crypto_scalarmult_curve25519_amd64_51_work_cswap:
+.globl _crypto_scalarmult_curve25519_amd64_64_work_cswap
+.globl crypto_scalarmult_curve25519_amd64_64_work_cswap
+_crypto_scalarmult_curve25519_amd64_64_work_cswap:
+crypto_scalarmult_curve25519_amd64_64_work_cswap:
 mov %rsp,%r11
 and $31,%r11
 add $0,%r11

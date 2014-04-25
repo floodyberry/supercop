@@ -107,12 +107,12 @@ do
 
       if [ "$t1" = gmp ]
       then
-        echo "gmp 5.0.4" >&8
+        echo "gmp 5.1.3" >&8
       fi
   
       if [ "$t1" = cryptopp ]
       then
-        echo "cryptopp 561" >&8
+        echo "cryptopp 562" >&8
       fi
   
       if [ "$t1" = openssl ]
@@ -231,7 +231,7 @@ do
 	    echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"
 	    rm -rf "$top/$target/work"
 	    mkdir -p "$top/$target/work"
-	    cp -pr gmp-5.0.4/* "$top/$target/work"
+	    cp -pr gmp-5.1.3/* "$top/$target/work"
 	    ( cd "$top/$target/work" \
 	      && ./configure --enable-cxx \
 	         ABI="$gmpabi" \
@@ -239,7 +239,7 @@ do
 	      && make \
 	      && make check \
 	      && cp gmp.h gmpxx.h gmp-impl.h longlong.h \
-	      config.h gmp-mparam.h fib_table.h mp_bases.h \
+	      config.h gmp-mparam.h fac_table.h fib_table.h mp_bases.h \
 	      "$top/$abi/include" \
 	      && ( ranlib ".libs/libgmp.a" || : ) \
 	      && cp .libs/libgmp.a "$top/$abi/lib/libgmp.a" \
@@ -269,7 +269,7 @@ do
         echo "=== `date` === trying CXX=$cpp CXXFLAGS=$cppopts"
         rm -rf "$top/$target/work"
         mkdir -p "$top/$target/work"
-        cp -pr cryptopp-561/* "$top/$target/work"
+        cp -pr cryptopp-562/* "$top/$target/work"
         ( cd "$top/$target/work" \
           && make CXX="$cpp" CXXFLAGS="-DNDEBUG $cppopts" LDFLAGS="$cppopts" \
           && cp libcryptopp.a "$top/$abi/lib/libcryptopp.a" \
@@ -311,8 +311,10 @@ do
         implementationdir="${o}/${p}/${t6}"
         opi=`echo "$implementationdir" | tr ./- ___`
   
-        expectedchecksum=''
-        [ -f "$o/$p/checksum" ] && expectedchecksum=`cat "$o/$p/checksum"`
+        expectedchecksumbig=''
+        [ -f "$o/$p/checksumbig" ] && expectedchecksumbig=`cat "$o/$p/checksumbig"`
+        expectedchecksumsmall=''
+        [ -f "$o/$p/checksumsmall" ] && expectedchecksumsmall=`cat "$o/$p/checksumsmall"`
   
         libs=`"oklibs-$abi"`
         libs="$top/$abi/lib/cpucycles.o $libs"
@@ -337,6 +339,7 @@ do
         cp -p "$o/try.c" "$top/$target/work/try.$language"
         cp -p "$o/measure.c" "$top/$target/work/measure.$language"
         cp -p "try-anything.c" "$top/$target/work/try-anything.$language"
+        cp -p "try.h" "$top/$target/work/try.h"
         cp -p "measure-anything.c" "$top/$target/work/measure-anything.$language"
 
         (
@@ -362,6 +365,7 @@ do
             echo "#define ${op}_H"
             echo ""
             sed 's/[         ]CRYPTO_/ '"${opi}"'_/g' < api.h
+	    echo ' '
             echo '#ifdef __cplusplus'
             echo 'extern "C" {'
             echo '#endif'
@@ -411,6 +415,42 @@ do
   
 	  (
             killafter 300 \
+            $compiler -DSMALL \
+              -I. -I"$top/$abi/include" \
+              -o try try.$language try-anything.$language \
+              "$op.a" $libs 2>&1 || rm -f OK
+	  ) | awk -v PREFIX="$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword try.$language" '
+	    {
+	      if (NR > 25) { print PREFIX,"..."; exit }
+	      print PREFIX,$0
+	    }
+	  ' >&5
+          [ -f OK ] || exit 0
+  
+          if sh -c 'killafter 3600 ./try || exit $?' >../errors 2>&1
+          then
+            checksumsmall=`awk '{print $1}' < ../errors`
+            cycles=`awk '{print $2}' < ../errors`
+            checksumcycles=`awk '{print $3}' < ../errors`
+            cyclespersecond=`awk '{print $4}' < ../errors`
+            impl=`awk '{print $5}' < ../errors`
+          else
+            echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword error $?" >&5
+            cat ../errors \
+            | while read err
+            do
+              echo "$version $shorthostname $abi $startdate $o $p tryfails $implementationdir $compilerword $err" >&5
+            done
+            exit 0
+          fi
+
+	  [ "x$expectedchecksumsmall" != x ] \
+	  && [ "x$expectedchecksumsmall" != "x$checksumsmall" ] \
+          && echo "$version $shorthostname $abi $startdate $o $p try $checksumsmall fails $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5 \
+	  && exit 0
+
+	  (
+            killafter 300 \
             $compiler \
               -I. -I"$top/$abi/include" \
               -o try try.$language try-anything.$language \
@@ -425,7 +465,7 @@ do
   
           if sh -c 'killafter 3600 ./try || exit $?' >../errors 2>&1
           then
-            checksum=`awk '{print $1}' < ../errors`
+            checksumbig=`awk '{print $1}' < ../errors`
             cycles=`awk '{print $2}' < ../errors`
             checksumcycles=`awk '{print $3}' < ../errors`
             cyclespersecond=`awk '{print $4}' < ../errors`
@@ -439,12 +479,17 @@ do
             done
             exit 0
           fi
-  
-          checksumok=fails
-          [ "x$expectedchecksum" = "x$checksum" ] && checksumok=ok
-          [ "x$expectedchecksum" = "x" ] && checksumok=unknown
-          echo "$version $shorthostname $abi $startdate $o $p try $checksum $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
-          [ "$checksumok" = fails ] && exit 0
+
+	  [ "x$expectedchecksumbig" != x ] \
+	  && [ "x$expectedchecksumbig" != "x$checksumbig" ] \
+          && echo "$version $shorthostname $abi $startdate $o $p try
+	  $checksumsmall/$checksumbig fails $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5 \
+	  && exit 0
+
+	  checksumok=ok
+	  [ "x$expectedchecksumsmall" = x ] && checksumok=unknown
+	  [ "x$expectedchecksumbig" = x ] && checksumok=unknown
+          echo "$version $shorthostname $abi $startdate $o $p try $checksumsmall/$checksumbig $checksumok $cycles $checksumcycles $cyclespersecond $impl $compilerword" >&5
   
 	  (
             killafter 3600 \

@@ -93,13 +93,13 @@
 
 # qhasm:   stack64 caller7_stack
 
-# qhasm: enter crypto_sign_ed25519_amd64_64_24k_batch_heap_rootreplaced
+# qhasm: enter crypto_sign_ed25519_amd64_64_heap_rootreplaced
 .text
 .p2align 5
-.globl _crypto_sign_ed25519_amd64_64_24k_batch_heap_rootreplaced
-.globl crypto_sign_ed25519_amd64_64_24k_batch_heap_rootreplaced
-_crypto_sign_ed25519_amd64_64_24k_batch_heap_rootreplaced:
-crypto_sign_ed25519_amd64_64_24k_batch_heap_rootreplaced:
+.globl _crypto_sign_ed25519_amd64_64_heap_rootreplaced
+.globl crypto_sign_ed25519_amd64_64_heap_rootreplaced
+_crypto_sign_ed25519_amd64_64_heap_rootreplaced:
+crypto_sign_ed25519_amd64_64_heap_rootreplaced:
 mov %rsp,%r11
 and $31,%r11
 add $64,%r11

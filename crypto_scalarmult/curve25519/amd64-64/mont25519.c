@@ -1,8 +1,8 @@
 #include "crypto_scalarmult.h"
 #include "fe25519.h"
 
-#define work_cswap crypto_scalarmult_curve25519_amd64_51_work_cswap
-#define ladderstep crypto_scalarmult_curve25519_amd64_51_ladderstep
+#define work_cswap crypto_scalarmult_curve25519_amd64_64_work_cswap
+#define ladderstep crypto_scalarmult_curve25519_amd64_64_ladderstep
 
 extern void work_cswap(fe25519 *, unsigned long long);
 extern void ladderstep(fe25519 *work);

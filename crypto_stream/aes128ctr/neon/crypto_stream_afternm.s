@@ -171,6 +171,8 @@
 .align 2
 .global _crypto_stream_aes128ctr_neon_afternm_constants
 .global crypto_stream_aes128ctr_neon_afternm_constants
+.type _crypto_stream_aes128ctr_neon_afternm_constants STT_FUNC
+.type crypto_stream_aes128ctr_neon_afternm_constants STT_FUNC
 _crypto_stream_aes128ctr_neon_afternm_constants:
 crypto_stream_aes128ctr_neon_afternm_constants:
 vpush {q4,q5,q6,q7}

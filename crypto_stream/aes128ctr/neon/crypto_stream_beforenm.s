@@ -121,6 +121,8 @@
 .align 2
 .global _crypto_stream_aes128ctr_neon_beforenm
 .global crypto_stream_aes128ctr_neon_beforenm
+.type _crypto_stream_aes128ctr_neon_beforenm STT_FUNC
+.type crypto_stream_aes128ctr_neon_beforenm STT_FUNC
 _crypto_stream_aes128ctr_neon_beforenm:
 crypto_stream_aes128ctr_neon_beforenm:
 vpush {q4,q5,q6,q7}

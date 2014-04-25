@@ -19,8 +19,6 @@ int crypto_dh(
   BIGNUM *bob;
   int len;
 
-  memset(s,0,SHAREDSECRET_BYTES);
-
   alice = DH_new(); if (!alice) return -1;
   bob = BN_new(); if (!bob) goto boberror;
 
@@ -34,6 +32,8 @@ int crypto_dh(
   if (!BN_bin2bn(sk,PUBLICKEY_BYTES,alice->pub_key)) goto error;
   if (!BN_bin2bn(sk + PUBLICKEY_BYTES,SECRETKEY_BYTES - PUBLICKEY_BYTES,alice->priv_key)) goto error;
   if (!BN_bin2bn(pk,PUBLICKEY_BYTES,bob)) goto error;
+
+  memset(s,0,SHAREDSECRET_BYTES);
 
   if (DH_size(alice) > SHAREDSECRET_BYTES) goto error;
   len = DH_compute_key(s,bob,alice);

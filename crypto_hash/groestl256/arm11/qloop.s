@@ -186,6 +186,8 @@
 .align 2
 .global _qloop
 .global qloop
+.type _qloop STT_FUNC
+.type qloop STT_FUNC
 _qloop:
 qloop:
 sub sp,sp,#128

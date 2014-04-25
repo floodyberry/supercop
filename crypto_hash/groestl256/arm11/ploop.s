@@ -186,6 +186,8 @@
 .align 2
 .global _ploop
 .global ploop
+.type _ploop STT_FUNC
+.type ploop STT_FUNC
 _ploop:
 ploop:
 sub sp,sp,#128

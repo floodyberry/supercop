@@ -162,6 +162,10 @@ g++ -m64 -march=core-avx-i -O3 -fomit-frame-pointer
 g++ -m64 -march=core-avx-i -Os -fomit-frame-pointer
 g++ -m64 -march=core-avx-i -O2 -fomit-frame-pointer
 g++ -m64 -march=core-avx-i -O -fomit-frame-pointer
+g++ -m64 -march=core-avx2 -O3 -fomit-frame-pointer
+g++ -m64 -march=core-avx2 -Os -fomit-frame-pointer
+g++ -m64 -march=core-avx2 -O2 -fomit-frame-pointer
+g++ -m64 -march=core-avx2 -O -fomit-frame-pointer
 g++ -m64 -march=k8 -O3 -fomit-frame-pointer
 g++ -m64 -march=k8 -Os -fomit-frame-pointer
 g++ -m64 -march=k8 -O2 -fomit-frame-pointer
@@ -390,6 +394,10 @@ g++ -m32 -march=core-avx-i -O3 -fomit-frame-pointer
 g++ -m32 -march=core-avx-i -Os -fomit-frame-pointer
 g++ -m32 -march=core-avx-i -O2 -fomit-frame-pointer
 g++ -m32 -march=core-avx-i -O -fomit-frame-pointer
+g++ -m32 -march=core-avx2 -O3 -fomit-frame-pointer
+g++ -m32 -march=core-avx2 -Os -fomit-frame-pointer
+g++ -m32 -march=core-avx2 -O2 -fomit-frame-pointer
+g++ -m32 -march=core-avx2 -O -fomit-frame-pointer
 g++ -m32 -march=k8 -O3 -fomit-frame-pointer
 g++ -m32 -march=k8 -Os -fomit-frame-pointer
 g++ -m32 -march=k8 -O2 -fomit-frame-pointer
@@ -924,6 +932,7 @@ opt-aCC-bin-aCC +DD64 -fast
 opt-aCC-bin-aCC +DD64
 opt-MIPSpro-bin-CC -64 -Ofast
 opt-MIPSpro-bin-CC -64
+icpc -fast
 icpc -m64 -xHost -vec-report0 -static
 icpc -m32 -xHost -vec-report0 -static
 icpc -O3 -static
@@ -988,6 +997,7 @@ pgCC -tp core2-32 -O3
 pgCC -tp core2-32 -fast
 clang++ -O3
 clang++ -O3 -mavx
+clang++ -O3 -mavx2
 clang++ -O3 -march=armv7-a -mfloat-abi=hard -mfpu=neon -fomit-frame-pointer
 clang++ -O3 -march=armv7-a -mfloat-abi=softfp -mfpu=neon -fomit-frame-pointer
 clang++ -O3 -march=armv7-a -mfloat-abi=hard -mfpu=vfpv3-d16 -fomit-frame-pointer

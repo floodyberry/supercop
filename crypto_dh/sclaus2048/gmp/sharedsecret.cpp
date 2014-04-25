@@ -20,6 +20,8 @@ int crypto_dh(
   mpz_import(base.get_mpz_t(),PUBLICKEY_BYTES,-1,1,0,0,pk);
   mpz_powm(result.get_mpz_t(),base.get_mpz_t(),a.get_mpz_t(),p.get_mpz_t());
   if (mpz_sizeinbase(result.get_mpz_t(),256) > SHAREDSECRET_BYTES) return -1;
+  long long i;
+  for (i = 0;i < SHAREDSECRET_BYTES;++i) s[i] = 0;
   mpz_export(s,0,-1,1,0,0,result.get_mpz_t());
   return 0;
 }

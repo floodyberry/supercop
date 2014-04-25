@@ -52,13 +52,16 @@ static
 #endif
 int crypto_dh(unsigned char *s, const unsigned char* pk, const unsigned char *sk){
 	uni_t zzn[FP_LEN], yyn[FP_LEN];
+	unsigned char result[32];
 
 	/*scalar multiplication*/
-	ec_fp_smul_256e((uni)s, yyn, zzn, (uni)sk, (uni)pk, (uni)(pk + (PUBLICKEY_BYTES/2)));
+	ec_fp_smul_256e((uni)result, yyn, zzn, (uni)sk, (uni)pk, (uni)(pk + (PUBLICKEY_BYTES/2)));
 
 	/*normalization*/
 	fp_inv_256((uni)zzn, (uni)zzn);
-	fp_mul_256((uni)s, (uni)s, (uni)zzn);
+	fp_mul_256((uni)result, (uni)result, (uni)zzn);
+
+	memcpy(s,result,32);
 
 	return 0;
 }

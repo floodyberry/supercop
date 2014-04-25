@@ -93,7 +93,7 @@ do
   echo "echo '"$abi"'" >&7
 
   syslibs=""
-  for i in -lm -lnsl -lsocket -lcrypto
+  for i in -lm -lnsl -lsocket -lntl -lcrypto
   do
     echo "=== `date` === checking $i" >&2
     (

@@ -1,0 +1,10 @@
+Pi64-Cipher256 as submitted to CAESAR competition on 15 April 2014.
+This is an optimized x86-64 asm eBASH implementation.
+Internal version: Pi64Cipher256v2AVX2_optimized , Build date 14 April 2014.
+
+Programmer:  Rune E. Jensen, 
+             email: runeerle@stud.ntnu.no 
+             April 2014
+
+Level of copyright protection: 0
+Level of patent protection: 0

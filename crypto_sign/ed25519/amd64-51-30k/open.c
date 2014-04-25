@@ -1,8 +1,8 @@
+#include <string.h>
 #include "crypto_sign.h"
 #include "crypto_verify_32.h"
 #include "crypto_hash_sha512.h"
 #include "ge25519.h"
-#include "hram.h"
 
 int crypto_sign_open(
     unsigned char *m,unsigned long long *mlen,
@@ -10,36 +10,40 @@ int crypto_sign_open(
     const unsigned char *pk
     )
 {
-  int i;
-  unsigned char t2[32];
+  unsigned char pkcopy[32];
+  unsigned char rcopy[32];
+  unsigned char hram[64];
+  unsigned char rcheck[32];
   ge25519 get1, get2;
   sc25519 schram, scs;
-  unsigned char hram[crypto_hash_sha512_BYTES];
-
-  *mlen = (unsigned long long) -1;
 
   if (smlen < 64) goto badsig;
-  if (ge25519_unpackneg_vartime(&get1, pk)) goto badsig;
+  if (sm[63] & 224) goto badsig;
+  if (ge25519_unpackneg_vartime(&get1,pk)) goto badsig;
 
-  get_hram(hram,sm,pk,m,smlen);
-
-  sc25519_from64bytes(&schram, hram);
+  memmove(pkcopy,pk,32);
+  memmove(rcopy,sm,32);
 
   sc25519_from32bytes(&scs, sm+32);
 
-  ge25519_double_scalarmult_vartime(&get2, &get1, &schram, &scs);
-  ge25519_pack(t2, &get2);
+  memmove(m,sm,smlen);
+  memmove(m + 32,pkcopy,32);
+  crypto_hash_sha512(hram,m,smlen);
 
-  if (!crypto_verify_32(sm, t2))
-  {
-    for(i=0;i<smlen-64;i++)
-      m[i] = sm[i + 64];
-    *mlen = smlen-64;
+  sc25519_from64bytes(&schram, hram);
+
+  ge25519_double_scalarmult_vartime(&get2, &get1, &schram, &scs);
+  ge25519_pack(rcheck, &get2);
+
+  if (crypto_verify_32(rcopy,rcheck) == 0) {
+    memmove(m,m + 64,smlen - 64);
+    memset(m + smlen - 64,0,64);
+    *mlen = smlen - 64;
     return 0;
   }
 
-  badsig:
-  for(i=0;i<smlen-64;i++)
-    m[i] = 0;
+badsig:
+  *mlen = (unsigned long long) -1;
+  memset(m,0,smlen);
   return -1;
 }

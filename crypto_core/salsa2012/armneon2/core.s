@@ -49,6 +49,8 @@
 .align 2
 .global _crypto_core_salsa2012_armneon2
 .global crypto_core_salsa2012_armneon2
+.type _crypto_core_salsa2012_armneon2 STT_FUNC
+.type crypto_core_salsa2012_armneon2 STT_FUNC
 _crypto_core_salsa2012_armneon2:
 crypto_core_salsa2012_armneon2:
 sub sp,sp,#0

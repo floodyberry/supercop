@@ -272,7 +272,9 @@ void scmul_end_halv_direct(elt254 x2, elt254 y2, elt254 x1, elt254 y1, elt254 k,
 	}	
 
 	//to lambda
-	ec_aff2lmb(PX, PM, x1, y1);
+	PX[0] = x1[0]; PX[1] = x1[1]; PX[2] = x1[2]; PX[3] = x1[3];
+	PM[0] = y1[0]; PM[1] = y1[1]; PM[2] = y1[2]; PM[3] = y1[3];
+	//ec_aff2lmb(PX, PM, x1, y1);
 	
 	//sign arrangements
 	if (k1sign) { PM[0] = PM[0] ^ 0x1; }
@@ -382,7 +384,9 @@ void scmul_end_halv_direct(elt254 x2, elt254 y2, elt254 x1, elt254 y1, elt254 k,
 	ec_add_full_lambda(Qx[3], Qm[3], Qz[3], Qx[3], Qm[3], Qz[3], Qx[0], Qm[0], Qz[0], c);
 
 	//to affine
-	ec_pro2aff_lambda(PX, PM, Qx[3], Qm[3], Qz[3]);
-	ec_lmb2aff(x2, y2, PX, PM);	
+	ec_pro2aff_lambda(x2, y2, Qx[3], Qm[3], Qz[3]);
+
+	//ec_pro2aff_lambda(PX, PM, Qx[3], Qm[3], Qz[3]);
+	//ec_lmb2aff(x2, y2, PX, PM);	
 }
 

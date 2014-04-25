@@ -95,6 +95,8 @@
 .align 2
 .global _F8
 .global F8
+.type _F8 STT_FUNC
+.type F8 STT_FUNC
 _F8:
 F8:
 vpush {q4,q5,q6,q7}

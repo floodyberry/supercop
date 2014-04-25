@@ -197,6 +197,8 @@ sigma:
 .align 2
 .global _crypto_stream_salsa20_armneon3_xor
 .global crypto_stream_salsa20_armneon3_xor
+.type _crypto_stream_salsa20_armneon3_xor STT_FUNC
+.type crypto_stream_salsa20_armneon3_xor STT_FUNC
 _crypto_stream_salsa20_armneon3_xor:
 crypto_stream_salsa20_armneon3_xor:
 sub sp,sp,#256

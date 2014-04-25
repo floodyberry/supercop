@@ -1,0 +1,308 @@
+/*
+ *  This file is part of Binary-library.
+ *
+ *  Binary-library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+//#ADD_MIX LAMBDA OPTIMIZED FOR HALVING#
+//Here we treat the case of z2 = 1
+//INF: (0:1:0)
+void ec_add_mix(elt254 x3, elt254 m3, elt254 z3, elt254 x2, elt254 m2,
+		elt254 z2, elt254 x1, elt254 m1, Curve * c) {
+	elt254 t0, t1, t2, t3, t4;
+
+	if (types_isone254(z2)) {
+		low_add254(t0, m2, m1);	//A
+		low_add254(t1, x2, x1);
+		low_sq254(t1, t1);		//B
+
+		low_mul254(z3, t0, t1);	//Zr
+
+		low_mul254(t2, x2, t0);	//XA
+		low_mul254(x3, x1, t0);	//xA
+		low_mul254(x3, x3, t2);	//Xr
+
+		low_add254(m3, t2, t1);
+		low_sq254(m3, m3);
+		low_mul254(t2, z3, m1);
+		low_add254(t2, t2, z3);
+		low_add254(m3, m3, t2);	//Lr
+	} else {
+		low_mul254(t0, z2, x1);
+		low_mul254(t1, z2, m1);
+		low_add254(t3, x2, t0);
+		low_add254(t2, m2, t1);
+
+		low_sq254(t4, t3);
+		low_mul254(t3, t4, t2);
+		low_mul254(z3, t3, z2);
+
+		low_mul254(t0, t0, t2);
+		low_mul254(t1, x2, t2);
+		low_mul254(x3, t0, t1);
+
+		low_add254(t4, t1, t4);
+		low_sq254(t1, t4);
+
+		low_mul254(t2, z3, m1);
+		low_add254(t2, t2, z3);
+
+		low_add254(m3, t1, t2);
+	}
+}
+
+//#DOUBLE AND ADDITION LAMBDA#
+//INF: (0:1:0)
+void ec_doub_add_mix(elt254 x3, elt254 m3, elt254 z3, elt254 x2, elt254 m2, elt254 z2, elt254 x1, elt254 m1, Curve *c) {
+        elt254 t0, t1, t2, t3, t4, t5;
+
+       low_sq254(t1, m2);
+       low_add254(t3, t1, m2);
+       t3[2] ^= 1;
+       low_sq254(t2, x2);
+
+       m1[0] = m1[0] ^ 0x1; m1[2] = m1[2] ^ 0x1;
+       types_copy254(t4, m1);
+       m1[2] = m1[2] ^ 0x1;
+
+       low_add254(t4, t4, t1);
+       low_mul254(t4, t4, t3);
+       low_add254(t4, t4, t2);
+
+       low_add254(t2, x1, t3);
+       low_sq254(t5, t2);
+       low_mul254(z3, t4, t5);
+       low_sq254(t0, t4);
+       low_mul254(x3, x1, t0);
+       low_add254(t0, t4, t5);
+       low_sq254(t0, t0);
+       low_mul254(t0, t0, t3);
+
+       low_mul254(t1, m1, z3);
+
+       m1[0] = m1[0] ^ 0x1;
+
+       low_add254(m3, t0, t1);
+}
+
+//#DOUBLE AND ADDITION LAMBDA#
+//INF: (0:1:0)
+void ec_doub_add(elt254 x3, elt254 m3, elt254 z3, elt254 x2, elt254 m2,
+		elt254 z2, elt254 x1, elt254 m1, Curve * c) {
+	elt254 t0, t1, t2, t3, t4, t5;
+
+	low_sq254(t0, z2);
+	low_sq254(t1, m2);
+	low_mul254(t2, m2, z2);
+
+	low_mul_a_2(t3, t0);
+
+	low_add254(t3, t3, t1);
+	low_add254(t3, t3, t2);
+	low_sq254(t2, x2);
+	low_mul254(t2, t2, t0);
+
+	m1[0] = m1[0] ^ 0x1;
+	m1[2] = m1[2] ^ 0x1;
+	low_mul254(t4, t0, m1);
+	m1[2] = m1[2] ^ 0x1;
+
+	low_add254(t4, t4, t1);
+	low_mul254(t4, t4, t3);
+	low_add254(t4, t4, t2);
+
+	low_mul254(t1, x1, t0);
+	low_add254(t2, t1, t3);
+	low_sq254(t5, t2);
+	low_mul254(t2, t0, t4);
+	low_mul254(z3, t2, t5);
+	low_sq254(t0, t4);
+	low_mul254(x3, t1, t0);
+	low_add254(t0, t4, t5);
+	low_sq254(t0, t0);
+	low_mul254(t0, t0, t3);
+
+	low_mul254(t1, m1, z3);
+
+	m1[0] = m1[0] ^ 0x1;
+
+	low_add254(m3, t0, t1);
+}
+
+//double-and-add-add Lopez-Dahab with lambda representation
+//INF: (0:1:0)
+void ec_doub_add2(elt254 x3, elt254 m3, elt254 z3, elt254 x2, elt254 m2,
+		elt254 z2, elt254 x1, elt254 m1, elt254 _x1, elt254 _m1, Curve * c) {
+	elt254 tmp1, tmp2, tmp3, tmp4, tmp5, tmp6;
+
+	/* tmp4 = T = L^2 + LZ + aZ^2. */
+	low_sq254(tmp1, z2);
+	low_sq254(tmp2, m2);
+	low_mul254(tmp3, m2, z2);
+	//low_mul_a_2(tmp4, tmp1);
+	types_copy(tmp4, tmp1 + 2);
+	low_add(tmp4 + 2, tmp1, tmp1 + 2);
+
+	low_add254(tmp4, tmp4, tmp2);
+	low_add254(tmp4, tmp4, tmp3);
+	/* tmp3 = X^2Z^2. */
+	low_sq254(tmp3, x2);
+	low_mul254(tmp3, tmp3, tmp1);
+
+	m1[0] = m1[0] ^ 0x1;
+	m1[2] = m1[2] ^ 0x1;
+	low_mul254(tmp5, tmp1, m1);
+	m1[2] = m1[2] ^ 0x1;
+
+	low_add254(tmp5, tmp5, tmp2);
+	low_mul254(tmp5, tmp5, tmp4);
+	low_add254(tmp5, tmp5, tmp3);
+
+	/* tmp6 = B = (xp * Z^2 + T)^2. */
+	low_mul254(tmp2, x1, tmp1);
+	low_add254(tmp3, tmp2, tmp4);
+	low_sq254(tmp6, tmp3);
+	/* Z3 = A * B * Z^2. */
+	low_mul254(tmp3, tmp1, tmp6);
+	low_mul254(z3, tmp3, tmp5);
+	/* X3 = A^2 * (xp * Z^2). */
+	low_sq254(tmp1, tmp5);
+	low_mul254(x3, tmp2, tmp1);
+	/* L3 = T*(A + B)^2 + (lp+ls+1)*Z3. */
+	low_add254(tmp1, tmp5, tmp6);
+	low_sq254(tmp1, tmp1);
+	low_mul254(tmp1, tmp1, tmp4);
+
+	low_add254(tmp2, _m1, m1);
+	m1[0] = m1[0] ^ 0x1;
+	low_mul254(m3, tmp2, z3);
+	low_add254(tmp3, m3, tmp1);
+	low_mul254(tmp1, z3, _x1);
+	low_add254(tmp4, x3, tmp1);
+
+	low_sq254(tmp5, tmp4);
+	low_mul254(tmp4, tmp5, tmp3);
+	low_mul254(z3, tmp4, z3);
+
+	low_mul254(tmp1, tmp1, tmp3);
+	low_mul254(tmp2, x3, tmp3);
+	low_mul254(x3, tmp1, tmp2);
+
+	low_add254(tmp5, tmp2, tmp5);
+	low_sq254(tmp2, tmp5);
+
+	_m1[0] ^= 0x1;
+	low_mul254(tmp3, z3, _m1);
+	_m1[0] ^= 0x1;
+	//low_add254(tmp3, tmp3, z3);
+
+	low_add254(m3, tmp2, tmp3);
+}
+
+//double-and-add Lopez-Dahab with lambda representation for precomputation
+//INF (0:1:0)
+void ec_doub_addsub(elt254 x4, elt254 m4, elt254 z4, elt254 x3, elt254 m3,
+		elt254 z3, elt254 x2, elt254 m2, elt254 z2, elt254 x1, elt254 m1,
+		Curve * c) {
+	elt254 tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8;
+
+	/* tmp4 = T = L^2 + LZ + aZ^2. */
+	low_sq254(tmp1, z2);
+	low_sq254(tmp2, m2);
+	low_mul254(tmp3, m2, z2);
+	//low_mul_a_2(tmp4, tmp1);
+	types_copy(tmp4, tmp1 + 2);
+	low_add(tmp4 + 2, tmp1, tmp1 + 2);
+	low_add254(tmp4, tmp4, tmp2);
+	low_add254(tmp4, tmp4, tmp3);
+	/* tmp3 = X^2Z^2. */
+	low_sq254(tmp3, x2);
+	low_mul254(tmp3, tmp3, tmp1);
+
+	m1[0] = m1[0] ^ 0x1;
+	m1[2] = m1[2] ^ 0x1;
+	low_mul254(tmp5, tmp1, m1);
+	low_add254(tmp7, tmp5, tmp1);
+	m1[2] = m1[2] ^ 0x1;
+
+	low_add254(tmp5, tmp5, tmp2);
+	low_mul254(tmp5, tmp5, tmp4);
+	low_add254(tmp5, tmp5, tmp3);
+	low_add254(tmp7, tmp7, tmp2);
+	low_mul254(tmp7, tmp7, tmp4);
+	low_add254(tmp7, tmp7, tmp3);
+
+	/* tmp6 = B = (xp * Z^2 + T)^2. */
+	low_mul254(tmp2, x1, tmp1);
+	low_add254(tmp3, tmp2, tmp4);
+	low_sq254(tmp6, tmp3);
+	/* Z3 = A * B * Z^2. */
+	low_mul254(tmp3, tmp1, tmp6);
+	low_mul254(z3, tmp3, tmp5);
+	low_mul254(z4, tmp3, tmp7);
+	/* X3 = A^2 * (xp * Z^2). */
+	low_sq254(tmp1, tmp5);
+	low_mul254(x3, tmp2, tmp1);
+	low_sq254(tmp8, tmp7);
+	low_mul254(x4, tmp2, tmp8);
+	/* L3 = T*(A + B)^2 + (lp+1)*Z3. */
+	low_add254(tmp1, tmp5, tmp6);
+	low_sq254(tmp1, tmp1);
+	low_mul254(tmp1, tmp1, tmp4);
+	low_add254(tmp8, tmp7, tmp6);
+	low_sq254(tmp8, tmp8);
+	low_mul254(tmp8, tmp8, tmp4);
+
+	low_mul254(tmp2, m1, z3);
+	m1[0] = m1[0] ^ 0x1;
+	low_mul254(tmp7, m1, z4);
+
+	low_add254(m3, tmp1, tmp2);
+	low_add254(m4, tmp8, tmp7);
+}
+
+void ec_doub(elt254 x2, elt254 m2, elt254 z2, elt254 x1, elt254 m1, elt254 z1,
+		Curve * c) {
+	elt254 tmp1, tmp2, tmp3, tmp4, tmp5;
+
+	/* [tmp2 = A] = [tmp1 = L(L+Z)] + [tmp5 = a*[tmp3 = Z^2]]. */
+	low_add254(tmp1, z1, m1);
+	low_mul254(tmp1, tmp1, m1);
+	low_sq254(tmp3, z1);
+	//low_mul_a_2(tmp5, tmp3);
+	types_copy(tmp5, tmp3 + 2);
+	low_add(tmp5 + 2, tmp3, tmp3 + 2);
+	low_add254(tmp2, tmp1, tmp5);
+	/* tmp4 = (L + X)^2. */
+	low_add254(tmp4, x1, m1);
+	low_sq254(tmp4, tmp4);
+	/* X2 = A^2. */
+	low_sq254(x2, tmp2);
+	/* Z2 = A * Z^2. */
+	low_mul254(z2, tmp2, tmp3);
+	/* L2 = tmp4 * (tmp4 + tmp1 + (a*Z^2 + Z^2) + (a+1)(Z^4 + Z3) + b*Z^4 + X2. */
+	/* L2 = tmp4 * (tmp4 + tmp2 + Z^2) + (a^2 + b)Z^4 + X2 + (a+1)Z2. */
+	low_add254(tmp5, tmp2, tmp3);
+	low_add254(tmp5, tmp5, tmp4);
+	low_mul254(tmp5, tmp5, tmp4);
+	low_sq254(tmp3, tmp3);
+	low_add254(tmp4, z2, tmp3);
+	types_copy(tmp2 + 2, tmp4);
+	low_mul(tmp3, c->b, tmp3);
+	low_mul(tmp3 + 2, c->b, tmp3 + 2);
+	low_add254(tmp3, tmp3, x2);
+	low_add(tmp2, tmp4, tmp4 + 2);
+	low_add254(tmp3, tmp3, tmp2);
+	low_add254(m2, tmp3, tmp5);
+}

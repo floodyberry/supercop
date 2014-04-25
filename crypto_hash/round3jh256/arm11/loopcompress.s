@@ -148,6 +148,8 @@
 .align 2
 .global _loopcompress
 .global loopcompress
+.type _loopcompress STT_FUNC
+.type loopcompress STT_FUNC
 _loopcompress:
 loopcompress:
 sub sp,sp,#128

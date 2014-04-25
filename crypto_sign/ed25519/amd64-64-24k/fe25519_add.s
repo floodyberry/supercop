@@ -65,13 +65,13 @@
 
 # qhasm:   stack64 caller7_stack
 
-# qhasm: enter crypto_sign_ed25519_amd64_64_24k_batch_fe25519_add
+# qhasm: enter crypto_sign_ed25519_amd64_64_fe25519_add
 .text
 .p2align 5
-.globl _crypto_sign_ed25519_amd64_64_24k_batch_fe25519_add
-.globl crypto_sign_ed25519_amd64_64_24k_batch_fe25519_add
-_crypto_sign_ed25519_amd64_64_24k_batch_fe25519_add:
-crypto_sign_ed25519_amd64_64_24k_batch_fe25519_add:
+.globl _crypto_sign_ed25519_amd64_64_fe25519_add
+.globl crypto_sign_ed25519_amd64_64_fe25519_add
+_crypto_sign_ed25519_amd64_64_fe25519_add:
+crypto_sign_ed25519_amd64_64_fe25519_add:
 mov %rsp,%r11
 and $31,%r11
 add $0,%r11

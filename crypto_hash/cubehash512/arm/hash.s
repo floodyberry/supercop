@@ -186,6 +186,8 @@
 .align 2
 .global _crypto_hash_cubehash512_arm
 .global crypto_hash_cubehash512_arm
+.type _crypto_hash_cubehash512_arm STT_FUNC
+.type crypto_hash_cubehash512_arm STT_FUNC
 _crypto_hash_cubehash512_arm:
 crypto_hash_cubehash512_arm:
 stmfd sp!,{r4,r5,r6,r7,r8,r9,sl,fp,lr}

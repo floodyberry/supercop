@@ -65,6 +65,8 @@
 
 # qhasm: int64 squarer7
 
+# qhasm: int64 squarer8
+
 # qhasm: int64 squarerax
 
 # qhasm: int64 squarerdx
@@ -81,13 +83,13 @@
 
 # qhasm: int64 squarei38
 
-# qhasm: enter crypto_sign_ed25519_amd64_64_24k_batch_fe25519_square
+# qhasm: enter crypto_sign_ed25519_amd64_64_fe25519_square
 .text
 .p2align 5
-.globl _crypto_sign_ed25519_amd64_64_24k_batch_fe25519_square
-.globl crypto_sign_ed25519_amd64_64_24k_batch_fe25519_square
-_crypto_sign_ed25519_amd64_64_24k_batch_fe25519_square:
-crypto_sign_ed25519_amd64_64_24k_batch_fe25519_square:
+.globl _crypto_sign_ed25519_amd64_64_fe25519_square
+.globl crypto_sign_ed25519_amd64_64_fe25519_square
+_crypto_sign_ed25519_amd64_64_fe25519_square:
+crypto_sign_ed25519_amd64_64_fe25519_square:
 mov %rsp,%r11
 and $31,%r11
 add $64,%r11
@@ -423,132 +425,152 @@ adc %rdx,%rcx
 # asm 2: mov  <squarer4=%r11,>squarerax=%rax
 mov  %r11,%rax
 
-# qhasm:   (uint128) squarerdx squarerax = squarerax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   (uint128) squarerdx squarerax = squarerax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? r0 += squarerax
-# asm 1: add  <squarerax=int64#7,<r0=int64#12
-# asm 2: add  <squarerax=%rax,<r0=%r14
-add  %rax,%r14
-
-# qhasm:   carry? r1 += squarerdx + carry
-# asm 1: adc <squarerdx=int64#3,<r1=int64#5
-# asm 2: adc <squarerdx=%rdx,<r1=%r8
-adc %rdx,%r8
-
-# qhasm:   r1 += 0 + carry
-# asm 1: adc $0,<r1=int64#5
-# asm 2: adc $0,<r1=%r8
-adc $0,%r8
+# qhasm:   squarer4 = squarerax
+# asm 1: mov  <squarerax=int64#7,>squarer4=int64#2
+# asm 2: mov  <squarerax=%rax,>squarer4=%rsi
+mov  %rax,%rsi
 
 # qhasm:   squarerax = squarer5
 # asm 1: mov  <squarer5=int64#10,>squarerax=int64#7
 # asm 2: mov  <squarer5=%r12,>squarerax=%rax
 mov  %r12,%rax
 
-# qhasm:   (uint128) squarerdx squarerax = squarerax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   squarer5 = squarerdx
+# asm 1: mov  <squarerdx=int64#3,>squarer5=int64#9
+# asm 2: mov  <squarerdx=%rdx,>squarer5=%r11
+mov  %rdx,%r11
 
-# qhasm:   carry? r1 += squarerax
-# asm 1: add  <squarerax=int64#7,<r1=int64#5
-# asm 2: add  <squarerax=%rax,<r1=%r8
-add  %rax,%r8
+# qhasm:   (uint128) squarerdx squarerax = squarerax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   carry? r2 += squarerdx + carry
-# asm 1: adc <squarerdx=int64#3,<r2=int64#6
-# asm 2: adc <squarerdx=%rdx,<r2=%r9
-adc %rdx,%r9
-
-# qhasm:   r2 += 0 + carry
-# asm 1: adc $0,<r2=int64#6
-# asm 2: adc $0,<r2=%r9
-adc $0,%r9
+# qhasm:   carry? squarer5 += squarerax
+# asm 1: add  <squarerax=int64#7,<squarer5=int64#9
+# asm 2: add  <squarerax=%rax,<squarer5=%r11
+add  %rax,%r11
 
 # qhasm:   squarerax = squarer6
 # asm 1: mov  <squarer6=int64#11,>squarerax=int64#7
 # asm 2: mov  <squarer6=%r13,>squarerax=%rax
 mov  %r13,%rax
 
-# qhasm:   (uint128) squarerdx squarerax = squarerax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   squarer6 = 0
+# asm 1: mov  $0,>squarer6=int64#10
+# asm 2: mov  $0,>squarer6=%r12
+mov  $0,%r12
 
-# qhasm:   carry? r2 += squarerax
-# asm 1: add  <squarerax=int64#7,<r2=int64#6
-# asm 2: add  <squarerax=%rax,<r2=%r9
-add  %rax,%r9
+# qhasm:   squarer6 += squarerdx + carry
+# asm 1: adc <squarerdx=int64#3,<squarer6=int64#10
+# asm 2: adc <squarerdx=%rdx,<squarer6=%r12
+adc %rdx,%r12
 
-# qhasm:   carry? r3 += squarerdx + carry
-# asm 1: adc <squarerdx=int64#3,<r3=int64#8
-# asm 2: adc <squarerdx=%rdx,<r3=%r10
-adc %rdx,%r10
+# qhasm:   (uint128) squarerdx squarerax = squarerax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   r3 += 0 + carry
-# asm 1: adc $0,<r3=int64#8
-# asm 2: adc $0,<r3=%r10
-adc $0,%r10
+# qhasm:   carry? squarer6 += squarerax
+# asm 1: add  <squarerax=int64#7,<squarer6=int64#10
+# asm 2: add  <squarerax=%rax,<squarer6=%r12
+add  %rax,%r12
 
 # qhasm:   squarerax = squarer7
 # asm 1: mov  <squarer7=int64#4,>squarerax=int64#7
 # asm 2: mov  <squarer7=%rcx,>squarerax=%rax
 mov  %rcx,%rax
 
-# qhasm:   (uint128) squarerdx squarerax = squarerax * *(uint64 *)&crypto_sign_ed25519_amd64_64_24k_batch_38
-mulq  crypto_sign_ed25519_amd64_64_24k_batch_38
+# qhasm:   squarer7 = 0
+# asm 1: mov  $0,>squarer7=int64#4
+# asm 2: mov  $0,>squarer7=%rcx
+mov  $0,%rcx
 
-# qhasm:   carry? r3 += squarerax
-# asm 1: add  <squarerax=int64#7,<r3=int64#8
-# asm 2: add  <squarerax=%rax,<r3=%r10
-add  %rax,%r10
+# qhasm:   squarer7 += squarerdx + carry
+# asm 1: adc <squarerdx=int64#3,<squarer7=int64#4
+# asm 2: adc <squarerdx=%rdx,<squarer7=%rcx
+adc %rdx,%rcx
 
-# qhasm:   squarer4 = 0
-# asm 1: mov  $0,>squarer4=int64#2
-# asm 2: mov  $0,>squarer4=%rsi
-mov  $0,%rsi
+# qhasm:   (uint128) squarerdx squarerax = squarerax * *(uint64 *)&crypto_sign_ed25519_amd64_64_38
+mulq  crypto_sign_ed25519_amd64_64_38
 
-# qhasm:   squarer4 += squarerdx + carry
-# asm 1: adc <squarerdx=int64#3,<squarer4=int64#2
-# asm 2: adc <squarerdx=%rdx,<squarer4=%rsi
-adc %rdx,%rsi
+# qhasm:   carry? squarer7 += squarerax
+# asm 1: add  <squarerax=int64#7,<squarer7=int64#4
+# asm 2: add  <squarerax=%rax,<squarer7=%rcx
+add  %rax,%rcx
 
-# qhasm:   squarer4 *= 38
-# asm 1: imulq  $38,<squarer4=int64#2,>squarer4=int64#2
-# asm 2: imulq  $38,<squarer4=%rsi,>squarer4=%rsi
-imulq  $38,%rsi,%rsi
+# qhasm:   squarer8 = 0
+# asm 1: mov  $0,>squarer8=int64#7
+# asm 2: mov  $0,>squarer8=%rax
+mov  $0,%rax
+
+# qhasm:   squarer8 += squarerdx + carry
+# asm 1: adc <squarerdx=int64#3,<squarer8=int64#7
+# asm 2: adc <squarerdx=%rdx,<squarer8=%rax
+adc %rdx,%rax
 
 # qhasm:   carry? r0 += squarer4
 # asm 1: add  <squarer4=int64#2,<r0=int64#12
 # asm 2: add  <squarer4=%rsi,<r0=%r14
 add  %rsi,%r14
 
-# qhasm:   carry? r1 += 0 + carry
-# asm 1: adc $0,<r1=int64#5
-# asm 2: adc $0,<r1=%r8
-adc $0,%r8
+# qhasm:   carry? r1 += squarer5 + carry
+# asm 1: adc <squarer5=int64#9,<r1=int64#5
+# asm 2: adc <squarer5=%r11,<r1=%r8
+adc %r11,%r8
 
-# qhasm:   carry? r2 += 0 + carry
-# asm 1: adc $0,<r2=int64#6
-# asm 2: adc $0,<r2=%r9
-adc $0,%r9
+# qhasm:   carry? r2 += squarer6 + carry
+# asm 1: adc <squarer6=int64#10,<r2=int64#6
+# asm 2: adc <squarer6=%r12,<r2=%r9
+adc %r12,%r9
 
-# qhasm:   carry? r3 += 0 + carry
-# asm 1: adc $0,<r3=int64#8
-# asm 2: adc $0,<r3=%r10
-adc $0,%r10
+# qhasm:   carry? r3 += squarer7 + carry
+# asm 1: adc <squarer7=int64#4,<r3=int64#8
+# asm 2: adc <squarer7=%rcx,<r3=%r10
+adc %rcx,%r10
 
 # qhasm:   squarezero = 0
 # asm 1: mov  $0,>squarezero=int64#2
 # asm 2: mov  $0,>squarezero=%rsi
 mov  $0,%rsi
 
-# qhasm:   squarei38 = 38
-# asm 1: mov  $38,>squarei38=int64#3
-# asm 2: mov  $38,>squarei38=%rdx
-mov  $38,%rdx
+# qhasm:   squarer8 += squarezero + carry
+# asm 1: adc <squarezero=int64#2,<squarer8=int64#7
+# asm 2: adc <squarezero=%rsi,<squarer8=%rax
+adc %rsi,%rax
 
-# qhasm:   squarezero = squarei38 if carry
-# asm 1: cmovc <squarei38=int64#3,<squarezero=int64#2
-# asm 2: cmovc <squarei38=%rdx,<squarezero=%rsi
-cmovc %rdx,%rsi
+# qhasm:   squarer8 *= 38
+# asm 1: imulq  $38,<squarer8=int64#7,>squarer8=int64#3
+# asm 2: imulq  $38,<squarer8=%rax,>squarer8=%rdx
+imulq  $38,%rax,%rdx
+
+# qhasm:   carry? r0 += squarer8
+# asm 1: add  <squarer8=int64#3,<r0=int64#12
+# asm 2: add  <squarer8=%rdx,<r0=%r14
+add  %rdx,%r14
+
+# qhasm:   carry? r1 += squarezero + carry
+# asm 1: adc <squarezero=int64#2,<r1=int64#5
+# asm 2: adc <squarezero=%rsi,<r1=%r8
+adc %rsi,%r8
+
+# qhasm:   carry? r2 += squarezero + carry
+# asm 1: adc <squarezero=int64#2,<r2=int64#6
+# asm 2: adc <squarezero=%rsi,<r2=%r9
+adc %rsi,%r9
+
+# qhasm:   carry? r3 += squarezero + carry
+# asm 1: adc <squarezero=int64#2,<r3=int64#8
+# asm 2: adc <squarezero=%rsi,<r3=%r10
+adc %rsi,%r10
+
+# qhasm:   squarezero += squarezero + carry
+# asm 1: adc <squarezero=int64#2,<squarezero=int64#2
+# asm 2: adc <squarezero=%rsi,<squarezero=%rsi
+adc %rsi,%rsi
+
+# qhasm:   squarezero *= 38
+# asm 1: imulq  $38,<squarezero=int64#2,>squarezero=int64#2
+# asm 2: imulq  $38,<squarezero=%rsi,>squarezero=%rsi
+imulq  $38,%rsi,%rsi
 
 # qhasm:   r0 += squarezero
 # asm 1: add  <squarezero=int64#2,<r0=int64#12
