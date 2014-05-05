@@ -309,7 +309,7 @@ do
 	    do
 	      if [ "$ok" = 1 ]
 	      then
-		$compiler \
+		$compiler -DSUPERCOP \
 		  -I. -I"$include" -I"$include/$abi" \
 		  -c "$f" >../errors 2>&1 || ok=0
 		( if [ `wc -l < ../errors` -lt 25 ]
@@ -333,7 +333,7 @@ do
 	    ranlib "$op.a"
 
 	    killafter 300 \
-	    $compiler -DSMALL \
+	    $compiler -DSUPERCOP -DSMALL \
 	      -I. -I"$include" -I"$include/$abi" \
 	      -o try try.$language try-anything.$language \
 	      "$op.a" $libs >../errors 2>&1 || ok=0
@@ -367,7 +367,7 @@ do
 	    && continue
 
 	    killafter 300 \
-	    $compiler \
+	    $compiler -DSUPERCOP \
 	      -I. -I"$include" -I"$include/$abi" \
 	      -o try try.$language try-anything.$language \
 	      "$op.a" $libs >../errors 2>&1 || ok=0

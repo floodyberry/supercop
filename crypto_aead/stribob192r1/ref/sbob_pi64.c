@@ -1,20 +1,20 @@
 // sbob_pi64.c
-// 06-Feb-14  Markku-Juhani O. Saarinen <mjos@iki.fi>
+// 28-Apr-14  Markku-Juhani O. Saarinen <mjos@iki.fi>
 
-// Reference 64-bit GCC version of the StriBob Pi permutation.
-// Released under CC0: This software is in Public Domain. See LICENSE
+// Reference 64-bit GCC version
 
 #include "stribob.h"
 
-// sbtab64.c
+// sbob_tab64.c
 extern const uint64_t sbob_sl64[8][256];
 extern const uint64_t sbob_rc64[12][8];
 
-// 64-bit version
-void sbob_pi(sbob_w512 *s512)
+// 64-bit ANSI C version
+
+void sbob_pi(w512_t *s512)
 {
     int i, r;
-    sbob_w512 t;                        // temporary
+    w512_t t;                           // temporary
 
     for (r = 0; r < 12; r++) {          // 12 rounds
 
@@ -32,5 +32,8 @@ void sbob_pi(sbob_w512 *s512)
                         sbob_sl64[7][t.b[i + 56]];
         }
     }
+
+    // clearing t deemed unnecessary
 }
+
 

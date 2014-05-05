@@ -1,0 +1,31 @@
+# Makefile.8bit
+# 03-May-14 	Markku-Juhani O. Saarinen <mjos@iki.fi>
+
+BIN	= xsbob
+
+OBJS	= testmain.o \
+	8bit/encrypt.o \
+	8bit/stribob.o \
+	8bit/sbob_pi8.o
+	
+DIST 	= stribob192r1
+
+CC	= gcc
+CFLAGS 	= -Wall -O2
+LIBS 	=
+LDFLAGS =
+INCS	= -I8bit
+
+$(BIN):	$(OBJS)
+	$(CC) $(LDFLAGS) -o $(BIN) $(OBJS) $(LIBS)
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
+
+clean:
+	rm -rf $(DIST)-*.tgz $(OBJS) $(BIN) *~ 
+
+dist:	clean
+	cd ../..; \
+	tar cfvz crypto_aead/$(DIST)/$(DIST)-`date "+%Y%m%d%H%M00"`.tgz \
+		crypto_aead/$(DIST)/*

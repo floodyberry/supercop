@@ -51,6 +51,7 @@ void measure(void)
   unsigned long long mlen;
   unsigned long long adlen;
   unsigned long long clen;
+  unsigned long long tlen;
 
   for (loop = 0;loop < LOOPS;++loop) {
     for (direction = 0;direction < 3;++direction) {
@@ -75,7 +76,7 @@ void measure(void)
         printentry(1000000 * adlen + mlen,"encrypt_cycles",cycles,TIMINGS);
         for (i = 0;i <= TIMINGS;++i) {
           cycles[i] = cpucycles();
-          crypto_aead_decrypt(m,&mlen,nsec,c,clen,ad,adlen,npub,k);
+          crypto_aead_decrypt(m,&tlen,nsec,c,clen,ad,adlen,npub,k);
         }
         for (i = 0;i < TIMINGS;++i) cycles[i] = cycles[i + 1] - cycles[i];
         printentry(1000000 * adlen + mlen,"decrypt_cycles",cycles,TIMINGS);
@@ -83,7 +84,7 @@ void measure(void)
           ++c[clen - 1];
           for (i = 0;i <= TIMINGS;++i) {
             cycles[i] = cpucycles();
-            crypto_aead_decrypt(m,&mlen,nsec,c,clen,ad,adlen,npub,k);
+            crypto_aead_decrypt(m,&tlen,nsec,c,clen,ad,adlen,npub,k);
           }
           for (i = 0;i < TIMINGS;++i) cycles[i] = cycles[i + 1] - cycles[i];
           printentry(1000000 * adlen + mlen,"forgery_decrypt_cycles",cycles,TIMINGS);

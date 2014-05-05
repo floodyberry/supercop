@@ -1,3 +1,5 @@
+#include "crypto_aead.h"
+
 # SSE2 version made by Rune E. Jensen
 # Version 1
 # CRYPTO_KEYBYTES 32

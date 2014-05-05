@@ -1,5 +1,5 @@
 /*
- * crypto_verify/try.c version 20140420
+ * crypto_verify/try.c version 20140502
  * D. J. Bernstein
  * Public domain.
  */
@@ -7,6 +7,12 @@
 #include "crypto_verify.h"
 #include "randombytes.h"
 #include "try.h"
+
+#ifdef SMALL
+#define LOOPS 10000
+#else
+#define LOOPS 1000000
+#endif
 
 const char *primitiveimplementation = crypto_verify_IMPLEMENTATION;
 
@@ -48,7 +54,7 @@ void test(void)
 {
   long long tests;
 
-  for (tests = 0;tests < 1000000;++tests) {
+  for (tests = 0;tests < LOOPS;++tests) {
     randombytes(x,crypto_verify_BYTES);
     randombytes(y,crypto_verify_BYTES);
     check();

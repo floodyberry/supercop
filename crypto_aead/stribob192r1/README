@@ -1,0 +1,81 @@
+readme.txt
+----------
+
+For the stribob192r1 reference implementation.
+11-Mar-14  Markku-Juhani O. Saarinen <mjos@iki.fi>
+
+
+The directory structure is mandated by the CAESAR call for algorithms.
+Under crypto_aead/stribob192r1 we have the Makefile, independent test 
+driver, and this file:
+
+    Makefile
+    Makefile.xmm
+    Makefile.8bit
+    testmain.c
+    README
+
+
+Reference implementation and glue for CAESAR api:
+
+    ref/api.h
+    ref/crypto_aead.h
+    ref/stribob.h
+    ref/stribob.c
+    ref/encrypt.c
+    ref/sbob_pi64.c
+    ref/sbob_tab64.c
+
+
+To build and test the reference implementation:
+
+    $ make
+    gcc -Wall -O2  -Iref -c testmain.c -o testmain.o
+    gcc -Wall -O2  -Iref -c ref/encrypt.c -o ref/encrypt.o
+    gcc -Wall -O2  -Iref -c ref/stribob.c -o ref/stribob.o
+    gcc -Wall -O2  -Iref -c ref/sbob_tab64.c -o ref/sbob_tab64.o
+    gcc -Wall -O2  -Iref -c ref/sbob_pi64.c -o ref/sbob_pi64.o
+    gcc  -o xsbob testmain.o ref/encrypt.o ref/stribob.o ref/sbob_tab64.o 
+    ref/sbob_pi64.o  
+
+    $ ./xsbob 
+    sbob_selftest() PASS
+    632098.88 kB/s (1024000kB/1.62s)
+    $ 
+
+
+VARIANTS:
+
+If you have SSE 4.1 or later you can use the XMM optimized 128-bit version:
+
+	$ make -f Makefile.xmm
+	gcc -Wall -Ofast -march=native -Ixmm -c testmain.c -o testmain.o
+	gcc -Wall -Ofast -march=native -Ixmm -c xmm/encrypt.c -o xmm/encrypt.o
+	gcc -Wall -Ofast -march=native -Ixmm -c xmm/stribob.c -o xmm/stribob.o
+	gcc -Wall -Ofast -march=native -Ixmm -c xmm/sbob_tab64.c -o xmm/sbob_tab64.o
+	gcc -Wall -Ofast -march=native -Ixmm -c xmm/sbob_pi64xmm.c -o xmm/sbob_pi64xmm.o
+	gcc  -o xsbob testmain.o xmm/encrypt.o xmm/stribob.o xmm/sbob_tab64.o xmm/sbob_pi64xmm.o 
+
+	$ ./xsbob 
+	sbob_selftest() PASS
+	1187665.00 kB/s (2048000kB/1.72439s)
+	$
+
+
+There's also a *SLOW* 8-bit version available.
+
+	$ make -f Makefile.8bit
+	gcc -Wall -O2 -I8bit -c testmain.c -o testmain.o
+	gcc -Wall -O2 -I8bit -c 8bit/encrypt.c -o 8bit/encrypt.o
+	gcc -Wall -O2 -I8bit -c 8bit/stribob.c -o 8bit/stribob.o
+	gcc -Wall -O2 -I8bit -c 8bit/sbob_pi8.c -o 8bit/sbob_pi8.o
+	gcc  -o xsbob testmain.o 8bit/encrypt.o 8bit/stribob.o 8bit/sbob_pi8.o 
+
+	$ ./xsbob 
+	sbob_selftest() PASS
+	37078.40 kB/s (64000kB/1.72607s)
+
+
+Cheers,
+- markku
+

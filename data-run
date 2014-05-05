@@ -397,7 +397,7 @@ do
             then
 	      (
                 killafter 300 \
-		$compiler \
+		$compiler -DSUPERCOP \
                   -I. -I"$top/$abi/include" \
                   -c "$f" 2>&1 || rm -f OK
 	      ) | awk -v PREFIX="$version $shorthostname $abi $startdate $o $p fromcompiler $implementationdir $compilerword $f" '
@@ -415,7 +415,7 @@ do
   
 	  (
             killafter 300 \
-            $compiler -DSMALL \
+            $compiler -DSUPERCOP -DSMALL \
               -I. -I"$top/$abi/include" \
               -o try try.$language try-anything.$language \
               "$op.a" $libs 2>&1 || rm -f OK
@@ -451,7 +451,7 @@ do
 
 	  (
             killafter 300 \
-            $compiler \
+            $compiler -DSUPERCOP \
               -I. -I"$top/$abi/include" \
               -o try try.$language try-anything.$language \
               "$op.a" $libs 2>&1 || rm -f OK

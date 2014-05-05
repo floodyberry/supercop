@@ -1,6 +1,5 @@
 // testmain.c
 // 07-Feb-14  Markku-Juhani O. Saarinen <mjos@cblnk.com>
-// Released under CC0: This software is in Public Domain. See LICENSE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -92,7 +91,7 @@ int sbob_selftest()
     sbob_clr(&sb);
     for (i = 0; i < 64; i++)
         sb.s.b[i] = i;
-
+        
     sbob_pi(&sb.s);
     for (i = 0; i < 64; i++) {
         if (sb.s.b[i] != pivec[i])
