@@ -1,6 +1,6 @@
-#include "crypto_aead.h"
 #include <string.h>
 #include <stdint.h>
+#include "crypto_aead.h"
 
 #ifdef _MSC_VER
 #define inline __inline
@@ -27,7 +27,7 @@ void printm(uint64_t state[][4])
 }
 */
 
-static inline void morus_stateupdate(const uint64_t* msgblk, uint64_t state[][4])   // call it as fun(state)
+static inline void morus_stateupdate(const uint64_t* msgblk, uint64_t state[][4])
 {
         uint64_t temp;
 
@@ -132,7 +132,7 @@ int morus_tag_verification(uint64_t msglen, uint64_t adlen, const uint8_t *c, ui
 	//in this program, the mac length is assumed to be a multiple of bytes
 	//verification
 	for (i = 0; i  < 16; i++) check |= (c[msglen + i] ^ ((uint8_t *)state[1])[i]);
-	if (0 == check) return 0; 
+	if (0 == check) return 0;
 	else return -1;
 
 }
@@ -179,7 +179,8 @@ void morus_enc_aut_partialblock(const uint8_t *plaintext,
         ((uint64_t*)ciphertextblock)[1] = ((uint64_t*)plaintextblock)[1] ^ state[0][1] ^ state[1][2] ^ (state[2][1] & state[3][1]);
         ((uint64_t*)ciphertextblock)[2] = ((uint64_t*)plaintextblock)[2] ^ state[0][2] ^ state[1][3] ^ (state[2][2] & state[3][2]);
         ((uint64_t*)ciphertextblock)[3] = ((uint64_t*)plaintextblock)[3] ^ state[0][3] ^ state[1][0] ^ (state[2][3] & state[3][3]);
-		memcpy(ciphertext, ciphertextblock, len);
+	
+        memcpy(ciphertext, ciphertextblock, len);
 
         morus_stateupdate(((uint64_t*)plaintextblock), state);
 }
@@ -191,8 +192,7 @@ void morus_dec_aut_partialblock(uint8_t *plaintext,
 {
         uint8_t plaintextblock[32], ciphertextblock[32];
 
-        //memset(plaintextblock, 0, 32);
-		memset(plaintext, 0, 32);
+        memset(ciphertextblock, 0, 32);
         memcpy(ciphertextblock, ciphertext, len);
 
         //decryption
@@ -201,9 +201,11 @@ void morus_dec_aut_partialblock(uint8_t *plaintext,
         ((uint64_t*)plaintextblock)[2] = ((uint64_t*)ciphertextblock)[2] ^ state[0][2] ^ state[1][3] ^ (state[2][2] & state[3][2]);
         ((uint64_t*)plaintextblock)[3] = ((uint64_t*)ciphertextblock)[3] ^ state[0][3] ^ state[1][0] ^ (state[2][3] & state[3][3]);
 
-		memcpy(plaintext, plaintextblock, len);
-
-        morus_stateupdate(((uint64_t*)plaintext), state);
+	memcpy(plaintext, plaintextblock, len);
+        memset(plaintextblock, 0, 32);
+	memcpy(plaintextblock, plaintext, len);
+   
+        morus_stateupdate(((uint64_t*)plaintextblock), state);
 }
 
 
@@ -249,8 +251,8 @@ int crypto_aead_encrypt(
 
         //finalization stage, we assume that the tag length is a multiple of bytes
         morus_tag_generation(mlen, adlen, c, morus_state);
-		*clen = mlen + 16; 
-		return 0;
+	*clen = mlen + 16;
+	return 0;
 }
 
 
@@ -269,6 +271,8 @@ int crypto_aead_decrypt(
         uint8_t check = 0;
         uint64_t  morus_state[5][4];
 
+        if (clen < 16) return -1; 
+
         morus_initialization(k, npub, morus_state);
 
         //process the associated data
@@ -285,7 +289,7 @@ int crypto_aead_decrypt(
         }
 
         // decrypt the ciphertext
-		*mlen = clen - 16; 
+	*mlen = clen - 16;
         for (i = 0; (i+32) <= *mlen; i += 32)
         {
               morus_dec_aut_step(m+i, c+i, morus_state);
@@ -298,7 +302,7 @@ int crypto_aead_decrypt(
         }
 
         // we assume that the tag length is a multiple of bytes
-		// verification
+	// verification
         return morus_tag_verification(*mlen, adlen, c, morus_state);
 }
 

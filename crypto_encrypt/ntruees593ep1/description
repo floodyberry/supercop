@@ -1,0 +1,3 @@
+CCA-2 secure product-form NTRU public-key encryption with 192-bit equivalent security.
+Relevant parameters: N=593, q=2048, maximum message length = 86 bytes.
+Hybrid encryption with Salsa20 and SHA-256.

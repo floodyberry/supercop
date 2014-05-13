@@ -1,0 +1,208 @@
+#define enc(a,b) _mm_aesenc_si128(a,b) 
+#define dec(a,b) _mm_aesdec_si128(a,b) 
+#define dec_last(a,b) _mm_aesdeclast_si128(a,b) 
+#define mc_inv(a)     _mm_aesimc_si128(a)
+#define xor(a,b) _mm_xor_si128(a,b) 
+#define and(a,b) _mm_and_si128(a,b)
+#define permute(a,b) _mm_shuffle_epi8(a,b) 
+#define add8(a,b)  _mm_add_epi8  (a,b)
+#define add64(a,b) _mm_add_epi64 (a,b)
+#define load(p)       _mm_load_si128((__m128i *)(p))
+#define store(p,x)    _mm_store_si128((__m128i *)(p), (x))
+#define constant8(b15,b14,b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0)   _mm_set_epi8 ((b0),(b1),(b2),(b3),(b4),(b5),(b6),(b7),(b8),(b9),(b10),(b11),(b12),(b13),(b14),(b15))
+#define constant32(b3,b2,b1,b0)   	_mm_set_epi32((b0),(b1),(b2),(b3))
+#define constant64(b1,b0)   		_mm_set_epi64((b0),(b1))
+
+
+
+#define TIMES2( key, new_key ) \
+  msbits = _mm_andnot_si128 (key, msb_mask);  \
+  multi_mask = _mm_or_si128( msbits, trivial_permutation);  \
+  rot_cons = _mm_shuffle_epi8( simply_1b, multi_mask);  \
+  tmp = _mm_slli_epi32( key, 1 );\
+  tmp = _mm_and_si128 ( tmp, kill_shift );  \
+  new_key = xor( tmp, rot_cons); 
+ 
+#define ONE_KEY_ROUND(key, new_key)\
+  TIMES2( key, new_key );\
+  new_key = permute( new_key, H_PERMUTATION);
+
+#define TWEAKEY_SCHEDULE2( subkeys, ts, key)\
+  subkeys[0] = _mm_loadu_si128((__m128i*)key); 	ts[ 0] = xor( subkeys[ 0], RCONS[ 0] ); \
+  ONE_KEY_ROUND( subkeys[ 0], subkeys[ 1] );	ts[ 1] = xor( subkeys[ 1], RCONS[ 1] ); \
+  ONE_KEY_ROUND( subkeys[ 1], subkeys[ 2] );	ts[ 2] = xor( subkeys[ 2], RCONS[ 2] ); \
+  ONE_KEY_ROUND( subkeys[ 2], subkeys[ 3] );	ts[ 3] = xor( subkeys[ 3], RCONS[ 3] ); \
+  ONE_KEY_ROUND( subkeys[ 3], subkeys[ 4] );	ts[ 4] = xor( subkeys[ 4], RCONS[ 4] ); \
+  ONE_KEY_ROUND( subkeys[ 4], subkeys[ 5] );	ts[ 5] = xor( subkeys[ 5], RCONS[ 5] ); \
+  ONE_KEY_ROUND( subkeys[ 5], subkeys[ 6] );	ts[ 6] = xor( subkeys[ 6], RCONS[ 6] ); \
+  ONE_KEY_ROUND( subkeys[ 6], subkeys[ 7] );	ts[ 7] = xor( subkeys[ 7], RCONS[ 7] ); \
+  ONE_KEY_ROUND( subkeys[ 7], subkeys[ 8] );	ts[ 8] = xor( subkeys[ 8], RCONS[ 8] ); \
+  ONE_KEY_ROUND( subkeys[ 8], subkeys[ 9] );	ts[ 9] = xor( subkeys[ 9], RCONS[ 9] ); \
+  ONE_KEY_ROUND( subkeys[ 9], subkeys[10] );	ts[10] = xor( subkeys[10], RCONS[10] ); \
+  ONE_KEY_ROUND( subkeys[10], subkeys[11] );	ts[11] = xor( subkeys[11], RCONS[11] ); \
+  ONE_KEY_ROUND( subkeys[11], subkeys[12] );	ts[12] = xor( subkeys[12], RCONS[12] ); \
+  ONE_KEY_ROUND( subkeys[12], subkeys[13] );	ts[13] = xor( subkeys[13], RCONS[13] ); \
+  ONE_KEY_ROUND( subkeys[13], subkeys[14] );	ts[14] = xor( subkeys[14], RCONS[14] ); \
+
+#define TWEAKEY_SCHEDULE2_INVERSE( subkeys, dsubkeys )\
+  dsubkeys[ 0] =        subkeys[14];\
+  dsubkeys[ 1] = mc_inv(subkeys[13]);\
+  dsubkeys[ 2] = mc_inv(subkeys[12]);\
+  dsubkeys[ 3] = mc_inv(subkeys[11]);\
+  dsubkeys[ 4] = mc_inv(subkeys[10]);\
+  dsubkeys[ 5] = mc_inv(subkeys[ 9]);\
+  dsubkeys[ 6] = mc_inv(subkeys[ 8]);\
+  dsubkeys[ 7] = mc_inv(subkeys[ 7]);\
+  dsubkeys[ 8] = mc_inv(subkeys[ 6]);\
+  dsubkeys[ 9] = mc_inv(subkeys[ 5]);\
+  dsubkeys[10] = mc_inv(subkeys[ 4]);\
+  dsubkeys[11] = mc_inv(subkeys[ 3]);\
+  dsubkeys[12] = mc_inv(subkeys[ 2]);\
+  dsubkeys[13] = mc_inv(subkeys[ 1]);\
+  dsubkeys[14] =        subkeys[ 0];
+
+
+// Tweakable AES
+#define AES( s , subkeys , realtweak, t)\
+t = realtweak;\
+s = xor( s , xor( subkeys[ 0] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 1] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 2] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 3] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 4] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 5] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 6] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 7] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 8] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 9] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[10] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[11] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[12] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[13] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[14] , t ) );
+
+
+// Tweakable AES decryption
+#define AES_DEC( s , subkeys , realtweak, t)\
+t = realtweak;t=permute( t , H_PERMUTATION_14);\
+s = xor( s , xor( subkeys[ 0] , t ) );t=permute( t , H_PERMUTATION_INV);\
+s = mc_inv(s);\
+s = dec( s , xor( subkeys[ 1] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 2] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 3] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 4] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 5] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 6] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 7] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 8] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 9] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[10] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[11] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[12] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[13] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec_last( s , xor( subkeys[14] , t ) );
+
+
+
+
+// XOR of the same subkey and 8 different tweaks to 8 different states
+#define ONE_XOR( s, subkey, tweak )\
+tmp = xor(subkey, tweak );\
+s[0] = xor( s[0] , tmp ); \
+s[1] = xor( s[1] , xor(tmp , tw_c[0][1]) );\
+s[2] = xor( s[2] , xor(tmp , tw_c[0][2]) );\
+s[3] = xor( s[3] , xor(tmp , tw_c[0][3]) ); \
+s[4] = xor( s[4] , xor(tmp , tw_c[0][4]) ); \
+s[5] = xor( s[5] , xor(tmp , tw_c[0][5]) ); \
+s[6] = xor( s[6] , xor(tmp , tw_c[0][6]) ); \
+s[7] = xor( s[7] , xor(tmp , tw_c[0][7]) );\
+tweak=permute( tweak , H_PERMUTATION);
+
+
+
+#define ONE_XOR_DEC( s, subkey, tweak )\
+tmp = xor(subkey, tweak );\
+tweak=permute( tweak , H_PERMUTATION_INV);\
+tmp_tweak = mc_inv(tweak);\
+s[0] = xor( s[0] , tmp ); 		    s[0] = mc_inv(s[0]);\
+s[1] = xor( s[1] , xor(tmp , tw_c[14][1]) );s[1] = mc_inv(s[1]); \
+s[2] = xor( s[2] , xor(tmp , tw_c[14][2]) );s[2] = mc_inv(s[2]); \
+s[3] = xor( s[3] , xor(tmp , tw_c[14][3]) );s[3] = mc_inv(s[3]); \
+s[4] = xor( s[4] , xor(tmp , tw_c[14][4]) );s[4] = mc_inv(s[4]); \
+s[5] = xor( s[5] , xor(tmp , tw_c[14][5]) );s[5] = mc_inv(s[5]); \
+s[6] = xor( s[6] , xor(tmp , tw_c[14][6]) );s[6] = mc_inv(s[6]); \
+s[7] = xor( s[7] , xor(tmp , tw_c[14][7]) );s[7] = mc_inv(s[7]); \
+
+// One AES round with the same subkey and 8 different tweaks
+#define ONE_ROUND( s, subkey, tweak , Round )\
+tmp = xor(subkey, tweak );\
+s[0] = enc( s[0] , tmp );\
+s[1] = enc( s[1] , xor(tmp, tw_c[Round][1] ) );\
+s[2] = enc( s[2] , xor(tmp, tw_c[Round][2] ) );\
+s[3] = enc( s[3] , xor(tmp, tw_c[Round][3] ) );\
+s[4] = enc( s[4] , xor(tmp, tw_c[Round][4] ) );\
+s[5] = enc( s[5] , xor(tmp, tw_c[Round][5] ) );\
+s[6] = enc( s[6] , xor(tmp, tw_c[Round][6] ) );\
+s[7] = enc( s[7] , xor(tmp, tw_c[Round][7] ) );\
+tweak=permute( tweak , H_PERMUTATION);
+
+#define ONE_ROUND_DEC( s, subkey, tweak , Round )\
+tmp = xor(subkey, tmp_tweak );\
+tweak=permute( tweak , H_PERMUTATION_INV);\
+tmp_tweak = mc_inv(tweak);\
+s[0] = dec( s[0] , tmp );\
+s[1] = dec( s[1] , xor(tmp, tw_c_inv[Round][1] ) );\
+s[2] = dec( s[2] , xor(tmp, tw_c_inv[Round][2] ) );\
+s[3] = dec( s[3] , xor(tmp, tw_c_inv[Round][3] ) );\
+s[4] = dec( s[4] , xor(tmp, tw_c_inv[Round][4] ) );\
+s[5] = dec( s[5] , xor(tmp, tw_c_inv[Round][5] ) );\
+s[6] = dec( s[6] , xor(tmp, tw_c_inv[Round][6] ) );\
+s[7] = dec( s[7] , xor(tmp, tw_c_inv[Round][7] ) );
+
+#define ONE_ROUND_DEC_LAST( s, subkey, tweak )\
+tmp = xor(subkey, tweak );\
+s[0] = dec_last( s[0] , tmp );\
+s[1] = dec_last( s[1] , xor(tmp, tw_c[0][1] ) );\
+s[2] = dec_last( s[2] , xor(tmp, tw_c[0][2] ) );\
+s[3] = dec_last( s[3] , xor(tmp, tw_c[0][3] ) );\
+s[4] = dec_last( s[4] , xor(tmp, tw_c[0][4] ) );\
+s[5] = dec_last( s[5] , xor(tmp, tw_c[0][5] ) );\
+s[6] = dec_last( s[6] , xor(tmp, tw_c[0][6] ) );\
+s[7] = dec_last( s[7] , xor(tmp, tw_c[0][7] ) );
+
+
+#define AES8( states, subkeys , tweak ) \
+  ONE_XOR  ( states , subkeys[ 0] , tweak );\
+  ONE_ROUND( states , subkeys[ 1] , tweak ,  1 );\
+  ONE_ROUND( states , subkeys[ 2] , tweak ,  2 );\
+  ONE_ROUND( states , subkeys[ 3] , tweak ,  3 );\
+  ONE_ROUND( states , subkeys[ 4] , tweak ,  4 );\
+  ONE_ROUND( states , subkeys[ 5] , tweak ,  5 );\
+  ONE_ROUND( states , subkeys[ 6] , tweak ,  6 );\
+  ONE_ROUND( states , subkeys[ 7] , tweak ,  7 );\
+  ONE_ROUND( states , subkeys[ 8] , tweak ,  8 );\
+  ONE_ROUND( states , subkeys[ 9] , tweak ,  9 );\
+  ONE_ROUND( states , subkeys[10] , tweak , 10 );\
+  ONE_ROUND( states , subkeys[11] , tweak , 11 );\
+  ONE_ROUND( states , subkeys[12] , tweak , 12 );\
+  ONE_ROUND( states , subkeys[13] , tweak , 13 );\
+  ONE_ROUND( states , subkeys[14] , tweak , 14 );
+  
+#define AES8_DEC( states, subkeys , tweak ) \
+  ONE_XOR_DEC   ( states , subkeys[ 0] , tweak );\
+  ONE_ROUND_DEC ( states , subkeys[ 1] , tweak , 13);\
+  ONE_ROUND_DEC ( states , subkeys[ 2] , tweak , 12);\
+  ONE_ROUND_DEC ( states , subkeys[ 3] , tweak , 11);\
+  ONE_ROUND_DEC ( states , subkeys[ 4] , tweak , 10);\
+  ONE_ROUND_DEC ( states , subkeys[ 5] , tweak ,  9);\
+  ONE_ROUND_DEC ( states , subkeys[ 6] , tweak ,  8);\
+  ONE_ROUND_DEC ( states , subkeys[ 7] , tweak ,  7);\
+  ONE_ROUND_DEC ( states , subkeys[ 8] , tweak ,  6);\
+  ONE_ROUND_DEC ( states , subkeys[ 9] , tweak ,  5);\
+  ONE_ROUND_DEC ( states , subkeys[10] , tweak ,  4);\
+  ONE_ROUND_DEC ( states , subkeys[11] , tweak ,  3);\
+  ONE_ROUND_DEC ( states , subkeys[12] , tweak ,  2);\
+  ONE_ROUND_DEC ( states , subkeys[13] , tweak ,  1);\
+  ONE_ROUND_DEC_LAST( states, subkeys[14], tweak );
+
+

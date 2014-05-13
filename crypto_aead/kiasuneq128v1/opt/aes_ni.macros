@@ -1,0 +1,129 @@
+#define enc(a,b) _mm_aesenc_si128(a,b) 
+#define dec(a,b) _mm_aesdec_si128(a,b) 
+#define enc_last(a,b) _mm_aesenclast_si128(a,b) 
+#define dec_last(a,b) _mm_aesdeclast_si128(a,b) 
+#define mc_inv(a)     _mm_aesimc_si128(a)
+#define xor(a,b) _mm_xor_si128(a,b) 
+#define and(a,b) _mm_and_si128(a,b)
+#define permute(a,b) _mm_shuffle_epi8(a,b) 
+#define add8(a,b)  _mm_add_epi8  (a,b)
+#define add64(a,b) _mm_add_epi64 (a,b)
+#define load(p)       _mm_load_si128((__m128i *)(p))
+#define store(p,x)    _mm_store_si128((__m128i *)(p), (x))
+#define constant8(b15,b14,b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0)   _mm_set_epi8 ((b0),(b1),(b2),(b3),(b4),(b5),(b6),(b7),(b8),(b9),(b10),(b11),(b12),(b13),(b14),(b15))
+#define constant32(b3,b2,b1,b0)   	_mm_set_epi32((b0),(b1),(b2),(b3))
+#define constant64(b1,b0)   		_mm_set_epi64((b0),(b1))
+
+
+// Tweakable AES
+#define AES( s , subkeys , tw)\
+s = xor( s , xor( subkeys[0] , tw ) );\
+s = enc( s , xor( subkeys[1] , tw ) );\
+s = enc( s , xor( subkeys[2] , tw ) );\
+s = enc( s , xor( subkeys[3] , tw ) );\
+s = enc( s , xor( subkeys[4] , tw ) );\
+s = enc( s , xor( subkeys[5] , tw ) );\
+s = enc( s , xor( subkeys[6] , tw ) );\
+s = enc( s , xor( subkeys[7] , tw ) );\
+s = enc( s , xor( subkeys[8] , tw ) );\
+s = enc( s , xor( subkeys[9] , tw ) );\
+s = enc_last( s , xor( subkeys[10] , tw ) );
+
+// Tweakable AES decryption
+#define AES_DEC( s , subkeys , tw, tw_inv)\
+s = xor( s , xor( subkeys[0] , tw ) );\
+s = dec( s , xor( subkeys[1] , tw_inv ) );\
+s = dec( s , xor( subkeys[2] , tw_inv ) );\
+s = dec( s , xor( subkeys[3] , tw_inv ) );\
+s = dec( s , xor( subkeys[4] , tw_inv ) );\
+s = dec( s , xor( subkeys[5] , tw_inv ) );\
+s = dec( s , xor( subkeys[6] , tw_inv ) );\
+s = dec( s , xor( subkeys[7] , tw_inv ) );\
+s = dec( s , xor( subkeys[8] , tw_inv ) );\
+s = dec( s , xor( subkeys[9] , tw_inv ) );\
+s = dec_last( s , xor( subkeys[10] , tw ) );
+
+
+// XOR of the same subkey and 8 different tweaks to 8 different states
+#define ONE_XOR( s, subkey, tw )\
+s[0] = xor( s[0] , xor( subkey, tw[0] ) );\
+s[1] = xor( s[1] , xor( subkey, tw[1] ) );\
+s[2] = xor( s[2] , xor( subkey, tw[2] ) );\
+s[3] = xor( s[3] , xor( subkey, tw[3] ) );\
+s[4] = xor( s[4] , xor( subkey, tw[4] ) );\
+s[5] = xor( s[5] , xor( subkey, tw[5] ) );\
+s[6] = xor( s[6] , xor( subkey, tw[6] ) );\
+s[7] = xor( s[7] , xor( subkey, tw[7] ) );
+
+// One AES round with the same subkey and 8 different tweaks
+#define ONE_ROUND( s, subkey, tw )\
+s[0] = enc( s[0] , xor( subkey, tw[0] ) );\
+s[1] = enc( s[1] , xor( subkey, tw[1] ) );\
+s[2] = enc( s[2] , xor( subkey, tw[2] ) );\
+s[3] = enc( s[3] , xor( subkey, tw[3] ) );\
+s[4] = enc( s[4] , xor( subkey, tw[4] ) );\
+s[5] = enc( s[5] , xor( subkey, tw[5] ) );\
+s[6] = enc( s[6] , xor( subkey, tw[6] ) );\
+s[7] = enc( s[7] , xor( subkey, tw[7] ) );
+
+#define ONE_ROUND_DEC( s, subkey, tw )\
+s[0] = dec( s[0] , xor( subkey, tw[0] ) );\
+s[1] = dec( s[1] , xor( subkey, tw[1] ) );\
+s[2] = dec( s[2] , xor( subkey, tw[2] ) );\
+s[3] = dec( s[3] , xor( subkey, tw[3] ) );\
+s[4] = dec( s[4] , xor( subkey, tw[4] ) );\
+s[5] = dec( s[5] , xor( subkey, tw[5] ) );\
+s[6] = dec( s[6] , xor( subkey, tw[6] ) );\
+s[7] = dec( s[7] , xor( subkey, tw[7] ) );
+
+
+// The last AES round with the same subkey and 8 different tweaks
+#define ONE_ROUND_LAST( s, subkey, tw )\
+s[0] = enc_last( s[0] , xor( subkey, tw[0] ) );\
+s[1] = enc_last( s[1] , xor( subkey, tw[1] ) );\
+s[2] = enc_last( s[2] , xor( subkey, tw[2] ) );\
+s[3] = enc_last( s[3] , xor( subkey, tw[3] ) );\
+s[4] = enc_last( s[4] , xor( subkey, tw[4] ) );\
+s[5] = enc_last( s[5] , xor( subkey, tw[5] ) );\
+s[6] = enc_last( s[6] , xor( subkey, tw[6] ) );\
+s[7] = enc_last( s[7] , xor( subkey, tw[7] ) );
+
+#define ONE_ROUND_LAST_DEC( s, subkey, tw )\
+s[0] = dec_last( s[0] , xor( subkey, tw[0] ) );\
+s[1] = dec_last( s[1] , xor( subkey, tw[1] ) );\
+s[2] = dec_last( s[2] , xor( subkey, tw[2] ) );\
+s[3] = dec_last( s[3] , xor( subkey, tw[3] ) );\
+s[4] = dec_last( s[4] , xor( subkey, tw[4] ) );\
+s[5] = dec_last( s[5] , xor( subkey, tw[5] ) );\
+s[6] = dec_last( s[6] , xor( subkey, tw[6] ) );\
+s[7] = dec_last( s[7] , xor( subkey, tw[7] ) );
+
+
+#define AES8( states, subkeys , tweaks ) \
+  ONE_XOR  ( states , subkeys[ 0] , tweaks );\
+  ONE_ROUND( states , subkeys[ 1] , tweaks );\
+  ONE_ROUND( states , subkeys[ 2] , tweaks );\
+  ONE_ROUND( states , subkeys[ 3] , tweaks );\
+  ONE_ROUND( states , subkeys[ 4] , tweaks );\
+  ONE_ROUND( states , subkeys[ 5] , tweaks );\
+  ONE_ROUND( states , subkeys[ 6] , tweaks );\
+  ONE_ROUND( states , subkeys[ 7] , tweaks );\
+  ONE_ROUND( states , subkeys[ 8] , tweaks );\
+  ONE_ROUND( states , subkeys[ 9] , tweaks );\
+  ONE_ROUND_LAST( states , subkeys[10] , tweaks );
+
+#define AES8_DEC( states, subkeys , tweaks , tweaks_inv ) \
+  ONE_XOR      ( 	states , subkeys[ 0] , tweaks );\
+  ONE_ROUND_DEC( 	states , subkeys[ 1] , tweaks_inv );\
+  ONE_ROUND_DEC( 	states , subkeys[ 2] , tweaks_inv );\
+  ONE_ROUND_DEC( 	states , subkeys[ 3] , tweaks_inv );\
+  ONE_ROUND_DEC( 	states , subkeys[ 4] , tweaks_inv );\
+  ONE_ROUND_DEC( 	states , subkeys[ 5] , tweaks_inv );\
+  ONE_ROUND_DEC( 	states , subkeys[ 6] , tweaks_inv );\
+  ONE_ROUND_DEC( 	states , subkeys[ 7] , tweaks_inv );\
+  ONE_ROUND_DEC( 	states , subkeys[ 8] , tweaks_inv );\
+  ONE_ROUND_DEC( 	states , subkeys[ 9] , tweaks_inv );\
+  ONE_ROUND_LAST_DEC( 	states , subkeys[10] , tweaks );
+  
+
+

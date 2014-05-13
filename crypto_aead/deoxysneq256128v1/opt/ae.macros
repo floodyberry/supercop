@@ -1,0 +1,116 @@
+#define GET_TWEAKS(Tweaks, tTweaks) \
+	  Tweaks[0] = tTweaks[0];\
+	  Tweaks[1] = tTweaks[1];\
+	  Tweaks[2] = tTweaks[2];\
+	  Tweaks[3] = tTweaks[3];\
+	  Tweaks[4] = tTweaks[4];\
+	  Tweaks[5] = tTweaks[5];\
+	  Tweaks[6] = tTweaks[6];\
+	  Tweaks[7] = tTweaks[7];
+	
+
+#define ADD_TO_TWEAK(t,x) \
+    t = permute(add64(permute(t,PERM_MASK),x), PERM_MASK);
+
+#define LOAD_8_STATES( States , input ) \
+ 	States[0] = load( (__m128i *) ( input +   0 ) );\
+	States[1] = load( (__m128i *) ( input +  16 ) );\
+	States[2] = load( (__m128i *) ( input +  32 ) );\
+	States[3] = load( (__m128i *) ( input +  48 ) );\
+	States[4] = load( (__m128i *) ( input +  64 ) );\
+	States[5] = load( (__m128i *) ( input +  80 ) );\
+	States[6] = load( (__m128i *) ( input +  96 ) );\
+	States[7] = load( (__m128i *) ( input + 112 ) );
+
+#define LOAD_7_STATES( States , input ) \
+ 	States[1] = load( (__m128i *) ( input +   0 ) );\
+	States[2] = load( (__m128i *) ( input +  16 ) );\
+	States[3] = load( (__m128i *) ( input +  32 ) );\
+	States[4] = load( (__m128i *) ( input +  48 ) );\
+	States[5] = load( (__m128i *) ( input +  64 ) );\
+	States[6] = load( (__m128i *) ( input +  80 ) );\
+	States[7] = load( (__m128i *) ( input +  96 ) );
+	
+#define STORE_8_STATES( States, output ) \
+	store( output +   0 , States[0] );\
+	store( output +  16 , States[1] );\
+	store( output +  32 , States[2] );\
+	store( output +  48 , States[3] );\
+	store( output +  64 , States[4] );\
+	store( output +  80 , States[5] );\
+	store( output +  96 , States[6] );\
+	store( output + 112 , States[7] );
+
+#define STORE_7_STATES( States, output ) \
+	store( output +   0 , States[1] );\
+	store( output +  16 , States[2] );\
+	store( output +  32 , States[3] );\
+	store( output +  48 , States[4] );\
+	store( output +  64 , States[5] );\
+	store( output +  80 , States[6] );\
+	store( output +  96 , States[7] );
+
+	
+#define XOR_8_STATES( States, Checksum ) \
+	Checksum = xor ( Checksum, xor(States[0], xor(States[1], xor(States[2], xor(States[3], xor(States[4], xor(States[5], xor(States[6],States[7]))))))) ); 
+
+#define XOR_7_STATES( States, Checksum ) \
+	Checksum = xor ( Checksum, xor(States[7], xor(States[1], xor(States[2], xor(States[3], xor(States[4], xor(States[5], States[6])))))) ); 
+	  
+#define PROCESS_8_MESSAGE_BLOCKS( States, input , output, Checksum , tTweak) \
+	  ADD_ONE = constant8( 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1 );\
+	  LOAD_8_STATES ( States , input );    \
+	  XOR_8_STATES  ( States, Checksum);       	    \
+	  AES8        ( States, subkeys, tTweak );	    \
+	  STORE_8_STATES( States, output );	
+
+#define PROCESS_7_MESSAGE_BLOCKS( States, input , output, Checksum , tTweak ) \
+	  LOAD_7_STATES ( States , input );    \
+	  XOR_7_STATES  ( States, Checksum);       	    \
+	  AES8        ( States, subkeys, tTweak );	    \
+	  STORE_7_STATES( States, output );	
+
+#define PROCESS_7_CIPHERTEXT_BLOCKS( States, subks, input , output, Checksum , tTweak ) \
+	  LOAD_7_STATES ( States , input );    \
+	  AES8_DEC        ( States, subks, tTweak );	    \
+	  XOR_7_STATES  ( States, Checksum);       	    \
+	  STORE_7_STATES( States, output );	
+
+#define PROCESS_8_CIPHERTEXT_BLOCKS( States, subks, input , output, Checksum , tTweak ) \
+	  LOAD_8_STATES ( States , input );    \
+	  AES8_DEC        ( States, subks, tTweak );	    \
+	  XOR_8_STATES  ( States, Checksum);       	    \
+	  STORE_8_STATES( States, output );	
+
+
+	  
+#define PROCESS_8_ASS_DATA_BLOCKS( States, input , Auth, tTweak ) \
+	  LOAD_8_STATES ( States , input );    \
+	  AES8        ( States, subkeys, tTweak );	    \
+	  XOR_8_STATES  ( States, Auth );       	
+
+#define PROCESS_7_ASS_DATA_BLOCKS( States, input , Auth, tTweak ) \
+	  LOAD_7_STATES ( States , input );    \
+	  AES8        ( States, subkeys, tTweak );	    \
+	  XOR_7_STATES  ( States, Auth );       	
+
+
+
+#define SET_STAGE_IN_TWEAK( Tw, bits )  Tw = xor ( and (Tw, STAGE_MASK), bits );
+#define SET_BLOCK_IN_TWEAK( Tw, numb )  Tw = xor ( and (Tw, BLOCK_MASK), numb );    
+#define SET_BLOCK_NO_IN_TWEAK( Tw, block_no )\
+    tmp = constant8( 0,0,0,0, 0,0,0,0,  \
+    (block_no >> 56) & 0x1f, (block_no >> 48) & 0xff, (block_no >> 40) & 0xff , (block_no >> 32) & 0xff,\
+    (block_no >> 24) & 0xff, (block_no >> 16) & 0xff, (block_no >>  8) & 0xff , (block_no >>  0) & 0xff );\
+    Tw = xor ( and(Tw, BLOCK_MASK), tmp );      
+
+#define INCREASE_TWEAKS_SIMPLE( tTweaks ) \
+    tTweaks[0] = add8 ( tTweaks[0] , EIGHT );\
+    tTweaks[1] = add8 ( tTweaks[1] , EIGHT );\
+    tTweaks[2] = add8 ( tTweaks[2] , EIGHT );\
+    tTweaks[3] = add8 ( tTweaks[3] , EIGHT );\
+    tTweaks[4] = add8 ( tTweaks[4] , EIGHT );\
+    tTweaks[5] = add8 ( tTweaks[5] , EIGHT );\
+    tTweaks[6] = add8 ( tTweaks[6] , EIGHT );\
+    tTweaks[7] = add8 ( tTweaks[7] , EIGHT );
+

@@ -1,4 +1,5 @@
-#include "crypto_aead.h"
+#define crypto_aead_encrypt crypto_aead_pi64cipher256v1_optimized_AVX_encrypt
+#define crypto_aead_decrypt crypto_aead_pi64cipher256v1_optimized_AVX_decrypt
 
 # AVX version made by Rune E. Jensen
 # Version 1
