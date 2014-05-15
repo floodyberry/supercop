@@ -1,0 +1,247 @@
+Changes from 20140514:
+
+   * crypto_aead additions: aegis*, deoxys*, joltik*, kiasu* (with the
+     submitted binaries removed), lacv11, tiaoxinv1.
+
+   * Updated crypto_aead/ifeed* and crypto_aead/morus*. Also added many
+     checksums from earlier submissions.
+
+   * New crypto_encrypt/ntru*{401,439,593,743}*.
+
+   * Another attempt to fix pi64cipher256v1/opt*.
+
+   * Touch blake2b/blake2s implementations that needed -DSUPERCOP so
+     that they're recompiled.
+
+Changes from 20140425:
+
+   * Allow crypto_aead_decrypt to use clen bytes as temporary storage,
+     and allow forgeries to set mlen arbitrarily.
+
+   * Add ascon*,calicov8,norx*,omdsha*,ppaev11*,stribob*,trivia* in
+     crypto_aead. Update pi64cipher opt* implementations.
+
+   * Declare randombytes in try.h to suppress warnings.
+
+   * Speed up crypto_verify/try.c.
+
+   * Define SUPERCOP for all compilation, not just measurements.
+
+Changes from 20130419:
+
+This is a major update, with an almost completely new test system that
+checks memory safety and purity much more comprehensively than the old
+system. Two examples:
+
+   crypto_dh ecfp256i tryfails ... crypto_dh_keypair writes after output
+   crypto_dh hecfp64e2i tryfails ... crypto_dh is nondeterministic
+
+One specific issue is that previously there was an ambiguity in the API:
+it wasn't clear whether the crypto_* implementation was responsible for
+handling overlap ("aliasing") between inputs and outputs (e.g., someone
+puts a temporary key into a buffer and then overwrites it with
+ciphertext), or whether the user was responsible for avoiding overlap.
+This is now generally resolved in favor of the first choice, safer for
+the user. There are a few exceptions, for example to allow a memset+xor
+implementation strategy for crypto_stream.
+
+Some previous submissions fail the new tests. I modified some of these
+(but not all), often (but not always) enough to pass the tests, perhaps
+without changing the semantics otherwise. I've also touched most of the
+ARM asm software to make it work on machines that default to Thumb 2.
+Implementors are advised to carefully check the SUPERCOP versions of
+their software. Directories with new or updated implementations:
+
+   crypto_core/aes128decrypt
+   crypto_core/aes128encrypt
+   crypto_core/aes256decrypt
+   crypto_core/aes256encrypt
+   crypto_core/salsa2012/armneon2
+   crypto_core/salsa208/armneon2
+   crypto_core/salsa20/armneon2
+   crypto_hashblocks/sha256/arm11
+   crypto_hash/blake2b
+   crypto_hash/cubehash1632
+   crypto_hash/cubehash512
+   crypto_hash/groestl256/arm11
+   crypto_hash/keccak/arm11
+   crypto_hash/round3jh256/arm11
+   crypto_hash/round3jh256/neon2
+   crypto_hash/round3jh512/neon2
+   crypto_hash/skein512256/neon2
+   crypto_stream/aes128ctr/neon
+   crypto_stream/chacha12/goll_gueron
+   crypto_stream/chacha12/krovetz
+   crypto_stream/chacha12/moon
+   crypto_stream/chacha20/goll_gueron
+   crypto_stream/chacha20/krovetz
+   crypto_stream/chacha20/moon
+   crypto_stream/chacha8/goll_gueron
+   crypto_stream/chacha8/krovetz
+   crypto_stream/chacha8/moon
+   crypto_stream/salsa2012
+   crypto_stream/salsa208
+   crypto_stream/salsa20
+   crypto_onetimeauth/poly1305/moon
+   crypto_onetimeauth/poly1305/neon2
+   crypto_aead (I'll say more about this on crypto-competitions)
+   crypto_scalarmult/curve25519
+   crypto_scalarmult/kummer
+   crypto_dh/claus/gmp
+   crypto_dh/claus/ntl
+   crypto_dh/claus/openssl
+   crypto_dh/ecfp256e
+   crypto_dh/ecfp256h
+   crypto_dh/ecfp256i
+   crypto_dh/ecfp256q
+   crypto_dh/ecfp256s
+   crypto_dh/gls254
+   crypto_dh/hec*
+   crypto_dh/kum*
+   crypto_dh/sclaus*
+   crypto_sign/donald2048
+   crypto_sign/ecdonaldp256
+   crypto_sign/ed25519
+   crypto_sign/pass769
+   crypto_sign/pass863
+   crypto_sign/pflash1
+   crypto_sign/rainbow
+
+The new test system also produces new checksums, so the usual speedup
+from running "data-do" rather than "do" doesn't apply to this upgrade:
+running tests will take a while. New results will be online eventually.
+All implementors, even those not listed above, are encouraged to check
+whether their software is successfully compiling, passing the new tests,
+and achieving the expected speeds.
+
+SUPERCOP users with small disks should note that crypto_aead is a rather
+large directory and is going to end up bigger than crypto_hash. I've
+been equipping my small benchmarking machines with 32GB SD cards (or
+larger USB sticks) formatted with 10485760 inodes (about what you get by
+default for a 160GB disk); this should be adequate for the moment. The
+big SUPERCOP redesign coming up will instead have files stored on a
+central cluster, so benchmarking machines won't need much storage.
+
+Changes from supercop-20130126:
+
+   * New crypto_sign/lattisigns512.
+   * New crypto_dh/gls254.
+   * New crypto_dh/kumfp{127,128}g.
+   * New crypto_dh/hecfp{127i,128bk,128fkt,128i}.
+
+Note to implementors: All .c files in the directory are separately
+compiled and linked together, so if you have an include file that isn't
+supposed to be separately compiled then you have to label it as .h,
+.incl, etc., not .c.
+
+Changes from supercop-20120928:
+
+   * Data collection centralized in machineinfo/do.
+   * Collect "cpb" (Turbo Core) status.
+   * New BLAKE2 hash function.
+
+Changes from supercop-20120908:
+
+   * New neon-vperm implementation of Groestl-256.
+   * New NEON implementation of Curve25519.
+   * Various NEON-related cleanups.
+
+There's no reason to re-run except on ARMs with NEON.
+
+Changes from supercop-20120812:
+
+   * New crypto_verify_8, replacing the ad-hoc crypto_verify_8
+     implementations in various crypto_auth implementations.
+
+   * New implementations of siphash24.
+
+   * New NEON implementations of aes128ctr, salsa20, poly1305.
+
+Changes from supercop-20120717:
+
+   * New groestl256/neon-bitslice implementation.
+   * Updated crypto_stream/chacha*/krovetz implementations.
+   * New crypto_auth/siphash*/sandy implementations.
+   * New crypto_auth/pyrhash (Python randomized hash).
+
+Changes from supercop-20120709:
+
+   * Updated implementations of groestl256 and groestl512.
+   * Tweaked crypto_stream/chacha*/krovetz for portability.
+
+I've also drafted
+
+   http://bench.cr.yp.to/cpucycles/sheevaplug.html
+
+with cycle-counting instructions for the SheevaPlug.
+
+Changes from supercop-20120704:
+
+   * New groestl256/neon-table implementation.
+   * New chacha*/krovetz implementations.
+   * Updated clang compiler lines.
+
+There's also documentation of the crypto_auth API, and preliminary
+results (not linked anywhere yet):
+
+   http://bench.cr.yp.to/results-auth.html
+   http://bench.cr.yp.to/call-auth.html
+
+Changes from supercop-20120525:
+
+   * New clang compiler lines.
+   * Improved portability of arm11 implementations: removed NEON FPU
+     declarations.
+   * Added siphash24 and siphash48 (under crypto_auth, which will be
+     joining the benchmarking web pages soon).
+
+Changes from supercop-20120521:
+
+   * "sh data-do" (but not yet "sh do") protects against compiler bugs
+     that produce endless compiler error messages.
+   * groestl256/thumb* is now marked as armeabi/thumb architecture.
+
+Changes from supercop-20120414:
+
+   * New Groestl implementations.
+   * New Keccak implementations.
+
+This could be the last chance to provide data to NIST to help them with
+the SHA-3 selection; if you're behind on benchmark runs then this is a
+great moment to catch up. Thanks to everyone who has contributed!
+
+Changes from supercop-20120329:
+
+   * Ported blake256/vect128-neon/*.s to hard-float.
+   * Fixed missing quotes in CRYPTO_VERSION for bblake512.
+   * Replaced keccak*/avr8asm with avr8asmc and avr8asmf.
+   * Added fugue2.
+   * Added many missing */architectures files.
+
+Changes from supercop-20120316:
+
+   * Added bblake512.
+   * Updated crypto_dh/curve2251.
+   * data-init is now scheduled on core 0 if the OS supports taskset or
+     cpuset. This simplifies enabling cycle counters on CPUs that don't
+     enable them by default; current worst offender is ARM.
+   * More cycle counters: linux/perf_event.h, and big-endian MIPS.
+   * More NEON compiler options.
+   * Updated list in mgrostl256/designers.
+
+Changes from supercop-20120310:
+
+   * NEON implementations of round3jh*.
+   * sources.new and data.new are now removed if the previous run is up
+     to date (i.e., sources matches sources.new).
+   * Cleanups in ed25519.
+
+This isn't worth a re-run from 20120310 except on ARM platforms with
+NEON (Cortex A8 etc.).
+
+Changes from supercop-20120225:
+
+   * New groestl256/avr8asm implementation.
+   * More implementations of blake256 and blake512.
+   * Updated rhash/ref implementation.
+
