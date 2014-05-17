@@ -1,141 +1,155 @@
-#include "crypto_aead.h"
+/* tested code for the submitted tested vectors */
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+
 #include "api.h"
-#include "sablier.h"
-#include "authenticate.h"
+#include "cipher_1.h"
+#include "authenticate_1.h"
+#include "crypto_aead.h"
 
-static int do_crypto_aead(
-	unsigned char *c,
-	const unsigned char *m, unsigned long long mlen,
-	const unsigned char *ad, unsigned long long adlen,
-	const unsigned char *npub,
-	const bool encrypt_or_decrypt,
-	const bool authenticate_or_not
-	){
-	u8 c0, c1, m0, m1, a0, a1;
-	u16 z;
-	size_type i, j;
 
-#define _leakage(stream) z = (stream)
-	if (authenticate_or_not){// need authenticate
-		// deal ad
-#define _round_c1 C1
-#define _round_c2 0x0000
-		for (i = 0; (j = i + 2) <= adlen; i = j){
-			m0 = ad[i];
-			m1 = ad[i + 1];
-			encrypt_authenticate_constant();
-		}
-		if (adlen & 1){
-			m0 = ad[i];
-			m1 = 0x81;
-		}
-		else{
-			m0 = 0x01;
-			m1 = 0x80;
-		}
-		encrypt_authenticate_constant();
-#undef _round_c1
-#undef _round_c2
-		// deal npub
-#define _round_c1 0x0000
-#define _round_c2 C2
-		for (i = 0; (j = i + 2) <= CRYPTO_NPUBBYTES; i = j){
-			m0 = npub[i];
-			m1 = npub[i + 1];
-			encrypt_authenticate_constant();
-		}
-#undef _round_c1
-#undef _round_c2
-		// deal m
-#define _round_c1 C1
-#define _round_c2 C2
-		for (i = 0; (j = i + 2) <= mlen; i = j){
-			m0 = m[i];
-			m1 = m[i + 1];
-			encrypt_authenticate_message();
-			c[i] = c0;
-			c[i + 1] = c1;
-		}
-		if (mlen & 1){
-			m0 = m[i];
-			m1 = 0x81;
-			encrypt_authenticate_message_and_constant();
-			c[i++] = c0;
-		}
-		else{
-			m0 = 0x01;
-			m1 = 0x80;
-			encrypt_authenticate_constant();
-		}
-		if (encrypt_or_decrypt){
-			c[i++] = tag(0);
-			c[i++] = tag(1);
-			c[i++] = tag(2);
-			c[i++] = tag(3);
-		}
-		else if (m[i + 0] != tag(0) ||
-			m[i + 1] != tag(1) ||
-			m[i + 2] != tag(2) ||
-			m[i + 3] != tag(3)){
-			memset(c, 0, mlen);
-
-			return -1;
-		}
-#undef _round_c1
-#undef _round_c2
-	}
-	else{
-		// deal m
-#define _round_c1 C1
-#define _round_c2 C2
-		for (i = 0; (j = i + 2) <= mlen; i = j){
-			m0 = m[i];
-			m1 = m[i + 1];
-			encrypt_only();
-			c[i] = c0;
-			c[i + 1] = c1;
-		}
-		if (mlen & 1){
-			m0 = m[i];
-			encrypt_only();
-			c[i++] = c0;
-		}
-#undef _round_c1
-#undef _round_c2
-	}
-#undef _leakage
-
-	return 0;
-}
 
 int crypto_aead_encrypt(
-	unsigned char *c,unsigned long long *clen,
-	const unsigned char *m,unsigned long long mlen,
-	const unsigned char *ad,unsigned long long adlen,
+	unsigned char *c, unsigned long long *clen,
+	const unsigned char *m, unsigned long long mlen,
+	const unsigned char *ad, unsigned long long adlen,
 	const unsigned char *nsec,
 	const unsigned char *npub,
 	const unsigned char *k
-){
-	if (load(k, npub)){
-		*clen = mlen + CRYPTO_ABYTES;
-		return do_crypto_aead(c, m, mlen, ad, adlen, npub, true, true);
-	}
-	*clen = mlen;
-	return do_crypto_aead(c, m, mlen, ad, adlen, npub, true, false);
+	)
+{
+	u8 i;
+	Sablier_State state;
+	Sablier_Authenstate authenstate;
+
+	memset(&state, 0, sizeof(Sablier_State));
+	memset(&authenstate, 0, sizeof(Sablier_Authenstate));
+
+	Initialization(&state, k, npub);     /*initializing the state*/
+	
+	
+	Authenticated_encryption(&state, &authenstate, ad, npub, m, c, mlen, adlen, CRYPTO_NPUBBYTES);
+	for (i = 0; i < CRYPTO_ABYTES; i++)c[mlen + i] = authenstate.accumulator[i];
+	*clen = mlen + CRYPTO_ABYTES;
+
+	return(0);
+
 }
 
-int crypto_aead_decrypt(
-	unsigned char *m,unsigned long long *mlen,
-	unsigned char *nsec,
-	const unsigned char *c,unsigned long long clen,
-	const unsigned char *ad,unsigned long long adlen,
+/*
+int crypto_aead_encrypt(
+	unsigned char *c, unsigned long long *clen,
+	const unsigned char *m, unsigned long long mlen,
+	const unsigned char *ad, unsigned long long adlen,
+	const unsigned char *nsec,
 	const unsigned char *npub,
 	const unsigned char *k
-){
-	if (load(k, npub)){
-		*mlen = clen - CRYPTO_ABYTES;
-		return do_crypto_aead(m, c, *mlen, ad, adlen, npub, false, true);
+	)
+{
+	u8 i;
+	Sablier_State state;
+	Sablier_Authenstate authenstate;
+
+	memset(&state, 0, sizeof(Sablier_State));
+	memset(&authenstate, 0, sizeof(Sablier_Authenstate));
+
+	Initialization(&state, (u8*)k, (u8*)npub);     //initializing the state
+
+	if (npub[0] & 1)
+	{
+		*clen = mlen + CRYPTO_ABYTES;
+		Authenticated_encryption(&state, &authenstate, ad, npub, m, c, mlen, adlen, CRYPTO_NPUBBYTES);
+		for (i = 0; i < CRYPTO_ABYTES; i++)c[mlen + i] = authenstate.accumulator[i];
 	}
-	*mlen = clen;
-	return do_crypto_aead(m, c, *mlen, ad, adlen, npub, false, false);
+	else
+	{
+		*clen = mlen;
+		EncryptMessage(&state, m, c, mlen);
+	}
+	
+	return(0);
 }
+*/
+
+int crypto_aead_decrypt(
+	unsigned char *m, unsigned long long *mlen,
+	unsigned char *nsec,
+	const unsigned char *c, unsigned long long clen,
+	const unsigned char *ad, unsigned long long adlen,
+	const unsigned char *npub,
+	const unsigned char *k
+	)
+{
+	u8 i, receivedtag[4];
+	Sablier_State state;
+	Sablier_Authenstate authenstate;
+
+	memset(&state, 0, sizeof(Sablier_State));
+	memset(&authenstate, 0, sizeof(Sablier_Authenstate));
+	for (i = 0; i < CRYPTO_ABYTES; i++)receivedtag[i] = 0x0;
+	for (i = 0; i < CRYPTO_ABYTES; i++)receivedtag[i] = c[clen - CRYPTO_ABYTES + i];
+
+	Initialization(&state, k, npub);     /*initializing the state*/
+	*mlen = clen - CRYPTO_ABYTES;
+
+	Authenticated_decryption(&state, &authenstate, ad, npub, adlen, CRYPTO_NPUBBYTES);
+	Authenticated_decryptmes(&state, &authenstate, m, c, *mlen);
+	for (i = 0; i < 4; i++)authenstate.tag[i] = authenstate.accumulator[i];
+	if (memcmp(authenstate.tag, receivedtag, CRYPTO_ABYTES) != 0)return(-1);
+	else return(0);
+	
+}
+
+/*
+int crypto_aead_decrypt(
+	unsigned char *m, unsigned long long *mlen,
+	unsigned char *nsec,
+	const unsigned char *c, unsigned long long clen,
+	const unsigned char *ad, unsigned long long adlen,
+	const unsigned char *npub,
+	const unsigned char *k
+	)
+{
+	int i;
+	u8 receivedtag[4];
+	Sablier_State state;
+	Sablier_Authenstate authenstate;
+
+	memset(&state, 0, sizeof(Sablier_State));
+	memset(&authenstate, 0, sizeof(Sablier_Authenstate));
+	for (i = 0; i < CRYPTO_ABYTES; i++)receivedtag[i] = 0x0;
+	//	for (i = CRYPTO_ABYTES -1; i >= 0; i--)receivedtag[3-i] = c[clen -1 - i];
+	for (i = 0; i < CRYPTO_ABYTES; i++)receivedtag[i] = c[clen - CRYPTO_ABYTES + i];
+	
+
+	Initialization(&state, (u8*)k, (u8*)npub);     //initializing the state
+
+	if (npub[0] & 1)
+	{
+		*mlen = clen - CRYPTO_ABYTES;
+		Authenticated_decryption(&state, &authenstate, ad, npub, adlen, CRYPTO_NPUBBYTES);
+		Authenticated_decryptmes(&state, &authenstate, m, c, *mlen);
+		for (i = 0; i < 4; i++)authenstate.tag[i] = authenstate.accumulator[i];
+		if (memcmp(authenstate.tag, receivedtag, CRYPTO_ABYTES) != 0)return(-1);
+		else return(0);
+	}
+	else
+	{
+		*mlen = clen;
+		EncryptMessage(&state, c, m, clen - CRYPTO_ABYTES);
+		return(0);
+	}
+	
+}
+*/
+
+
+

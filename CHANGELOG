@@ -1,3 +1,9 @@
+Changes from 20140517: Many, many, many crypto_aead updates.
+
+Miguel Montes points out that SUPERCOP doesn't work on big-endian
+machines with the new checksum system, so for the moment please run it
+only on little-endian machines. This will be fixed in the next release.
+
 Changes from 20140514:
 
    * crypto_aead additions: aegis*, deoxys*, joltik*, kiasu* (with the

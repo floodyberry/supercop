@@ -100,7 +100,8 @@ static void A4(half_block out, half_block A) {
 /*----------------------------
  works on a half_block A and computes 5.A
  5.A = 3.(3.A)
- ----------------------------*/static void A5(half_block out, half_block A) {
+ ----------------------------*/
+static void A5(half_block out, half_block A) {
 	A3(A, A);
 	A3(A, A);
 	memcpy(out, A, 8);
@@ -168,8 +169,8 @@ static void F(block out, block in, int alpha, int beta) {
  computes a tau-bit tag value for the associated data "A" using "key"
  this value will be used in the process of message encryption and authentication
  ----------------------------*/
-static void H(unsigned char *out, const unsigned char *key, const unsigned char *in,
-		long long abytes) {
+static void H(unsigned char *out, const unsigned char *key,
+		const unsigned char *in, long long abytes) {
 	AES_KEY aes_key;
 	block S, L, temp, delta;
 	AES_set_encrypt_key(key, KEYBYTES * 8, &aes_key);
@@ -207,10 +208,12 @@ static void H(unsigned char *out, const unsigned char *key, const unsigned char 
 	memcpy(out, S, TAGBYTES);
 }
 
-static int enc(unsigned char *out, const unsigned char *key, const unsigned char *nonce,
-		const unsigned char *a, long long abytes, const unsigned char *in,
-		long long inbytes) {
+static int enc(unsigned char *c, const unsigned char *key,
+		const unsigned char *nonce, const unsigned char *a, long long abytes,
+		const unsigned char *m, long long inbytes) {
 
+	const unsigned char* in = m;
+	unsigned char* out = c;
 	AES_KEY aes_key;
 	AES_set_encrypt_key(key, KEYBYTES * 8, &aes_key);
 	block temp1, temp2, R, delta, T_A, T, S;
@@ -220,14 +223,16 @@ static int enc(unsigned char *out, const unsigned char *key, const unsigned char
 	unsigned char tau_char = tau_par & 0xFF;
 	unsigned char b_char = b_par & 0xFF;
 
-	memset(temp1, 0, 16 - NONCEBYTES - 2);
+	if (16 - NONCEBYTES - 2 > 0)
+		memset(temp1, 0, 16 - NONCEBYTES - 2);
 	temp1[16 - NONCEBYTES - 2] = tau_char;
 	temp1[16 - NONCEBYTES - 1] = b_char;
 	memcpy(&temp1[16 - NONCEBYTES], nonce, NONCEBYTES);
 	AES_encrypt(temp1, R, &aes_key);
 	int bytes_1 = l_par / 8;
 	memcpy(temp2, R, 16);
-	memset(temp2 + 16 - bytes_1, 255, bytes_1);
+	if (bytes_1 > 0)
+		memset(temp2 + 16 - bytes_1, 255, bytes_1);
 	temp2[15 - bytes_1] |= 0x03;
 	rotate(temp2, (l_par / 2) + 1, 16);
 	F(delta, temp2, 2, 2);
@@ -244,7 +249,8 @@ static int enc(unsigned char *out, const unsigned char *key, const unsigned char
 
 		pad_block(temp1, C_0, inbytes);
 
-		memset(temp2, 0, 16 - TAGBYTES);
+		if (16 - TAGBYTES > 0)
+			memset(temp2, 0, 16 - TAGBYTES);
 		memcpy(&temp2[16 - TAGBYTES], T_A, TAGBYTES);
 
 		xor_block(temp1, temp1, temp2);
@@ -266,11 +272,13 @@ static int enc(unsigned char *out, const unsigned char *key, const unsigned char
 	}
 
 	// T = T_A xor ((0^(tau-l))||C_0)
-	memset(temp1, 0, (tau_par - l_par) / 8);
+	if ((tau_par - l_par) / 8 > 0)
+		memset(temp1, 0, (tau_par - l_par) / 8);
 	memcpy(&temp1[(tau_par - l_par) / 8], C_0, l_bytes);
 	for (i = 0; i < (TAGBYTES); i++)
 		T[i] = T_A[i] ^ temp1[i];
-	memset(S, 0, n_par / 8);
+	if (n_par / 8 > 0)
+		memset(S, 0, n_par / 8);
 
 	long long total_blocks = (inbytes - l_bytes) / 16;
 	int remaining_bytes = (inbytes - l_bytes) % 16;
@@ -312,19 +320,21 @@ static int enc(unsigned char *out, const unsigned char *key, const unsigned char
 		xor_block(S, S, temp1);
 		F(delta, delta, 2, 4);
 
-		memset(temp1, 0, 16 - TAGBYTES);
+		if (16 - TAGBYTES > 0)
+			memset(temp1, 0, 16 - TAGBYTES);
 		memcpy(&temp1[16 - TAGBYTES], T, TAGBYTES);
 		xor_block(temp1, temp1, delta);
 		AES_encrypt(temp1, temp1, &aes_key);
-		xor_block(out, in, temp1);
-		out += remaining_bytes;
-
+		int i;
+		for (i = 0; i < remaining_bytes; i++, in++, out++)
+			*out = *in ^ temp1[i];
 		if (remaining_bytes < 16)
 			F(delta, delta, 3, 5);
 		else
 			F(delta, delta, 5, 3);
 
-		memset(temp1, 0, 16 - TAGBYTES);
+		if (16 - TAGBYTES > 0)
+			memset(temp1, 0, 16 - TAGBYTES);
 		memcpy(&temp1[16 - TAGBYTES], T, TAGBYTES);
 		xor_block(temp1, temp1, delta);
 		xor_block(temp1, temp1, S);
@@ -336,10 +346,12 @@ static int enc(unsigned char *out, const unsigned char *key, const unsigned char
 	return -1;
 }
 
-static int dec(unsigned char *out, const unsigned char *key, const unsigned char *nonce,
-		const unsigned char *a, long long abytes, const unsigned char *in,
-		long long inbytes) {
+static int dec(unsigned char *m, const unsigned char *key,
+		const unsigned char *nonce, const unsigned char *a, long long abytes,
+		const unsigned char *c, long long inbytes) {
 
+	const unsigned char* in = c;
+	unsigned char* out = m;
 	AES_KEY aes_key, aes_decrypt_key;
 	AES_set_encrypt_key(key, KEYBYTES * 8, &aes_key);
 	AES_set_decrypt_key(key, KEYBYTES * 8, &aes_decrypt_key);
@@ -352,16 +364,17 @@ static int dec(unsigned char *out, const unsigned char *key, const unsigned char
 	// R = E((0^(128 - nonce_bytes - 2)) || (tau) || (b) || (nonce))
 	unsigned char tau_char = tau_par & 0xFF;
 	unsigned char b_char = b_par & 0xFF;
-	memset(temp1, 0, 16 - NONCEBYTES - 2);
+	if (16 - NONCEBYTES - 2 > 0)
+		memset(temp1, 0, 16 - NONCEBYTES - 2);
 	temp1[16 - NONCEBYTES - 2] = tau_char;
 	temp1[16 - NONCEBYTES - 1] = b_char;
 	memcpy(&temp1[16 - NONCEBYTES], nonce, NONCEBYTES);
-	memcpy(R, temp1, 16);
 	AES_encrypt(temp1, R, &aes_key);
 
 	int bytes_1 = l_par / 8;
 	memcpy(temp2, R, 16);
-	memset(temp2 + 16 - bytes_1, 255, bytes_1);
+	if (bytes_1 > 0)
+		memset(temp2 + 16 - bytes_1, 255, bytes_1);
 	temp2[15 - bytes_1] |= 0x03;
 	rotate(temp2, (l_par / 2) + 1, 16);
 	F(delta, temp2, 2, 2);
@@ -370,13 +383,14 @@ static int dec(unsigned char *out, const unsigned char *key, const unsigned char
 		int i, C_0_bytes = inbytes - (TAGBYTES);
 		for (i = 0; i < C_0_bytes; i++, in++) {
 			C_0[i] = *in;
-			M_0[i] = *in ^ R[16 - inbytes + i];
+			M_0[i] = *in ^ R[16 - C_0_bytes + i];
 		}
 
 		F(delta, delta, 3, 3);
 		pad_block(temp1, C_0, C_0_bytes);
 
-		memset(temp2, 0, 16 - TAGBYTES);
+		if (16 - TAGBYTES > 0)
+			memset(temp2, 0, 16 - TAGBYTES);
 		memcpy(&temp2[16 - TAGBYTES], T_A, TAGBYTES);
 
 		xor_block(temp1, temp1, temp2);
@@ -406,7 +420,8 @@ static int dec(unsigned char *out, const unsigned char *key, const unsigned char
 	}
 
 	// T = T_A xor ((0^(tau-l))||C_0)
-	memset(temp1, 0, (tau_par - l_par) / 8);
+	if ((tau_par - l_par) / 8 > 0)
+		memset(temp1, 0, (tau_par - l_par) / 8);
 	memcpy(temp1 + (tau_par - l_par) / 8, C_0, l_bytes);
 
 	for (i = 0; i < (TAGBYTES); i++)
@@ -474,8 +489,9 @@ static int dec(unsigned char *out, const unsigned char *key, const unsigned char
 		}
 
 		F(delta, delta, 2, 4);
-		memset(temp1, 0, 16 - (TAGBYTES));
-		memcpy(&temp1[16 - (TAGBYTES)], T, (TAGBYTES));
+		if (16 - TAGBYTES > 0)
+			memset(temp1, 0, 16 - TAGBYTES);
+		memcpy(&temp1[16 - TAGBYTES], T, TAGBYTES);
 		xor_block(temp1, temp1, delta);
 		AES_encrypt(temp1, temp1, &aes_key);
 		xor_block(temp1, C_m_1, temp1);
@@ -488,13 +504,14 @@ static int dec(unsigned char *out, const unsigned char *key, const unsigned char
 			F(delta, delta, 3, 5);
 		else
 			F(delta, delta, 5, 3);
-		memset(temp1, 0, 16 - (TAGBYTES));
-		memcpy(&temp1[16 - (TAGBYTES)], T, (TAGBYTES));
+		if (16 - TAGBYTES > 0)
+			memset(temp1, 0, 16 - TAGBYTES);
+		memcpy(&temp1[16 - TAGBYTES], T, TAGBYTES);
 		xor_block(temp1, temp1, delta);
 		xor_block(temp1, temp1, S);
 		AES_encrypt(temp1, temp1, &aes_key);
 
-		int validation_test = memcmp(C_m, temp1, (TAGBYTES));
+		int validation_test = memcmp(C_m, temp1, TAGBYTES);
 		if (validation_test == 0)
 			return 0;
 		else
@@ -508,10 +525,10 @@ int crypto_aead_encrypt(unsigned char *c, unsigned long long *clen,
 		const unsigned char *ad, unsigned long long adlen,
 		const unsigned char *nsec, const unsigned char *npub,
 		const unsigned char *k) {
-
-	*clen = mlen + TAGBYTES;
-	enc(c, k, npub, ad, adlen, m, mlen);
-	return 0;
+	
+	int res = enc(c, k, npub, ad, adlen, m, mlen);
+	*clen = mlen + (long long)TAGBYTES;
+	return res;
 }
 
 int crypto_aead_decrypt(unsigned char *m, unsigned long long *mlen,
@@ -519,6 +536,7 @@ int crypto_aead_decrypt(unsigned char *m, unsigned long long *mlen,
 		const unsigned char *ad, unsigned long long adlen,
 		const unsigned char *npub, const unsigned char *k) {
 
-	*mlen = clen - TAGBYTES;
-	return dec(m, k, npub, ad, adlen, c, clen);
+	int res = dec(m, k, npub, ad, adlen, c, clen);
+	*mlen = clen - (long long)TAGBYTES;
+	return res;
 }
