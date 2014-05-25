@@ -5,8 +5,8 @@
 /////////// sizes.h //////////////
 #define SECRETKEY_BYTES 94384
 #define PUBLICKEY_BYTES 102912
-#define SIGNATURE_BYTES 40
-#define SHORTHASH_BYTES 32
+#define SIGNATURE_BYTES 32
+#define SHORTHASH_BYTES 20
 /////////// sizes.h ////////////////
 
 

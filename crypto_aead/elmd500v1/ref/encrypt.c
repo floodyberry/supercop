@@ -221,5 +221,5 @@ const unsigned char *k
 	
 	for(i=0; i<16; i++) {if(CS[i]!=result[i]) return -1; } 
 	*mlen = outputmlen;
-	return -1;
+	return 0;
 }

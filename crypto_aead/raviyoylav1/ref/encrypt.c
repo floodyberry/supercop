@@ -2,223 +2,235 @@
 #include "api.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
-void stir(unsigned long long * state, int statelen)
+typedef unsigned char u8;
+typedef unsigned long long u64;
+
+static void store64to8x8(u8 *Bytes, u64 Block) 
+{ int i; for (i = 7; i >= 0; i--) {Bytes[i] = (u8)Block; Block >>= 8; }}
+
+void revolve_all(u8 * state,  u8 * carry)
 {
-	unsigned long long mixer = 6148914691236517205;
-	unsigned long long carry = 1234567890123456789;
-	int i, j, rounds = 8;
+	int i;
 	
-	for(i = 0; i < rounds; i++)
+	for(i = 0; i < 256; i++)
 	{
-		for(j = 0; j < statelen; j++)
-		{
-			if(state[(j+2)%statelen]>state[(j+3)%statelen])
-				carry ^= state[(j+1)%statelen];
-			else
-				carry ^= ~state[(j+1)%statelen];
+		if(state[(i+2)%256]>state[(i+3)%256])
+			* carry ^= state[(i+1)%256];
+		else
+			* carry ^= ~state[(i+1)%256];
 
-			state[j] ^= carry;
-			carry += mixer;
+		state[i] ^= * carry;
+	}
+}
+
+void evolve(u8 * state)
+{
+	int i, j;
+	
+	for(i = 0; i < 256; i++)
+	{	
+		for(j = 0; j < 256; j++)
+		{
+			if(state[(j + 1) % 256] > state[(j + 3) % 256])
+				state[j % 256] ^=  state[(j + 1) % 256];
+			else
+				state[j % 256] ^=  ~state[(j + 1) % 256];
+			
+			if(state[(j + 2) % 256] > state[(j + 3) % 256])
+				state[j % 256] ^=  state[(j + 2) % 256];
+			else
+				state[j % 256] ^=  ~state[(j + 2) % 256];	
+			
+			if(state[(j + 3) % 256] % 2 == 1)
+				state[j % 256] ^=  state[(j + 3) % 256];
+			else
+				state[j % 256] ^=  ~state[(j + 3) % 256];	
 		}
 	}
 }
 
-unsigned long long revolve_step(unsigned long long * state, unsigned long long i, unsigned long long * carry)
+int crypto_aead_encrypt
+(
+	u8 *c,u64 *clen,
+	const u8 *m,u64 mlen,
+	const u8 *ad,u64 adlen,
+	const u8 *nsec,
+	const u8 *npub,
+	const u8 *k
+)
 {
-	unsigned long long elen = 256;
-	if(state[(i+2)%elen]>state[(i+3)%elen])
-		* carry ^= state[(i+1)%elen];
-	else
-		* carry ^= ~state[(i+1)%elen];
+	u8 ignite[1028] = {0};
+	u8 ping[256], pong[256], sing[256], song[256];
+	u8 carry = 'a', mixer = 'b';
+	u64 i, j;
+		
+	memmove(ignite, k, CRYPTO_KEYBYTES);
+	memmove(ignite + CRYPTO_KEYBYTES, npub, CRYPTO_NPUBBYTES);
+	store64to8x8(ignite + (CRYPTO_KEYBYTES + CRYPTO_NPUBBYTES), mlen);
+	store64to8x8(ignite + (CRYPTO_KEYBYTES + CRYPTO_NPUBBYTES + 8), adlen);
+	*clen = mlen + CRYPTO_ABYTES;
+	
+	for(i = 0; i < 8; i++)
+	{
+		for(j = 0; j < 1028; j++)
+		{
+			if(ignite[(j+2)%1028]>ignite[(j+3)%1028])
+				carry ^= ignite[(j+1)%1028];
+			else
+				carry ^= ~ignite[(j+1)%1028];
 
-	state[i%elen] ^= * carry;
-	return state[i%elen];
-}
-
-void get_stream(unsigned long long * ignite,  
-	const unsigned char * in, unsigned char * out, unsigned long long msglen)
-{
-	unsigned long long ping[256], pong[256], sing[256];
-	unsigned long long ping_carry, pong_carry, sing_carry;
-	unsigned long long one, two, three, sum, i;
-	unsigned long long end;
-	unsigned char * buff;
+			ignite[j] ^= carry;
+			carry += mixer;
+		}
+	}
 	
 	for(i = 0; i < 256; i++)
 	{
 		ping[i] = ignite[i];
 		pong[i] = ignite[i + 256];
 		sing[i] = ignite[i + 512];
+		song[i] = ignite[i + 768];
 	}
-		
-	buff = (unsigned char *) calloc (msglen, sizeof(unsigned char));
-	end = msglen / 8;
-	ping_carry = ignite[1024];
-	pong_carry = ignite[1025];
-	sing_carry = ignite[1026];
 	
-	for(i = 0; i < end; i++)
+	for(i = 0; i < mlen; i++)
 	{
-		one = revolve_step(ping, i, &ping_carry);
-		two = revolve_step(pong, i, &pong_carry);
-		three = revolve_step(sing, i, &sing_carry);
-		sum = one ^ two ^ three;
-		memmove(buff + (i * 8), (unsigned char*)&sum, 8);
-	}
-	if(msglen % 8 > 0)
-	{
-		one = revolve_step(ping, i, &ping_carry);
-		two = revolve_step(pong, i, &pong_carry);
-		three = revolve_step(sing, i, &sing_carry);
-		sum = one ^ two ^ three;
-		memmove(buff + (end * 8), (unsigned char *)&three, msglen % 8);
-	}
-	for(i = 0; i < msglen; i++)
-		out[i] = in[i] ^ buff[i];
-		
-	free(buff);
-}
-
-void revolve_all(unsigned long long * state, int elen, unsigned long long * carry)
-{
-	int i;
-	
-	for(i = 0; i < elen; i++)
-	{
-		if(state[(i+2)%elen]>state[(i+3)%elen])
-			* carry ^= state[(i+1)%elen];
+		if(ping[(i+2)%256]>ping[(i+3)%256])
+			ignite[1024] ^= ping[(i+1)%256];
 		else
-			* carry ^= ~state[(i+1)%elen];
+			ignite[1024] ^= ~ping[(i+1)%256];
 
-		state[i] ^= * carry;
-	}
-}
-
-void evolve(unsigned long long * ignite, int statelen)
-{
-	int i, j;
-	unsigned long long * state;
-	
-	state = &ignite[768];
-	
-	for(i = 0; i < statelen; i++)
-	{	
-		for(j = 0; j < statelen; j++)
-		{
-			if(state[(j + 1) % statelen] > state[(j + 3) % statelen])
-				state[j % statelen] ^=  state[(j + 1) % statelen];
-			else
-				state[j % statelen] ^=  ~state[(j + 1) % statelen];
-			
-			if(state[(j + 2) % statelen] > state[(j + 3) % statelen])
-				state[j % statelen] ^=  state[(j + 2) % statelen];
-			else
-				state[j % statelen] ^=  ~state[(j + 2) % statelen];	
-			
-			if(state[(j + 3) % statelen] % 2 == 1)
-				state[j % statelen] ^=  state[(j + 3) % statelen];
-			else
-				state[j % statelen] ^=  ~state[(j + 3) % statelen];	
-		}
-	}
-}
-
-void xorit(unsigned long long * ignite, unsigned char *aorc, unsigned long long aorclen)
-{
-	unsigned long long * song;
-	unsigned long long carry;
-	unsigned long long temp;
-	unsigned long long inlen = 0;
-	unsigned long long runlen = 0;
-	unsigned long long i;
-	int arraylen = 256;
-	int j, tail, sizelen = 8;
-	
-	song = &ignite[768];
-	carry = ignite[1027];
-	
-	inlen = aorclen / 8;
-	tail = aorclen % 8;
-	if(tail > 0) inlen++;
-	
-	runlen = inlen / arraylen;
-	if((inlen % arraylen) > 0) runlen++;
-	
-	for(i = 0; i < runlen; i++)
-	{
-		for(j = 0; j < arraylen || (j * i) < inlen; j++)
-		{
-			if(((j * i) + 1 == inlen) && tail > 0)
-				sizelen = tail;
-			memmove(&temp, aorc + (j * i * 8), sizelen);
-			song[j] ^= temp;
-		}
-		revolve_all(ignite, arraylen, &carry);
-	}
-	ignite[1027] = carry;
-}
-
-int crypto_aead_encrypt
-(
-	unsigned char *c,unsigned long long *clen,
-	const unsigned char *m,unsigned long long mlen,
-	const unsigned char *ad,unsigned long long adlen,
-	const unsigned char *nsec,
-	const unsigned char *npub,
-	const unsigned char *k
-)
-{
-	int statelen = 1028;
-	unsigned long long ignite[1028] = {0};
+		ping[i%256] ^= ignite[1024];
 		
-	*clen = mlen + CRYPTO_ABYTES;	
-	memmove(&ignite[0], k, CRYPTO_KEYBYTES );
-	memmove(&ignite[4], npub, CRYPTO_NPUBBYTES); 
-	ignite[statelen - 1] = mlen;
-	ignite[statelen - 2] = adlen;
-	
-	stir(ignite, statelen);
-	get_stream(ignite, m, c, mlen);
-	xorit(ignite, (unsigned char*) ad, adlen);
-	xorit(ignite, (unsigned char*) c, mlen);
-	evolve(ignite, 256);
-	
-	memcpy(&c[mlen], &ignite[896], CRYPTO_ABYTES);
+		if(pong[(i+2)%256]>pong[(i+3)%256])
+			ignite[1025] ^= pong[(i+1)%256];
+		else
+			ignite[1025] ^= ~pong[(i+1)%256];
+
+		pong[i%256] ^= ignite[1025];
+		
+		if(sing[(i+2)%256]>sing[(i+3)%256])
+			ignite[1026] ^= sing[(i+1)%256];
+		else
+			ignite[1026] ^= ~sing[(i+1)%256];
+
+		sing[i%256] ^= ignite[1026];
 			
+		c[i] = m[i] ^ ping[i%256] ^ pong[i%256] ^ sing[i%256];
+	}
+	
+	for(i = 0; i < adlen; i++)
+	{
+		song[i%256] ^= ad[i];
+		if(i%256 == 0 && i > 0)
+			revolve_all(song, &ignite[1027]);
+	}
+	revolve_all(song, &ignite[1027]);
+	
+	for(i = 0; i < mlen; i++)
+	{
+		song[i%256] ^= c[i];
+		if(i%256 == 0 && i > 0)
+			revolve_all(song, &ignite[1027]);
+	}
+	revolve_all(song, &ignite[1027]);
+	
+	evolve(song);
+	
+	memmove(c + mlen, song + 128, CRYPTO_ABYTES);
+	
 	return 0;
 }
 
 int crypto_aead_decrypt
 (
-	unsigned char *m,unsigned long long *mlen,
-	unsigned char *nsec,
-	const unsigned char *c,unsigned long long clen,
-	const unsigned char *ad,unsigned long long adlen,
-	const unsigned char *npub,
-	const unsigned char *k
+	u8 *m,u64 *mlen,
+	u8 *nsec,
+	const u8 *c,u64 clen,
+	const u8 *ad,u64 adlen,
+	const u8 *npub,
+	const u8 *k
 )
 {
-	int statelen = 1028;
-	unsigned long long ignite[1028] = {0};
-			
+	u8 ignite[1028] = {0};
+	u8 ping[256], pong[256], sing[256], song[256];
+	u8 carry = 'a', mixer = 'b';
+	u64 i, j;
+		
 	*mlen = clen - CRYPTO_ABYTES;
-	memmove(&ignite[0], k, CRYPTO_KEYBYTES );
-	memmove(&ignite[4], npub, CRYPTO_NPUBBYTES); 
-	ignite[statelen - 1] = clen - CRYPTO_ABYTES;
-	ignite[statelen - 2] = adlen;
+	memmove(ignite, k, CRYPTO_KEYBYTES);
+	memmove(ignite + CRYPTO_KEYBYTES, npub, CRYPTO_NPUBBYTES);
+	store64to8x8(ignite + (CRYPTO_KEYBYTES + CRYPTO_NPUBBYTES), *mlen);
+	store64to8x8(ignite + (CRYPTO_KEYBYTES + CRYPTO_NPUBBYTES + 8), adlen);
 	
-	stir(ignite, statelen);
-	xorit(ignite, (unsigned char*) ad, adlen);
-	xorit(ignite, (unsigned char*) c, *mlen);	
-	evolve(ignite, 256);
+	for(i = 0; i < 8; i++)
+	{
+		for(j = 0; j < 1028; j++)
+		{
+			if(ignite[(j+2)%1028]>ignite[(j+3)%1028])
+				carry ^= ignite[(j+1)%1028];
+			else
+				carry ^= ~ignite[(j+1)%1028];
+
+			ignite[j] ^= carry;
+			carry += mixer;
+		}
+	}
 	
-	if(memcmp(&ignite[896], &c[*mlen], CRYPTO_ABYTES) != 0)
+	for(i = 0; i < 256; i++)
+	{
+		ping[i] = ignite[i];
+		pong[i] = ignite[i + 256];
+		sing[i] = ignite[i + 512];
+		song[i] = ignite[i + 768];
+	}
+		
+	for(i = 0; i < adlen; i++)
+	{
+		song[i%256] ^= ad[i];
+		if(i%256 == 0 && i > 0)
+			revolve_all(song, &ignite[1027]);
+	}
+	revolve_all(song, &ignite[1027]);
+	
+	for(i = 0; i < *mlen; i++)
+	{
+		song[i%256] ^= c[i];
+		if(i%256 == 0 && i > 0)
+			revolve_all(song, &ignite[1027]);
+	}
+	revolve_all(song, &ignite[1027]);
+	
+	evolve(song);
+	
+	if(memcmp(song + 128, c + *mlen, CRYPTO_ABYTES) != 0)
 		return -1;
-	
-	get_stream(ignite, c, m, *mlen);
+		
+	for(i = 0; i < *mlen; i++)
+	{
+		if(ping[(i+2)%256]>ping[(i+3)%256])
+			ignite[1024] ^= ping[(i+1)%256];
+		else
+			ignite[1024] ^= ~ping[(i+1)%256];
+
+		ping[i%256] ^= ignite[1024];
+		
+		if(pong[(i+2)%256]>pong[(i+3)%256])
+			ignite[1025] ^= pong[(i+1)%256];
+		else
+			ignite[1025] ^= ~pong[(i+1)%256];
+
+		pong[i%256] ^= ignite[1025];
+		
+		if(sing[(i+2)%256]>sing[(i+3)%256])
+			ignite[1026] ^= sing[(i+1)%256];
+		else
+			ignite[1026] ^= ~sing[(i+1)%256];
+
+		sing[i%256] ^= ignite[1026];
+		
+		m[i] = c[i] ^ ping[i%256] ^ pong[i%256] ^ sing[i%256];
+	}
 	
 	return 0;
 }
-

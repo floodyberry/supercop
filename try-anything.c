@@ -128,8 +128,17 @@ static void testvector(unsigned char *x,unsigned long long xlen)
 
 unsigned long long myrandom(void)
 {
+  unsigned char x[8];
   unsigned long long result;
-  testvector((unsigned char *) &result,sizeof(result));
+  testvector(x,8);
+  result = x[7];
+  result = (result<<8)|x[6];
+  result = (result<<8)|x[5];
+  result = (result<<8)|x[4];
+  result = (result<<8)|x[3];
+  result = (result<<8)|x[2];
+  result = (result<<8)|x[1];
+  result = (result<<8)|x[0];
   return result;
 }
 

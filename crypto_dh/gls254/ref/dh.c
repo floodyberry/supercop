@@ -25,9 +25,8 @@ int crypto_dh_gls254_ref_keypair(unsigned char *pk, unsigned char *sk) {
 int crypto_dh_gls254_ref(unsigned char *out, const unsigned char *pk, const unsigned char *sk) {
 	Curve curve;
 	curves_domParam(&curve, GLS254);
-	elt254 tmp;
 	
-	scmul_end_halv_direct((ui64*) out, tmp, (ui64*) &pk[0], (ui64*) &pk[32], (ui64*) sk, &curve);
+	scmul_end_halv_direct((ui64*) &out[0], (ui64*) &out[32], (ui64*) &pk[0], (ui64*) &pk[32], (ui64*) sk, &curve);
 
 	return 0;
 }

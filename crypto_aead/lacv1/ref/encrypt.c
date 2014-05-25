@@ -213,8 +213,8 @@ unsigned char S[16] = {14,9,15,0,13,4,10,11,1,2,8,3,7,6,12,5};
 
   //encryption algorithm of the reduced 16-round LBlock-s
   void G(
-   const unsigned char *input,
-   const unsigned char *subkey,
+   unsigned char *input,
+   unsigned char *subkey,
    unsigned char *output
  )
  {
@@ -277,8 +277,8 @@ unsigned char S[16] = {14,9,15,0,13,4,10,11,1,2,8,3,7,6,12,5};
 
   //encryption algorithm of the reduced 16-round LBlock-s with 48-bit leak data
   void Gleak(
-   const unsigned char *input,
-   const unsigned char *subkey,
+   unsigned char *input,
+   unsigned char *subkey,
    unsigned char *output,
    unsigned char *leak
  )
@@ -407,28 +407,39 @@ unsigned char S[16] = {14,9,15,0,13,4,10,11,1,2,8,3,7,6,12,5};
 	unsigned char tag[8];
 	int i, j;
 
-	//message should not be null
+	/*	//1 message should not be null
 	if(mlen == 0)
 	{
 		return -2;	
 	}
-	//at most 2^40 bits data (including associate data and message are allowed to be processed with the same key)
-	if((mlen + adlen) > ((unsigned long long)0x1 << 37))
+	//2 at most 2^40 bits data (including associate data and message are allowed to be processed with the same key)
+	if((mlen + adlen) > ((unsigned long)0x1 << 37))
 	{
 		return -3;	
 	}
+*/
 
-	//compute the length of padded message(in bytes)
-	if((mlen + 5) % 6 == 0)
+	if(mlen == 0) //if the message is null, the result is expected to be computed as follows 
 	{
-		mpadlen = mlen + 5;
+		mpadlen = 0;
+		mpad = (unsigned char *)malloc(mpadlen);	//the array to store padded message(mpad bytes)
+		padding(m, mlen, mpad, mpadlen);
 	}
 	else
 	{
-		mpadlen = ((mlen + 5) / 6 + 1) * 6;
+		//compute the length of padded message(in bytes)
+		if((mlen + 5) % 6 == 0)
+		{
+			mpadlen = mlen + 5;
+		}
+		else
+		{
+			mpadlen = ((mlen + 5) / 6 + 1) * 6;
+		}
+		mpad = (unsigned char *)malloc(mpadlen);	//the array to store padded message(mpad bytes)
+		padding(m, mlen, mpad, mpadlen);	//message padding procedure
 	}
-	mpad = (unsigned char *)malloc(mpadlen);	//the array to store padded message(mpad bytes)
-	padding(m, mlen, mpad, mpadlen);	//message padding procedure
+	
 
 	if(adlen == 0)		//associate data can be null
 	{
@@ -523,28 +534,36 @@ unsigned char S[16] = {14,9,15,0,13,4,10,11,1,2,8,3,7,6,12,5};
 
 	*mlen = clen - 8;	//length of message 
 
-	//message should not be null
+	/*1 message should not be null
 	if(*mlen == 0)
 	{
 		return -2;	
 	}
-	//at most 2^40 bits data (including associate data and message are allowed to be processed with the same key)
-	if((*mlen + adlen) > ((unsigned long long)0x1 << 37))
+	//2 at most 2^40 bits data (including associate data and message are allowed to be processed with the same key)
+	if((*mlen + adlen) > ((unsigned long)0x1 << 37))
 	{
 		return -3;	
-	}
+	}*/
 
-	//compute the length of padded message(in bytes), and store the padding data in the array mpad
-	if((*mlen + 5) % 6 == 0)
+	if(*mlen == 0) //if the message is null, the result is expected to be computed as follows 
 	{
-		mpadlen = *mlen + 5;
+		mpadlen = 0;	
 	}
 	else
 	{
-		mpadlen = ((*mlen + 5) / 6 + 1) * 6;
+		//compute the length of padded message(in bytes), and store the padding data in the array mpad
+		if((*mlen + 5) % 6 == 0)
+		{
+			mpadlen = *mlen + 5;
+		}
+		else
+		{
+			mpadlen = ((*mlen + 5) / 6 + 1) * 6;
+		}
+		mpad = (unsigned char *)malloc(mpadlen);
+		padding(m, *mlen, mpad, mpadlen);
 	}
-	mpad = (unsigned char *)malloc(mpadlen);
-	padding(m, *mlen, mpad, mpadlen);
+	
 
 	if(adlen == 0)		//associate data can be null
 	{

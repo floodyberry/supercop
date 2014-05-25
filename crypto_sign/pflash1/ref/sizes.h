@@ -10,7 +10,7 @@
 #define SECRETKEY_BYTES		L_PRI
 #define PUBLICKEY_BYTES		L_PUB
 #define SIGNATURE_BYTES		L_SIGN
-#define SHORTHASH_BYTES		32
+#define SHORTHASH_BYTES		L_MSG
 
 #endif /* _SIZE_H */
 

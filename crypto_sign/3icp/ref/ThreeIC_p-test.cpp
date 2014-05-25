@@ -34,7 +34,7 @@ Usage:	g++ -O3 -msse2 -o ThreeIC_p-test ThreeIC_p-test.cpp
 #define PUBLICKEY_BYTES 35712
 
 #define SIGNATURE_BYTES 36
-#define SHORTHASH_BYTES 32
+#define SHORTHASH_BYTES 20
 
 
 /* ========= sizes.h ================ */

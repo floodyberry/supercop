@@ -24,22 +24,6 @@ typedef unsigned char byte ;
 #define CC_BYTES (CC_WORDS*4)
 
 /*
- * functions to do various simple things to data chunks
- * defined in enchilada.c
- * 
- * conventions are as for memcpy()
- * all take pointers d for destination, s for source
- * argument order always d, s
-*/
-
-void zero_128( u32 * ) ;
-void cpy_128( u32 *, u32 * ) ;
-void mov_128( u32 *, u32 * ) ;
-void add_128(u32 *, u32 * ) ;
-void sub_128(u32 *, u32 * ) ;
-void xor_128(u32 *, u32 * ) ;
-
-/*
 	declarations for main functions in enchilada.c
 	copied from Bernstein's example AES-GCM code
 	to be sure they match test framework

@@ -122,5 +122,5 @@ static const unsigned char __attribute__((aligned(32))) base[48] = {
 
 int smult_base(unsigned char *q, const unsigned char *n)
 {
-  return smult(q,base,n);
+  return smult(q,n,base);
 }

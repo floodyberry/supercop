@@ -25,9 +25,8 @@ int crypto_dh_gls254_prot_keypair(unsigned char *pk, unsigned char *sk) {
 int crypto_dh_gls254_prot(unsigned char *out, const unsigned char *pk, const unsigned char *sk) {
 	Curve curve;
 	curves_domParam(&curve, GLS254);
-	elt254 tmp;
 	
-	scmul_rand_wreg((ui64*) out, tmp, (ui64*) &pk[0], (ui64*) &pk[32], (ui64*) sk, 5, &curve);
+	scmul_rand_wreg((ui64*) &out[0], (ui64*) &out[32], (ui64*) &pk[0], (ui64*) &pk[32], (ui64*) sk, 5, &curve);
 
 	return 0;
 }

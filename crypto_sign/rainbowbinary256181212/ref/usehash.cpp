@@ -13,9 +13,6 @@ extern int verification(const unsigned char *,unsigned long long,
   const unsigned char *,unsigned long long,
   const unsigned char *,unsigned long long);
 
-#ifdef __cplusplus
-extern "C"
-#endif
 int crypto_sign_keypair( unsigned char *pk, unsigned char *sk )
 {
 	unsigned long long sklen;
@@ -23,9 +20,6 @@ int crypto_sign_keypair( unsigned char *pk, unsigned char *sk )
 	return keypair( sk , &sklen , pk , &pklen );
 }
 
-#ifdef __cplusplus
-extern "C"
-#endif
 int crypto_sign(
   unsigned char *sm,unsigned long long *smlen,
   const unsigned char *m,unsigned long long mlen,
@@ -37,8 +31,8 @@ int crypto_sign(
 
   crypto_hash_sha256(h,m,mlen);
 
-  if (SHORTHASH_BYTES < 32) return -1;
-  i = signatureofshorthash(sm,smlen,h,32,sk,SECRETKEY_BYTES);
+  /* if (SHORTHASH_BYTES < 32) return -1; */
+  i = signatureofshorthash(sm,smlen,h,SHORTHASH_BYTES,sk,SECRETKEY_BYTES);
   if (i < 0) return i;
 
   if (*smlen != SIGNATURE_BYTES) return -1;
@@ -49,9 +43,6 @@ int crypto_sign(
   return 0;
 }
 
-#ifdef __cplusplus
-extern "C"
-#endif
 int crypto_sign_open(
   unsigned char *m,unsigned long long *mlen,
   const unsigned char *sm,unsigned long long smlen,
@@ -62,9 +53,10 @@ int crypto_sign_open(
   int i;
 
   if (smlen < SIGNATURE_BYTES) return -100;
+  crypto_hash_sha256(h,sm+SIGNATURE_BYTES,smlen-SIGNATURE_BYTES);
+  /* if (SHORTHASH_BYTES < 32) return -1; */
+  int r = verification(h,SHORTHASH_BYTES,sm,SIGNATURE_BYTES,pk,PUBLICKEY_BYTES);
   for (i = SIGNATURE_BYTES;i < smlen;++i) m[i - SIGNATURE_BYTES] = sm[i];
   *mlen = smlen - SIGNATURE_BYTES;
-  crypto_hash_sha256(h,m,*mlen);
-  if (SHORTHASH_BYTES < 32) return -1;
-  return verification(h,32,sm,SIGNATURE_BYTES,pk,PUBLICKEY_BYTES);
+  return r;
 }

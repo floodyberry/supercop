@@ -11,8 +11,6 @@
 	Simplified some, eliminated options I did not need
 
 	Assume 32-bit operations & standard libraries
-	Replace his copy_block(), xor_block()
-	 with cpy_128(), xor_128() from my code
 	Get rid of some ifdefs, including his VERSION_1
 
 	I do not use his aes.h
