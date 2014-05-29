@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <errno.h>
 #include <string.h>
 
 #include "crypto_aead.h"
@@ -25,7 +26,8 @@ int crypto_aead_encrypt(unsigned char *c,unsigned long long *clen,
   encrypt_final(&ctx, m, mlen, c, tag);
 
 
-  return 0;
+  if(errno) return -1;
+  else return 0;
 
 }
 
@@ -54,6 +56,6 @@ int crypto_aead_decrypt(unsigned char *m,unsigned long long *mlen,
 
   result = decrypt_final(&ctx, c, *mlen, tag,m);
 
-  if (result) return -1;
-  return 0;
+  if (errno|result) return -1;
+  else return 0;
 }

@@ -91,7 +91,7 @@ typedef struct {
     unsigned char chacha_key[32];
     unsigned char nh_key[HS1_SIV_NH_LEN+16*(HS1_SIV_HASH_RNDS-1)];
     unsigned char poly_key[HS1_SIV_HASH_RNDS*8];
-    #if HS1_SIV_ASU_HASH /* ASU */
+    #if (HS1_SIV_HASH_RNDS > 4) /* ASU */
     unsigned char asu_key[HS1_SIV_HASH_RNDS*24];
     #else
     unsigned char asu_key[];
@@ -320,7 +320,7 @@ void prf_hash2(uint64_t *h, uint32_t *in, unsigned inbytes, uint32_t *nhkey, uin
     s0 = poly_finalize(s0);
     s1 = poly_finalize(s1);
     #if (HS1_SIV_HASH_RNDS > 4)
-    write64le(h, (uint64_t)asu_hash(s1, asukey+3) << 32 | asu_hash(s0, asukey);
+    write64le(h, (uint64_t)asu_hash(s1, asukey+3) << 32 | asu_hash(s0, asukey));
     #else
     (void)asukey;
     write64le(h,s0);

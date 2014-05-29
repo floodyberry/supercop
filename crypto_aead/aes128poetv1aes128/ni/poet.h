@@ -2,8 +2,8 @@
 #define _POET_HL_
 
 #include <stdint.h>
-#include "aes.h"
 #include "api.h"
+#include "aes-ni.h"
 
 #define BLOCKLEN      CRYPTO_NPUBBYTES
 #define BLOCKLEN_BITS CRYPTO_NPUBBYTES*8
@@ -29,6 +29,8 @@ typedef int boolean;
 struct poet_ctx {
   AES_KEY aes_enc;
   AES_KEY aes_dec;
+  AES_KEY aes_lt;
+  AES_KEY aes_lb;
 
   block k; /* block cipher key */
   block tm; /* masking keys */
@@ -51,8 +53,8 @@ void encrypt_block(struct poet_ctx *ctx, const uint8_t plaintext[16],
 		   uint8_t ciphertext[16]);
 
 void encrypt_final(struct poet_ctx *ctx, const uint8_t *plaintext,
-		   uint64_t plen, uint8_t *ciphertext, uint8_t tag[BLOCKLEN]);
-
+		   uint64_t plen, uint8_t *ciphertext,
+		   uint8_t tag[BLOCKLEN]);
 
 
 void decrypt_block(struct poet_ctx *ctx, const uint8_t ciphertext[16],

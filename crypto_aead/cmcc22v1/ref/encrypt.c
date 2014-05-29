@@ -69,17 +69,17 @@ int ctr(uc *v, const uc *k, const uc *plain, unsigned long long plain_len,
 	{
 	  v[15] += 1;
 	}
-      else if(v[15] = 255)
+      else if(v[15] == 255)
 	{
 	  v[15] = 0;
 	  if(v[14] < 255)
 	    v[14] += 1;
-	  else if(v[14] = 255)
+	  else if(v[14] == 255)
 	    {
 	      v[14] = 0;
 	      if(v[13] < 255)
 		v[13] += 1;
-	      else if(v[13] = 255)
+	      else if(v[13] == 255)
 		{
 		  v[13] = 0;
 		  v[12] += 1;
@@ -139,7 +139,7 @@ int pad(uc *buf, unsigned int pad_length, unsigned long long length,
     {
       /* we have a whole block to pad */
       for(i=length-ABS; i <= length-1; i++)
-	buf[i] ^= k1[i];
+	buf[i] ^= k1[i - length + ABS];
       return 0;
     }
   else if(pad_length > 16 || pad_length < 1)
@@ -153,7 +153,7 @@ int pad(uc *buf, unsigned int pad_length, unsigned long long length,
       for(i=0; i< pad_length-1;i++)
 	buf[length+1+i] = 0x00; /* NOW XOR last 16 bytes with K2 */
       n = ABS - pad_length;
-      for(i=0; i<16; i++)
+      for(i=0; i < ABS; i++)
 	buf[length-n+i] ^= k2[i];
     }
 }
@@ -221,7 +221,7 @@ int crypto_aead_encrypt(
   uc big_m[ABS] = {0xb6, 0xb6, 0xb6, 0xb6,0xb6, 0xb6, 0xb6, 0xb6, 
                    0xb6, 0xb6, 0xb6, 0xb6,0xb6, 0xb6, 0xb6, 0xb6};
   unsigned long long p1_length, p2_length, cbc_length, j;
-  int i, pad_length, temp;
+  int i, pad_length, temp, index;
   uc k1[16], k2[16], w[16], tag[16], *scratch, *cbc_buffer;
   uc *x, small[CRYPTO_ABYTES];
   if(nsec != NULL)
@@ -230,8 +230,9 @@ int crypto_aead_encrypt(
     return -2;
   if(*clen < mlen + CRYPTO_ABYTES)
     return -2;
-  for(i=ABS-CRYPTO_NPUBBYTES;i<ABS;i++)
-    big_m[i] = npub[i];
+  index = ABS - CRYPTO_NPUBBYTES;
+  for(i=index; i < ABS; i++)
+    big_m[i] = npub[i - index];
   p1_length = (mlen + CRYPTO_ABYTES)/2;
   p2_length = (mlen + CRYPTO_ABYTES) - p1_length;
   cbc_length = p1_length;
@@ -288,7 +289,7 @@ int crypto_aead_encrypt(
   for(j=0; j < p2_length; j++)
         x[j] = cbc_buffer[j];
   for(j=p2_length; j < p2_length + adlen; j++)
-    cbc_buffer[j] = ad[j];
+    cbc_buffer[j] = ad[j - p2_length];
   if(cmac(cbc_buffer, k+32, p2_length+adlen, tag) == -1)
     return -4;
   scratch = malloc(cbc_length*sizeof(unsigned char *));
@@ -345,7 +346,7 @@ int crypto_aead_decrypt(
   uc big_m[ABS] = {0xb6, 0xb6, 0xb6, 0xb6,0xb6, 0xb6, 0xb6, 0xb6, 
                    0xb6, 0xb6, 0xb6, 0xb6,0xb6, 0xb6, 0xb6, 0xb6};
   unsigned long long p1_length, p2_length, cbc_length, j;
-  int i, pad_length, temp;
+  int i, pad_length, temp, index;
   uc k1[16], k2[16], w[16], tag[16], *scratch, *cbc_buffer;
   uc *x;
   if(nsec != NULL)
@@ -358,8 +359,9 @@ int crypto_aead_decrypt(
     return -2;
   if(clen < CRYPTO_ABYTES)
     return -1;
-  for(i=ABS-CRYPTO_NPUBBYTES;i<ABS;i++)
-    big_m[i] = npub[i];
+  index = ABS - CRYPTO_NPUBBYTES;
+  for(i=index; i < ABS; i++)
+    big_m[i] = npub[i - index];
   p1_length = clen/2;
   p2_length = clen - p1_length;
   cbc_length = p1_length;
@@ -405,7 +407,7 @@ int crypto_aead_decrypt(
   for(j=0; j < p2_length; j++)
         x[j] = cbc_buffer[j];
   for(j=p2_length; j < p2_length + adlen; j++)
-    cbc_buffer[j] = ad[j];
+     cbc_buffer[j] = ad[j - p2_length];
   if(cmac(cbc_buffer, k+32, p2_length+adlen, tag) == -1)
     return -4;
   scratch = malloc(cbc_length*sizeof(unsigned char *));

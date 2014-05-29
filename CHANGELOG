@@ -1,3 +1,17 @@
+Changes from 20140529:
+
+   * Minor fixes to paeq, cmcc, hs1sivhiv1.
+
+   * aes128poet: Remove gf128mul at submitter's request. Add AES-NI
+     implementations.
+
+   * More clang options. (But only a few options per architecture: we
+     don't want benchmarks to run forever. People who want to do heavy
+     exploration of different optimization options should do it on their
+     own and submit asm.)
+
+Many machines are chugging along on 20140525 now.
+
 Changes from 20140517:
 
    * crypto_aead: Updates to aegis, aesjambu, elmd500, enchilada, lac,

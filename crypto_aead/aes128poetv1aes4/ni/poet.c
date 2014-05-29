@@ -1,41 +1,59 @@
 #ifdef DEBUG
-#include<stdio.h>
+   #include<stdio.h>
 #endif
-
+#include <byteswap.h>
 #include <string.h>
 
-#include "poet.h"
+#ifdef __linux__
+   #include <endian.h>
+#elif __FreeBSD__ || __NetBSD__ ||  __OpenBSD__
+  #include <sys/endian.h>
+#elif __APPLE__
+  #include <machine/endian.h>
+#endif
 
+#include "poet.h"
 #include "gf_mul.h"
 
-#define TOP_HASH     gf_mul(ctx->x, ctx->x, ctx->lt)
-#define BOTTOM_HASH  gf_mul(ctx->y, ctx->y, ctx->lb)
+
+#if BYTE_ORDER == BIG_ENDIAN
+  #define TO_BIG_ENDIAN_64(n) (n)
+#else
+  #define TO_BIG_ENDIAN_64(n) bswap_64(n)
+#endif
 
 
-void keysetup(struct poet_ctx *ctx, const uint8_t key[KEYLEN_BITS]){
 
+#define TOP_HASH     AESNI_encrypt4(ctx->x, ctx->x, ctx->aes_lt)
+#define BOTTOM_HASH  AESNI_encrypt4(ctx->y, ctx->y, ctx->aes_lb)
+
+
+void keysetup(struct poet_ctx *ctx, const uint8_t key[KEYLEN_BITS])
+{
   uint8_t ctr[BLOCKLEN];
-  AES_KEY aes_enc;
+  AES_KEY aes_key;
 
   memset(ctx->tau,0,BLOCKLEN);
   memset(ctr,0, BLOCKLEN);
 
   /* Generate block cipher key */
-  AES_set_encrypt_key(key, KEYLEN_BITS, &aes_enc);
-  AES_encrypt(ctr, ctx->k,  &aes_enc);
+  AESNI_Key_Expansion(key, aes_key);
+  AESNI_encrypt(ctr, ctx->k,aes_key);
 
-  AES_set_encrypt_key(ctx->k, KEYLEN_BITS, &(ctx->aes_enc));
-  AES_set_decrypt_key(ctx->k, KEYLEN_BITS, &(ctx->aes_dec));
+  AESNI_Key_Expansion(ctx->k, ctx->aes_enc);
+  AES_Key_Dec(ctx->aes_enc, ctx->aes_dec);
 
   /* Generate header key */
-  ctr[BLOCKLEN-1]+=1; AES_encrypt(ctr, ctx->l,  &aes_enc);
+  ctr[BLOCKLEN-1]+=1; AESNI_encrypt(ctr, ctx->l, aes_key);
 
   /* Generate almost XOR universal hash function keys */
-  ctr[BLOCKLEN-1]+=1; AES_encrypt(ctr, ctx->lt,  &aes_enc);
-  ctr[BLOCKLEN-1]+=1; AES_encrypt(ctr, ctx->lb,  &aes_enc);
+  ctr[BLOCKLEN-1]+=1; AESNI_encrypt(ctr, ctx->lt, aes_key);
+  AESNI_Key_Expansion4(ctx->lt, ctx->aes_lt);
+  ctr[BLOCKLEN-1]+=1; AESNI_encrypt(ctr, ctx->lb, aes_key);
+  AESNI_Key_Expansion4(ctx->lb,ctx->aes_lb);
 
   /* Generate tag masking keys */
-  ctr[BLOCKLEN-1]+=1; AES_encrypt(ctr, ctx->tm,  &aes_enc);
+  ctr[BLOCKLEN-1]+=1; AESNI_encrypt(ctr, ctx->tm, aes_key);
 
 }
 
@@ -58,61 +76,70 @@ inline void xor_block(uint8_t *c, const uint8_t  *a, const uint8_t  *b)
 /***************************************************************************/
 
 
+
 void process_header(struct poet_ctx *ctx, const uint8_t  *header, uint64_t header_len )
 {
-  block mask;
-  block factor;
+  uint64_t h[2];
+  unsigned char *mask = (unsigned char *) h;
   block in;
   block out;
-  block product;
   uint64_t offset=0;
 
   ctx->mlen=0;
-  memset(factor,0,BLOCKLEN);
-  memset(product,0,BLOCKLEN);
-  memset(mask,0,BLOCKLEN);
-  memset(ctx->tau,0,BLOCKLEN);
+  memcpy(h, ctx->l, BLOCKLEN);
+  memset(ctx->tau, 0, BLOCKLEN);
 
-  product[0] = 0x80; // since 1000 0000 = 1
-  factor[0]  = 0x40; // since 0100 0000 = 2
 
   while(header_len > BLOCKLEN)
     {
-      gf_mul(mask, product, ctx->l);
+
+      if(offset)
+	{
+	  h[0] = TO_BIG_ENDIAN_64(h[0]);  h[1] = TO_BIG_ENDIAN_64(h[1]);
+	  GF128_double(h);
+	  h[0] = TO_BIG_ENDIAN_64(h[0]); h[1] = TO_BIG_ENDIAN_64(h[1]);
+	}
       xor_block(in,header+offset,mask);
-      AES_encrypt(in,out,&(ctx->aes_enc));
+
+      AESNI_encrypt(in,out,ctx->aes_enc);
       xor_block(ctx->tau,out,ctx->tau);
 
       offset += BLOCKLEN;
       header_len -= BLOCKLEN;
-
-      gf_mul(product,product,factor);
     }
 
+  h[0] = TO_BIG_ENDIAN_64(h[0]);  h[1] = TO_BIG_ENDIAN_64(h[1]);
+  GF128_double(h);
+  h[0] = TO_BIG_ENDIAN_64(h[0]);  h[1] = TO_BIG_ENDIAN_64(h[1]);
+
   /* LASTBLOCK */
-  if(header_len < 16)
+   if(header_len < 16)
     {
-      factor[0]=0xA0; // 1010 0000 = 5 in Big Endian
       memset(in,0,BLOCKLEN);
       memcpy(in,header+offset,header_len);
       in[header_len]=0x80;
+
+      h[0] = TO_BIG_ENDIAN_64(h[0]); h[1] = TO_BIG_ENDIAN_64(h[1]);
+      GF128_quintuple(h);
+      h[0] = TO_BIG_ENDIAN_64(h[0]); h[1] = TO_BIG_ENDIAN_64(h[1]);
+
     }
-  else
-    {
-      factor[0]=0xC0; // 1100 0000 = 3 in Big Endian
-      memcpy(in,header+offset,BLOCKLEN);
-    }
+   else
+     {
+       memcpy(in,header+offset,BLOCKLEN);
+       h[0] = TO_BIG_ENDIAN_64(h[0]); h[1] = TO_BIG_ENDIAN_64(h[1]);
+       GF128_triple(h);
+       h[0] = TO_BIG_ENDIAN_64(h[0]); h[1] = TO_BIG_ENDIAN_64(h[1]);
+     }
 
-  gf_mul(product,product,factor);
-  gf_mul(mask,product,ctx->l);
-  xor_block(in,mask,in);
+   xor_block(in,mask,in);
 
-  xor_block(in,in,ctx->tau);
-  AES_encrypt(in ,ctx->tau, &(ctx->aes_enc));
-
-  memcpy(ctx->x, ctx->tau, BLOCKLEN);
-  memcpy(ctx->y, ctx->tau, BLOCKLEN);
+   xor_block(in,in,ctx->tau);
+   AESNI_encrypt(in ,ctx->tau, ctx->aes_enc);
+   memcpy(ctx->x, ctx->tau, BLOCKLEN);
+   memcpy(ctx->y, ctx->tau, BLOCKLEN);
 }
+
 
 
 
@@ -127,7 +154,7 @@ void encrypt_block(struct poet_ctx *ctx, const uint8_t plaintext[16],
   TOP_HASH;
   xor_block(ctx->x, plaintext,ctx->x);
 
-  AES_encrypt(ctx->x, tmp, &(ctx->aes_enc));
+  AESNI_encrypt(ctx->x, tmp, ctx->aes_enc);
 
   BOTTOM_HASH;
   xor_block(ciphertext, tmp,ctx->y);
@@ -164,7 +191,7 @@ void encrypt_final(struct poet_ctx *ctx, const uint8_t *plaintext,
   memset(s,0,BLOCKLEN);
   len =  TO_LITTLE_ENDIAN_64(ctx->mlen);
   memcpy(s, &len,8);
-  AES_encrypt(s, s ,&(ctx->aes_enc));
+  AESNI_encrypt(s, s ,ctx->aes_enc);
 
   /* Last message block must be padded if necesscary */
   memcpy(tmp,plaintext+offset,plen);
@@ -177,7 +204,7 @@ void encrypt_final(struct poet_ctx *ctx, const uint8_t *plaintext,
   xor_block(tmp,s,tmp);
   xor_block(ctx->x,tmp,ctx->x);
 
-  AES_encrypt(ctx->x, tmp, &(ctx->aes_enc));
+  AESNI_encrypt(ctx->x, tmp, ctx->aes_enc);
 
   BOTTOM_HASH;
   xor_block(tmp2, tmp,ctx->y);
@@ -201,7 +228,7 @@ void encrypt_final(struct poet_ctx *ctx, const uint8_t *plaintext,
   xor_block(ctx->x, ctx->tau, ctx->x);
   xor_block(ctx->x, ctx->tm, ctx->x);
 
-  AES_encrypt(ctx->x, tmp, &(ctx->aes_enc));
+  AESNI_encrypt(ctx->x, tmp, ctx->aes_enc);
 
   BOTTOM_HASH;
   xor_block(tmp, ctx->y, tmp);
@@ -224,7 +251,7 @@ void decrypt_block(struct poet_ctx *ctx, const uint8_t ciphertext[16],
   BOTTOM_HASH;
   xor_block(ctx->y, ciphertext,ctx->y);
 
-  AES_decrypt(ctx->y, tmp, &(ctx->aes_dec));
+  AESNI_decrypt(ctx->y, tmp, ctx->aes_dec);
 
   TOP_HASH;
   xor_block(plaintext, tmp,ctx->x);
@@ -265,7 +292,7 @@ int decrypt_final(struct poet_ctx *ctx, const uint8_t *ciphertext,
   memset(s,0,BLOCKLEN);
   len =  TO_LITTLE_ENDIAN_64(ctx->mlen);
   memcpy(s, &len, 8);
-  AES_encrypt(s, s ,&(ctx->aes_enc));
+  AESNI_encrypt(s, s ,ctx->aes_enc);
 
 
   /* Last ciphertext block must be padded if necesscary */
@@ -278,7 +305,7 @@ int decrypt_final(struct poet_ctx *ctx, const uint8_t *ciphertext,
   xor_block(tmp,s,tmp);
   xor_block(ctx->y, tmp,ctx->y);
 
-  AES_decrypt(ctx->y, tmp, &(ctx->aes_dec));
+  AESNI_decrypt(ctx->y, tmp, ctx->aes_dec);
 
   TOP_HASH;
   xor_block(tmp2, tmp, ctx->x);
@@ -302,7 +329,7 @@ int decrypt_final(struct poet_ctx *ctx, const uint8_t *ciphertext,
   xor_block(ctx->x, ctx->tau ,ctx->x);
   xor_block(ctx->x, ctx->tm ,ctx->x);
 
-  AES_encrypt(ctx->x, tmp, &(ctx->aes_enc));
+  AESNI_encrypt(ctx->x, tmp, ctx->aes_enc);
 
   BOTTOM_HASH;
   xor_block(tmp, ctx->y, tmp);
