@@ -96,6 +96,17 @@ do
 	cat "$top/$abi/$source/sources" >&8
       done
 
+      if [ "$t1" = integrate ]
+      then
+        grep "^$t2 " OPERATIONS \
+        | while read o macros prototypes
+        do
+          p=$t3
+          [ -f "$o/$p/used" ] \
+	  && echo "used" >&8
+        done
+      fi
+
     else
       while read source
       do

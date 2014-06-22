@@ -96,6 +96,7 @@ int ctr(uc *v, const uc *k, const uc *plain, unsigned long long plain_len,
       j += 16;
       no_blocks--;
     }
+  return 0;
 }
 
 int get_subkeys(uc *key1, uc *key2, const uc *aes_key)
@@ -128,6 +129,7 @@ int get_subkeys(uc *key1, uc *key2, const uc *aes_key)
     }
   if(flag == 1)
     key2[ABS-1] ^= 0x87;
+  return 0;
 }
 
 int pad(uc *buf, unsigned int pad_length, unsigned long long length,
@@ -156,6 +158,7 @@ int pad(uc *buf, unsigned int pad_length, unsigned long long length,
       for(i=0; i < ABS; i++)
 	buf[length-n+i] ^= k2[i];
     }
+  return 0;
 }
 
 int cmac(uc *msg, const uc *aes_key, unsigned long long length, uc *tag)
@@ -180,6 +183,7 @@ int cmac(uc *msg, const uc *aes_key, unsigned long long length, uc *tag)
 	temp[i] = msg[16*j + i] ^ tag[i];
       AES(tag,temp,aes_key);
     }
+  return 0;
 }
 
 int cbc_encrypt(uc *in, unsigned long long length, uc *out, 
@@ -203,6 +207,7 @@ int cbc_encrypt(uc *in, unsigned long long length, uc *out,
 	ivc[i] = in[16*j + i] ^ out[16*(j-1) + i];
       AES(out + 16*j,ivc,aes_key);
     }
+  return 0;
 }
 
 
@@ -224,12 +229,9 @@ int crypto_aead_encrypt(
   int i, pad_length, temp, index;
   uc k1[16], k2[16], w[16], tag[16], *scratch, *cbc_buffer;
   uc *x, small[CRYPTO_ABYTES];
-  if(nsec != NULL)
-    return -2;
   if(npub == NULL)
     return -2;
-  if(*clen < mlen + CRYPTO_ABYTES)
-    return -2;
+  *clen = mlen + CRYPTO_ABYTES;
   index = ABS - CRYPTO_NPUBBYTES;
   for(i=index; i < ABS; i++)
     big_m[i] = npub[i - index];
@@ -349,14 +351,11 @@ int crypto_aead_decrypt(
   int i, pad_length, temp, index;
   uc k1[16], k2[16], w[16], tag[16], *scratch, *cbc_buffer;
   uc *x;
-  if(nsec != NULL)
-    return -2;
   if(npub == NULL)
     return -2;
-  /* WE EXPECT *mlen to be the length of the buffer m and
-     we expect that *mlen is at least clen - CRYPTO_ABYTES */
-  if(*mlen < clen - CRYPTO_ABYTES)
-    return -2;
+  /* WE EXPECT *mlen to lower bound the length of the buffer m and
+     we expect that m has at least clen - CRYPTO_ABYTES */
+  *mlen = clen - CRYPTO_ABYTES;
   if(clen < CRYPTO_ABYTES)
     return -1;
   index = ABS - CRYPTO_NPUBBYTES;

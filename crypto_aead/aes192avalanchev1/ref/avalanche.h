@@ -27,9 +27,6 @@
 #include "crypto_aead.h"
 #include "openssl/aes.h"
 
-
-//#define DebugOn
-
 /***************	Sizes	********************/
 #define col			4 
 #define row			4
@@ -84,9 +81,12 @@ void InitializeForAD(unsigned long long *length);
 void FileSettingForEnc(Byte *cipherText, unsigned long long numOfChunks);
 void FileSettingForDec(Byte *plainText, unsigned long long mlen);
 //PCMAC.c
-void SetupForEnc(AESArguments *input, const unsigned char *m, Chunk r, unsigned long long mLen, unsigned long long numOfChunks);
-void SetupForDec(AESArguments *input, const unsigned char *c, unsigned long long numOfChunks);
-void TagGeneration(const unsigned char *m, Chunk r, Chunk tag, unsigned long long numOfChunks);
+void SetupForEnc(AESArguments *input, const unsigned char *m, Chunk r,
+		unsigned long long mLen, unsigned long long numOfChunks);
+void SetupForDec(AESArguments *input, const unsigned char *c,
+		unsigned long long numOfChunks);
+void TagGeneration(const unsigned char *m, Chunk r, Chunk tag,
+		unsigned long long numOfChunks);
 void NumGenerator(Chunk x, int random);
 void XORKey(Byte* nCtr, Byte* key, Byte* finalKey);
 void ConvertCharToHex(char cipherInHex[], char temp[]);

@@ -218,7 +218,7 @@ void joltik_aead_encrypt(const uint8_t *ass_data, size_t ass_data_len,
 {
 
     uint32_t i;
-    uint8_t tweak[8];
+    uint8_t tweak[12];
     uint8_t tweakey[TWEAKEY_STATE_SIZE/8];
     uint8_t Auth[8];
     uint8_t last_block[8];
@@ -412,7 +412,7 @@ int joltik_aead_decrypt(const uint8_t *ass_data, size_t ass_data_len,
 {
 
     uint32_t i;
-    uint8_t tweak[8];
+    uint8_t tweak[12];
     uint8_t tweakey[TWEAKEY_STATE_SIZE/8];
     uint8_t Auth[8];
     uint8_t last_block[8];

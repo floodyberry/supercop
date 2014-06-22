@@ -475,10 +475,11 @@ int crypto_aead_decrypt(
 	unsigned char* out = m;
 	unsigned long long remaining;
 
+	const unsigned char* T;
+	unsigned char buf[32]; /* for XLS: at most 15 + 16 bytes */
 	block_t V;
 	block_t lastblock;
 	block_t checksum = { 0 };
-	const unsigned char* T;
 	block_t tag;
 	block_t block, Lup, Ldown, twod1;
 	block_t LL = { 0 };
@@ -528,10 +529,9 @@ int crypto_aead_decrypt(
 		remaining -= 16;
 	}
 
-	T = in;
-	if (remaining > 0) { /* last partial block remaining, use XLS^-1 */
-		unsigned char buf[32]; /* at most 15 + 16 bytes */
-		
+	if (remaining == 0) { /* last block full, take tag from input */
+		T = in;
+	} else { /* last partial block remaining, use XLS^-1 */
 		memcpy(buf, in, remaining+16);
 		in += remaining;
 		xlsinv(buf, remaining, twod1, k);

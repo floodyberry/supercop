@@ -27,8 +27,6 @@
 #include "crypto_aead.h"
 #include "openssl/aes.h"
 
-//#define DebugOn
-
 /***************	Sizes	********************/
 #define col			4 
 #define row			4

@@ -83,15 +83,7 @@
 /***************************************************************************/
 /* Derived configuration options - Adjust as needed                        */
 /***************************************************************************/
-
-/* These determine whether vectors should be used.                         */
 #define USE_SSE2    ((__SSE2__ || (_M_IX86_FP>=2) || _M_X64) && !VECTORS_OFF)
-#define USE_ALTIVEC (__ALTIVEC__ && !VECTORS_OFF)
-#define USE_NEON    (__ARM_NEON__ && !VECTORS_OFF)
-
-/* These determine how to allocate 16-byte aligned vectors, if needed.     */
-#define USE_MM_MALLOC      (USE_SSE2 && !(_M_X64 || __amd64__))
-#define USE_POSIX_MEMALIGN (USE_ALTIVEC && __GLIBC__ && !__PPC64__)
 
 /***************************************************************************/
 /* Define blocks and operations -- Patch if incorrect on your compiler.    */
@@ -104,27 +96,31 @@
     #define xor_block(x,y)        _mm_xor_si128(x,y)
     #define zero_block()          _mm_setzero_si128()
     #define store(p,x)    _mm_store_si128((__m128i *)(p), (x))
+
     #if __SSSE3__
-        #include <tmmintrin.h>          /* SSSE3 instructions              */
+        #include <tmmintrin.h>              /* SSSE3 instructions            */
     #endif
-#elif USE_ALTIVEC
-    #include <altivec.h>
-    typedef ALIGN(16) vector unsigned block;
-    #define xor_block(x,y)         vec_xor(x,y)
-    #define zero_block()           vec_splat_u32(0)
-#elif USE_NEON
-    #include <arm_neon.h>
-    typedef ALIGN(16) int8x16_t block;  /* Yay! Endian-neutral reads!      */
-    #define xor_block(x,y)             veorq_s8(x,y)
-    #define zero_block()               vdupq_n_s8(0)
-#else
-    typedef struct { uint64_t l,r; } block;
-    static inline block xor_block(block x, block y) {
-        x.l^=y.l; x.r^=y.r; return x;
-    }
-    static inline block zero_block(void) { 
-        const block t = {0,0}; return t; 
-    }
+
+
+#define L0(i,tmpblock,ta,adp,b) {                                           \
+    if((i)==0) {                                                            \
+      (ta)[0]=zero_block();                                                 \
+    } else {                                                                \
+      (tmpblock)=_mm_loadu_si128((__m128i const*)&(adp)[(b)++]);            \
+      _mm_store_si128((__m128i *)&(ta)[0], (tmpblock));                     \
+    }                                                                       \
+  }
+
+#define L(i,count,tmpblock,ta,adp,b) {                                      \
+    if((i)<(count)) {                                                       \
+      (tmpblock)=_mm_loadu_si128((__m128i const*)&(adp)[(b)++]);            \
+      _mm_store_si128((__m128i *)&(ta)[(i)], (tmpblock));                   \
+    } else {                                                                \
+      (ta)[(i)]=zero_block();                                               \
+    }                                                                       \
+  }
+
+
 #endif
 
 /***************************************************************************/
@@ -452,6 +448,7 @@ void printBlock(block B) {
     ALIGN(16) const block* adp;      /* Pointer to the blocks to process */
     uint8_t tweak[16];	             /* The tweak value */
     uint8_t hasBeenPadded;           /* boolean flag which indicates whether the input has been padded */
+    ALIGN(16) __m128i tmpblock;
 
     /*************************************************
      *
@@ -499,16 +496,14 @@ void printBlock(block B) {
         set_block_number_in_tweak(tweak, i/16);
         AES_set_tweak(tweak, &allTweaks);
 
-        if(i==0) ta[0] = zero_block();
-        else     ta[0] = adp[b++];
-
-        ta[1] = (1<count)?adp[b++]:zero_block();
-        ta[2] = (2<count)?adp[b++]:zero_block();
-        ta[3] = (3<count)?adp[b++]:zero_block();
-        ta[4] = (4<count)?adp[b++]:zero_block();
-        ta[5] = (5<count)?adp[b++]:zero_block();
-        ta[6] = (6<count)?adp[b++]:zero_block();
-        ta[7] = (7<count)?adp[b++]:zero_block();
+        L0(i     ,tmpblock,ta,adp,b);
+        L(1,count,tmpblock,ta,adp,b);
+        L(2,count,tmpblock,ta,adp,b);
+        L(3,count,tmpblock,ta,adp,b);
+        L(4,count,tmpblock,ta,adp,b);
+        L(5,count,tmpblock,ta,adp,b);
+        L(6,count,tmpblock,ta,adp,b);
+        L(7,count,tmpblock,ta,adp,b);
 
         /* bitslice AES on BPI=8 parallel blocks */
         AES_ecb_encrypt_blks(ta, BPI, &encrypt_key, &allTweaks);
@@ -732,15 +727,14 @@ void printBlock(block B) {
         set_block_number_in_tweak(tweak, i/16);
         AES_set_tweak(tweak, &allTweaks);
 
-        if(i==0) ta[0] = zero_block();
-        else     ta[0] = adp[b++];
-        ta[1] = (1<count)?adp[b++]:zero_block();
-        ta[2] = (2<count)?adp[b++]:zero_block();
-        ta[3] = (3<count)?adp[b++]:zero_block();
-        ta[4] = (4<count)?adp[b++]:zero_block();
-        ta[5] = (5<count)?adp[b++]:zero_block();
-        ta[6] = (6<count)?adp[b++]:zero_block();
-        ta[7] = (7<count)?adp[b++]:zero_block();
+        L0(i     ,tmpblock,ta,adp,b);
+        L(1,count,tmpblock,ta,adp,b);
+        L(2,count,tmpblock,ta,adp,b);
+        L(3,count,tmpblock,ta,adp,b);
+        L(4,count,tmpblock,ta,adp,b);
+        L(5,count,tmpblock,ta,adp,b);
+        L(6,count,tmpblock,ta,adp,b);
+        L(7,count,tmpblock,ta,adp,b);
 
         /* Accumulate the XOR of input blocks in the Checksum  */
         for (k=0; k<count; ++k) {
@@ -894,6 +888,7 @@ void printBlock(block B) {
     ALIGN(16) const block* adp;      /* Pointer to the blocks to process */
     uint8_t tweak[16];               /* The tweak value */
     uint8_t hasBeenPadded;           /* boolean flag which indicates whether the input has been padded */
+    ALIGN(16) __m128i tmpblock;
 
     /*************************************************
     *
@@ -941,15 +936,14 @@ void printBlock(block B) {
         set_block_number_in_tweak(tweak, i/16);
         AES_set_tweak(tweak, &allTweaks);
 
-        if(i==0) ta[0] = zero_block();
-        else     ta[0] = adp[b++];
-        ta[1] = (1<count)?adp[b++]:zero_block();
-        ta[2] = (2<count)?adp[b++]:zero_block();
-        ta[3] = (3<count)?adp[b++]:zero_block();
-        ta[4] = (4<count)?adp[b++]:zero_block();
-        ta[5] = (5<count)?adp[b++]:zero_block();
-        ta[6] = (6<count)?adp[b++]:zero_block();
-        ta[7] = (7<count)?adp[b++]:zero_block();
+        L0(i     ,tmpblock,ta,adp,b);
+        L(1,count,tmpblock,ta,adp,b);
+        L(2,count,tmpblock,ta,adp,b);
+        L(3,count,tmpblock,ta,adp,b);
+        L(4,count,tmpblock,ta,adp,b);
+        L(5,count,tmpblock,ta,adp,b);
+        L(6,count,tmpblock,ta,adp,b);
+        L(7,count,tmpblock,ta,adp,b);
 
         /* bitslice AES on BPI=8 parallel blocks */
         AES_ecb_encrypt_blks(ta, BPI, &encrypt_key, &allTweaks);
@@ -1059,14 +1053,16 @@ void printBlock(block B) {
         AES_set_tweak(tweak, &allTweaks);
 
         /* Apply the first layer of AES on the block */
+        tmpblock=_mm_loadu_si128((__m128i const*)&adp[0]);
+        _mm_store_si128((__m128i *)&ta[0], tmpblock);
         ta[0] = adp[0];
-        ta[1] = adp[0];
-        ta[2] = adp[0];
-        ta[3] = adp[0];
-        ta[4] = adp[0];
-        ta[5] = adp[0];
-        ta[6] = adp[0];
-        ta[7] = adp[0];
+        ta[1] = ta[0];
+        ta[2] = ta[0];
+        ta[3] = ta[0];
+        ta[4] = ta[0];
+        ta[5] = ta[0];
+        ta[6] = ta[0];
+        ta[7] = ta[0];
 
         /* bitslice AES on the block */
         AES_ecb_decrypt_blks(ta, BPI, &encrypt_key, &allTweaks);
@@ -1170,15 +1166,14 @@ void printBlock(block B) {
         set_block_number_in_tweak(tweak, i/16);
         AES_set_tweak(tweak, &allTweaks);
 
-        if(i==0) ta[0] = zero_block();
-        else     ta[0] = adp[b++];
-        ta[1] = (1<count)?adp[b++]:zero_block();
-        ta[2] = (2<count)?adp[b++]:zero_block();
-        ta[3] = (3<count)?adp[b++]:zero_block();
-        ta[4] = (4<count)?adp[b++]:zero_block();
-        ta[5] = (5<count)?adp[b++]:zero_block();
-        ta[6] = (6<count)?adp[b++]:zero_block();
-        ta[7] = (7<count)?adp[b++]:zero_block();
+        L0(i     ,tmpblock,ta,adp,b);
+        L(1,count,tmpblock,ta,adp,b);
+        L(2,count,tmpblock,ta,adp,b);
+        L(3,count,tmpblock,ta,adp,b);
+        L(4,count,tmpblock,ta,adp,b);
+        L(5,count,tmpblock,ta,adp,b);
+        L(6,count,tmpblock,ta,adp,b);
+        L(7,count,tmpblock,ta,adp,b);
 
         /* bitslice AES on BPI=8 parallel blocks */
         AES_ecb_decrypt_blks(ta, BPI, &encrypt_key, &allTweaks);

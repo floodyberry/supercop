@@ -603,7 +603,7 @@ swapmove \x3, \x7, $4, BS2, \t
 
 .macro bitslicekey0 key, bskey
 
-movdqa (\key), %xmm0
+movdqu (\key), %xmm0
 pshufb M0,     %xmm0
 movdqa %xmm0,  %xmm1
 movdqa %xmm0,  %xmm2

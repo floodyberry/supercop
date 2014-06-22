@@ -141,7 +141,7 @@ stack_r14 = caller_r14
 
 count = 0xff
 prevbit = 0
-count ^= 0x4
+count ^= 0x5
 
 looptop:
 

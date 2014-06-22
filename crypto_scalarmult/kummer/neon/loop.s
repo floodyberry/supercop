@@ -328,10 +328,10 @@ ldr r4,=0xff
 # asm 2: ldr >prevbit=r5,=0
 ldr r5,=0
 
-# qhasm: count ^= 0x4
-# asm 1: eor >count=int32#5,<count=int32#5,#0x4
-# asm 2: eor >count=r4,<count=r4,#0x4
-eor r4,r4,#0x4
+# qhasm: count ^= 0x5
+# asm 1: eor >count=int32#5,<count=int32#5,#0x5
+# asm 2: eor >count=r4,<count=r4,#0x5
+eor r4,r4,#0x5
 
 # qhasm: looptop:
 ._looptop:

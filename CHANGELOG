@@ -1,5 +1,19 @@
 Changes from 20140529:
 
+   * New crypto_sign/sphincs256 and crypto_sign/ntrumls*.
+
+   * New tiaoxinv1/table.
+
+   * Updates to aescopav1/ref, *avalanche*, stribob192r1/xmm,
+     aes128poetv1*, ppaev11/ref, joltikeq9696v1, kiasu*, cmcc*,
+     crypto_scalarmult/kummer/neon.
+
+   * Data flow from "used" (marking some primitives as subroutines used
+     by other implementations) to "integrate". This forces some one-time
+     recompilation but simplifies future updates of the subroutine list.
+
+Changes from 20140529:
+
    * Minor fixes to paeq, cmcc, hs1sivhiv1.
 
    * aes128poet: Remove gf128mul at submitter's request. Add AES-NI

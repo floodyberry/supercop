@@ -12,5 +12,6 @@
 //-------------------------------------------------------------------------------
 #define CRYPTO_KEYBYTES 64
 #define CRYPTO_NSECBYTES 0
-#define CRYPTO_NPUBBYTES 20
-#define CRYPTO_ABYTES 33 //16 for r, 16 for tag, 1 for EOT
+#define CRYPTO_NPUBBYTES 36 //10 for nonce and 16 for r
+#define CRYPTO_ABYTES 48 //16 for r, 16 for tag, 1 for EOT, 15 for padding
+#define CRYPTO_NOOVERLAP 1

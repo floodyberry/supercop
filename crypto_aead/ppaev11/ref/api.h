@@ -10,3 +10,5 @@
 // Moreover, ++AE recommended parameter set reference API for CAESAR is defined by:
 // - AES algorithm (16 byte / 128 bit blocks) with 16 byte (128 bit) key
 // - Padding by means ICV bit stealing (the padded bits are used as "implicit" tag bits (and the tag is truncated)
+
+#define CRYPTO_NOOVERLAP 1        // Added May 31th 2014

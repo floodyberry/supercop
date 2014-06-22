@@ -165,7 +165,7 @@ void LongNumShiftLeft(Byte * a, NumCarry *carryFlag, int length)
 	for (i = length - 2; i >= 0; i--)
 	{
 		if (a[i] & WORD_LEFT_BIT)
-			a[i + 1] |= WORD_RIGHT_BIT;      // OR operation to set the LSB of a[i+1]
+			a[i + 1] |= WORD_RIGHT_BIT; // OR operation to set the LSB of a[i+1]
 		a[i] <<= 1;
 	}
 }
@@ -194,7 +194,8 @@ void LongNumShiftLeftMany(Byte * a, int shifts, int length)
 //                  ----------------------------
 //   carryFlag Result(n-1)Result(n-2) ... Result(1)Result(0)
 /////////////////////////////////////////////////////////////////////////////////////////////////
-void LongNumSub(Byte * A, Byte * B, Byte * result, NumCarry *carryFlag, int length)
+void LongNumSub(Byte * A, Byte * B, Byte * result, NumCarry *carryFlag,
+		int length)
 {
 	int i;
 
@@ -217,7 +218,7 @@ void LongNumShiftRight(Byte * a, NumCarry *carryFlag, int length)
 	for (i = 1; i < length; i++)
 	{
 		if (a[i] & WORD_RIGHT_BIT)
-			a[i - 1] |= WORD_LEFT_BIT;   // OR operation to set the MSB of a[i-1]
+			a[i - 1] |= WORD_LEFT_BIT; // OR operation to set the MSB of a[i-1]
 		a[i] >>= 1;
 	}
 }
@@ -232,7 +233,8 @@ void LongNumShiftRight(Byte * a, NumCarry *carryFlag, int length)
 //                  ----------------------------
 //   carryFlag Result(n-1)Result(n-2) ... Result(1)Result(0)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void LongNumAdd(Byte * A, Byte * B, Byte * result, NumCarry *carryFlag, int length)//Multi-Precision Addition Algorithm
+void LongNumAdd(Byte * A, Byte * B, Byte * result, NumCarry *carryFlag,
+		int length) //Multi-Precision Addition Algorithm
 {
 	int i;
 
@@ -252,19 +254,20 @@ void LongNumAdd(Byte * A, Byte * B, Byte * result, NumCarry *carryFlag, int leng
 //                  ----------------------------
 //         Result(2n-1)Result(2n-2) ... Result(1)Result(0)
 /////////////////////////////////////////////////////////////////////////////////////////////////
-void InterleavedModularMultiplication(Chunk a, Chunk b, Chunk mod, Byte * result )
+void InterleavedModularMultiplication(Chunk a, Chunk b, Chunk mod,
+		Byte * result)
 {
 	int i = 0, j = 0;
 	unsigned int x = 0;
 	NumCarry carryFlag = 0;
-	Byte B[SIZE*2];
-	Byte Mod[SIZE*2];
-	int length = SIZE*2;
+	Byte B[SIZE * 2];
+	Byte Mod[SIZE * 2];
+	int length = SIZE * 2;
 	LongNumSetZero(result, length);
 	ConvertLongNum(b, B, length);
 	ConvertLongNum(mod, Mod, length);
 
-	for (j = SIZE - 1; j >= 0; j--)//a's index
+	for (j = SIZE - 1; j >= 0; j--) //a's index
 	{
 		for (i = BYTE_SIZE - 1; i >= 0; i--)
 		{
@@ -292,14 +295,13 @@ void Reduce(Byte *Result, Chunk n, Chunk result, int length)
 
 	int i;
 	NumCarry carryFlag = 0;
-	Modulus = (Byte*) malloc(
-						(length) * sizeof(Byte));
+	Modulus = (Byte*) malloc((length) * sizeof(Byte));
 
 	ConvertLongNum(n, Modulus, length);
 
-	LongNumShiftLeftMany(Modulus, (length-SIZE)*8, length);
+	LongNumShiftLeftMany(Modulus, (length - SIZE) * 8, length);
 
-	for (i = 1; i <= (length-SIZE)*8; i++)
+	for (i = 1; i <= (length - SIZE) * 8; i++)
 	{
 		if (LongNumCompare(Result, Modulus, length) >= 0)
 			LongNumSub(Result, Modulus, Result, &carryFlag, length);

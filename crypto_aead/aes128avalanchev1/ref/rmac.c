@@ -24,26 +24,46 @@
 void AppendOne(const Byte *m, Byte *mApp, int length)
 {
 	Byte mask = WORD_LEFT_BIT;
-	int j, i = 0;
-
-	if (m[length - 1] & mask)
-	{
-		mApp[length] = 0x01;
-		for (j = 0; j < length; j++)
-			mApp[j] = m[j];
-	}
+	unsigned int flag = 1, flagFull = 1, i = 0;
+	int j;
+	if (length == 0)
+		mApp[0] = 0x01;
 	else
 	{
-		while (!(mask & m[length - 1]))
+		for (i = 0; i < length; i++)
+			mApp[i] = m[i];
+		//	this only works when last bit is zero, if not we need a new index
+		//	 Remove all leading zero (at MSB):
+		//	 Shift the index to the first non-zero digit of Exponent (e)
+		i = length - 1;
+
+		while (!mApp[i])
 		{
-			mask >>= 1;
-			i++;
+			flagFull = 0;
+			i--;
 		}
-		mask <<= 1;
-		mApp[length] = 0x00;
-		mApp[length - 1] = m[length - 1] | mask;
-		for (j = 0; j < length - 1; j++)
-			mApp[j] = m[j];
+
+		// Shift the mask (0x0...10...0) for the first non-zero bit within Exponent (e)
+		while (!(mask & mApp[i]))
+		{
+			flag = 0;
+			mask >>= 1;
+		}
+
+		if (flag && !flagFull)
+			mApp[i + 1] = 1;
+
+		else if (!flag)
+		{
+			mask <<= 1;
+			mApp[i] = mApp[i] ^ mask;
+		}
+
+		else if (flag && flagFull)
+		{
+			mApp[i + 1] = 0x01;
+
+		}
 	}
 }
 
@@ -57,47 +77,27 @@ void Sign(Chunk prime, Chunk key, const Byte *m, int length, Chunk Tag)
 	int i;
 	Chunk mRes;
 	Byte *result, *mApp;
-	result = (Byte*) malloc((length) * sizeof(Byte));
-	mApp = (Byte*) malloc((length) * sizeof(Byte));
+	if (length < 16)
+	{
+		result = (Byte*) malloc((SIZE * 2) * sizeof(Byte));
+		mApp = (Byte*) malloc((SIZE * 2) * sizeof(Byte));
+		memset(mApp, 0, SIZE * 2);
 
-	memset(mApp, 0, length + 2);
-#ifdef  DebugOn
-	printf("\nm inside sign is:\n");
-	for (i = length - 1; i >= 0; i--)
-	printf("%02x", m[i]);
-#endif
+	}
+	else
+	{
+		result = (Byte*) malloc((length * 2) * sizeof(Byte));
+		mApp = (Byte*) malloc((length * 2) * sizeof(Byte));
+		memset(mApp, 0, length * 2);
+	}
 
 	AppendOne(m, mApp, length);
-#ifdef  DebugOn
-	printf("\nmApp is:\n");
-	for (i = length - 1; i >= 0; i--)
-	printf("%02x", mApp[i]);
-#endif
 
 	Reduce(mApp, prime, mRes, length);
 
-#ifdef  DebugOn
-	printf("\nmod p:\n");
-	for (i = SIZE - 1; i >= 0; i--)
-	printf("%02x", prime[i]);
-
-	printf("\nmRes is:\n");
-	for (i = SIZE - 1; i >= 0; i--)
-	printf("%02x", mRes[i]);
-
-	printf("\nKey is:\n");
-	for (i = SIZE - 1; i >= 0; i--)
-	printf("%02x", key[i]);
-#endif
-
 	InterleavedModularMultiplication(key, mRes, prime, result);
-#ifdef  DebugOn
-	printf("\nresult is:\n");
-	for (i = SIZE - 1; i >= 0; i--)
-	printf("%02x", result[i]);
-#endif
 
-	for (i = 0; i < SIZE; ++i) //converted from little endian to big endian or the reverse??????????? have to specify
+	for (i = 0; i < SIZE; ++i) //converted from little endian to big endian
 		Tag[i] = result[SIZE - 1 - i];
 
 	free(result);
@@ -111,19 +111,7 @@ void Sign(Chunk prime, Chunk key, const Byte *m, int length, Chunk Tag)
 /////////////////////////////////////////////////////////////////////////////////////////////////
 int Verify(Chunk tag, Chunk tagFromCipher)
 {
-	int result, i;
-	char temp[SIZE], tempChar[hSIZE + 1];
-	memset(temp, '\0', SIZE);
-	memset(tempChar, '\0', hSIZE);
-
-#ifdef  DebugOn
-	printf("\nRMAC tagFromCipher= \t");
-	for (i = 0; i < SIZE; i++)
-	printf("%02x", tagFromCipher[i]);
-	printf("\nRMAC Tag= \t");
-	for (i = 0; i < SIZE; i++)
-	printf("%02x", tag[i]);
-#endif
+	int result;
 	result = NumCompare(tag, tagFromCipher);
 	return result;
 }

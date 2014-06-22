@@ -83,40 +83,48 @@ void SetupForEnc(AESArguments *input, const unsigned char *m, Chunk r,
 		unsigned long long mLen, unsigned long long numOfChunks)
 {
 	int i = 0, j = 0;
-	char ch[2] = "0", eot[2] = "0", temp[SIZE * 2]; //temp double sized to avoid buffer overflow
-	int sizeOfPadding, sizeOfLastChunk;
-	ch[0] = (char) pad;
-	eot[0] = (char) EOT;
+	unsigned char temp[SIZE]; //temp double sized to avoid buffer overflow
+	int sizeOfPadding = 0;
+	int sizeOfLastChunk = 0;
 	sizeOfLastChunk = mLen % SIZE;
 	if (sizeOfLastChunk != 0)
-		sizeOfPadding = SIZE - sizeOfLastChunk;
-
+		sizeOfPadding = SIZE - sizeOfLastChunk - 1;
 	for (i = 0; i < SIZE; i++)
 		input[0].plainText[i] = r[i];
 
 	for (i = 0; i < numOfChunks - 2; i++)
 	{
+		memset(temp, 0, SIZE);
 		memcpy(temp, m + (SIZE * i), SIZE);
 		for (j = 0; j < SIZE; j++)
 			input[i + 1].plainText[j] = temp[j];
 	}
 
-	memcpy(temp, m + (SIZE * i), SIZE); //for last chunk
-	if (sizeOfLastChunk == 0)
-		strcat(temp, eot);
-	//padding
-	if (sizeOfLastChunk != 0) //check if chunk is the last chunk for odd case
-	{
-		strcat(temp, eot);
-		//pad the last chunk
-		for (i = 0; i < (sizeOfPadding - 1); i++)
-			strcat(temp, ch);
-		ch[0] = (char) sizeOfPadding;
+	memset(temp, 0, SIZE);
+	memcpy(temp, m + (SIZE * i), SIZE - sizeOfPadding - 1); //for last chunk
 
-		strcat(temp, ch);
+	if (sizeOfLastChunk == 0)
+	{
+		memset(temp, 0, SIZE);
+		temp[0] = EOT;
 	}
+	
+	if (sizeOfPadding == 0 && sizeOfLastChunk == 15)
+		temp[SIZE-1] = EOT;
+	
+	//padding
+	if (sizeOfLastChunk != 0 && sizeOfLastChunk != 15)
+	{
+		temp[SIZE - sizeOfPadding - 1] = EOT;
+		//pad the last chunk
+		for (i = 0; i < sizeOfPadding - 1; i++)
+			temp[SIZE - sizeOfPadding + i] = pad;
+		temp[SIZE - 1] = (char) sizeOfPadding;
+	}
+	
 	for (j = 0; j < SIZE; j++)
 		input[numOfChunks - 1].plainText[j] = temp[j];
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,7 +173,7 @@ void TagGeneration(const unsigned char *m, Chunk r, Chunk tag,
 	int i, j, k;
 
 	memset(tag, 0, SIZE);
-	for (i = 0; i < numOfChunks - 1; i++)
+	for (i = 0; i < numOfChunks - 2; i++)
 	{
 		memcpy(temp, m + (SIZE * i), SIZE);
 		if (i == numOfChunks - 2)
@@ -185,4 +193,5 @@ void TagGeneration(const unsigned char *m, Chunk r, Chunk tag,
 	for (i = 0; i < SIZE; i++)
 		temp[i] = r[i];
 	ModularAddition(tag, temp);
+
 }
