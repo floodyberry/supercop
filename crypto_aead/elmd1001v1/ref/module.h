@@ -1,3 +1,8 @@
+#include "crypto_uint8.h"
+typedef crypto_uint8 u8;
+#include "crypto_uint64.h"
+typedef crypto_uint64 u64;
+
 /* ========== Various Modules, used in all the reference implementations of ELmD ============= */
 
 
@@ -10,8 +15,6 @@
 #define IT_MAX 32  // This denotes the maximum no. of intermediate tag blocks generated. It is required for  intermediated tag versions only.  We provide intermediate tags upto message length of 2^16 bytes. As we generate intermediate tags after 127 blocks, maximum floor(2^12/127) = 32 blocks of intermediate tags can be generated. So, corresponding ABYTES value will be 536 (= 2^4*32+24) for fixed versions using intermediate tags and 552 (= 2^4*32+40) for flexible version. 
 
 
-typedef unsigned char u8;
-typedef unsigned long long u64;
 typedef unsigned char block[16];
 
 

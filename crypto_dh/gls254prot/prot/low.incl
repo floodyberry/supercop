@@ -1,0 +1,556 @@
+/*
+ *  This file is part of Binary-library.
+ *
+ *  Binary-library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+//#MULTIPLICATION_127#
+void low_mul(elt c, elt a, elt b) {
+	__m128i ma, mb, m0, m1;
+	__m128i t0;
+
+	ma = _mm_load_si128((__m128i *) a);
+	mb = _mm_load_si128((__m128i *) b);
+
+	MUL4(m1, m0, ma, mb);
+	REDUCE(t0, m1, m0);
+
+	_mm_store_si128((__m128i *) c, m0);
+}
+
+//#MULTIPLICATION_254#
+//Karatsuba method
+void low_mul254(elt254 c, elt254 a, elt254 b) {
+	__m128i maL, maH, mbL, mbH, mabL, mabH;
+	__m128i m1, m0, m2, m3, m4, m5, t0;
+
+	maL = _mm_load_si128((__m128i *) & a[0]);
+	maH = _mm_load_si128((__m128i *) & a[2]);
+	mbL = _mm_load_si128((__m128i *) & b[0]);
+	mbH = _mm_load_si128((__m128i *) & b[2]);
+	mabL = _mm_xor_si128(maL, maH);
+	mabH = _mm_xor_si128(mbL, mbH);
+
+	MUL4(m1, m0, maL, mbL);
+	MUL4(m3, m2, maH, mbH);
+	MUL4(m5, m4, mabL, mabH);
+
+	//final sum
+	m2 = _mm_xor_si128(m2, m0);
+	m3 = _mm_xor_si128(m3, m1);
+	m4 = _mm_xor_si128(m4, m0);
+	m5 = _mm_xor_si128(m5, m1);
+
+	REDUCE(t0, m3, m2);
+	REDUCE(t0, m5, m4);
+
+	_mm_store_si128((__m128i *) & c[0], m2);
+	_mm_store_si128((__m128i *) & c[2], m4);
+}
+
+//#MULTIPLICATION_254 - NO REDUCTION#
+void low_mul_nr254(elt254_x2 c, elt254 a, elt254 b) {
+	__m128i maL, maH, mbL, mbH, mabL, mabH;
+	__m128i m1, m0, m2, m3, m4, m5, t0, t1;
+
+	maL = _mm_load_si128((__m128i *) & a[0]);
+	maH = _mm_load_si128((__m128i *) & a[2]);
+	mbL = _mm_load_si128((__m128i *) & b[0]);
+	mbH = _mm_load_si128((__m128i *) & b[2]);
+	mabL = _mm_xor_si128(maL, maH);
+	mabH = _mm_xor_si128(mbL, mbH);
+
+	MUL4(m1, m0, maL, mbL);
+	MUL4(m3, m2, maH, mbH);
+	MUL4(m5, m4, mabL, mabH);
+
+	//final sum
+	m2 = _mm_xor_si128(m2, m0);
+	m3 = _mm_xor_si128(m3, m1);
+	m4 = _mm_xor_si128(m4, m0);
+	m5 = _mm_xor_si128(m5, m1);
+
+	_mm_store_si128((__m128i *) & c[0], m2);
+	_mm_store_si128((__m128i *) & c[2], m3);
+	_mm_store_si128((__m128i *) & c[4], m4);
+	_mm_store_si128((__m128i *) & c[6], m5);
+}
+
+//#MULTIPLICATION_254 TO a = u
+//The result is given to the same register
+void low_mul_a(elt254 a) {
+	elt tmp;
+
+	types_copy(tmp, &a[2]);
+	low_add(&a[2], &a[2], &a[0]);
+	types_copy(&a[0], tmp);
+}
+
+//#MULTIPLICATION_254 TO a = u
+//The result is given in another register
+void low_mul_a_2(elt254 b, elt254 a) {
+	low_add(&b[2], &a[2], &a[0]);
+	types_copy(&b[0], &a[2]);
+}
+
+//#MULTIPLICATION_254 TO (a + 1) = (u + 1)
+//The result is given in another register
+void low_mul_aplus1(elt254 b, elt254 a) {
+	types_copy(&b[2], &a[0]);
+	low_add(&b[0], &a[0], &a[2]);
+}
+
+//#SQUARING_127#
+void low_sq(elt b, elt a) {
+	__m128i m0, m1, t0, sq, mask;
+
+	sq = _mm_set_epi32(0x55545150, 0x45444140, 0x15141110, 0x05040100);
+	mask = _mm_set_epi32(0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F);
+
+	m0 = _mm_load_si128((__m128i *) a);
+
+	SQUARE(m0, m1, sq, mask);
+	REDUCESQUARE(t0, m1, m0);
+
+	_mm_store_si128((__m128i *) b, m0);
+}
+
+//#SQUARING_254#
+void low_sq254(elt254 b, elt254 a) {
+	__m128i ma0, ma1, mb0, mb1;
+	__m128i t0, sq, mask;
+
+	sq = _mm_set_epi32(0x55545150, 0x45444140, 0x15141110, 0x05040100);
+	mask = _mm_set_epi32(0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F);
+
+	ma0 = _mm_load_si128((__m128i *) & a[0]);
+	mb0 = _mm_load_si128((__m128i *) & a[2]);
+	SQUARE(ma0, ma1, sq, mask);
+	SQUARE(mb0, mb1, sq, mask);
+	REDUCESQUARE(t0, ma1, ma0);
+	REDUCESQUARE(t0, mb1, mb0);
+
+	ma0 = _mm_xor_si128(ma0, mb0);
+
+	_mm_store_si128((__m128i *) & b[0], ma0);
+	_mm_store_si128((__m128i *) & b[2], mb0);
+}
+
+//#SQUARING_254 - NO REDUCTION#
+void low_sq_nr254(elt254_x2 b, elt254 a) {
+	__m128i ma0, ma1, mb0, mb1;
+	__m128i t0, t1, sq, mask;
+
+	sq = _mm_set_epi32(0x55545150, 0x45444140, 0x15141110, 0x05040100);
+	mask = _mm_set_epi32(0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F);
+
+	ma0 = _mm_load_si128((__m128i *) & a[0]);
+	mb0 = _mm_load_si128((__m128i *) & a[2]);
+
+	SQUARE(ma0, ma1, sq, mask);
+	SQUARE(mb0, mb1, sq, mask);
+
+	ma0 = _mm_xor_si128(ma0, mb0);
+	ma1 = _mm_xor_si128(ma1, mb1);
+
+	_mm_store_si128((__m128i *) & b[0], ma0);
+	_mm_store_si128((__m128i *) & b[2], ma1);
+	_mm_store_si128((__m128i *) & b[4], mb0);
+	_mm_store_si128((__m128i *) & b[6], mb1);
+}
+
+//#MULTI_SQUARING_127#
+void low_sqi(elt b, elt a, int times) {
+	__m128i m0, m1, t0, sq, mask;
+	int i;
+
+	sq = _mm_set_epi32(0x55545150, 0x45444140, 0x15141110, 0x05040100);
+	mask = _mm_set_epi32(0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F);
+
+	m0 = _mm_load_si128((__m128i *) a);
+
+	for (i = 0; i < times; i++) {
+		SQUARE(m0, m1, sq, mask);
+		REDUCESQUARE(t0, m1, m0);
+	}
+
+	_mm_store_si128((__m128i *) b, m0);
+}
+
+//#MULTI_SQUARING_127 6x#
+void low_sqr06(elt b, elt a) {
+	__m128i r0;
+	elt_pt p;
+	int i;
+
+	r0 = _mm_setzero_si128();
+
+	for (i = 0; i < 16; i++) {
+		p = tbl_sqr06[i][(a[0] >> (4 * i)) & 0x0F];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+
+		p = tbl_sqr06[i + 16][(a[1] >> (4 * i)) & 0x0F];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+	}
+
+	_mm_store_si128((__m128i *) b, r0);
+}
+
+//#MULTI_SQUARING_127 12x#
+void low_sqr12(elt b, elt a) {
+	__m128i r0;
+	elt_pt p;
+	int i;
+
+	r0 = _mm_setzero_si128();
+
+	for (i = 0; i < 16; i++) {
+		p = tbl_sqr12[i][(a[0] >> (4 * i)) & 0x0F];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+
+		p = tbl_sqr12[i + 16][(a[1] >> (4 * i)) & 0x0F];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+	}
+
+	_mm_store_si128((__m128i *) b, r0);
+}
+
+//#MULTI_SQUARING_127 24x#
+void low_sqr24(elt b, elt a) {
+	__m128i r0;
+	elt_pt p;
+	int i;
+
+	r0 = _mm_setzero_si128();
+
+	for (i = 0; i < 16; i++) {
+		p = tbl_sqr24[i][(a[0] >> (4 * i)) & 0x0F];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+
+		p = tbl_sqr24[i + 16][(a[1] >> (4 * i)) & 0x0F];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+	}
+
+	_mm_store_si128((__m128i *) b, r0);
+}
+
+//#MULTI_SQUARING_127 48x#
+void low_sqr48(elt b, elt a) {
+	__m128i r0;
+	elt_pt p;
+	int i;
+
+	r0 = _mm_setzero_si128();
+
+	for (i = 0; i < 16; i++) {
+		p = tbl_sqr48[i][(a[0] >> (4 * i)) & 0x0F];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+
+		p = tbl_sqr48[i + 16][(a[1] >> (4 * i)) & 0x0F];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+	}
+
+	_mm_store_si128((__m128i *) b, r0);
+}
+
+//#SQUARE_ROOT_254#
+void low_sqrt254(elt254 b, elt254 a) {
+	__m128i a0, aL, aH, uu0, uu1, vv0, vv1;
+	__m128i ma, mb;
+	ui64 uu[2], vv[2];
+
+	__m128i perm =
+			_mm_set_epi32(0x0F0D0B09, 0x07050301, 0x0E0C0A08, 0x06040200);
+	__m128i sqrtL =
+			_mm_set_epi32(0x33322322, 0x31302120, 0x13120302, 0x11100100);
+	__m128i sqrtH =
+			_mm_set_epi32(0xCCC88C88, 0xC4C08480, 0x4C480C08, 0x44400400);
+	__m128i maskL =
+			_mm_set_epi32(0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F, 0x0F0F0F0F);
+	__m128i maskH =
+			_mm_set_epi32(0xF0F0F0F0, 0xF0F0F0F0, 0xF0F0F0F0, 0xF0F0F0F0);
+
+	ma = _mm_load_si128((__m128i *) & a[0]);
+	mb = _mm_load_si128((__m128i *) & a[2]);
+	ma = _mm_xor_si128(ma, mb);
+
+	//Extraction of even (ae0) and odd (ao0) bits
+	uu0 = _mm_shuffle_epi8(ma, perm);
+
+	uu1 = _mm_and_si128(uu0, maskL);
+	vv1 = _mm_and_si128(uu0, maskH);
+	vv1 = _mm_srli_epi64(vv1, 4);
+
+	uu1 = _mm_shuffle_epi8(sqrtL, uu1);
+	vv1 = _mm_shuffle_epi8(sqrtH, vv1);
+
+	uu0 = _mm_xor_si128(uu1, vv1);
+
+	uu1 = _mm_and_si128(uu0, maskL);
+	vv1 = _mm_and_si128(uu0, maskH);
+
+	//Extraction of even (ae0) and odd (ao0) bits
+	a0 = _mm_shuffle_epi8(mb, perm);
+
+	aL = _mm_and_si128(a0, maskL);
+	aH = _mm_and_si128(a0, maskH);
+	aH = _mm_srli_epi64(aH, 4);
+
+	aL = _mm_shuffle_epi8(sqrtL, aL);
+	aH = _mm_shuffle_epi8(sqrtH, aH);
+
+	a0 = _mm_xor_si128(aL, aH);
+
+	aL = _mm_and_si128(a0, maskL);
+	aH = _mm_and_si128(a0, maskH);
+
+	//Multiplication of odd vector to constant value sqrt(x)
+	//sqrt(x) = x^64 + x^32
+	uu0 = _mm_unpacklo_epi64(uu1, aL);
+	uu1 = _mm_unpackhi_epi64(uu1, aL);
+	vv0 = _mm_unpacklo_epi64(vv1, aH);
+	vv1 = _mm_unpackhi_epi64(vv1, aH);
+
+	uu1 = _mm_slli_epi64(uu1, 4);
+	vv0 = _mm_srli_epi64(vv0, 4);
+
+	uu0 = _mm_xor_si128(uu0, uu1);
+	vv0 = _mm_xor_si128(vv0, vv1);
+
+	uu0 = _mm_xor_si128(uu0, _mm_slli_epi64(vv0, 32));	//b2b0
+	vv0 = _mm_xor_si128(vv0, _mm_srli_epi64(vv0, 32));	//b3b1
+
+	aL = _mm_unpacklo_epi64(uu0, vv0);
+	aH = _mm_unpackhi_epi64(uu0, vv0);
+
+	_mm_store_si128((__m128i *) & b[0], aL);
+	_mm_store_si128((__m128i *) & b[2], aH);
+}
+
+//#INVERSE_127#
+//Itoh-Tsujii Algorithm with the following addition chain
+//2-3-6-12-14-48-96-120-126
+void low_inv(elt b, elt a) {
+	elt tmp;
+	elt a2_6, a2_24;
+
+	//a^(2^2-2) * a = a^(2^2-1)
+	low_sq(b, a);
+	low_mul(b, b, a);
+
+	//a^(2^3-2) * a = a^(2^3-1)
+	low_sq(b, b);
+	low_mul(b, b, a);
+
+	//a^(2^6-2^3) * a^(2^3-1) = a^(2^6-1)
+	low_sqi(a2_6, b, 3);
+	low_mul(a2_6, a2_6, b);
+
+	//a^(2^12-2^6) * a^(2^6-1) = a^(2^12-1)
+	//low_sqi(b, a2_6, 6);
+	low_sqr06(b, a2_6);
+	low_mul(b, b, a2_6);
+
+	//a^(2^24-2^12) * a^(2^12-1) = a^(2^24-1)
+	low_sqr12(a2_24, b);
+	low_mul(a2_24, a2_24, b);
+
+	//a^(2^48-2^24) * a^(2^24-1) = a^(2^48-1)
+	low_sqr24(b, a2_24);
+	low_mul(b, b, a2_24);
+
+	//a^(2^96-2^48) * a^(2^48-1) = a^(2^96-1)
+	low_sqr48(tmp, b);
+	low_mul(b, tmp, b);
+
+	//a^(2^120-2^24) * a^(2^24-1) = a^(2^120-1)
+	low_sqr24(b, b);
+	low_mul(b, b, a2_24);
+
+	//a^(2^126-2^6) * a^(2^6-1) = a^(2^126-1)
+	//low_sqi(b, b, 6);
+	low_sqr06(b, b);
+	low_mul(b, b, a2_6);
+
+	//a^(2^127-2)
+	low_sq(b, b);
+}
+
+//#INVERSE_254#
+void low_inv254(elt254 b, elt254 a) {
+	elt ma, mb;
+	elt ma2, mb2, mab, minv;
+
+	ma[0] = a[0];
+	ma[1] = a[1];
+	mb[0] = a[2];
+	mb[1] = a[3];
+
+	low_sq(ma2, ma);
+	low_sq(mb2, mb);
+	low_mul(mab, mb, ma);
+
+	mab[0] = mab[0] ^ mb2[0] ^ ma2[0];
+	mab[1] = mab[1] ^ mb2[1] ^ ma2[1];
+
+	//minv = (a^2 + b^2 + ba)^(-1)
+	low_inv(minv, mab);
+
+	//ma = a + b
+	ma[0] = ma[0] ^ mb[0];
+	ma[1] = ma[1] ^ mb[1];
+
+	low_mul(&b[0], ma, minv);
+	low_mul(&b[2], mb, minv);
+}
+
+//#HALF_TRACE_127#
+void low_htr(elt b, elt a) {
+	int i;
+	elt_pt p;
+	__m128i r0;
+	unsigned char *tmp0, *tmp1;
+
+	r0 = _mm_setzero_si128();
+
+	tmp0 = (unsigned char *)&a[0];
+	tmp1 = (unsigned char *)&a[1];
+
+	for (i = 0; i < 8; i++) {
+		p = tbl_htr[i][*tmp0++];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+		p = tbl_htr[i + 8][*tmp1++];
+		r0 = _mm_xor_si128(r0, *(__m128i *) (p));
+	}
+
+	_mm_store_si128((__m128i *) b, r0);
+}
+
+//#HALF_TRACE_254#
+//WARNING!! This half-trace cannot be used outside the halving function!!!
+//It has now the inverse of the trace
+void low_htr254(elt254 b, elt254 a) {
+	elt ma;
+	int tr_ma;
+
+	low_htr(&b[2], &a[2]);
+
+	low_add(ma, &a[0], &b[2]);
+	low_add(ma, ma, &a[2]);
+
+	tr_ma = low_trHTR(ma);
+
+	low_htr(&b[0], ma);
+	b[2] = b[2] ^ tr_ma;
+}
+
+//####Diego
+void low_inv_const(elt b, elt a) {
+	elt tmp;
+	elt a2_6, a2_24;
+
+	//a^(2^2-2) * a = a^(2^2-1)
+	low_sq(b, a);
+	low_mul(b, b, a);
+
+	//a^(2^3-2) * a = a^(2^3-1)
+	low_sq(b, b);
+	low_mul(b, b, a);
+
+	//a^(2^6-2^3) * a^(2^3-1) = a^(2^6-1)
+	low_sqi(a2_6, b, 3);
+	low_mul(a2_6, a2_6, b);
+
+	//a^(2^12-2^6) * a^(2^6-1) = a^(2^12-1)
+	low_sqi(b, a2_6, 6);
+	//low_sqr06(b, a2_6);
+	low_mul(b, b, a2_6);
+
+	//a^(2^24-2^12) * a^(2^12-1) = a^(2^24-1)
+	low_sqi(a2_24, b, 12);
+	//low_sqr12(a2_24, b);
+	low_mul(a2_24, a2_24, b);
+
+	//a^(2^48-2^24) * a^(2^24-1) = a^(2^48-1)
+	low_sqi(b, a2_24, 24);
+	//low_sqr24(b, a2_24);
+	low_mul(b, b, a2_24);
+
+	//a^(2^96-2^48) * a^(2^48-1) = a^(2^96-1)
+	low_sqi(tmp, b, 48);
+	//low_sqr48(tmp, b);
+	low_mul(b, tmp, b);
+
+	//a^(2^120-2^24) * a^(2^24-1) = a^(2^120-1)
+	low_sqi(b, b, 24);
+	//low_sqr24(b, b);
+	low_mul(b, b, a2_24);
+
+	//a^(2^126-2^6) * a^(2^6-1) = a^(2^126-1)
+	low_sqi(b, b, 6);
+	//low_sqr06(b, b);
+	low_mul(b, b, a2_6);
+
+	//a^(2^127-2)
+	low_sq(b, b);
+}
+
+void low_inv254_const(elt254 b, elt254 a) {
+	elt ma, mb;
+	elt ma2, mb2, mab, minv;
+
+	ma[0] = a[0];
+	ma[1] = a[1];
+	mb[0] = a[2];
+	mb[1] = a[3];
+
+	low_sq(ma2, ma);
+	low_sq(mb2, mb);
+	low_mul(mab, mb, ma);
+
+	mab[0] = mab[0] ^ mb2[0] ^ ma2[0];
+	mab[1] = mab[1] ^ mb2[1] ^ ma2[1];
+
+	//minv = (a^2 + b^2 + ba)^(-1)
+	low_inv_const(minv, mab);
+
+	//ma = a + b
+	ma[0] = ma[0] ^ mb[0];
+	ma[1] = ma[1] ^ mb[1];
+
+	low_mul(&b[0], ma, minv);
+	low_mul(&b[2], mb, minv);
+}
+
+void low_inv254_sim(elt254 * c, elt254 * a, int n) {
+	int i;
+	elt254 u, t[n];
+
+	types_copy254(c[0], a[0]);
+	types_copy254(t[0], a[0]);
+
+	for (i = 1; i < n; i++) {
+		types_copy254(t[i], a[i]);
+		low_mul254(c[i], c[i - 1], a[i]);
+	}
+
+	low_inv254_const(u, c[n - 1]);
+
+	for (i = n - 1; i > 0; i--) {
+		low_mul254(c[i], u, c[i - 1]);
+		low_mul254(u, u, t[i]);
+	}
+
+	types_copy254(c[0], u);
+}

@@ -1,0 +1,45 @@
+/*
+ *  This file is part of Binary-library.
+ *
+ *  Binary-library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+void curves_domParam(Curve * c, curve_type type)
+{	
+	if(type == GLS254)
+	{
+		c->deg = DEGREE254;
+		c->type = type;
+		
+		//curve parameters a and b
+		c->a[3] = 0; c->a[2] = 0x1;
+		c->a[1] = 0; c->a[0] = 0;
+
+		c->b[3]= 0; c->b[2]= 0;
+		c->b[1]= 0x59c8202cb9e6e0ae; c->b[0]= 0x2e6d944fa54de7e5;
+			
+		//point generator
+		c->Gx[3]= 0x3703bc2465316c2a; c->Gx[2]= 0x84e0df4a9e499ccd;
+		c->Gx[1]= 0x30923d664e35dd35; c->Gx[0]= 0x71e2ef2b084a1f42;	
+
+		/* lambda */
+		c->Gy[3] = 0x5c6748a76924b561; c->Gy[2] = 0x39c5fd46dfc7190a;
+		c->Gy[1] = 0x1a03c12cb6aeb80e; c->Gy[0] = 0xa9d779edc1d425fe;
+
+		/* y */ 
+		/* c->Gy[3]= 0x35afad938be3f51e; c->Gy[2]= 0x8b35b31611582339;
+		c->Gy[1]= 0x0da7cb0e27609338; c->Gy[0]= 0xe10971b17a356c97; */
+		
+	}
+}

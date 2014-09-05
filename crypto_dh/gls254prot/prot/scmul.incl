@@ -1,0 +1,290 @@
+/*
+ *  This file is part of Binary-library.
+ *
+ *  Binary-library is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  any later version.
+ *
+ *  Foobar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+typedef unsigned int uint128_t __attribute__((mode(TI)));
+typedef unsigned long ui64;
+typedef ui64 elt[2];
+typedef ui64 elt254[4];
+
+#define PSI_LAMBDA_ORG(x,y,a,b)\
+        x[2] = a[2]; x[3] = a[3];\
+        low_add(&x[0], &a[0], &a[2]);\
+        y[2] = b[2]; y[3] = b[3];\
+        low_add(&y[0], &b[0], &y[2]);\
+        y[2] = y[2] ^ 0x1;
+
+/* schoolbook multiplication (4 x 1) 64-bit words */
+
+#define SCHBOOK_4x1(h, c, a, b)\
+        h = ((uint128_t) a*b[0]);\
+        c[0] = h; c[1] = h >> 64;\
+        h = ((uint128_t) a*b[1]);\
+        c[2] = h; c[3] = h >> 64;\
+        h = ((uint128_t) a*b[2]);\
+        c[4] = h; c[5] = h >> 64;\
+        h = ((uint128_t) a*b[3]);\
+        c[6] = h; c[7] = h >> 64;
+
+/* schoolbook addition (4 x 1) 64-bit words
+   result on MSW c[7] | c[5] | c[3] | c[1] | c[0] LSW */
+
+#define SCHBOOK_SUM_4x1(c)\
+        asm ("addq %4, %0 \n\t"\
+             "adcq %5, %1 \n\t"\
+             "adcq %6, %2 \n\t"\
+             "adcq $0, %3 \n\t"\
+        : "+r" (c[1]), "+r" (c[3]), "+r" (c[5]), "+r" (c[7])\
+        : "r" (c[2]), "r" (c[4]), "r" (c[6])\
+        );
+
+/* 128-bit addition with carry */
+
+#define SUM_128(c0, c1, a0, a1)\
+        asm ("addq %2, %0 \n\t"\
+             "adcq %3, %1 \n\t"\
+        : "+r" (c0), "+r" (c1)\
+        : "r" (a0), "r" (a1)\
+        );      
+
+/* 128-bit subtraction with carry */
+
+#define SUB_128(c0, c1, a0, a1)\
+        asm ("subq %2, %0 \n\t"\
+             "sbbq %3, %1 \n\t"\
+        : "+r" (c0), "+r" (c1)\
+        : "r" (a0), "r" (a1)\
+        );
+
+/* PROTECTED DIRECT RECODING (k -> k1, k2)
+   Method described in http://cacr.uwaterloo.ca/techreports/2012/cacr2012-24.pdf (Sec. 3.2) */
+
+void scmul_protected_direct_recoding(elt254 k, elt k1, elt k2, int *k1neg, int *k2neg) {
+        const ui64 BETA_22 = 0xD792EA76691524E3; /* "t" term of #E = t^2 - (q-1)^2 */
+        const ui64 ALL_ZERO = 0;
+
+        uint128_t reg_128; /* 128-bit "register" */     
+
+        ui64 result_4x1[8];
+        ui64 b1[2], b1_times_t[2], b2, b2_times_t[2];
+        ui64 tmp[4], sign;
+                 
+        /* b1 (-k div 2^127) */
+        b1[1] = (k[3] << 1) | (k[2] >> 63);
+        b1[0] = (k[2] << 1) | (k[1] >> 63);
+
+        /* b2 (k*t div 2^254) */
+        SCHBOOK_4x1(reg_128, result_4x1, BETA_22, k);
+        SCHBOOK_SUM_4x1(result_4x1);
+        b2 = (result_4x1[5] >> 62) | (result_4x1[7] << 2);
+        b2 |= 1;
+
+        /* b1*t */
+        reg_128 = ((uint128_t) BETA_22*b1[0]);
+        b1_times_t[0] = reg_128; b1_times_t[1] = reg_128 >> 64;
+        reg_128 = ((uint128_t) BETA_22*b1[1]);
+        b1_times_t[1] = b1_times_t[1] + reg_128;
+
+        /* b2*t */
+        reg_128 = ((uint128_t) BETA_22*b2);
+        b2_times_t[0] = reg_128; b2_times_t[1] = reg_128 >> 64;
+
+        /** k1 computation */
+
+        /* b1*q (q = 2^127) */
+        tmp[0] = 0;
+        tmp[1] = b1[0] << 63;
+
+        /* b1*q + b2*t */
+        SUM_128(tmp[0], tmp[1], b2_times_t[0], b2_times_t[1]);
+
+        /* tmp = b1q + b2t - b1 */
+        SUB_128(tmp[0], tmp[1], b1[0], b1[1]);
+
+        /* k1 sign (0 for positive, 1 for negative) */
+        sign = tmp[1] < k[1];
+        
+        /* final subtraction */
+        SUB_128(tmp[0], tmp[1], k[0], k[1]);
+
+        /* Two's complement (if necessary) */
+        tmp[0] = tmp[0] ^ (ALL_ZERO - sign);
+        tmp[1] = tmp[1] ^ (ALL_ZERO - sign);
+        SUM_128(tmp[0], tmp[1], sign, ALL_ZERO);
+
+        /* output */
+        /* invert sign, as we are computing tmp - k instead of k - tmp */
+        *k1neg = (int) sign ^ 0x1;
+        k1[0] = tmp[0];
+        k1[1] = tmp[1];
+
+        /** k2 computation */
+
+        /* tmp0 = b1t + b2 */
+        tmp[0] = b1_times_t[0];
+        tmp[1] = b1_times_t[1];
+        SUM_128(tmp[0], tmp[1], b2, ALL_ZERO);
+
+        /* tmp2 = b2*q (q = 2^127) */
+        tmp[2] = 0;
+        tmp[3] = b2 << 63;
+
+        /* k2 sign (0 for positive, 1 for negative) */
+        sign = tmp[3] < tmp[1];
+
+        /* final subtraction */
+        SUB_128(tmp[2], tmp[3], tmp[0], tmp[1]);
+
+        /* Two's complement (if necessary) */
+        tmp[2] = tmp[2] ^ (ALL_ZERO - sign);
+        tmp[3] = tmp[3] ^ (ALL_ZERO - sign);
+        SUM_128(tmp[2], tmp[3], sign, ALL_ZERO);
+
+        /* output */
+        /* invert sign, as we are computing tmp2 - tmp0 instead of tmp0 - tmp2 */
+        *k2neg = (int) sign ^ 0x1;
+        k2[0] = tmp[2];
+        k2[1] = tmp[3];
+}
+
+#define CEIL(A, B)                      (((A) - 1) / (B) + 1)
+#define MASK(B)                         (((ui64)1 << (B)) - 1)
+
+void bn_rsh(ui64 *a, int size, int bits) {
+        int i;
+        ui64 r, carry, shift, mask, *c;
+
+        a += size - 1;
+        
+        /* Prepare the bit mask. */
+        shift = 64 - bits;
+        carry = 0;
+        mask = MASK(bits);
+        for (i = size - 1; i >= 0; i--, a--) {
+                /* Get the needed least significant bits. */
+                r = (*a) & mask;
+                /* Shift left the operand. */
+                *a = ((*a) >> bits) | (carry << shift);
+                /* Update the carry. */
+                carry = r;
+        }
+}
+
+void scmul_wreg(signed char *naf, int *len, elt k, int n, int w) {
+        int i, l;
+        elt t;
+        i64 t0, mask;
+        i64 u_i;
+        i64 efe=(ui64)(-1), zero = 0x0, one = 0x1;
+
+        mask = MASK(w);
+        l = CEIL(n, (w - 1));
+
+        types_copy(t, k);
+
+        i = 0;
+        for (i = 0; t[1] != 0; i++, naf++) {
+                u_i = (t[0] & mask) - ((i64)1 << (w - 1));
+                t[0] -= u_i;
+                *naf = u_i;
+                bn_rsh(t, 2, w - 1);
+        }
+        for (; i < l; i++, naf++) {
+                u_i = (t[0] & mask) - ((i64)1 << (w - 1));
+                t[0] -= u_i;
+                *naf = u_i;
+                t[0] >>= (w - 1);
+        }
+        *naf = t[0] & mask;
+        *len = l + 1;
+}
+
+void scmul_rand_wreg(elt254 x2, elt254 y2, elt254 x1, elt254 y1, elt254 k, int w, Curve *c) {
+        int i, j, l, k1s, k2s, s, o1, o2;
+        elt k1, k2;
+        elt254 PX, PM, QX, QM, QZ;
+        signed char r1[64], r2[64], *t1, *t2, n1, n2, s1, s2;
+        elt254 tabx[16], tabl[16], tabz[16], tab0, tab1, tab2, tab3, tab4, tab5;
+
+        scmul_protected_direct_recoding(k, k1, k2, &k1s, &k2s);
+        
+        o1 = 1 ^ (k1[0] & 1);
+        k1[0] |= 1;
+        
+        types_setone254(QZ);
+        types_copy254(PX, x1);
+        types_copy254(PM, y1);
+        
+        PM[0] = PM[0] ^ k1s;
+        s = k1s ^ k2s;
+        
+        types_copy254(tabx[0], PX);
+        types_copy254(tabl[0], PM);
+        ec_doub_add_mix(tabx[1], tabl[1], tabz[1], tabx[0], tabl[0], QZ, PX, PM, c);
+        for (i = 1; i < (1 << (w - 3)); i++) {
+                ec_doub_addsub(tabx[2*i], tabl[2*i], tabz[2*i], tabx[2*i+1], tabl[2*i+1], tabz[2*i+1], tabx[i], tabl[i], tabz[i], PX, PM, c);
+        }
+        low_inv254_sim(tabz + 1, tabz + 1, (1 << (w - 2)) - 1);
+        for (i = 1; i < (1 << (w - 2)); i++) {
+                low_mul254(tabx[i], tabx[i], tabz[i]);
+                low_mul254(tabl[i], tabl[i], tabz[i]);
+        }
+
+        scmul_wreg(r1, &l, k1, 128, w);
+        scmul_wreg(r2, &l, k2, 128, w);
+        t1 = r1 + l - 2;
+        t2 = r2 + l - 2;
+
+        types_copy254(tab0, tabx[0]);
+        types_copy254(tab1, tabl[0]);
+        tab1[0] ^= s;
+        PSI_LAMBDA_ORG(QX, QM, tab0, tab1);
+        tab1[0] ^= s;
+        
+        ec_add_mix(QX, QM, QZ, QX, QM, QZ, tab0, tab1, c);
+
+        for (i = l - 2; i >= 0; i--, t1--, t2--) {
+                for (j = 0; j < w - 2; j++) {
+                        ec_doub(QX, QM, QZ, QX, QM, QZ, c);
+                }
+
+                n1 = *t2;
+                s1 = (n1 >> 7);
+                n1 = (n1^s1) - s1;
+                n1 = n1 >> 1;
+                n2 = *t1;
+                s2 = (n2 >> 7);
+                n2 = (n2^s2) - s2;
+                n2 = n2 >> 1;
+                
+                types_cond_copy2(tab0, tab4, tabx, n1, n2);
+                types_cond_copy2(tab1, tab5, tabl, n1, n2);
+                tab1[0] ^= (-s1) ^ s;
+                tab5[0] ^= (-s2);
+                PSI_LAMBDA_ORG(tab2, tab3, tab0, tab1);
+                
+                ec_doub_add2(QX, QM, QZ, QX, QM, QZ, tab2, tab3, tab4, tab5, c);
+        }
+
+        PM[0] ^= o1;
+        ec_add_mix(tab0, tab1, tab2, QX, QM, QZ, PX, PM, c);
+        types_cond_copy(QX, tab0, o1);
+        types_cond_copy(QM, tab1, o1);
+        types_cond_copy(QZ, tab2, o1);
+
+        low_inv254_const(tab0, QZ);
+        low_mul254(y2, QM, tab0); low_mul254(x2, QX, tab0);
+}

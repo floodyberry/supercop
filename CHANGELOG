@@ -1,3 +1,29 @@
+Changes from 20140622:
+
+   * Added gls254prot, copying the "prot" implementation from gls254.
+     Please don't imitate this approach---it's just a temporary
+     workaround for SUPERCOP not yet knowing how to separately benchmark
+     protected implementations.
+
+   * aes256ctr: new openssl and dolbeau implementations.
+
+   * aes256gcmv1: new cryptopp and dolbeau implementations.
+
+   * calicov8: define CRYPTO_NOOVERLAP; now compiles.
+
+   * chacha20: new dolbeau implementation.
+
+   * elmd*: clean up definitions of u32 etc. (I still see trouble with
+     clang compatibility on some machines; will look at this more.)
+
+   * hs1sivhiv1: new dolbeau implementation.
+
+   * joltikneq*: new vperm implementations.
+
+   * salsa20: new dolbeau implementation.
+
+   * sphincs256: protect against smlen<CRYPTO_BYTES.
+
 Changes from 20140529:
 
    * New crypto_sign/sphincs256 and crypto_sign/ntrumls*.

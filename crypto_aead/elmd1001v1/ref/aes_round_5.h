@@ -1,3 +1,8 @@
+#include "crypto_uint8.h"
+#include "crypto_uint32.h"
+typedef crypto_uint8 u8;
+typedef crypto_uint32 u32;
+
 /* =====================================   AES Round 5 implementation ==================================== */
 /* == This code is a modified version of the rijndael's code that can be found in crypto/aes/aes_core.c == */
 
@@ -25,8 +30,6 @@ Td2[x] = Si[x].[0d, 0b, 0e, 09];
 Td3[x] = Si[x].[09, 0d, 0b, 0e];
 Td4[x] = Si[x].[01];
 */
-typedef unsigned int u32;
-typedef unsigned char u8;
 #if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_AMD64) || defined(_M_X64))
 # define SWAP(x) (_lrotl(x, 8) & 0x00ff00ff | _lrotr(x, 8) & 0xff00ff00)
 # define GETU32(p) SWAP(*((u32 *)(p)))
@@ -35,14 +38,6 @@ typedef unsigned char u8;
 # define GETU32(pt) (((u32)(pt)[0] << 24) ^ ((u32)(pt)[1] << 16) ^ ((u32)(pt)[2] <<  8) ^ ((u32)(pt)[3]))
 # define PUTU32(ct, st) { (ct)[0] = (u8)((st) >> 24); (ct)[1] = (u8)((st) >> 16); (ct)[2] = (u8)((st) >>  8); (ct)[3] = (u8)(st); }
 #endif
-
-#ifdef AES_LONG
-typedef unsigned long u32;
-#else
-typedef unsigned int u32;
-#endif
-typedef unsigned short u16;
-typedef unsigned char u8;
 
 static const u32 Te0[256] = {
     0xc66363a5U, 0xf87c7c84U, 0xee777799U, 0xf67b7b8dU,

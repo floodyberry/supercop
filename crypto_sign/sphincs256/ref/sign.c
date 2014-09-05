@@ -364,6 +364,9 @@ int crypto_sign_open(unsigned char *m,unsigned long long *mlen, const unsigned c
   unsigned char *sigp;
   unsigned char tpk[CRYPTO_PUBLICKEYBYTES];
 
+  if(smlen < CRYPTO_BYTES)
+    return -1;
+
   unsigned char m_h[MSGHASH_BYTES];
 
   for(i=0;i<CRYPTO_PUBLICKEYBYTES;i++)

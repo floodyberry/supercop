@@ -1,0 +1,1 @@
+Elliptic-curve Diffie--Hellman secret sharing using the GLS binary curve (L^2 + LZ + aZ^2)X^2 = X^4 + bZ^4 defined over GF(2^254) and implemented with lambda-projective coordinates (X, L, Z).

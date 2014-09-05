@@ -395,6 +395,9 @@ int crypto_sign_open(unsigned char *m,unsigned long long *mlen, const unsigned c
 
   unsigned char m_h[MSGHASH_BYTES];
 
+  if(smlen < CRYPTO_BYTES)
+    return -1;
+
   for(i=0;i<CRYPTO_PUBLICKEYBYTES;i++)
     tpk[i] = pk[i];
 
