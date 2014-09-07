@@ -1,4 +1,4 @@
-// ++AE crypto header API (Recommended Parameter Set )
+// ++AE crypto header API (Recommended Parameter Set ) 3rd revision 20140702
 
 #define CRYPTO_KEYBYTES  16       // 128 bit key
 #define CRYPTO_NPUBBYTES 8        // Public message counter of 64 bits (i.e. S<2^b)
@@ -11,4 +11,4 @@
 // - AES algorithm (16 byte / 128 bit blocks) with 16 byte (128 bit) key
 // - Padding by means ICV bit stealing (the padded bits are used as "implicit" tag bits (and the tag is truncated)
 
-#define CRYPTO_NOOVERLAP 1        // Added May 31th 2014
+#define CRYPTO_NOOVERLAP 1

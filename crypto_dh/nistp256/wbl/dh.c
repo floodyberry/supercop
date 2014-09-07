@@ -4,7 +4,7 @@
 #include "randombytes.h"
 
 void
-crypto_dh_nistp256_wbl_keypair(unsigned char *pk, const unsigned char *sk)
+crypto_dh_nistp256_wbl_keypair(unsigned char *pk, unsigned char *sk)
 {
         point temp;
         randombytes(sk, 32);
@@ -20,10 +20,10 @@ crypto_dh_nistp256_wbl(unsigned char *out, const unsigned char *n,
         point temp;
         p256unpack(&temp, p);
         if(!p256oncurvefinite(&temp)){ //we don't have a good point
-                crypto_scalarmult_nistp256_base(q, n); //use the basepoint instead
-                return;
-        }
-  p256scalarmult(&temp, &temp, n);
-  p256pack(q, &temp);
-  return;
+                p256scalarmult_base(&temp, n); //use the basepoint instead
+        } else {
+                p256scalarmult(&temp, &temp, n);
+	}
+        p256pack(out, &temp);
+        return;
 }

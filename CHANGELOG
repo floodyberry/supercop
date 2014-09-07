@@ -1,3 +1,13 @@
+Changes from 20140905:
+
+   * ppae: tweaks, but still doesn't work.
+   * elmd*: portability fix.
+   * hs1*: "a couple of small bugs" fixed.
+   * omd*: optimized implementations.
+   * scream*, iscream*: NEON implementations.
+   * tiaoxinv1: "aesnim" implementation.
+   * Many more checksums.
+
 Changes from 20140622:
 
    * Added gls254prot, copying the "prot" implementation from gls254.

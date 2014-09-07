@@ -1,5 +1,3 @@
-#include "crypto_uint8.h"
-typedef crypto_uint8 u8;
 #include "crypto_uint64.h"
 typedef crypto_uint64 u64;
 

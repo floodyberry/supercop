@@ -1,0 +1,19 @@
+SCREAM/iSCREAM NEON implementation
+
+Written in 2014 by:
+  Gaëtan Leurent <gaetan.leurent@normalesup.org>
+
+To the extent possible under law, the author(s) have dedicated all
+copyright and related and neighboring rights to this software to the
+public domain worldwide. This software is distributed without any
+warranty.
+
+You should have received a copy of the CC0 Public Domain Dedication
+along with this software. If not, see
+<http://creativecommons.org/publicdomain/zero/1.0/>
+
+
+This implementation uses GCC vector builtins, and some C99
+constructions. It can be compiled with a recent version of GCC (>= 4.7);
+compilation flags should enable the NEON instruction set, and select gnu89,
+c99, or gnu99 mode.

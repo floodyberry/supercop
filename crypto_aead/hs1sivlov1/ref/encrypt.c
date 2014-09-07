@@ -7,7 +7,7 @@
 // ** This version is slow and susceptible to side-channel attacks. **
 // ** Do not use for any purpose other than to understand HS1-SIV.  **
 //
-// Written by Ted Krovetz (ted@krovetz.net). Last modified 15 May 2014.
+// Written by Ted Krovetz (ted@krovetz.net). Last modified 20 August 2014.
 //
 // This is free and unencumbered software released into the public domain.
 //
@@ -308,9 +308,9 @@ void prf_hash2(uint64_t *h, uint32_t *in, unsigned inbytes, uint32_t *nhkey, uin
             for (j=0;j<inbytes;j++)
                 ((unsigned char *)tail)[j] = ((unsigned char *)(in+i))[j];
             a0 += (uint64_t)(read32le(tail+0) + nhkey[i+0]) * (read32le(tail+2) + nhkey[i+2]);
-            a0 += (uint64_t)(read32le(tail+0) + nhkey[i+1]) * (read32le(tail+2) + nhkey[i+3]);
-            a1 += (uint64_t)(read32le(tail+2) + nhkey[i+4]) * (read32le(tail+3) + nhkey[i+6]);
-            a1 += (uint64_t)(read32le(tail+2) + nhkey[i+5]) * (read32le(tail+3) + nhkey[i+7]);
+            a0 += (uint64_t)(read32le(tail+1) + nhkey[i+1]) * (read32le(tail+3) + nhkey[i+3]);
+            a1 += (uint64_t)(read32le(tail+0) + nhkey[i+4]) * (read32le(tail+2) + nhkey[i+6]);
+            a1 += (uint64_t)(read32le(tail+1) + nhkey[i+5]) * (read32le(tail+3) + nhkey[i+7]);
             a0 += inbytes;
             a1 += inbytes;
         }
@@ -437,10 +437,11 @@ void hs1siv_encrypt(hs1siv_ctx_t *ctx, void *m, unsigned mbytes, void *a, unsign
     free(buf);
     buf = (unsigned char *)malloc(mbytes+64);
     hs1(ctx, tmp_t, HS1_SIV_SIV_LEN, n, buf, mbytes+64);
-    for (i=1; i<=mbytes; i++)
-        ((unsigned char *)c)[mbytes-i] = ((unsigned char *)m)[mbytes-i] ^ buf[mbytes+64-i];
-    free(buf);
+    for (i=0; i<mbytes; i++)
+        buf[64+i] ^= ((unsigned char *)m)[i];
+    memcpy(c,buf+64,mbytes);
     memcpy(t,tmp_t,HS1_SIV_SIV_LEN);
+    free(buf);
 }
 
 int hs1siv_decrypt(hs1siv_ctx_t *ctx, void *c, unsigned cbytes, void *a, unsigned abytes, void *n, void *t, void *m)
@@ -484,7 +485,7 @@ int crypto_aead_encrypt(
     (void)nsec;
     hs1siv_subkeygen(&ctx, (void *)k, CRYPTO_KEYBYTES);
     if (clen) *clen = mlen+CRYPTO_ABYTES;
-    hs1siv_encrypt(&ctx, (void *)m, mlen, (void *)ad, adlen, (void *)npub, c, c+CRYPTO_ABYTES);
+    hs1siv_encrypt(&ctx, (void *)m, mlen, (void *)ad, adlen, (void *)npub, c+mlen, c);
     return 0;
 }
 
@@ -501,5 +502,5 @@ int crypto_aead_decrypt(
     (void)nsec;
     if (mlen) *mlen = clen-CRYPTO_ABYTES;
     hs1siv_subkeygen(&ctx, (void *)k, CRYPTO_KEYBYTES);
-    return hs1siv_decrypt(&ctx, (void *)(c+CRYPTO_ABYTES), clen-CRYPTO_ABYTES, (void *)ad, adlen, (void *)npub, (void *)c, m);
+    return hs1siv_decrypt(&ctx, (void *)c, clen-CRYPTO_ABYTES, (void *)ad, adlen, (void *)npub, (void *)(c+clen-CRYPTO_ABYTES), m);
 }
