@@ -1,5 +1,5 @@
 /*
-u16.h version $Date: 2014/07/16 16:12:15 $
+u16.h version $Date: 2014/09/07 16:11:01 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -41,7 +41,7 @@ if (bytes >= 1024)
   __m512i y14;
   __m512i y15;
 
-  __m512i z0  = _mm512_load_si512((__m512i*)(x +  0)); /* load the entire block */
+  __m512i z0  = _mm512_loadu_si512((__m512i*)(x +  0)); /* load the entire block */
   /* permutexvar -> not subtle */
   __m512i z5  = _mm512_permutexvar_epi32(_mm512_set1_epi32(1), z0);
   __m512i z10 = _mm512_permutexvar_epi32(_mm512_set1_epi32(2), z0);
@@ -326,38 +326,38 @@ if (bytes >= 1024)
       z##b = _mm512_unpackhi_epi64(y##a, y##b);                         \
       z##c = _mm512_unpacklo_epi64(y##c, y##d);                         \
       z##d = _mm512_unpackhi_epi64(y##c, y##d);                         \
-      t0 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##a,0), _mm_load_si128((__m128i*)(m+0))); \
-      _mm_store_si128((__m128i*)(out+0),t0);                            \
-      t1 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##b,0), _mm_load_si128((__m128i*)(m+64))); \
-      _mm_store_si128((__m128i*)(out+64),t1);                           \
-      t2 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##c,0), _mm_load_si128((__m128i*)(m+128))); \
-      _mm_store_si128((__m128i*)(out+128),t2);                          \
-      t3 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##d,0), _mm_load_si128((__m128i*)(m+192))); \
-      _mm_store_si128((__m128i*)(out+192),t3);                          \
-      t0 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##a,1), _mm_load_si128((__m128i*)(m+256))); \
-      _mm_store_si128((__m128i*)(out+256),t0);                          \
-      t1 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##b,1), _mm_load_si128((__m128i*)(m+320))); \
-      _mm_store_si128((__m128i*)(out+320),t1);                          \
-      t2 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##c,1), _mm_load_si128((__m128i*)(m+384))); \
-      _mm_store_si128((__m128i*)(out+384),t2);                          \
-      t3 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##d,1), _mm_load_si128((__m128i*)(m+448))); \
-      _mm_store_si128((__m128i*)(out+448),t3);                          \
-      t0 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##a,2), _mm_load_si128((__m128i*)(m+512))); \
-      _mm_store_si128((__m128i*)(out+512),t0);                            \
-      t1 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##b,2), _mm_load_si128((__m128i*)(m+576))); \
-      _mm_store_si128((__m128i*)(out+576),t1);                           \
-      t2 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##c,2), _mm_load_si128((__m128i*)(m+640))); \
-      _mm_store_si128((__m128i*)(out+640),t2);                          \
-      t3 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##d,2), _mm_load_si128((__m128i*)(m+704))); \
-      _mm_store_si128((__m128i*)(out+704),t3);                          \
-      t0 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##a,3), _mm_load_si128((__m128i*)(m+768))); \
-      _mm_store_si128((__m128i*)(out+768),t0);                          \
-      t1 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##b,3), _mm_load_si128((__m128i*)(m+832))); \
-      _mm_store_si128((__m128i*)(out+832),t1);                          \
-      t2 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##c,3), _mm_load_si128((__m128i*)(m+896))); \
-      _mm_store_si128((__m128i*)(out+896),t2);                          \
-      t3 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##d,3), _mm_load_si128((__m128i*)(m+960))); \
-      _mm_store_si128((__m128i*)(out+960),t3);                          \
+      t0 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##a,0), _mm_loadu_si128((__m128i*)(m+0))); \
+      _mm_storeu_si128((__m128i*)(out+0),t0);                            \
+      t1 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##b,0), _mm_loadu_si128((__m128i*)(m+64))); \
+      _mm_storeu_si128((__m128i*)(out+64),t1);                           \
+      t2 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##c,0), _mm_loadu_si128((__m128i*)(m+128))); \
+      _mm_storeu_si128((__m128i*)(out+128),t2);                          \
+      t3 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##d,0), _mm_loadu_si128((__m128i*)(m+192))); \
+      _mm_storeu_si128((__m128i*)(out+192),t3);                          \
+      t0 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##a,1), _mm_loadu_si128((__m128i*)(m+256))); \
+      _mm_storeu_si128((__m128i*)(out+256),t0);                          \
+      t1 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##b,1), _mm_loadu_si128((__m128i*)(m+320))); \
+      _mm_storeu_si128((__m128i*)(out+320),t1);                          \
+      t2 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##c,1), _mm_loadu_si128((__m128i*)(m+384))); \
+      _mm_storeu_si128((__m128i*)(out+384),t2);                          \
+      t3 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##d,1), _mm_loadu_si128((__m128i*)(m+448))); \
+      _mm_storeu_si128((__m128i*)(out+448),t3);                          \
+      t0 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##a,2), _mm_loadu_si128((__m128i*)(m+512))); \
+      _mm_storeu_si128((__m128i*)(out+512),t0);                            \
+      t1 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##b,2), _mm_loadu_si128((__m128i*)(m+576))); \
+      _mm_storeu_si128((__m128i*)(out+576),t1);                           \
+      t2 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##c,2), _mm_loadu_si128((__m128i*)(m+640))); \
+      _mm_storeu_si128((__m128i*)(out+640),t2);                          \
+      t3 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##d,2), _mm_loadu_si128((__m128i*)(m+704))); \
+      _mm_storeu_si128((__m128i*)(out+704),t3);                          \
+      t0 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##a,3), _mm_loadu_si128((__m128i*)(m+768))); \
+      _mm_storeu_si128((__m128i*)(out+768),t0);                          \
+      t1 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##b,3), _mm_loadu_si128((__m128i*)(m+832))); \
+      _mm_storeu_si128((__m128i*)(out+832),t1);                          \
+      t2 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##c,3), _mm_loadu_si128((__m128i*)(m+896))); \
+      _mm_storeu_si128((__m128i*)(out+896),t2);                          \
+      t3 = _mm_xor_si128(_mm512_extracti32x4_epi32(z##d,3), _mm_loadu_si128((__m128i*)(m+960))); \
+      _mm_storeu_si128((__m128i*)(out+960),t3);                          \
     }
     
     __m512i gvv = _mm512_set_epi64(776,768,520,512,264,256,8,0);

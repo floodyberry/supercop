@@ -1,3 +1,20 @@
+Changes from 20140907:
+
+   * New crypto_hash/shake256 and crypto_stream/rijn256ctr, which don't
+     seem to work; similarly crypto_hash/keccakc512/gil. Please test
+     your code in SUPERCOP before submission.
+
+   * crypto_stream/*/dolbeau fixes.
+
+   * New crypto_dh/ed448goldilocks and crypto_sign/ed448goldilocks.
+
+   * New implementations of crypto_scalarmult/kummer.
+
+   * New compiler lines.
+
+   * data-run now removes previous implementations of a primitive from
+     the .a file when it's integrating a faster new implementation.
+
 Changes from 20140905:
 
    * ppae: tweaks, but still doesn't work.

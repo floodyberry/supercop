@@ -1,5 +1,5 @@
 /*
-chacha.c version $Date: 2014/07/16 16:27:54 $
+chacha.c version $Date: 2014/09/07 16:10:57 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -7,7 +7,6 @@ Public domain.
 
 #include "e/ecrypt-sync.h"
 #include "api.h"
-#include "estream-convert-api.h"
 
 #include <immintrin.h>
 #include <stdio.h>

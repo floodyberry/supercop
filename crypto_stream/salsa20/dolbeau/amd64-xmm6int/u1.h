@@ -1,5 +1,5 @@
 /*
-u1.h version $Date: 2014/08/22 16:41:35 $
+u1.h version $Date: 2014/09/07 16:11:01 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -8,10 +8,10 @@ Public domain.
 if (!bytes) return;
 {
   while (bytes >= 64) {
-    __m128i diag0 = _mm_load_si128((__m128i*)(x +  0));
-    __m128i diag1 = _mm_load_si128((__m128i*)(x +  4));
-    __m128i diag2 = _mm_load_si128((__m128i*)(x +  8));
-    __m128i diag3 = _mm_load_si128((__m128i*)(x + 12));
+    __m128i diag0 = _mm_loadu_si128((__m128i*)(x +  0));
+    __m128i diag1 = _mm_loadu_si128((__m128i*)(x +  4));
+    __m128i diag2 = _mm_loadu_si128((__m128i*)(x +  8));
+    __m128i diag3 = _mm_loadu_si128((__m128i*)(x + 12));
     __m128i a0;
     __m128i a1;
     __m128i a2;
@@ -177,10 +177,10 @@ if (!bytes) return;
       diag0 = _mm_xor_si128(diag0, b7);
     }
 
-    diag0 = _mm_add_epi32(diag0, _mm_load_si128((__m128i*)(x +  0)));
-    diag1 = _mm_add_epi32(diag1, _mm_load_si128((__m128i*)(x +  4)));
-    diag2 = _mm_add_epi32(diag2, _mm_load_si128((__m128i*)(x +  8)));
-    diag3 = _mm_add_epi32(diag3, _mm_load_si128((__m128i*)(x + 12)));
+    diag0 = _mm_add_epi32(diag0, _mm_loadu_si128((__m128i*)(x +  0)));
+    diag1 = _mm_add_epi32(diag1, _mm_loadu_si128((__m128i*)(x +  4)));
+    diag2 = _mm_add_epi32(diag2, _mm_loadu_si128((__m128i*)(x +  8)));
+    diag3 = _mm_add_epi32(diag3, _mm_loadu_si128((__m128i*)(x + 12)));
     
 #define ONEQUAD_SHUFFLE(a,b,c,d)                    \
     u32 in##a =_mm_cvtsi128_si32(diag0);            \

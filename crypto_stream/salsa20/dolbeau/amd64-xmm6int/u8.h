@@ -1,5 +1,5 @@
 /*
-u8.h version $Date: 2014/08/22 16:41:35 $
+u8.h version $Date: 2014/09/07 16:11:02 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -48,7 +48,7 @@ if (bytes >= 512)
 #else
   /* element broadcast immediate for _mm_shuffle_epi32 are in order:
      0x00, 0x55, 0xaa, 0xff */
-  __m256i z0  = _mm256_load_si256((__m256i*)(x +  0));
+  __m256i z0  = _mm256_loadu_si256((__m256i*)(x +  0));
   /* intra-lane shuffle (does both sides at once) */
   __m256i z5  = _mm256_shuffle_epi32(z0, 0x55);
   __m256i z10 = _mm256_shuffle_epi32(z0, 0xaa);
@@ -64,7 +64,7 @@ if (bytes >= 512)
   z10 = _mm256_permute2x128_si256(z10, z10, 0x00);
   z15 = _mm256_permute2x128_si256(z15, z15, 0x00);
 
-  __m256i z2  = _mm256_load_si256((__m256i*)(x +  8));
+  __m256i z2  = _mm256_loadu_si256((__m256i*)(x +  8));
   /* intra-lane shuffle (does both sides at once) */
   __m256i z8 = _mm256_shuffle_epi32(z2, 0x00); /* propagating both sides, even though z8 is useless */
   __m256i z13  = _mm256_shuffle_epi32(z2, 0x55);
@@ -511,22 +511,22 @@ if (bytes >= 512)
       z##b = _mm256_unpackhi_epi64(y##a, y##b);                         \
       z##c = _mm256_unpacklo_epi64(y##c, y##d);                         \
       z##d = _mm256_unpackhi_epi64(y##c, y##d);                         \
-      t0 = _mm_xor_si128(_mm256_extracti128_si256(z##a,0), _mm_load_si128((__m128i*)(m+0))); \
-      _mm_store_si128((__m128i*)(out+0),t0);                            \
-      t1 = _mm_xor_si128(_mm256_extracti128_si256(z##b,0), _mm_load_si128((__m128i*)(m+64))); \
-      _mm_store_si128((__m128i*)(out+64),t1);                           \
-      t2 = _mm_xor_si128(_mm256_extracti128_si256(z##c,0), _mm_load_si128((__m128i*)(m+128))); \
-      _mm_store_si128((__m128i*)(out+128),t2);                          \
-      t3 = _mm_xor_si128(_mm256_extracti128_si256(z##d,0), _mm_load_si128((__m128i*)(m+192))); \
-      _mm_store_si128((__m128i*)(out+192),t3);                          \
-      t0 = _mm_xor_si128(_mm256_extracti128_si256(z##a,1), _mm_load_si128((__m128i*)(m+256))); \
-      _mm_store_si128((__m128i*)(out+256),t0);                          \
-      t1 = _mm_xor_si128(_mm256_extracti128_si256(z##b,1), _mm_load_si128((__m128i*)(m+320))); \
-      _mm_store_si128((__m128i*)(out+320),t1);                          \
-      t2 = _mm_xor_si128(_mm256_extracti128_si256(z##c,1), _mm_load_si128((__m128i*)(m+384))); \
-      _mm_store_si128((__m128i*)(out+384),t2);                          \
-      t3 = _mm_xor_si128(_mm256_extracti128_si256(z##d,1), _mm_load_si128((__m128i*)(m+448))); \
-      _mm_store_si128((__m128i*)(out+448),t3);                          \
+      t0 = _mm_xor_si128(_mm256_extracti128_si256(z##a,0), _mm_loadu_si128((__m128i*)(m+0))); \
+      _mm_storeu_si128((__m128i*)(out+0),t0);                            \
+      t1 = _mm_xor_si128(_mm256_extracti128_si256(z##b,0), _mm_loadu_si128((__m128i*)(m+64))); \
+      _mm_storeu_si128((__m128i*)(out+64),t1);                           \
+      t2 = _mm_xor_si128(_mm256_extracti128_si256(z##c,0), _mm_loadu_si128((__m128i*)(m+128))); \
+      _mm_storeu_si128((__m128i*)(out+128),t2);                          \
+      t3 = _mm_xor_si128(_mm256_extracti128_si256(z##d,0), _mm_loadu_si128((__m128i*)(m+192))); \
+      _mm_storeu_si128((__m128i*)(out+192),t3);                          \
+      t0 = _mm_xor_si128(_mm256_extracti128_si256(z##a,1), _mm_loadu_si128((__m128i*)(m+256))); \
+      _mm_storeu_si128((__m128i*)(out+256),t0);                          \
+      t1 = _mm_xor_si128(_mm256_extracti128_si256(z##b,1), _mm_loadu_si128((__m128i*)(m+320))); \
+      _mm_storeu_si128((__m128i*)(out+320),t1);                          \
+      t2 = _mm_xor_si128(_mm256_extracti128_si256(z##c,1), _mm_loadu_si128((__m128i*)(m+384))); \
+      _mm_storeu_si128((__m128i*)(out+384),t2);                          \
+      t3 = _mm_xor_si128(_mm256_extracti128_si256(z##d,1), _mm_loadu_si128((__m128i*)(m+448))); \
+      _mm_storeu_si128((__m128i*)(out+448),t3);                          \
     }
     
 #define ONEQUAD(a,b,c,d) ONEQUAD_TRANSPOSE(a,b,c,d)
@@ -558,22 +558,22 @@ if (bytes >= 512)
       y##c2 = _mm256_permute2x128_si256(z##c, z##c2, 0x31);          \
       y##d  = _mm256_permute2x128_si256(z##d, z##d2, 0x20);          \
       y##d2 = _mm256_permute2x128_si256(z##d, z##d2, 0x31);          \
-      y##a  = _mm256_xor_si256(y##a , _mm256_load_si256((__m256i*)(m+  0))); \
-      y##b  = _mm256_xor_si256(y##b , _mm256_load_si256((__m256i*)(m+ 64))); \
-      y##c  = _mm256_xor_si256(y##c , _mm256_load_si256((__m256i*)(m+128))); \
-      y##d  = _mm256_xor_si256(y##d , _mm256_load_si256((__m256i*)(m+192))); \
-      y##a2 = _mm256_xor_si256(y##a2, _mm256_load_si256((__m256i*)(m+256))); \
-      y##b2 = _mm256_xor_si256(y##b2, _mm256_load_si256((__m256i*)(m+320))); \
-      y##c2 = _mm256_xor_si256(y##c2, _mm256_load_si256((__m256i*)(m+384))); \
-      y##d2 = _mm256_xor_si256(y##d2, _mm256_load_si256((__m256i*)(m+448))); \
-      _mm256_store_si256((__m256i*)(out+  0), y##a );                   \
-      _mm256_store_si256((__m256i*)(out+ 64), y##b );                   \
-      _mm256_store_si256((__m256i*)(out+128), y##c );                   \
-      _mm256_store_si256((__m256i*)(out+192), y##d );                   \
-      _mm256_store_si256((__m256i*)(out+256), y##a2);                   \
-      _mm256_store_si256((__m256i*)(out+320), y##b2);                   \
-      _mm256_store_si256((__m256i*)(out+384), y##c2);                   \
-      _mm256_store_si256((__m256i*)(out+448), y##d2);                  \
+      y##a  = _mm256_xor_si256(y##a , _mm256_loadu_si256((__m256i*)(m+  0))); \
+      y##b  = _mm256_xor_si256(y##b , _mm256_loadu_si256((__m256i*)(m+ 64))); \
+      y##c  = _mm256_xor_si256(y##c , _mm256_loadu_si256((__m256i*)(m+128))); \
+      y##d  = _mm256_xor_si256(y##d , _mm256_loadu_si256((__m256i*)(m+192))); \
+      y##a2 = _mm256_xor_si256(y##a2, _mm256_loadu_si256((__m256i*)(m+256))); \
+      y##b2 = _mm256_xor_si256(y##b2, _mm256_loadu_si256((__m256i*)(m+320))); \
+      y##c2 = _mm256_xor_si256(y##c2, _mm256_loadu_si256((__m256i*)(m+384))); \
+      y##d2 = _mm256_xor_si256(y##d2, _mm256_loadu_si256((__m256i*)(m+448))); \
+      _mm256_storeu_si256((__m256i*)(out+  0), y##a );                   \
+      _mm256_storeu_si256((__m256i*)(out+ 64), y##b );                   \
+      _mm256_storeu_si256((__m256i*)(out+128), y##c );                   \
+      _mm256_storeu_si256((__m256i*)(out+192), y##d );                   \
+      _mm256_storeu_si256((__m256i*)(out+256), y##a2);                   \
+      _mm256_storeu_si256((__m256i*)(out+320), y##b2);                   \
+      _mm256_storeu_si256((__m256i*)(out+384), y##c2);                   \
+      _mm256_storeu_si256((__m256i*)(out+448), y##d2);                  \
     }
 
 #if 0

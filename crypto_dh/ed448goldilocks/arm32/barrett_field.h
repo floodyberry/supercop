@@ -37,7 +37,7 @@ extern const struct barrett_prime_t curve_prime_order;
 /**
  * Reduce a number (with optional high carry word) mod p.
  *
- * @param [inout] a The value to be reduced.
+ * @param [in,out] a The value to be reduced.
  * @param [in] nwords_a The number of words in a.
  * @param [in] a_carry A high word to be carried into the computation.
  * @param [in] prime The Barrett prime.
@@ -132,7 +132,7 @@ barrett_mul_or_mac(
 static inline void
 barrett_mul(
     word_t *out,
-    int nwords_out,
+    uint32_t nwords_out,
 
     const word_t *a,
     uint32_t nwords_a,
@@ -158,7 +158,7 @@ barrett_mac(
 
     const struct barrett_prime_t *prime
 ) {
-    barrett_mul_or_mac(out,nwords_out,a,nwords_a,b,nwords_b,prime,-1);
+    barrett_mul_or_mac(out,nwords_out,a,nwords_a,b,nwords_b,prime,-(mask_t)1);
 }
 
 mask_t

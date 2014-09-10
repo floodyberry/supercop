@@ -88,7 +88,7 @@ mask_t
 p448_is_zero (
     const p448_t *in
 );
-             
+  
 static __inline__ void
 p448_bias (
     p448_t *inout,

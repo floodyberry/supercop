@@ -3,17 +3,17 @@
 #include "curve.h"
 #include "randombytes.h"
 
-void
+int
 crypto_dh_nistp256_wbl_keypair(unsigned char *pk, unsigned char *sk)
 {
         point temp;
         randombytes(sk, 32);
         p256scalarmult_base(&temp, sk);
         p256pack(pk, &temp);
-        return;
+        return 0;
 }
 
-void
+int
 crypto_dh_nistp256_wbl(unsigned char *out, const unsigned char *n,
                                 const unsigned char *p)
 {
@@ -25,5 +25,5 @@ crypto_dh_nistp256_wbl(unsigned char *out, const unsigned char *n,
                 p256scalarmult(&temp, &temp, n);
 	}
         p256pack(out, &temp);
-        return;
+        return 0;
 }

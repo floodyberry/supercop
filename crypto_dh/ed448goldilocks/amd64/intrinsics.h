@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #include "config.h"
 
-#if __i386__ || __x86_64__
+#if defined(__i386__) || defined(__x86_64__)
 #include <immintrin.h>
 #endif
 
@@ -33,13 +33,20 @@
 /**
  * @brief If on x86, read the timestamp counter.  Otherwise, return 0.
  */
-INTRINSIC u_int64_t rdtsc() {
+#ifndef __has_builtin
+#define __has_builtin(X) 0
+#endif
+#if defined(__clang__) && __has_builtin(__builtin_readcyclecounter)
+#define rdtsc __builtin_readcyclecounter
+#else
+INTRINSIC u_int64_t rdtsc(void) {
   u_int64_t out = 0;
 # if (defined(__i386__) || defined(__x86_64__))
     __asm__ __volatile__ ("rdtsc" : "=A"(out));
 # endif
   return out;
 }
+#endif
 
 /**
  * Return x unchanged, but confuse the compiler.

@@ -88,7 +88,7 @@ p448_mulw (
     const p448_t *as,
     uint64_t b
 ) {
-    const uint32_t bhi = b>>28, blo = b & (1<<28)-1;
+    const uint32_t bhi = b>>28, blo = b & ((1<<28)-1);
     
     const uint32_t *a = as->limb;
     uint32_t *c = cs->limb;
@@ -223,7 +223,7 @@ p448_deserialize (
         for (j=0; j<7; j++) {
             out |= ((uint64_t)serial[7*i+j])<<(8*j);
         }
-        x->limb[2*i] = out & (1ull<<28)-1;
+        x->limb[2*i] = out & ((1ull<<28)-1);
         x->limb[2*i+1] = out >> 28;
     }
     

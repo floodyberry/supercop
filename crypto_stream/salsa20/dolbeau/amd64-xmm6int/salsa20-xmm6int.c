@@ -1,5 +1,5 @@
 /*
-salsa20-xmm6int.c version $Date: 2014/07/16 15:50:53 $
+salsa20-xmm6int.c version $Date: 2014/09/07 16:11:01 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -7,7 +7,6 @@ Public domain.
 
 #include "e/ecrypt-sync.h"
 #include "api.h"
-#include "estream-convert-api.h"
 
 #include <immintrin.h>
 #include <stdio.h>

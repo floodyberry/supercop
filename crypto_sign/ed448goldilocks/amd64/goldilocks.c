@@ -57,7 +57,7 @@ static struct {
 } goldilocks_global;
 
 static inline mask_t
-goldilocks_check_init() {
+goldilocks_check_init(void) {
     if (likely(goldilocks_global.state == G_INITED)) {
         return MASK_SUCCESS;
     } else {
@@ -66,7 +66,7 @@ goldilocks_check_init() {
 }
 
 int
-goldilocks_init () {
+goldilocks_init (void) {
     const char *res = compare_and_swap(&goldilocks_global.state, NULL, G_INITING);
     if (res == G_INITED) return GOLDI_EALREADYINIT;
     else if (res) {
@@ -306,6 +306,7 @@ goldilocks_shared_secret (
     );
 }
 
+#if GOLDI_IMPLEMENT_SIGNATURES
 static void
 goldilocks_derive_challenge(
     word_t challenge[GOLDI_FIELD_WORDS],
@@ -340,7 +341,7 @@ goldilocks_sign (
     word_t skw[GOLDI_FIELD_WORDS];
     mask_t succ = barrett_deserialize(skw,privkey->opaque,&curve_prime_order);
     if (!succ) {
-        memset(skw,0,sizeof(skw));
+        really_memset(skw,0,sizeof(skw));
         return GOLDI_ECORRUPT;
     }
         
@@ -389,9 +390,9 @@ goldilocks_sign (
         
     memcpy(signature_out, signature_tmp, GOLDI_FIELD_BYTES);
     barrett_serialize(signature_out+GOLDI_FIELD_BYTES, tk, GOLDI_FIELD_BYTES);
-    memset((unsigned char *)tk,0,sizeof(tk));
-    memset((unsigned char *)skw,0,sizeof(skw));
-    memset((unsigned char *)challenge,0,sizeof(challenge));
+    really_memset((unsigned char *)tk,0,sizeof(tk));
+    really_memset((unsigned char *)skw,0,sizeof(skw));
+    really_memset((unsigned char *)challenge,0,sizeof(challenge));
     
     /* response = 2(nonce_secret - sk*challenge)
      * Nonce = 8[nonce_secret]*G
@@ -448,6 +449,7 @@ goldilocks_verify (
     
     return succ ? 0 : GOLDI_EINVAL;
 }
+#endif
 
 #if GOLDI_IMPLEMENT_PRECOMPUTED_KEYS
 
@@ -494,7 +496,7 @@ goldilocks_destroy_precomputed_public_key (
 ) {
     if (!precom) return;
     destroy_fixed_base(&precom->table);
-    memset(&precom->pub.opaque, 0, sizeof(precom->pub));
+    really_memset(&precom->pub.opaque, 0, sizeof(precom->pub));
     free(precom);
 }
 

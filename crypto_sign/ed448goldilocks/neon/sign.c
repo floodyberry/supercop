@@ -30,16 +30,17 @@ int crypto_sign (
     unsigned long long mlen,
     const unsigned char sk[SECRETKEY_BYTES]
 ) {
+    unsigned char sig[SIGNATURE_BYTES];
     int ret = goldilocks_sign(
-        sm, m, mlen,
+        sig, m, mlen,
         (const struct goldilocks_private_key_t *)sk
     );
-    if (ret) abort();
-
-    memcpy(sm + SIGNATURE_BYTES, m, mlen);
-    
-    *smlen = mlen + SIGNATURE_BYTES;
-    return 0;
+    if (!ret) {
+        memmove(sm + SIGNATURE_BYTES, m, mlen);
+        memcpy(sm, sig, SIGNATURE_BYTES);
+        *smlen = mlen + SIGNATURE_BYTES;
+    }
+    return ret ? -1 : 0;
 }
 
 int crypto_sign_open (
@@ -55,7 +56,7 @@ int crypto_sign_open (
     );
     if (!ret) {
         *mlen = smlen - SIGNATURE_BYTES;
-        memcpy(m, sm + SIGNATURE_BYTES, *mlen);
+        memmove(m, sm + SIGNATURE_BYTES, *mlen);
     }
     return ret ? -1 : 0;
 }

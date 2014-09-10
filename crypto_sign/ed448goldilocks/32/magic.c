@@ -27,11 +27,17 @@ const word_t SCALARMUL_FIXED_WINDOW_ADJUSTMENT[2*SCALAR_WORDS] = {
 };
 
 const struct affine_t goldilocks_base_point = {
+#ifdef USE_NEON_PERM
+    {{ 0xaed939f,0xc59d070,0xf0de840,0x5f065c3, 0xf4ba0c7,0xdf73324,0xc170033,0x3a6a26a,
+       0x4c63d96,0x4609845,0xf3932d9,0x1b4faff, 0x6147eaa,0xa2692ff,0x9cecfa9,0x297ea0e
+    }},
+#else
     {{ U58LE(0xf0de840aed939f), U58LE(0xc170033f4ba0c7),
        U58LE(0xf3932d94c63d96), U58LE(0x9cecfa96147eaa),
        U58LE(0x5f065c3c59d070), U58LE(0x3a6a26adf73324),
        U58LE(0x1b4faff4609845), U58LE(0x297ea0ea2692ff)
     }},
+#endif
     {{ 19 }}
 };
 
@@ -50,6 +56,12 @@ const struct barrett_prime_t curve_prime_order = {
 
 const struct field_t
 sqrt_d_minus_1 = {{
+#ifdef USE_NEON_PERM
+    0x6749f46,0x24d9770,0xd2e2183,0xa49f7b4,
+    0xb4f0179,0x8c5f656,0x888db42,0xdcac462,
+    0xbdeea38,0x748734a,0x5a189aa,0x49443b8,
+    0x6f14c06,0x0b25b7a,0x51e65ca,0x12fec0c
+#else
     U58LE(0xd2e21836749f46),
     U58LE(0x888db42b4f0179),
     U58LE(0x5a189aabdeea38),
@@ -58,4 +70,5 @@ sqrt_d_minus_1 = {{
     U58LE(0xdcac4628c5f656),
     U58LE(0x49443b8748734a),
     U58LE(0x12fec0c0b25b7a)
+#endif
 }};

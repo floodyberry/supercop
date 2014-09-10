@@ -1,5 +1,5 @@
 /*
-u4.h version $Date: 2014/07/16 16:00:28 $
+u4.h version $Date: 2014/09/07 16:10:57 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -144,14 +144,14 @@ if (bytes>=256) {
       x_##b = _mm_unpackhi_epi64(t_##a, t_##b);                      \
       x_##c = _mm_unpacklo_epi64(t_##c, t_##d);                      \
       x_##d = _mm_unpackhi_epi64(t_##c, t_##d);                      \
-      t0 = _mm_xor_si128(x_##a, _mm_load_si128((__m128i*)(m+0)));       \
-      _mm_store_si128((__m128i*)(out+0),t0);                            \
-      t1 = _mm_xor_si128(x_##b, _mm_load_si128((__m128i*)(m+64)));      \
-      _mm_store_si128((__m128i*)(out+64),t1);                           \
-      t2 = _mm_xor_si128(x_##c, _mm_load_si128((__m128i*)(m+128)));     \
-      _mm_store_si128((__m128i*)(out+128),t2);                          \
-      t3 = _mm_xor_si128(x_##d, _mm_load_si128((__m128i*)(m+192)));     \
-      _mm_store_si128((__m128i*)(out+192),t3);                          \
+      t0 = _mm_xor_si128(x_##a, _mm_loadu_si128((__m128i*)(m+0)));       \
+      _mm_storeu_si128((__m128i*)(out+0),t0);                            \
+      t1 = _mm_xor_si128(x_##b, _mm_loadu_si128((__m128i*)(m+64)));      \
+      _mm_storeu_si128((__m128i*)(out+64),t1);                           \
+      t2 = _mm_xor_si128(x_##c, _mm_loadu_si128((__m128i*)(m+128)));     \
+      _mm_storeu_si128((__m128i*)(out+128),t2);                          \
+      t3 = _mm_xor_si128(x_##d, _mm_loadu_si128((__m128i*)(m+192)));     \
+      _mm_storeu_si128((__m128i*)(out+192),t3);                          \
     }
     
 #define ONEQUAD(a,b,c,d) ONEQUAD_TRANSPOSE(a,b,c,d)

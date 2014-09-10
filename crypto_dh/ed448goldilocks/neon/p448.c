@@ -39,7 +39,7 @@ xx_vaddup_s64(int64x2_t x) {
 #include "neon_emulation.h"
 #endif /* ARM_NEON */
 
-static inline void __attribute__((gnu_inline,always_inline))
+static inline void __attribute__((gnu_inline,always_inline,unused))
 smlal (
     uint64_t *acc,
     const uint32_t a,
@@ -48,7 +48,7 @@ smlal (
     *acc += (int64_t)(int32_t)a * (int64_t)(int32_t)b;
 }
 
-static inline void __attribute__((gnu_inline,always_inline))
+static inline void __attribute__((gnu_inline,always_inline,unused))
 smlal2 (
     uint64_t *acc,
     const uint32_t a,
@@ -57,7 +57,7 @@ smlal2 (
     *acc += (int64_t)(int32_t)a * (int64_t)(int32_t)b * 2;
 }
 
-static inline void __attribute__((gnu_inline,always_inline))
+static inline void __attribute__((gnu_inline,always_inline,unused))
 smull (
     uint64_t *acc,
     const uint32_t a,
@@ -66,7 +66,7 @@ smull (
     *acc = (int64_t)(int32_t)a * (int64_t)(int32_t)b;
 }
 
-static inline void __attribute__((gnu_inline,always_inline))
+static inline void __attribute__((gnu_inline,always_inline,unused))
 smull2 (
     uint64_t *acc,
     const uint32_t a,
@@ -83,6 +83,7 @@ p448_mul (
 ) {
     const uint32_t *a = as->limb, *b = bs->limb;
     uint32_t *c = cs->limb;
+    
     
     const int32x2_t
         *val = (const int32x2_t *)a,
@@ -109,154 +110,169 @@ p448_mul (
     
     accumx0a = vmull_lane_s32(          delta = val[1] + vah[1], vbh[3], 0);
     accumx1a = vmull_lane_s32(          delta, vbh[3], 1);
-    accumx2a = vmull_lane_s32(          delta = val[2] + vah[2], vbh[3], 0);
-    accumx3a = vmull_lane_s32(          delta, vbh[3], 1);
-    accumx0a = vmlal_lane_s32(accumx0a, delta, vbh[2], 0);
+    accumx0a = vmlal_lane_s32(accumx0a, delta = val[2] + vah[2], vbh[2], 0);
     accumx1a = vmlal_lane_s32(accumx1a, delta, vbh[2], 1);
-    accumx2a = vmlal_lane_s32(accumx2a, delta = val[3] + vah[3], vbh[2], 0);
-    accumx3a = vmlal_lane_s32(accumx3a, delta, vbh[2], 1);
-    accumx0a = vmlal_lane_s32(accumx0a, delta, vbh[1], 0);
+    accumx0a = vmlal_lane_s32(accumx0a, delta = val[3] + vah[3], vbh[1], 0);
     accumx1a = vmlal_lane_s32(accumx1a, delta, vbh[1], 1);
-    accumx2b = vmull_lane_s32(          delta = val[0] + vah[0], vbh[1], 0);
-    accumx3b = vmull_lane_s32(          delta, vbh[1], 1);
-    accumx0b = vmull_lane_s32(          delta, vbh[0], 0);
+    accumx0b = vmull_lane_s32(          delta = val[0] + vah[0], vbh[0], 0);
     accumx1b = vmull_lane_s32(          delta, vbh[0], 1);
-    accumx2b = vmlal_lane_s32(accumx2b, delta = val[1] + vah[1], vbh[0], 0);
-    accumx3b = vmlal_lane_s32(accumx3b, delta, vbh[0], 1);
     accumx0b = vmlal_lane_s32(accumx0b, vah[1], vbl[3], 0);
     accumx1b = vmlal_lane_s32(accumx1b, vah[1], vbl[3], 1);
-    accumx2b = vmlal_lane_s32(accumx2b, vah[2], vbl[3], 0);
-    accumx3b = vmlal_lane_s32(accumx3b, vah[2], vbl[3], 1);
     accumx0b = vmlal_lane_s32(accumx0b, vah[2], vbl[2], 0);
     accumx1b = vmlal_lane_s32(accumx1b, vah[2], vbl[2], 1);
-    accumx2b = vmlal_lane_s32(accumx2b, vah[3], vbl[2], 0);
-    accumx3b = vmlal_lane_s32(accumx3b, vah[3], vbl[2], 1);
     accumx0b = vmlal_lane_s32(accumx0b, vah[3], vbl[1], 0);
     accumx1b = vmlal_lane_s32(accumx1b, vah[3], vbl[1], 1);
-    accumx2b += accumx2a;
-    accumx3b += accumx3a;
-    accumx2a = vmlal_lane_s32(accumx2a, vah[0], vbl[1], 0);
-    accumx3a = vmlal_lane_s32(accumx3a, vah[0], vbl[1], 1);
     accumx0b += accumx0a;
     accumx1b += accumx1a;
     accumx0a = vmlal_lane_s32(accumx0a, vah[0], vbl[0], 0);
     accumx1a = vmlal_lane_s32(accumx1a, vah[0], vbl[0], 1);
-    accumx2a = vmlal_lane_s32(accumx2a, vah[1], vbl[0], 0);
-    accumx3a = vmlal_lane_s32(accumx3a, vah[1], vbl[0], 1);
     accumx0a = vmlal_lane_s32(accumx0a, val[1], delta = vbl[3] - vbh[3], 0);
     accumx1a = vmlal_lane_s32(accumx1a, val[1], delta, 1);
-    accumx2a = vmlal_lane_s32(accumx2a, val[2], delta, 0);
-    accumx3a = vmlal_lane_s32(accumx3a, val[2], delta, 1);
     accumx0a = vmlal_lane_s32(accumx0a, val[2], delta = vbl[2] - vbh[2], 0);
     accumx1a = vmlal_lane_s32(accumx1a, val[2], delta, 1);
-    accumx2a = vmlal_lane_s32(accumx2a, val[3], delta, 0);
-    accumx3a = vmlal_lane_s32(accumx3a, val[3], delta, 1);
     accumx0a = vmlal_lane_s32(accumx0a, val[3], delta = vbl[1] - vbh[1], 0);
     accumx1a = vmlal_lane_s32(accumx1a, val[3], delta, 1);
-    accumx2a += accumx2b;
-    accumx3a += accumx3b;
-    accumx2b = vmlal_lane_s32(accumx2b, val[0], delta, 0);
-    accumx3b = vmlal_lane_s32(accumx3b, val[0], delta, 1);
     accumx0a += accumx0b;
     accumx1a += accumx1b;
     accumx0b = vmlal_lane_s32(accumx0b, val[0], delta = vbl[0] - vbh[0], 0);
     accumx1b = vmlal_lane_s32(accumx1b, val[0], delta, 1);
-    accumx2b = vmlal_lane_s32(accumx2b, val[1], delta, 0);
-    accumx3b = vmlal_lane_s32(accumx3b, val[1], delta, 1);
     xx_vtrnq_s64(&accumx0a, &accumx0b);
     xx_vtrnq_s64(&accumx1a, &accumx1b);
-    xx_vtrnq_s64(&accumx2a, &accumx2b);
-    xx_vtrnq_s64(&accumx3a, &accumx3b);
     accumx0b += accumx1a;
     accumx0b = vsraq_n_s64(accumx0b,accumx0a,28);
     accumx1b = vsraq_n_s64(accumx1b,accumx0b,28);
+    trn_res = vtrn_s32(vmovn_s64(accumx0a), vmovn_s64(accumx0b));
+    vcl[0] = trn_res.val[1] & vmask;
+    vch[0] = trn_res.val[0] & vmask;
+    
+    
+    
+    
+    accumx2a = vmull_lane_s32(          delta = val[2] + vah[2], vbh[3], 0);
+    accumx3a = vmull_lane_s32(          delta, vbh[3], 1);
+    accumx2a = vmlal_lane_s32(accumx2a, delta = val[3] + vah[3], vbh[2], 0);
+    accumx3a = vmlal_lane_s32(accumx3a, delta, vbh[2], 1);
+    accumx2b = vmull_lane_s32(          delta = val[0] + vah[0], vbh[1], 0);
+    accumx3b = vmull_lane_s32(          delta, vbh[1], 1);
+    accumx2b = vmlal_lane_s32(accumx2b, delta = val[1] + vah[1], vbh[0], 0);
+    accumx3b = vmlal_lane_s32(accumx3b, delta, vbh[0], 1);
+    accumx2b = vmlal_lane_s32(accumx2b, vah[2], vbl[3], 0);
+    accumx3b = vmlal_lane_s32(accumx3b, vah[2], vbl[3], 1);
+    accumx2b = vmlal_lane_s32(accumx2b, vah[3], vbl[2], 0);
+    accumx3b = vmlal_lane_s32(accumx3b, vah[3], vbl[2], 1);
+    accumx2b += accumx2a;
+    accumx3b += accumx3a;
+    accumx2a = vmlal_lane_s32(accumx2a, vah[0], vbl[1], 0);
+    accumx3a = vmlal_lane_s32(accumx3a, vah[0], vbl[1], 1);
+    accumx2a = vmlal_lane_s32(accumx2a, vah[1], vbl[0], 0);
+    accumx3a = vmlal_lane_s32(accumx3a, vah[1], vbl[0], 1);
+    accumx2a = vmlal_lane_s32(accumx2a, val[2], delta = vbl[3] - vbh[3], 0);
+    accumx3a = vmlal_lane_s32(accumx3a, val[2], delta, 1);
+    accumx2a = vmlal_lane_s32(accumx2a, val[3], delta = vbl[2] - vbh[2], 0);
+    accumx3a = vmlal_lane_s32(accumx3a, val[3], delta, 1);
+    accumx2a += accumx2b;
+    accumx3a += accumx3b;
+    accumx2b = vmlal_lane_s32(accumx2b, val[0], delta = vbl[1] - vbh[1], 0);
+    accumx3b = vmlal_lane_s32(accumx3b, val[0], delta, 1);
+    accumx2b = vmlal_lane_s32(accumx2b, val[1], delta = vbl[0] - vbh[0], 0);
+    accumx3b = vmlal_lane_s32(accumx3b, val[1], delta, 1);
+    xx_vtrnq_s64(&accumx2a, &accumx2b);
+    xx_vtrnq_s64(&accumx3a, &accumx3b);
     accumx2a += accumx1b;
     accumx2b += accumx3a;
     accumx2b = vsraq_n_s64(accumx2b,accumx2a,28);
     accumx3b = vsraq_n_s64(accumx3b,accumx2b,28);
-    trn_res = vtrn_s32(vmovn_s64(accumx0a), vmovn_s64(accumx0b));
-    vcl[0] = trn_res.val[1] & vmask;
-    vch[0] = trn_res.val[0] & vmask;
     trn_res = vtrn_s32(vmovn_s64(accumx2a), vmovn_s64(accumx2b));
     vcl[1] = trn_res.val[1] & vmask;
     vch[1] = trn_res.val[0] & vmask;
     carry = accumx3b;
     
+    
+    
+    
     accumx4a = vmull_lane_s32(          delta = val[3] + vah[3], vbh[3], 0);
     accumx5a = vmull_lane_s32(          delta, vbh[3], 1);
-    accumx6b = vmull_lane_s32(          delta = val[0] + vah[0], vbh[3], 0);
-    accumx7b = vmull_lane_s32(          delta, vbh[3], 1);
     accumx4b = accumx4a;
     accumx5b = accumx5a;
-    accumx4b = vmlal_lane_s32(accumx4b, delta, vbh[2], 0);
+    accumx4b = vmlal_lane_s32(accumx4b, delta = val[0] + vah[0], vbh[2], 0);
     accumx5b = vmlal_lane_s32(accumx5b, delta, vbh[2], 1);
-    accumx6b = vmlal_lane_s32(accumx6b, delta = val[1] + vah[1], vbh[2], 0);
-    accumx7b = vmlal_lane_s32(accumx7b, delta, vbh[2], 1);
-    accumx4b = vmlal_lane_s32(accumx4b, delta, vbh[1], 0);
+    accumx4b = vmlal_lane_s32(accumx4b, delta = val[1] + vah[1], vbh[1], 0);
     accumx5b = vmlal_lane_s32(accumx5b, delta, vbh[1], 1);
-    accumx6b = vmlal_lane_s32(accumx6b, delta = val[2] + vah[2], vbh[1], 0);
-    accumx7b = vmlal_lane_s32(accumx7b, delta, vbh[1], 1);
-    accumx4b = vmlal_lane_s32(accumx4b, delta, vbh[0], 0);
+    accumx4b = vmlal_lane_s32(accumx4b, delta = val[2] + vah[2], vbh[0], 0);
     accumx5b = vmlal_lane_s32(accumx5b, delta, vbh[0], 1);
-    accumx6b = vmlal_lane_s32(accumx6b, delta = val[3] + vah[3], vbh[0], 0);
-    accumx7b = vmlal_lane_s32(accumx7b, delta, vbh[0], 1);
     accumx4b = vmlal_lane_s32(accumx4b, vah[3], vbl[3], 0);
     accumx5b = vmlal_lane_s32(accumx5b, vah[3], vbl[3], 1);
-    accumx6a = accumx6b;
-    accumx7a = accumx7b;
-    accumx6a = vmlal_lane_s32(accumx6a, vah[0], vbl[3], 0);
-    accumx7a = vmlal_lane_s32(accumx7a, vah[0], vbl[3], 1);
     accumx4a += accumx4b;
     accumx5a += accumx5b;
     accumx4a = vmlal_lane_s32(accumx4a, vah[0], vbl[2], 0);
     accumx5a = vmlal_lane_s32(accumx5a, vah[0], vbl[2], 1);
-    accumx6a = vmlal_lane_s32(accumx6a, vah[1], vbl[2], 0);
-    accumx7a = vmlal_lane_s32(accumx7a, vah[1], vbl[2], 1);
     accumx4a = vmlal_lane_s32(accumx4a, vah[1], vbl[1], 0);
     accumx5a = vmlal_lane_s32(accumx5a, vah[1], vbl[1], 1);
-    accumx6a = vmlal_lane_s32(accumx6a, vah[2], vbl[1], 0);
-    accumx7a = vmlal_lane_s32(accumx7a, vah[2], vbl[1], 1);
     accumx4a = vmlal_lane_s32(accumx4a, vah[2], vbl[0], 0);
     accumx5a = vmlal_lane_s32(accumx5a, vah[2], vbl[0], 1);
-    accumx6a = vmlal_lane_s32(accumx6a, vah[3], vbl[0], 0);
-    accumx7a = vmlal_lane_s32(accumx7a, vah[3], vbl[0], 1);
     accumx4a = vmlal_lane_s32(accumx4a, val[3], delta = vbl[3] - vbh[3], 0);
     accumx5a = vmlal_lane_s32(accumx5a, val[3], delta, 1);
     /**/
-    accumx6b = vmlal_lane_s32(accumx6b, val[0], delta, 0);
-    accumx7b = vmlal_lane_s32(accumx7b, val[0], delta, 1);
     accumx4b = vmlal_lane_s32(accumx4b, val[0], delta = vbl[2] - vbh[2], 0);
     accumx5b = vmlal_lane_s32(accumx5b, val[0], delta, 1);
-    accumx6b = vmlal_lane_s32(accumx6b, val[1], delta, 0);
-    accumx7b = vmlal_lane_s32(accumx7b, val[1], delta, 1);
     accumx4b = vmlal_lane_s32(accumx4b, val[1], delta = vbl[1] - vbh[1], 0);
     accumx5b = vmlal_lane_s32(accumx5b, val[1], delta, 1);
-    accumx6b = vmlal_lane_s32(accumx6b, val[2], delta, 0);
-    accumx7b = vmlal_lane_s32(accumx7b, val[2], delta, 1);
     accumx4b = vmlal_lane_s32(accumx4b, val[2], delta = vbl[0] - vbh[0], 0);
     accumx5b = vmlal_lane_s32(accumx5b, val[2], delta, 1);
-    accumx6b = vmlal_lane_s32(accumx6b, val[3], delta, 0);
-    accumx7b = vmlal_lane_s32(accumx7b, val[3], delta, 1);
     
     xx_vtrnq_s64(&accumx4a, &accumx4b);
     xx_vtrnq_s64(&accumx5a, &accumx5b);
-    xx_vtrnq_s64(&accumx6a, &accumx6b);
-    xx_vtrnq_s64(&accumx7a, &accumx7b);
     accumx4a += carry;
     accumx4b += accumx5a;
     accumx4b = vsraq_n_s64(accumx4b,accumx4a,28);
     accumx5b = vsraq_n_s64(accumx5b,accumx4b,28);
-    accumx6a += accumx5b;
-    accumx6b += accumx7a;
     
     trn_res = vtrn_s32(vmovn_s64(accumx4a), vmovn_s64(accumx4b));
     vcl[2] = trn_res.val[1] & vmask;
     vch[2] = trn_res.val[0] & vmask;
+    
+    
+    
+    
+    accumx6b = vmull_lane_s32(          delta = val[0] + vah[0], vbh[3], 0);
+    accumx7b = vmull_lane_s32(          delta, vbh[3], 1);
+    accumx6b = vmlal_lane_s32(accumx6b, delta = val[1] + vah[1], vbh[2], 0);
+    accumx7b = vmlal_lane_s32(accumx7b, delta, vbh[2], 1);
+    accumx6b = vmlal_lane_s32(accumx6b, delta = val[2] + vah[2], vbh[1], 0);
+    accumx7b = vmlal_lane_s32(accumx7b, delta, vbh[1], 1);
+    accumx6b = vmlal_lane_s32(accumx6b, delta = val[3] + vah[3], vbh[0], 0);
+    accumx7b = vmlal_lane_s32(accumx7b, delta, vbh[0], 1);
+    accumx6a = accumx6b;
+    accumx7a = accumx7b;
+    accumx6a = vmlal_lane_s32(accumx6a, vah[0], vbl[3], 0);
+    accumx7a = vmlal_lane_s32(accumx7a, vah[0], vbl[3], 1);
+    accumx6a = vmlal_lane_s32(accumx6a, vah[1], vbl[2], 0);
+    accumx7a = vmlal_lane_s32(accumx7a, vah[1], vbl[2], 1);
+    accumx6a = vmlal_lane_s32(accumx6a, vah[2], vbl[1], 0);
+    accumx7a = vmlal_lane_s32(accumx7a, vah[2], vbl[1], 1);
+    accumx6a = vmlal_lane_s32(accumx6a, vah[3], vbl[0], 0);
+    accumx7a = vmlal_lane_s32(accumx7a, vah[3], vbl[0], 1);
+    /**/
+    accumx6b = vmlal_lane_s32(accumx6b, val[0], delta = vbl[3] - vbh[3], 0);
+    accumx7b = vmlal_lane_s32(accumx7b, val[0], delta, 1);
+    accumx6b = vmlal_lane_s32(accumx6b, val[1], delta = vbl[2] - vbh[2], 0);
+    accumx7b = vmlal_lane_s32(accumx7b, val[1], delta, 1);
+    accumx6b = vmlal_lane_s32(accumx6b, val[2], delta = vbl[1] - vbh[1], 0);
+    accumx7b = vmlal_lane_s32(accumx7b, val[2], delta, 1);
+    accumx6b = vmlal_lane_s32(accumx6b, val[3], delta = vbl[0] - vbh[0], 0);
+    accumx7b = vmlal_lane_s32(accumx7b, val[3], delta, 1);
+
+    xx_vtrnq_s64(&accumx6a, &accumx6b);
+    xx_vtrnq_s64(&accumx7a, &accumx7b);
+    accumx6a += accumx5b;
+    accumx6b += accumx7a;
+    
     accumx6b = vsraq_n_s64(accumx6b,accumx6a,28);
     accumx7b = vsraq_n_s64(accumx7b,accumx6b,28);
     trn_res = vtrn_s32(vmovn_s64(accumx6a), vmovn_s64(accumx6b));
     vcl[3] = trn_res.val[1] & vmask;
     vch[3] = trn_res.val[0] & vmask;
+    
     
     accumx7b = xx_vaddup_s64(accumx7b);
 

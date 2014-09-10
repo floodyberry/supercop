@@ -17,6 +17,11 @@
 #define GOLDI_IMPLEMENT_PRECOMPUTED_KEYS 1
 #endif
 
+#ifndef GOLDI_IMPLEMENT_SIGNATURES
+/** If nonzero, implement signatures. */
+#define GOLDI_IMPLEMENT_SIGNATURES 1
+#endif
+
 /** The size of the Goldilocks field, in bits. */
 #define GOLDI_FIELD_BITS          448
 
@@ -38,7 +43,7 @@
 /** The size of a Goldilocks private key, in bytes. */
 #define GOLDI_PRIVATE_KEY_BYTES   (2*GOLDI_FIELD_BYTES + GOLDI_SYMKEY_BYTES)
 
-/** The size of a Goldilocks private key, in bytes. */
+/** The size of a Goldilocks signature, in bytes. */
 #define GOLDI_SIGNATURE_BYTES     (2*GOLDI_FIELD_BYTES)
 
 /**
@@ -100,7 +105,7 @@ static const int GOLDI_EALREADYINIT  = 44805;
  * @retval Nonzero An error occurred.
  */
 int
-goldilocks_init ()
+goldilocks_init (void)
 __attribute__((warn_unused_result,visibility ("default")));
 
 
@@ -206,7 +211,8 @@ goldilocks_shared_secret (
     const struct goldilocks_private_key_t *my_privkey,
     const struct goldilocks_public_key_t *your_pubkey
 ) __attribute__((warn_unused_result,nonnull(1,2,3),visibility ("default")));
-    
+
+#if GOLDI_IMPLEMENT_SIGNATURES
 /**
  * @brief Sign a message.
  *
@@ -264,6 +270,7 @@ goldilocks_verify (
     uint64_t message_len,
     const struct goldilocks_public_key_t *pubkey
 ) __attribute__((warn_unused_result,nonnull(1,2,4),visibility ("default")));
+#endif
 
 #if GOLDI_IMPLEMENT_PRECOMPUTED_KEYS
 

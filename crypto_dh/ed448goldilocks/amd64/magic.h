@@ -76,7 +76,7 @@ extern const word_t SCALARMUL_FIXED_WINDOW_ADJUSTMENT[2*SCALAR_WORDS];
  * @brief If true, use wider tables for the precomputed combs.
  */
 #ifndef USE_BIG_COMBS
-#if __ARM_NEON__
+#if defined(__ARM_NEON__)
 #define USE_BIG_COMBS 1
 #else
 #define USE_BIG_COMBS (WORD_BITS==64)

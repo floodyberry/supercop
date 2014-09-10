@@ -1,6 +1,7 @@
 /* Copyright (c) 2014 Cryptography Research, Inc.
  * Released under the MIT License.  See LICENSE.txt for license information.
  */
+
 #include "word.h"
 
 #include <stdlib.h>
@@ -76,7 +77,7 @@ constant_time_lookup_tw_pniels (
     int j;
     unsigned int k;
     
-    memset(out, 0, sizeof(*out));
+    really_memset(out, 0, sizeof(*out));
     for (j=0; j<nin; j++, big_i-=big_one) {
         big_register_t mask = br_is_zero(big_i);
         for (k=0; k<sizeof(*out)/sizeof(*o); k++) {
@@ -98,7 +99,7 @@ constant_time_lookup_tw_niels (
     int j;
     unsigned int k;
     
-    memset(out, 0, sizeof(*out));
+    really_memset(out, 0, sizeof(*out));
     for (j=0; j<nin; j++, big_i-=big_one) {
         big_register_t mask = br_is_zero(big_i);
         for (k=0; k<sizeof(*out)/sizeof(*o); k++) {
@@ -449,7 +450,7 @@ precompute_fixed_base (
   struct tw_niels_t *prealloc
 ) {
     if (s < 1 || t < 1 || n < 1 || n*t*s < SCALAR_BITS) {
-        memset(out, 0, sizeof(*out));
+        really_memset(out, 0, sizeof(*out));
         return 0;
     }
     
@@ -478,8 +479,8 @@ precompute_fixed_base (
         free(doubles);
         free(zs);
         free(zis);
-        memset(out, 0, sizeof(*out));
-        memset(table, 0, sizeof(*table) * (n<<(t-1)));
+        really_memset(out, 0, sizeof(*out));
+        really_memset(table, 0, sizeof(*table) * (n<<(t-1)));
         if (!prealloc) free(table);
         return 0;
     }
@@ -593,9 +594,9 @@ precompute_fixed_base (
     free(zis);
 
     if (unlikely(!ret)) {
-        memset(table, 0, sizeof(*table) * (n<<(t-1)));
+        really_memset(table, 0, sizeof(*table) * (n<<(t-1)));
         if (!prealloc) free(table);
-        memset(out, 0, sizeof(*out));
+        really_memset(out, 0, sizeof(*out));
         return 0;
     }
 
@@ -607,12 +608,12 @@ destroy_fixed_base (
     struct fixed_base_table_t *table
 ) {
     if (table->table) {
-        memset(table->table,0,sizeof(*table->table)*(table->n<<(table->t-1)));
+        really_memset(table->table,0,sizeof(*table->table)*(table->n<<(table->t-1)));
     }
     if (table->own_table) {
         free(table->table);
     }
-    memset(table,0,sizeof(*table));
+    really_memset(table,0,sizeof(*table));
 }
 
 mask_t
@@ -751,6 +752,7 @@ prepare_wnaf_table(
     struct tw_extensible_t *working,
     unsigned int tbits
 ) {
+    int i;
     convert_tw_extensible_to_tw_pniels(&output[0], working);
 
     if (tbits == 0) return;
@@ -762,7 +764,7 @@ prepare_wnaf_table(
     add_tw_pniels_to_tw_extensible(working, &output[0]);
     convert_tw_extensible_to_tw_pniels(&output[1], working);
 
-    for (int i=2; i < 1<<tbits; i++) {
+    for (i=2; i < 1<<tbits; i++) {
         add_tw_pniels_to_tw_extensible(working, &twop);
         convert_tw_extensible_to_tw_pniels(&output[i], working);
     }

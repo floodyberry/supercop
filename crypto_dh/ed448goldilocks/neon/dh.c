@@ -27,8 +27,8 @@ int crypto_dh_keypair (
 
 int crypto_dh (
     unsigned char s[SHAREDSECRET_BYTES],
-    const unsigned char sk[SECRETKEY_BYTES],
-    const unsigned char pk[PUBLICKEY_BYTES]
+    const unsigned char pk[PUBLICKEY_BYTES],
+    const unsigned char sk[SECRETKEY_BYTES]
 ) {
   return goldilocks_shared_secret (
         s,

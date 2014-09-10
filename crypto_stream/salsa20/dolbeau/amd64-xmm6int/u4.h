@@ -1,5 +1,5 @@
 /*
-u4.h version $Date: 2014/08/22 16:41:35 $
+u4.h version $Date: 2014/09/07 16:11:02 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -30,22 +30,22 @@ if (bytes >= 256)
 
   /* element broadcast immediate for _mm_shuffle_epi32 are in order:
      0x00, 0x55, 0xaa, 0xff */
-  __m128i z0  = _mm_load_si128((__m128i*)(x +  0));
+  __m128i z0  = _mm_loadu_si128((__m128i*)(x +  0));
   __m128i z5  = _mm_shuffle_epi32(z0, 0x55);
   __m128i z10 = _mm_shuffle_epi32(z0, 0xaa);
   __m128i z15 = _mm_shuffle_epi32(z0, 0xff);
   z0  = _mm_shuffle_epi32(z0, 0x00);
-  __m128i z1  = _mm_load_si128((__m128i*)(x +  4));
+  __m128i z1  = _mm_loadu_si128((__m128i*)(x +  4));
   __m128i z6  = _mm_shuffle_epi32(z1, 0xaa);
   __m128i z11 = _mm_shuffle_epi32(z1, 0xff);
   __m128i z12 = _mm_shuffle_epi32(z1, 0x00);
   z1  = _mm_shuffle_epi32(z1, 0x55);
-  __m128i z2  = _mm_load_si128((__m128i*)(x +  8));
+  __m128i z2  = _mm_loadu_si128((__m128i*)(x +  8));
   __m128i z7  = _mm_shuffle_epi32(z2, 0xff);
   __m128i z13 = _mm_shuffle_epi32(z2, 0x55);
   z2 = _mm_shuffle_epi32(z2, 0xaa);
   /* no z8 -> first half of the nonce, will fill later */
-  __m128i z3  = _mm_load_si128((__m128i*)(x +  12));
+  __m128i z3  = _mm_loadu_si128((__m128i*)(x +  12));
   __m128i z4  = _mm_shuffle_epi32(z3, 0x00);
   __m128i z14 = _mm_shuffle_epi32(z3, 0xaa);
   z3 = _mm_shuffle_epi32(z3, 0xff);
@@ -568,14 +568,14 @@ if (bytes >= 256)
     z##b = _mm_unpackhi_epi64(y##a, y##b);                              \
     z##c = _mm_unpacklo_epi64(y##c, y##d);                              \
     z##d = _mm_unpackhi_epi64(y##c, y##d);                              \
-    y##a = _mm_xor_si128(z##a, _mm_load_si128((__m128i*)(m+0)));        \
-    _mm_store_si128((__m128i*)(out+0),y##a);                            \
-    y##b = _mm_xor_si128(z##b, _mm_load_si128((__m128i*)(m+64)));       \
-    _mm_store_si128((__m128i*)(out+64),y##b);                           \
-    y##c = _mm_xor_si128(z##c, _mm_load_si128((__m128i*)(m+128)));      \
-    _mm_store_si128((__m128i*)(out+128),y##c);                          \
-    y##d = _mm_xor_si128(z##d, _mm_load_si128((__m128i*)(m+192)));      \
-    _mm_store_si128((__m128i*)(out+192),y##d)
+    y##a = _mm_xor_si128(z##a, _mm_loadu_si128((__m128i*)(m+0)));        \
+    _mm_storeu_si128((__m128i*)(out+0),y##a);                            \
+    y##b = _mm_xor_si128(z##b, _mm_loadu_si128((__m128i*)(m+64)));       \
+    _mm_storeu_si128((__m128i*)(out+64),y##b);                           \
+    y##c = _mm_xor_si128(z##c, _mm_loadu_si128((__m128i*)(m+128)));      \
+    _mm_storeu_si128((__m128i*)(out+128),y##c);                          \
+    y##d = _mm_xor_si128(z##d, _mm_loadu_si128((__m128i*)(m+192)));      \
+    _mm_storeu_si128((__m128i*)(out+192),y##d)
 
 #define ONEQUAD(a,b,c,d) ONEQUAD_TRANSPOSE(a,b,c,d)
 

@@ -56,6 +56,18 @@
 #define EXPERIMENT_ECDH_OBLITERATE_CT   1
 
 /**
+ * @brief Whether or not define the signing functions, which
+ * currently require SHA-512.
+ */
+#define GOLDI_IMPLEMENT_SIGNATURES      1
+
+/**
+ * @brief Whether or not to define and implement functions
+ * working with pre-computed keys.
+ */
+#define GOLDI_IMPLEMENT_PRECOMPUTED_KEYS 1
+
+/**
  * @brief ECDH adds public keys into the hash, to prevent
  * esoteric attacks.
  */
