@@ -85,14 +85,18 @@ typedef struct {
 } SHA256_HMAC_DRBG_STATE;
 
 
-/* DRBG state structure
- * Note: this could contain a DRBG_TYPE to direct allocation, instantiation,
- *       and generation to multiple types of DRBGs; at present only the
- *       SHA256_HMAC_DRBG is implemented
- */
+/* External DRBG state structure */
+
+typedef struct {
+    RANDOM_BYTES_FN   randombytesfn;
+} EXTERNAL_DRBG_STATE;
+
+
+/* DRBG state structure */
 
 typedef struct {
     uint32_t    handle;
+    DRBG_TYPE   type;
     void       *state;
 } DRBG_STATE;
 
@@ -658,12 +662,15 @@ drbg_get_new_handle(void)
 /* ntru_crypto_drbg_instantiate
  *
  * This routine instantiates a drbg with the requested security strength.
- * See ANS X9.82: Part 3-2007.
+ * See ANS X9.82: Part 3-2007. This routine currently returns an instance
+ * of SHA-256 HMAC_DRBG for all requested security strengths.
  *
  * Returns DRBG_OK if successful.
  * Returns DRBG_ERROR_BASE + DRBG_BAD_PARAMETER if an argument pointer is NULL.
  * Returns DRBG_ERROR_BASE + DRBG_BAD_LENGTH if the security strength requested
  *  or the personalization string is too large.
+ * Returns DRBG_ERROR_BASE + DRBG_NOT_AVAILABLE if there are no instantiation
+ *  slots available
  * Returns DRBG_ERROR_BASE + DRBG_OUT_OF_MEMORY if the internal state cannot be
  *  allocated from the heap.
  */
@@ -743,6 +750,7 @@ ntru_crypto_drbg_instantiate(
     /* init drbg state */
 
     drbg->handle = drbg_get_new_handle();
+    drbg->type = SHA256_HMAC_DRBG;
     drbg->state = state;
 
     /* return drbg handle */
@@ -751,6 +759,58 @@ ntru_crypto_drbg_instantiate(
     DRBG_RET(DRBG_OK);
 } 
 
+
+/* ntru_crypto_external_drbg_instantiate
+ *
+ * This routine instruments an external DRBG so that ntru_crypto routines
+ * can call it. randombytesfn must be of type
+ * uint32_t (randombytesfn*)(unsigned char *out, unsigned long long num_bytes);
+ * and should return DRBG_OK on success.
+ *
+ * Returns DRBG_OK if successful.
+ * Returns DRBG_ERROR_BASE + DRBG_NOT_AVAILABLE if there are no instantiation
+ *  slots available
+ * Returns DRBG_ERROR_BASE + DRBG_OUT_OF_MEMORY if the internal state cannot be
+ *  allocated from the heap.
+ */
+
+uint32_t
+ntru_crypto_external_drbg_instantiate(
+    RANDOM_BYTES_FN  randombytesfn, /*  in - pointer to random bytes function */
+    DRBG_HANDLE     *handle)        /* out - address for drbg handle */
+{
+    DRBG_STATE             *drbg = NULL;
+    EXTERNAL_DRBG_STATE    *state = NULL;
+
+    /* get an uninstantiated drbg */
+
+    if ((drbg = drbg_get_new_drbg()) == NULL)
+    {
+        DRBG_RET(DRBG_NOT_AVAILABLE);
+    }
+
+    /* instantiate an External DRBG */
+
+    state = (EXTERNAL_DRBG_STATE*) MALLOC(sizeof(EXTERNAL_DRBG_STATE));
+    if (state == NULL)
+    {
+        DRBG_RET(DRBG_OUT_OF_MEMORY);
+    }
+
+    state->randombytesfn = randombytesfn;
+
+    /* init drbg state */
+
+    drbg->handle = drbg_get_new_handle();
+    drbg->type = EXTERNAL_DRBG;
+    drbg->state = state;
+
+    /* return drbg handle */
+
+    *handle = drbg->handle;
+
+    DRBG_RET(DRBG_OK);
+}
 
 /* ntru_crypto_drbg_uninstantiate
  *
@@ -772,12 +832,20 @@ ntru_crypto_drbg_uninstantiate(
     {
         DRBG_RET(DRBG_BAD_PARAMETER);
     }
-    
+
     /* zero and free drbg state */
 
     if (drbg->state) 
     {
-        sha256_hmac_drbg_free((SHA256_HMAC_DRBG_STATE *)drbg->state);
+        switch (drbg->type)
+        {
+            case EXTERNAL_DRBG:
+                FREE(drbg->state);
+                break;
+            case SHA256_HMAC_DRBG:
+                sha256_hmac_drbg_free((SHA256_HMAC_DRBG_STATE *)drbg->state);
+                break;
+        }
         drbg->state = NULL;
     }
 
@@ -805,6 +873,11 @@ ntru_crypto_drbg_reseed(
     /* find the instantiated drbg */
 
     if ((drbg = drbg_get_drbg(handle)) == NULL)
+    {
+        DRBG_RET(DRBG_BAD_PARAMETER);
+    }
+
+    if (drbg->type == EXTERNAL_DRBG)
     {
         DRBG_RET(DRBG_BAD_PARAMETER);
     }
@@ -859,7 +932,17 @@ ntru_crypto_drbg_generate(
     
     /* generate pseudorandom output from the SHA256_HMAC_DRBG */
 
-    return sha256_hmac_drbg_generate((SHA256_HMAC_DRBG_STATE *)drbg->state,
+    switch (drbg->type)
+    {
+        case EXTERNAL_DRBG:
+            return ((EXTERNAL_DRBG_STATE *)drbg->state)->randombytesfn(out,
+                                                                     num_bytes);
+        case SHA256_HMAC_DRBG:
+            return sha256_hmac_drbg_generate(
+                                    (SHA256_HMAC_DRBG_STATE *)drbg->state,
                                      sec_strength_bits, num_bytes, out);
+        default:
+            DRBG_RET(DRBG_BAD_PARAMETER);
+    }
 }
 

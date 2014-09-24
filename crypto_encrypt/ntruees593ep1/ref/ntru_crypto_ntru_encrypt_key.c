@@ -66,39 +66,30 @@ ntru_crypto_ntru_encrypt_key_parse(
 {
     uint8_t tag;
 
-    ASSERT(key_blob_len);
-    ASSERT(key_blob);
-    ASSERT(pubkey_pack_type);
-    ASSERT(params);
-    ASSERT(pubkey);
-
     /* parse key blob based on tag */
 
     tag = key_blob[0];
     switch (tag)
     {
         case NTRU_ENCRYPT_PUBKEY_TAG:
-           
+
             if (!pubkey_parse)
             {
                 return FALSE;
             }
-            
+
             break;
-            
+
         case NTRU_ENCRYPT_PRIVKEY_DEFAULT_TAG:
         case NTRU_ENCRYPT_PRIVKEY_TRITS_TAG:
         case NTRU_ENCRYPT_PRIVKEY_INDICES_TAG:
-            
-            ASSERT(privkey_pack_type);
-            ASSERT(privkey);
-            
+
             if (pubkey_parse)
             {
                 return FALSE;
             }
             break;
-            
+
         default:
             return FALSE;
             break;
@@ -259,10 +250,6 @@ ntru_crypto_ntru_encrypt_key_get_blob_params(
 {
     uint16_t pubkey_packed_len = (params->N * params->q_bits + 7) >> 3;
 
-    ASSERT(params);
-    ASSERT(pubkey_pack_type);
-    ASSERT(pubkey_blob_len);
-    
     *pubkey_pack_type = NTRU_ENCRYPT_KEY_PACKED_COEFFICIENTS;
     *pubkey_blob_len = 5 + pubkey_packed_len;
 
@@ -322,10 +309,7 @@ ntru_crypto_ntru_encrypt_key_create_pubkey_blob(
     uint8_t                      *pubkey_blob)        /* out - addr for the
                                                                pubkey blob */
 {
-    ASSERT(params);
-    ASSERT(pubkey);
-    ASSERT(pubkey_blob);
-    
+
     switch (pubkey_pack_type)
     {
         case NTRU_ENCRYPT_KEY_PACKED_COEFFICIENTS:
@@ -336,12 +320,12 @@ ntru_crypto_ntru_encrypt_key_create_pubkey_blob(
             ntru_elements_2_octets(params->N, pubkey, params->q_bits,
                                    pubkey_blob);
             break;
-            
+
         default:
             ASSERT(FALSE);
             break;
     }
-    
+
     return;
 }
 
@@ -365,10 +349,7 @@ ntru_crypto_ntru_encrypt_key_recreate_pubkey_blob(
     uint8_t                      *pubkey_blob)        /* out - addr for the
                                                                pubkey blob */
 {
-    ASSERT(params);
-    ASSERT(packed_pubkey);
-    ASSERT(pubkey_blob);
-    
+
     switch (pubkey_pack_type)
     {
         case NTRU_ENCRYPT_KEY_PACKED_COEFFICIENTS:
@@ -378,12 +359,12 @@ ntru_crypto_ntru_encrypt_key_recreate_pubkey_blob(
             pubkey_blob += sizeof(params->OID);
             memcpy(pubkey_blob, packed_pubkey, packed_pubkey_len);
             break;
-            
+
         default:
             ASSERT(FALSE);
             break;
     }
-    
+
     return;
 }
 
@@ -410,11 +391,6 @@ ntru_crypto_ntru_encrypt_key_create_privkey_blob(
     uint8_t                      *privkey_blob)       /* out - addr for the
                                                                privkey blob */
 {
-    ASSERT(params);
-    ASSERT(pubkey);
-    ASSERT(privkey);
-    ASSERT(privkey_blob);
-
     switch (privkey_pack_type)
     {
         case NTRU_ENCRYPT_KEY_PACKED_TRITS:

@@ -116,21 +116,87 @@ ntru_poly_check_min_weight(
  * beyond 16 bits does not matter.
  */
 
+/* wrapper */
 extern void
 ntru_ring_mult_indices(
     uint16_t const *a,          /*  in - pointer to ring element a */
-    uint16_t        bi_P1_len,  /*  in - no. of +1 coefficients in b */
-    uint16_t        bi_M1_len,  /*  in - no. of -1 coefficients in b */
+    uint16_t const  bi_P1_len,  /*  in - no. of +1 coefficients in b */
+    uint16_t const  bi_M1_len,  /*  in - no. of -1 coefficients in b */
     uint16_t const *bi,         /*  in - pointer to the list of nonzero
                                          indices of ring element b,
                                          containing indices for the +1
                                          coefficients followed by the
                                          indices for -1 coefficients */
-    uint16_t        N,          /*  in - no. of coefficients in a, b, c */
-    uint16_t        q,          /*  in - large modulus */
+    uint16_t const  N,          /*  in - no. of coefficients in a, b, c */
+    uint16_t const  q,          /*  in - large modulus */
     uint16_t       *t,          /*  in - temp buffer of N elements */
     uint16_t       *c);         /* out - address for polynomial c */
 
+/* original implementation */
+extern void
+ntru_ring_mult_indices_orig(
+    uint16_t const *a,          /*  in - pointer to ring element a */
+    uint16_t const  bi_P1_len,  /*  in - no. of +1 coefficients in b */
+    uint16_t const  bi_M1_len,  /*  in - no. of -1 coefficients in b */
+    uint16_t const *bi,         /*  in - pointer to the list of nonzero
+                                         indices of ring element b,
+                                         containing indices for the +1
+                                         coefficients followed by the
+                                         indices for -1 coefficients */
+    uint16_t const  N,          /*  in - no. of coefficients in a, b, c */
+    uint16_t const  q,          /*  in - large modulus */
+    uint16_t       *t,          /*  in - temp buffer of N elements */
+    uint16_t       *c);         /* out - address for polynomial c */
+
+/* original implementation */
+extern void
+ntru_ring_mult_indices_sse3(
+    uint16_t const *a,          /*  in - pointer to ring element a */
+    uint16_t const  bi_P1_len,  /*  in - no. of +1 coefficients in b */
+    uint16_t const  bi_M1_len,  /*  in - no. of -1 coefficients in b */
+    uint16_t const *bi,         /*  in - pointer to the list of nonzero
+                                         indices of ring element b,
+                                         containing indices for the +1
+                                         coefficients followed by the
+                                         indices for -1 coefficients */
+    uint16_t const  N,          /*  in - no. of coefficients in a, b, c */
+    uint16_t const  q,          /*  in - large modulus */
+    uint16_t       *t,          /*  in - temp buffer of N elements */
+    uint16_t       *c);         /* out - address for polynomial c */
+
+
+/* fits two coefficients into a uint32_t */
+extern void
+ntru_ring_mult_indices_double_width_conv(
+    uint16_t const *a,          /*  in - pointer to ring element a */
+    uint16_t const  bi_P1_len,  /*  in - no. of +1 coefficients in b */
+    uint16_t const  bi_M1_len,  /*  in - no. of -1 coefficients in b */
+    uint16_t const *bi,         /*  in - pointer to the list of nonzero
+                                         indices of ring element b,
+                                         containing indices for the +1
+                                         coefficients followed by the
+                                         indices for -1 coefficients */
+    uint16_t const  N,          /*  in - no. of coefficients in a, b, c */
+    uint16_t const  q,          /*  in - large modulus */
+    uint16_t       *t,          /*  in - temp buffer of N elements */
+    uint16_t       *c);         /* out - address for polynomial c */
+
+
+/* fits four coefficients into a uint64_t */
+void
+ntru_ring_mult_indices_quadruple_width_conv(
+    uint16_t const *a,          /*  in - pointer to ring element a */
+    uint16_t const  bi_P1_len,  /*  in - no. of +1 coefficients in b */
+    uint16_t const  bi_M1_len,  /*  in - no. of -1 coefficients in b */
+    uint16_t const *bi,         /*  in - pointer to the list of nonzero
+                                         indices of ring element b,
+                                         containing indices for the +1
+                                         coefficients followed by the
+                                         indices for -1 coefficients */
+    uint16_t const  N,          /*  in - no. of coefficients in a, b, c */
+    uint16_t const  q,          /*  in - large modulus */
+    uint16_t       *t,          /*  in - temp buffer of N elements */
+    uint16_t       *c);         /* out - address for polynomial c */
 
 /* ntru_ring_mult_product_indices
  *
@@ -154,18 +220,18 @@ ntru_ring_mult_indices(
 
 extern void
 ntru_ring_mult_product_indices(
-    uint16_t       *a,          /*  in - pointer to ring element a */
-    uint16_t        b1i_len,    /*  in - no. of +1 or -1 coefficients in b1 */
-    uint16_t        b2i_len,    /*  in - no. of +1 or -1 coefficients in b2 */
-    uint16_t        b3i_len,    /*  in - no. of +1 or -1 coefficients in b3 */
+    uint16_t const *a,          /*  in - pointer to ring element a */
+    uint16_t const  b1i_len,    /*  in - no. of +1 or -1 coefficients in b1 */
+    uint16_t const  b2i_len,    /*  in - no. of +1 or -1 coefficients in b2 */
+    uint16_t const  b3i_len,    /*  in - no. of +1 or -1 coefficients in b3 */
     uint16_t const *bi,         /*  in - pointer to the list of nonzero
                                          indices of polynomials b1, b2, b3,
                                          containing indices for the +1
                                          coefficients followed by the
                                          indices for -1 coefficients for
                                          each polynomial */
-    uint16_t        N,          /*  in - no. of coefficients in a, b, c */
-    uint16_t        q,          /*  in - large modulus */
+    uint16_t const  N,          /*  in - no. of coefficients in a, b, c */
+    uint16_t const  q,          /*  in - large modulus */
     uint16_t       *t,          /*  in - temp buffer of 2N elements */
     uint16_t       *c);         /* out - address for polynomial c */
 
@@ -186,8 +252,10 @@ extern void
 ntru_ring_mult_coefficients(
     uint16_t const *a,          /*  in - pointer to polynomial a */
     uint16_t const *b,          /*  in - pointer to polynomial b */
-    uint16_t        N,          /*  in - no. of coefficients in a, b, c */
+    uint16_t        N,          /*  in - degree of (x^N - 1) */
+    uint16_t        padN,       /*  in - no. of coefficients in a, b, c */
     uint16_t        q,          /*  in - large modulus */
+    uint16_t       *tmp,        /*  in - temp buffer of 3*padN elements */
     uint16_t       *c);         /* out - address for polynomial c */
 
 
@@ -203,7 +271,6 @@ extern bool
 ntru_ring_inv(
     uint16_t       *a,          /*  in - pointer to polynomial a */
     uint16_t        N,          /*  in - no. of coefficients in a */
-    uint16_t        q,          /*  in - large modulus */
     uint16_t       *t,          /*  in - temp buffer of 2N elements */
     uint16_t       *a_inv);     /* out - address for polynomial a^-1 */
 

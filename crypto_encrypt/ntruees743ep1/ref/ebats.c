@@ -31,36 +31,11 @@ int patentclaims(void)
     return 30;
 }
 
-static uint8_t get_entropy(ENTROPY_CMD cmd, uint8_t *out)
+int
+randombytesfn(unsigned char*x, unsigned long long xlen)
 {
-    static uint8_t seed[SEED_LENGTH];
-    static size_t index;
-    
-    if (cmd == INIT) {
-        randombytes(seed, sizeof(seed));
-        index = 0;
-        return 1;
-    }
-    
-    if (out == NULL)
-        return 0;
-    
-    if (cmd == GET_NUM_BYTES_PER_BYTE_OF_ENTROPY) {
-        *out = 1;
-        return 1;
-    }
-    
-    if (cmd == GET_BYTE_OF_ENTROPY) {
-        if (index == sizeof(seed))
-        {
-            randombytes(seed, sizeof(seed));
-            index = 0;
-        }
-        
-        *out = seed[index++];
-        return 1;
-    }
-    return 0;
+    randombytes(x,xlen);
+    DRBG_RET(DRBG_OK);
 }
 
 int crypto_encrypt_keypair(uint8_t *pk, uint8_t *sk) {
@@ -74,7 +49,7 @@ int crypto_encrypt_keypair(uint8_t *pk, uint8_t *sk) {
         return -1;
     }
     
-    if (ntru_crypto_drbg_instantiate(SEC_STRENGTH, NULL, 0, (ENTROPY_FN) &get_entropy, &drbg) != DRBG_OK) {
+    if (ntru_crypto_external_drbg_instantiate((RANDOM_BYTES_FN) &randombytesfn, &drbg) != DRBG_OK) {
         return -2;
     }
     
@@ -106,7 +81,7 @@ int shortciphertext(uint8_t *c, uint64_t *clen, const uint8_t *m, uint64_t mlen,
         return -2;
     }
     
-    if (ntru_crypto_drbg_instantiate(SEC_STRENGTH, NULL, 0, (ENTROPY_FN) &get_entropy, &drbg) != DRBG_OK) {
+    if (ntru_crypto_external_drbg_instantiate((RANDOM_BYTES_FN) &randombytesfn, &drbg) != DRBG_OK) {
         return -3;
     }
     

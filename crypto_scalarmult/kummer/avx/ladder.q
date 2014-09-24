@@ -26,13 +26,6 @@ reg256 y3
 reg256 y4
 reg256 y5
 
-reg256 t0
-reg256 t1
-reg256 t2
-reg256 t3
-reg256 t4
-reg256 t5
-
 reg256 b
 
 reg256 two
@@ -376,6 +369,12 @@ reg256 a5b3
 reg256 a5b4
 reg256 a5b5
 
+stack256 127I1_stack
+stack256 127I2_stack
+stack256 127I3_stack
+stack256 127I4_stack
+stack256 127I5_stack
+
 enter ladder
 
   stack_r11 = caller_r11
@@ -492,149 +491,6 @@ enter ladder
  
 mainloop:
 
-                          yxtz0[0,1,2,3] = E0[1,0,3,2]
-                          abcd0[0,1,2,3] approx= E0[0]-yxtz0[0],E0[1]+yxtz0[1],E0[2]-yxtz0[2],E0[3]+yxtz0[3]
-                          yxtz2[0,1,2,3] = E2[1,0,3,2]
-                          abcd2[0,1,2,3] approx= E2[0]-yxtz2[0],E2[1]+yxtz2[1],E2[2]-yxtz2[2],E2[3]+yxtz2[3]
-                          yxtz4[0,1,2,3] = E4[1,0,3,2]
-                          abcd4[0,1,2,3] approx= E4[0]-yxtz4[0],E4[1]+yxtz4[1],E4[2]-yxtz4[2],E4[3]+yxtz4[3]
-                          cdab0[0,1,2,3] = abcd0[2,3],abcd0[0,1]
-                          badc0[0,1,2,3] = abcd0[1,0,3,2]
-                          H0[0,1,2,3] approx= badc0[0]-cdab0[0],badc0[1]+cdab0[1],badc0[2]-cdab0[2],badc0[3]+cdab0[3]
-
-                          cdab2[0,1,2,3] = abcd2[2,3],abcd2[0,1]
-                          badc2[0,1,2,3] = abcd2[1,0,3,2]
-                          H2[0,1,2,3] approx= badc2[0]-cdab2[0],badc2[1]+cdab2[1],badc2[2]-cdab2[2],badc2[3]+cdab2[3]
-
-  mem256[work1 + 0] aligned= F4
-
-                          cdab4[0,1,2,3] = abcd4[2,3],abcd4[0,1]
-                          badc4[0,1,2,3] = abcd4[1,0,3,2]
-                          H4[0,1,2,3] approx= badc4[0]-cdab4[0],badc4[1]+cdab4[1],badc4[2]-cdab4[2],badc4[3]+cdab4[3]
-
-  yxtz0[0,1,2,3] = F0[1,0,3,2]
-  abcd0[0,1,2,3] approx= F0[0]-yxtz0[0],F0[1]+yxtz0[1],F0[2]-yxtz0[2],F0[3]+yxtz0[3]
-
-  cdab0[0,1,2,3] = abcd0[2,3],abcd0[0,1]
-  badc0[0,1,2,3] = abcd0[1,0,3,2]
-  I0[0,1,2,3] approx= badc0[0]-cdab0[0],badc0[1]+cdab0[1],badc0[2]-cdab0[2],badc0[3]+cdab0[3]
-
-                          a22 aligned= mem256[const2 - 128]
-                          4x H1 = approx H0 + a22
-                          4x H1 approx-= a22
-                          # 4x H1 = approx H0 * mem256[const0 + 64]
-                          # 4x H1 = round(H1)
-                          # 4x H1 approx*= mem256[const0 - 128]
-
-                          4x H0 approx-= H1
-
-                          # a64 aligned= mem256[const2 - 64]
-                          # 4x H3 = approx H2 + a64
-                          # 4x H3 approx-= a64
-                          4x H3 = approx H2 * mem256[const1 - 96]
-                          4x H3 = round(H3)
-                          4x H3 approx*= mem256[const0 - 64]
-
-                          4x H2 approx-= H3
-
-                          # a106 aligned= mem256[const2 + 0]
-                          # 4x H5 = approx H4 + a106
-                          # 4x H5 approx-= a106
-                          4x H5 = approx H4 * mem256[const1 - 32]
-                          4x H5 = round(H5)
-                          4x H5 approx*= mem256[const0 + 0]
-
-                          4x H4 approx-= H5
-
-  a22 aligned= mem256[const2 - 128]
-  4x I1 = approx I0 + a22
-  4x I1 approx-= a22
-  # 4x I1 = approx I0 * mem256[const0 + 64]
-  # 4x I1 = round(I1)
-  # 4x I1 approx*= mem256[const0 - 128]
-  4x I0 approx-= I1
-
-
-                                    4x 127I1 = approx I1 * mem256[const1 - 128]
-                                  4x R1 = approx I1 * H0
-                                4x R2 = approx I1 * H1
-                              4x R3 = approx I1 * H2
-                            4x R4 = approx I1 * H3
-                          4x R5 = approx I1 * H4
-                                    4x R0 = approx 127I1 * H5
-                                4x a0b2 = approx I0 * H2
-                                4x R2 approx+= a0b2
-			  
-  yxtz2[0,1,2,3] = F2[1,0,3,2]
-  abcd2[0,1,2,3] approx= F2[0]-yxtz2[0],F2[1]+yxtz2[1],F2[2]-yxtz2[2],F2[3]+yxtz2[3]
-  cdab2[0,1,2,3] = abcd2[2,3],abcd2[0,1]
-  badc2[0,1,2,3] = abcd2[1,0,3,2]
-  I2[0,1,2,3] approx= badc2[0]-cdab2[0],badc2[1]+cdab2[1],badc2[2]-cdab2[2],badc2[3]+cdab2[3]
-
-                              4x a0b3 = approx I0 * H3
-                              4x R3 approx+= a0b3
-                            4x a0b4 = approx I0 * H4
-                            4x R4 approx+= a0b4
-                          4x a0b5 = approx I0 * H5
-                          4x R5 approx+= a0b5
-                                  4x a0b1 = approx I0 * H1
-                                  4x R1 approx+= a0b1
-                                    4x a0b0 = approx I0 * H0
-                                    4x R0 approx+= a0b0
-
-  b = mem64[work3 + 32],mem64[work3 + 32],mem64[work3 + 32],mem64[work3 + 32]
-	      4x Q1 = I1 if b<0 else H1
-              mem256[work1 - 96] aligned= Q1
-	      4x Q0 = I0 if b<0 else H0
-              mem256[work1 - 128] aligned= Q0
-
-  a64 aligned= mem256[const2 - 64]
-  4x I3 = approx I2 + a64
-  4x I3 approx-= a64
-  # 4x I3 = approx I2 * mem256[const1 - 96]
-  # 4x I3 = round(I3)
-  # 4x I3 approx*= mem256[const0 - 64]
-
-  4x I2 approx-= I3
-
-
-			      4x a3b0 =approx I3 * H0
-                              4x R3 approx+= a3b0
-                            4x a3b1 = approx I3 * H1
-                            4x R4 approx+= a3b1
-                          4x a3b2 = approx I3 * H2
-                          4x R5 approx+= a3b2
-                                4x 127I3 = approx I3 * mem256[const1 - 128]
-                                4x a3b5 = approx 127I3 * H5
-                                4x R2 approx+= a3b5
-                                  4x a3b4 = approx 127I3 * H4
-                                  4x R1 approx+= a3b4
-                                    4x a3b3 = approx 127I3 * H3
-                                    4x R0 approx+= a3b3
-
-                          4x a2b3 = approx I2 * H3
-                          4x R5 approx+= a2b3
-                            4x a2b2 = approx I2 * H2
-                            4x R4 approx+= a2b2
-                              4x a2b1 = approx I2 * H1
-                              4x R3 approx+= a2b1
-			        4x a2b0 =approx I2 * H0
-                                4x R2 approx+= a2b0
-                                  4x 127I2 = approx I2 * mem256[const1 - 128]
-                                  4x a2b5 = approx 127I2 * H5
-                                  4x R1 approx+= a2b5
-                                    4x a2b4 = approx 127I2 * H4
-                                    4x R0 approx+= a2b4
-
-  b = mem64[work3 + 32],mem64[work3 + 32],mem64[work3 + 32],mem64[work3 + 32]
-	      4x Q3 = I3 if b<0 else H3
-              mem256[work1 - 32] aligned= Q3
-
-	      4x Q2 = I2 if b<0 else H2
-              mem256[work1 - 64] aligned= Q2
-  
-  F4 aligned= mem256[work1 + 0]
-
   yxtz4[0,1,2,3] = F4[1,0,3,2]
   abcd4[0,1,2,3] approx= F4[0]-yxtz4[0],F4[1]+yxtz4[1],F4[2]-yxtz4[2],F4[3]+yxtz4[3]
   cdab4[0,1,2,3] = abcd4[2,3],abcd4[0,1]
@@ -646,36 +502,92 @@ mainloop:
   4x I5 approx-= a106
   4x I4 approx-= I5
 
+    4x 127I5 = approx I5 * mem256[const1 - 128]
+    127I5_stack aligned= 127I5
+      4x 127I4 = approx I4 * mem256[const1 - 128]
+      127I4_stack aligned= 127I4
 
-			  4x a5b0 = approx I5 * H0
-                          4x R5 approx+= a5b0
-                            4x 127I5 = approx I5 * mem256[const1 - 128]
-                            4x a5b5 = approx 127I5 * H5
-                            4x R4 approx+= a5b5
-                              4x a5b4 = approx 127I5 * H4
-                              4x R3 approx+= a5b4
-                                4x a5b3 = approx 127I5 * H3
-                                4x R2 approx+= a5b3
-                                  4x a5b2 = approx 127I5 * H2
-                                  4x R1 approx+= a5b2
-                                    4x a5b1 = approx 127I5 * H1
-                                    4x R0 approx+= a5b1
+  yxtz0[0,1,2,3] = F0[1,0,3,2]
+  yxtz2[0,1,2,3] = F2[1,0,3,2]
+  abcd2[0,1,2,3] approx= F2[0]-yxtz2[0],F2[1]+yxtz2[1],F2[2]-yxtz2[2],F2[3]+yxtz2[3]
+  cdab2[0,1,2,3] = abcd2[2,3],abcd2[0,1]
+  badc2[0,1,2,3] = abcd2[1,0,3,2]
+  I2[0,1,2,3] approx= badc2[0]-cdab2[0],badc2[1]+cdab2[1],badc2[2]-cdab2[2],badc2[3]+cdab2[3]
 
-                          4x a4b1 = approx I4 * H1
-                          4x R5 approx+= a4b1
-                            4x a4b0 = approx I4 * H0
-			    4x R4 approx+= a4b0
-                              4x 127I4 = approx I4 * mem256[const1 - 128]
-                              4x a4b5 = approx 127I4 * H5
-                              4x R3 approx+= a4b5
-                                4x a4b4 = approx 127I4 * H4
-                                4x R2 approx+= a4b4
-                                  4x a4b3 = approx 127I4 * H3
-                                  4x R1 approx+= a4b3
-                                    4x a4b2 = approx 127I4 * H2
-                                    4x R0 approx+= a4b2
+  a64 aligned= mem256[const2 - 64]
+  4x I3 = approx I2 + a64
+  4x I3 approx-= a64
+  # 4x I3 = approx I2 * mem256[const1 - 96]
+  # 4x I3 = round(I3)
+  # 4x I3 approx*= mem256[const0 - 64]
+
+  4x I2 approx-= I3
+
+        4x 127I3 = approx I3 * mem256[const1 - 128]
+	127I3_stack aligned= 127I3
+          4x 127I2 = approx I2 * mem256[const1 - 128]
+	  127I2_stack aligned= 127I2
+
+  abcd0[0,1,2,3] approx= F0[0]-yxtz0[0],F0[1]+yxtz0[1],F0[2]-yxtz0[2],F0[3]+yxtz0[3]
+
+  cdab0[0,1,2,3] = abcd0[2,3],abcd0[0,1]
+  badc0[0,1,2,3] = abcd0[1,0,3,2]
+  I0[0,1,2,3] approx= badc0[0]-cdab0[0],badc0[1]+cdab0[1],badc0[2]-cdab0[2],badc0[3]+cdab0[3]
+
+  a22 aligned= mem256[const2 - 128]
+  4x I1 = approx I0 + a22
+  4x I1 approx-= a22
+  # 4x I1 = approx I0 * mem256[const0 + 64]
+  # 4x I1 = round(I1)
+  # 4x I1 approx*= mem256[const0 - 128]
+  4x I0 approx-= I1
+
+            4x 127I1 = approx I1 * mem256[const1 - 128]
+	    mem256[const1 + 96] aligned= 127I1
+
+                          yxtz4[0,1,2,3] = E4[1,0,3,2]
+                          abcd4[0,1,2,3] approx= E4[0]-yxtz4[0],E4[1]+yxtz4[1],E4[2]-yxtz4[2],E4[3]+yxtz4[3]
+                          cdab4[0,1,2,3] = abcd4[2,3],abcd4[0,1]
+                          badc4[0,1,2,3] = abcd4[1,0,3,2]
+                          H4[0,1,2,3] approx= badc4[0]-cdab4[0],badc4[1]+cdab4[1],badc4[2]-cdab4[2],badc4[3]+cdab4[3]
+                          yxtz2[0,1,2,3] = E2[1,0,3,2]
+                          abcd2[0,1,2,3] approx= E2[0]-yxtz2[0],E2[1]+yxtz2[1],E2[2]-yxtz2[2],E2[3]+yxtz2[3]
+                          cdab2[0,1,2,3] = abcd2[2,3],abcd2[0,1]
+                          badc2[0,1,2,3] = abcd2[1,0,3,2]
+                          H2[0,1,2,3] approx= badc2[0]-cdab2[0],badc2[1]+cdab2[1],badc2[2]-cdab2[2],badc2[3]+cdab2[3]
+                          yxtz0[0,1,2,3] = E0[1,0,3,2]
+                          abcd0[0,1,2,3] approx= E0[0]-yxtz0[0],E0[1]+yxtz0[1],E0[2]-yxtz0[2],E0[3]+yxtz0[3]
+                          cdab0[0,1,2,3] = abcd0[2,3],abcd0[0,1]
+                          badc0[0,1,2,3] = abcd0[1,0,3,2]
+                          H0[0,1,2,3] approx= badc0[0]-cdab0[0],badc0[1]+cdab0[1],badc0[2]-cdab0[2],badc0[3]+cdab0[3]
 
 
+                          a106 aligned= mem256[const2 + 0]
+                          4x H5 = approx H4 + a106
+                          4x H5 approx-= a106
+                          # 4x H5 = approx H4 * mem256[const1 - 32]
+                          # 4x H5 = round(H5)
+                          # 4x H5 approx*= mem256[const0 + 0]
+
+                          4x H4 approx-= H5
+
+                          a64 aligned= mem256[const2 - 64]
+                          4x H3 = approx H2 + a64
+                          4x H3 approx-= a64
+                          # 4x H3 = approx H2 * mem256[const1 - 96]
+                          # 4x H3 = round(H3)
+                          # 4x H3 approx*= mem256[const0 - 64]
+
+                          4x H2 approx-= H3
+
+                          a22 aligned= mem256[const2 - 128]
+                          4x H1 = approx H0 + a22
+                          4x H1 approx-= a22
+                          # 4x H1 = approx H0 * mem256[const0 + 64]
+                          # 4x H1 = round(H1)
+                          # 4x H1 approx*= mem256[const0 - 128]
+
+                          4x H0 approx-= H1
 
 
   b = mem64[work3 + 32],mem64[work3 + 32],mem64[work3 + 32],mem64[work3 + 32]
@@ -684,6 +596,96 @@ mainloop:
 
 	      4x Q4 = I4 if b<0 else H4
               mem256[work1 + 0] aligned= Q4
+			  
+	      4x Q3 = I3 if b<0 else H3
+              mem256[work1 - 32] aligned= Q3
+
+	      4x Q2 = I2 if b<0 else H2
+              mem256[work1 - 64] aligned= Q2
+
+	      4x Q1 = I1 if b<0 else H1
+              mem256[work1 - 96] aligned= Q1
+	      4x Q0 = I0 if b<0 else H0
+              mem256[work1 - 128] aligned= Q0
+
+
+                          4x R5 = approx I1 * H4
+                            4x R4 = approx I1 * H3
+                              4x R3 = approx I1 * H2
+
+                          4x a0b5 = approx I0 * H5
+                          4x R5 approx+= a0b5
+                            4x a0b4 = approx I0 * H4
+                            4x R4 approx+= a0b4
+                              4x a0b3 = approx I0 * H3
+                              4x R3 approx+= a0b3
+
+                          4x a3b2 = approx I3 * H2
+                          4x R5 approx+= a3b2
+                            4x a3b1 = approx I3 * H1
+                            4x R4 approx+= a3b1
+			      4x a3b0 =approx I3 * H0
+                              4x R3 approx+= a3b0
+
+                          4x a2b3 = approx I2 * H3
+                          4x R5 approx+= a2b3
+                            4x a2b2 = approx I2 * H2
+                            4x R4 approx+= a2b2
+                              4x a2b1 = approx I2 * H1
+                              4x R3 approx+= a2b1
+
+			  4x a5b0 = approx I5 * H0
+                          4x R5 approx+= a5b0
+                            4x a5b5 = approx H5 * 127I5_stack
+                            4x R4 approx+= a5b5
+                              4x a5b4 = approx H4 * 127I5_stack
+                              4x R3 approx+= a5b4
+
+                          4x a4b1 = approx I4 * H1
+                          4x R5 approx+= a4b1
+                            4x a4b0 = approx I4 * H0
+			    4x R4 approx+= a4b0
+                              4x a4b5 = approx H5 * 127I4_stack
+                              4x R3 approx+= a4b5
+
+                                4x R2 = approx I1 * H1
+                                  4x R1 = approx I1 * H0
+                                    4x R0 = approx H5 * mem256[const1 + 96]
+
+                                4x a0b2 = approx I0 * H2
+                                4x R2 approx+= a0b2
+                                  4x a0b1 = approx I0 * H1
+                                  4x R1 approx+= a0b1
+                                    4x a0b0 = approx I0 * H0
+                                    4x R0 approx+= a0b0
+
+                                4x a3b5 = approx H5 * 127I3_stack
+                                4x R2 approx+= a3b5
+                                  4x a3b4 = approx H4 * 127I3_stack
+                                  4x R1 approx+= a3b4
+                                    4x a3b3 = approx H3 * 127I3_stack
+                                    4x R0 approx+= a3b3
+
+			        4x a2b0 =approx H0 * I2
+                                4x R2 approx+= a2b0
+                                  4x a2b5 = approx H5 * 127I2_stack
+                                  4x R1 approx+= a2b5
+                                    4x a2b4 = approx H4 * 127I2_stack
+                                    4x R0 approx+= a2b4
+
+                                4x a5b3 = approx H3 * 127I5_stack
+                                4x R2 approx+= a5b3
+                                  4x a5b2 = approx H2 * 127I5_stack
+                                  4x R1 approx+= a5b2
+                                    4x a5b1 = approx H1 * 127I5_stack
+                                    4x R0 approx+= a5b1
+
+                                4x a4b4 = approx H4 * 127I4_stack
+                                4x R2 approx+= a4b4
+                                  4x a4b3 = approx H3 * 127I4_stack
+                                  4x R1 approx+= a4b3
+                                    4x a4b2 = approx H2 * 127I4_stack
+                                    4x R0 approx+= a4b2
 
                                       4x c5 = approx R5 * mem256[const1 - 128]
                                       4x c4 = approx R4 * mem256[const1 - 32]
@@ -1089,15 +1091,14 @@ noload:
                           4x C4 approx-= c4
                           4x C5 approx+= c4
                         
-
-   a22 aligned= mem256[const2 - 128]
-   4x B1 = approx B0 + a22
-   4x B1 approx-= a22
-   # 4x B1 = approx B0 * mem256[const0 + 64]
-   # 4x B1 = round(B1)
-   # 4x B1 approx*= mem256[const0 - 128]
-   4x B0 approx-= B1
-
+   a106 aligned= mem256[const2 + 0]
+   4x B5 = approx B4 + a106
+   4x B5 approx-= a106
+   # 4x B5 = approx B4 * mem256[const1 - 32]
+   # 4x B5 = round(B5)
+   # 4x B5 approx*= mem256[const0 + 0]
+   4x B4 approx-= B5
+ 
    # a64 aligned= mem256[const2 - 64]
    # 4x B3 = approx B2 + a64
    # 4x B3 approx-= a64
@@ -1106,6 +1107,7 @@ noload:
    4x B3 approx*= mem256[const0 - 64]
    4x B2 approx-= B3
                         
+
 			  # a85 aligned= mem256[const2 - 32]
                           # 4x c3 = approx C3 + a85
                           # 4x c3 approx-= a85
@@ -1115,14 +1117,13 @@ noload:
                           4x C4 approx+= c3
                           4x C3 approx-= c3
                         
-   a106 aligned= mem256[const2 + 0]
-   4x B5 = approx B4 + a106
-   4x B5 approx-= a106
-   # 4x B5 = approx B4 * mem256[const1 - 32]
-   # 4x B5 = round(B5)
-   # 4x B5 approx*= mem256[const0 + 0]
-   4x B4 approx-= B5
- 
+   a22 aligned= mem256[const2 - 128]
+   4x B1 = approx B0 + a22
+   4x B1 approx-= a22
+   # 4x B1 = approx B0 * mem256[const0 + 64]
+   # 4x B1 = round(B1)
+   # 4x B1 approx*= mem256[const0 - 128]
+   4x B0 approx-= B1
 
                           mem256[work2 +   0] aligned= C4
 
@@ -1250,118 +1251,114 @@ noload:
     mem256[work1 - 128] aligned= D0
 
                           a0 aligned= mem256[work0 - 128]
-                          C4 aligned= mem256[work2 +   0]
                           C5 aligned= mem256[work2 +  32]
+                          C4 aligned= mem256[work2 +   0]
 
-                                    4x E0 = approx a0 * C0
-                                  4x E1 = approx a0 * C1
-                                4x E2 = approx a0 * C2
-                              4x E3 = approx a0 * C3
-                            4x E4 = approx a0 * C4
                           4x E5 = approx a0 * C5
+                            4x E4 = approx a0 * C4
+                              4x E3 = approx a0 * C3
 
+                          a1 aligned= mem256[work0 - 96]
+                          4x a1b4 = approx a1 * C4
+                          4x E5 approx+= a1b4
+                            4x a1b3 = approx a1 * C3
+                            4x E4 approx+= a1b3
+                              4x a1b2 = approx a1 * C2
+                              4x E3 approx+= a1b2
+
+                                4x E2 = approx a0 * C2
+                                  4x E1 = approx a0 * C1
+                                    4x E0 = approx a0 * C0
+
+                                4x a1b1 = approx a1 * C1
+                                4x E2 approx+= a1b1
+                                  4x a1b0 = approx a1 * C0
+			          4x E1 approx+= a1b0
                                     127a1 aligned= mem256[work3 + 0]
                                     4x a1b5 = approx 127a1 * C5
                                     4x E0 approx+= a1b5
 
-                          a1 aligned= mem256[work0 - 96]
-
-                                  4x a1b0 = approx a1 * C0
-			          4x E1 approx+= a1b0
-                                4x a1b1 = approx a1 * C1
-                                4x E2 approx+= a1b1
-                              4x a1b2 = approx a1 * C2
-                              4x E3 approx+= a1b2
-                            4x a1b3 = approx a1 * C3
-                            4x E4 approx+= a1b3
-                          4x a1b4 = approx a1 * C4
-                          4x E5 approx+= a1b4
-
-                                  127a2 aligned= mem256[work3 - 32]
-                                    4x a2b4 = approx 127a2 * C4
-                                    4x E0 approx+= a2b4
-                                  4x a2b5 = approx 127a2 * C5
-                                  4x E1 approx+= a2b5
-                        
                           a2 aligned= mem256[work0 - 64]
-
-                                4x a2b0 = approx a2 * C0
-			        4x E2 approx+= a2b0
-                              4x a2b1 = approx a2 * C1
-                              4x E3 approx+= a2b1
-                            4x a2b2 = approx a2 * C2
-                            4x E4 approx+= a2b2
                           4x a2b3 = approx a2 * C3
                           4x E5 approx+= a2b3
-
-                                127a3 aligned= mem256[work3 - 64]
-                                    4x a3b3 = approx 127a3 * C3
-                                    4x E0 approx+= a3b3
-                                  4x a3b4 = approx 127a3 * C4
-                                  4x E1 approx+= a3b4
-                                4x a3b5 = approx 127a3 * C5
-                                4x E2 approx+= a3b5
+                            4x a2b2 = approx a2 * C2
+                            4x E4 approx+= a2b2
+                              4x a2b1 = approx a2 * C1
+                              4x E3 approx+= a2b1
+                                4x a2b0 = approx a2 * C0
+			        4x E2 approx+= a2b0
 
                           a3 aligned= mem256[work0 - 32]
-
-                              4x a3b0 = approx a3 * C0
-			      4x E3 approx+= a3b0
-                            4x a3b1 = approx a3 * C1
-                            4x E4 approx+= a3b1
                           4x a3b2 = approx a3 * C2
                           4x E5 approx+= a3b2
+                            4x a3b1 = approx a3 * C1
+                            4x E4 approx+= a3b1
+                              4x a3b0 = approx a3 * C0
+			      4x E3 approx+= a3b0
 
-                              127a4 aligned= mem256[work3 - 96]
-                                    4x a4b2 = approx 127a4 * C2
-                                    4x E0 approx+= a4b2
-                                  4x a4b3 = approx 127a4 * C3
-                                  4x E1 approx+= a4b3
-                                4x a4b4 = approx 127a4 * C4
-                                4x E2 approx+= a4b4
-                              4x a4b5 = approx 127a4 * C5
-                              4x E3 approx+= a4b5
+                                  127a2 aligned= mem256[work3 - 32]
+                                  4x a2b5 = approx 127a2 * C5
+                                  4x E1 approx+= a2b5
+                                    4x a2b4 = approx 127a2 * C4
+                                    4x E0 approx+= a2b4
+                        
+                                127a3 aligned= mem256[work3 - 64]
+                                4x a3b5 = approx 127a3 * C5
+                                4x E2 approx+= a3b5
+                                  4x a3b4 = approx 127a3 * C4
+                                  4x E1 approx+= a3b4
+                                    4x a3b3 = approx 127a3 * C3
+                                    4x E0 approx+= a3b3
 
                           a4 aligned= mem256[work0 + 0]
-                            4x a4b0 = approx a4 * C0
-			    4x E4 approx+= a4b0
                           4x a4b1 = approx a4 * C1
                           4x E5 approx+= a4b1
-
-                            127a5 aligned= mem256[work3 - 128]
-                                    4x a5b1 = approx 127a5 * C1
-                                    4x E0 approx+= a5b1
-                                  4x a5b2 = approx 127a5 * C2
-                                  4x E1 approx+= a5b2
-                                4x a5b3 = approx 127a5 * C3
-                                4x E2 approx+= a5b3
-                              4x a5b4 = approx 127a5 * C4
-                              4x E3 approx+= a5b4
-                            4x a5b5 = approx 127a5 * C5
-                            4x E4 approx+= a5b5
+                            4x a4b0 = approx a4 * C0
+			    4x E4 approx+= a4b0
+                              127a4 aligned= mem256[work3 - 96]
+                              4x a4b5 = approx 127a4 * C5
+                              4x E3 approx+= a4b5
+                                4x a4b4 = approx 127a4 * C4
+                                4x E2 approx+= a4b4
+                                  4x a4b3 = approx 127a4 * C3
+                                  4x E1 approx+= a4b3
+                                    4x a4b2 = approx 127a4 * C2
+                                    4x E0 approx+= a4b2
 
                           a5 aligned= mem256[work0 + 32]
-
                           4x a5b0 = approx a5 * C0
 			  4x E5 approx+= a5b0
 
-					    a22 aligned= mem256[const2 - 128]
-                                            4x c0 = approx E0 + a22
-                                            4x c0 approx-= a22
-                                            4x E1 approx+= c0
+                            127a5 aligned= mem256[work3 - 128]
+                            4x a5b5 = approx 127a5 * C5
+                            4x E4 approx+= a5b5
+                              4x a5b4 = approx 127a5 * C4
+                              4x E3 approx+= a5b4
+                                4x a5b3 = approx 127a5 * C3
+                                4x E2 approx+= a5b3
+                                  4x a5b2 = approx 127a5 * C2
+                                  4x E1 approx+= a5b2
+                                    4x a5b1 = approx 127a5 * C1
+                                    4x E0 approx+= a5b1
+
+                                            a106 aligned= mem256[const2 + 0]
+                                            4x c4 = approx E4 + a106
+                                            4x c4 approx-= a106
+                                            4x E5 approx+= c4
+                                            4x E4 approx-= c4
 
                                             a64 aligned= mem256[const2 - 64]
                                             4x c2 = approx E2 + a64
                                             4x c2 approx-= a64
                                             4x E3 approx+= c2
 
-                                            a106 aligned= mem256[const2 + 0]
-                                            4x c4 = approx E4 + a106
-                                            4x c4 approx-= a106
-                                            4x E5 approx+= c4
+					    a22 aligned= mem256[const2 - 128]
+                                            4x c0 = approx E0 + a22
+                                            4x c0 approx-= a22
+                                            4x E1 approx+= c0
 
-                                            4x E0 approx-= c0
                                             4x E2 approx-= c2
-                                            4x E4 approx-= c4
+                                            4x E0 approx-= c0
 
   ABCD aligned= mem256[const2 + 64]
   # D3 aligned= mem256[work1 - 32]
@@ -1376,11 +1373,11 @@ noload:
   4x F1 = approx ABCD * mem256[work1 - 96]
   4x F0 = approx ABCD * mem256[work1 - 128]
 
-                                            a85 aligned= mem256[const2 - 32]
-                                            4x c3 = approx E3 + a85
-                                            4x c3 approx-= a85
-                                            4x E4 approx+= c3
-					    4x E3 approx-= c3
+                                          a85 aligned= mem256[const2 - 32]
+                                          4x c3 = approx E3 + a85
+                                          4x c3 approx-= a85
+                                          4x E4 approx+= c3
+					  4x E3 approx-= c3
 
                                           4x c5 = approx E5 * mem256[const1 - 128]
                                           4x c5 = round(c5)
@@ -1394,11 +1391,11 @@ noload:
                                           # 4x E4 approx+= c3
                                           # 4x E3 approx-= c3
 
-                                            # a43 aligned= mem256[const2 - 96]
-                                            # 4x c1 = approx E1 + a43
-                                            # 4x c1 approx-= a43
-                                            # 4x E2 approx+= c1
-					    # 4x E1 approx-= c1
+                                          # a43 aligned= mem256[const2 - 96]
+                                          # 4x c1 = approx E1 + a43
+                                          # 4x c1 approx-= a43
+                                          # 4x E2 approx+= c1
+					  # 4x E1 approx-= c1
 
                                           4x c1 = approx E1 * mem256[const0 + 96]
                                           4x c1 = round(c1)
@@ -1438,19 +1435,10 @@ goto mainloop if !signed<
   prevbit -= 1
   mem64[work3 + 32] = prevbit
   
-
-  t4 = F4 ^ E4
-  t2 = F2 ^ E2
-  t0 = F0 ^ E0
-
   b = mem64[work3 + 32],mem64[work3 + 32],mem64[work3 + 32],mem64[work3 + 32]
-
-  t4 &= b
-  E4 ^= t4
-  t2 &= b
-  E2 ^= t2
-  t0 &= b
-  E0 ^= t0
+  4x E4 = F4 if b<0 else E4
+  4x E2 = F2 if b<0 else E2
+  4x E0 = F0 if b<0 else E0
 
   mem256[work1 + 0] aligned= E4
   mem256[work1 - 64] aligned= E2

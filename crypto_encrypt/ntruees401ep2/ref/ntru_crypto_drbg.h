@@ -80,6 +80,12 @@ extern "C" {
  ********************/
 
 typedef uint32_t DRBG_HANDLE;               /* drbg handle */
+
+typedef enum {                              /* drbg types */
+    EXTERNAL_DRBG,
+    SHA256_HMAC_DRBG,
+} DRBG_TYPE;
+
 typedef enum {                              /* entropy-function commands */
     GET_NUM_BYTES_PER_BYTE_OF_ENTROPY = 0,
     INIT,
@@ -88,6 +94,12 @@ typedef enum {                              /* entropy-function commands */
 typedef uint8_t (*ENTROPY_FN)(              /* get entropy function */
                     ENTROPY_CMD  cmd,       /* command */
                     uint8_t     *out);      /* address for output */
+
+
+/* Type for external PRNG functions. Must return DRBG_OK on success */
+typedef uint32_t (*RANDOM_BYTES_FN)(                /* random bytes function */
+                    unsigned char *out,             /* output buffer */
+                    unsigned long long num_bytes);  /* number of bytes */
 
 
 /***************
@@ -134,6 +146,24 @@ ntru_crypto_drbg_instantiate(
     ENTROPY_FN     entropy_fn,        /*  in - pointer to entropy function */
     DRBG_HANDLE   *handle);           /* out - address for drbg handle */
 
+/* ntru_crypto_external_drbg_instantiate
+ *
+ * This routine instruments an external DRBG so that ntru_crypto routines
+ * can call it. randombytesfn must be of type
+ * uint32_t (randombytesfn*)(unsigned char *out, unsigned long long num_bytes);
+ * and should return DRBG_OK on success.
+ *
+ * Returns DRBG_OK if successful.
+ * Returns DRBG_ERROR_BASE + DRBG_NOT_AVAILABLE if there are no instantiation
+ *  slots available
+ * Returns DRBG_ERROR_BASE + DRBG_OUT_OF_MEMORY if the internal state cannot be
+ *  allocated from the heap.
+ */
+
+NTRUCALL
+ntru_crypto_external_drbg_instantiate(
+    RANDOM_BYTES_FN  randombytesfn, /*  in - pointer to random bytes function */
+    DRBG_HANDLE     *handle);       /* out - address for drbg handle */
 
 /* ntru_crypto_drbg_uninstantiate
  *

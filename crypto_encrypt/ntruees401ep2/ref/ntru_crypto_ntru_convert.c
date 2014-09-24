@@ -60,9 +60,6 @@ ntru_bits_2_trits(
     uint32_t bits3;
     uint32_t shift;
 
-    ASSERT(octets);
-    ASSERT(trits);
-
     while (num_trits >= 16) 
     {
         /* get next three octets */
@@ -161,9 +158,6 @@ ntru_trits_2_bits(
     uint32_t bits24;
     uint32_t bits3;
     uint32_t shift;
-
-    ASSERT(octets);
-    ASSERT(trits);
 
     while (num_trits >= 16) 
     {
@@ -311,9 +305,6 @@ ntru_coeffs_mod4_2_octets(
     int      shift;
     uint16_t i;
 
-    ASSERT(coeffs);
-    ASSERT(octets);
-
     *octets = 0;
     shift = 6;
     for (i = 0; i < num_coeffs; i++) 
@@ -346,9 +337,6 @@ ntru_trits_2_octet(
 {
     int i;
 
-    ASSERT(trits);
-    ASSERT(octet);
-
     *octet = 0;
     for (i = 4; i >= 0; i--) 
     {
@@ -370,8 +358,6 @@ ntru_octet_2_trits(
     uint8_t *trits)                 /* out - address for trits */
 {
     int i;
-
-    ASSERT(trits);
 
     for (i = 0; i < 5; i++) 
     {
@@ -399,9 +385,6 @@ ntru_indices_2_trits(
     uint8_t     trit = plus1 ? 1 : 2;
     uint16_t    i;
     
-    ASSERT(in);
-    ASSERT(out);
-    
     for (i = 0; i < in_len; i++) 
     {
         out[in[i]] = trit;
@@ -428,10 +411,6 @@ ntru_packed_trits_2_indices(
     uint8_t  trits[5];
     uint16_t i = 0;
     int      j;
-
-    ASSERT(in);
-    ASSERT(indices_plus1);
-    ASSERT(indices_minus1);
 
     while (num_trits >= 5)
     {
@@ -502,9 +481,6 @@ ntru_indices_2_packed_trits(
     uint8_t        *buf,            /*  in - temp buf, N octets */
     uint8_t        *out)            /* out - address for packed octets */
 {
-    ASSERT(indices);
-    ASSERT(buf);
-    ASSERT(out);
     
     /* convert indices to an array of trits */
 
@@ -538,7 +514,8 @@ ntru_indices_2_packed_trits(
 /* ntru_elements_2_octets
  *
  * Packs an array of n-bit elements into an array of
- * ((in_len * n_bits) + 7) / 8 octets, 8 < n_bits < 16.
+ * ((in_len * n_bits) + 7) / 8 octets.
+ * NOTE: Assumes 8 < n_bits < 16.
  */
 
 void
@@ -549,13 +526,8 @@ ntru_elements_2_octets(
     uint8_t        *out)            /* out - addr for output octets */
 {
     uint16_t  temp;
-    int       shift;
+    uint16_t  shift;
     uint16_t  i;
-
-    ASSERT(in_len);
-    ASSERT(in);
-    ASSERT((n_bits > 8) && (n_bits < 16));
-    ASSERT(out);
 
     /* pack */
 
@@ -564,30 +536,27 @@ ntru_elements_2_octets(
     i = 0;
     while (i < in_len) 
     {
-
         /* add bits to temp to fill an octet and output the octet */
-
         temp |= in[i] >> shift;
         *out++ = (uint8_t)(temp & 0xff);
-        shift = 8 - shift;
-        if (shift < 1) 
+        if (shift > 8)
         {
             /* next full octet is in current input word */
 
-            shift += n_bits;
+            shift = shift - 8;
             temp = 0;
-        } 
-        else 
+        }
+        else
         {
+            shift = 8 - shift;
             /* put remaining bits of input word in temp as partial octet,
              * and increment index to next input word
              */
-            temp = in[i] << (uint16_t)shift;
+            temp = in[i] << shift;
+            shift = n_bits - shift;
 
             ++i;
         }
-        
-        shift = n_bits - shift;
     }
 
     /* output any bits remaining in last input word */
@@ -596,7 +565,7 @@ ntru_elements_2_octets(
     {
         *out++ = (uint8_t)(temp & 0xff);
     }
-    
+
     return;
 }
 
@@ -604,7 +573,8 @@ ntru_elements_2_octets(
 /* ntru_octets_2_elements
  *
  * Unpacks an octet string into an array of ((in_len * 8) / n_bits)
- * n-bit elements, 8 < n_bits < 16.  Any extra bits are discarded.
+ * n-bit elements.  Any extra bits are discarded.
+ * NOTE: Assumes 8 < n_bits < 16.
  */
 
 void
@@ -615,48 +585,44 @@ ntru_octets_2_elements(
     uint16_t       *out)            /* out - addr for output elements */
 {
     uint16_t  temp;
-    uint16_t  mask = (1 << n_bits) - 1;
-    int       shift;
+    uint16_t  mask;
+    uint16_t  shift;
     uint16_t  i;
-
-    ASSERT(in_len > 1);
-    ASSERT(in);
-    ASSERT((n_bits > 8) && (n_bits < 16));
-    ASSERT(out);
 
     /* unpack */
 
     temp = 0;
+    mask = (1 << n_bits) - 1;
     shift = n_bits;
     i = 0;
-    
+
     while (i < in_len) 
     {
-        shift = 8 - shift;
-        if (shift < 0) 
+        if (shift > 8)
         {
             /* the current octet will not fill the current element */
 
-            shift += n_bits;
-        } 
-        else 
+            shift = shift - 8;
+            temp |= ((uint16_t)in[i]) << shift;
+        }
+        else
         {
             /* add bits from the current octet to fill the current element and
              * output the element
              */
 
+            shift = 8 - shift;
+
             temp |= ((uint16_t)in[i]) >> shift;
             *out++ = temp & mask;
-            temp = 0;
+
+            /* add the remaining bits of the current octet to start an element */ 
+            shift = n_bits - shift;
+            temp = ((uint16_t)in[i]) << shift;
         }
-
-        /* add the remaining bits of the current octet to start an element */
-
-        shift = n_bits - shift;
-        temp |= ((uint16_t)in[i]) << shift;
         ++i;
     }
-    
+
     return;
 }
 

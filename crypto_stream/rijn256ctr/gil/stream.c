@@ -73,16 +73,17 @@ static inline void _partial_xor(const void* ks,
   Rijndael_k32b32_encrypt_x4(ks, &buf, nc);
   
   uint8_t* bufb = (uint8_t*)&buf;
-  for (size_t i = 0; i < inlen; i++) {
+  size_t i;
+  for (i = 0; i < inlen; i++) {
     outb[i] = inb[i] ^  bufb[i];
   }
 }
 
 int crypto_stream_rijn256ctr_gil_xor(uint8_t* out,
-                        const uint8_t* in,
-                        size_t oplen,
-                        const void* _n,
-                        const void* k) {
+                                     const uint8_t* in,
+                                     size_t oplen,
+                                     const void* _n,
+                                     const void* k) {
   if (oplen == 0) {
     return 0;
   } 
@@ -131,7 +132,8 @@ static inline void _partial_stream(const void* ks, void* out, v16u8* nc, size_t 
   v16u8 buf = {0};
   uint8_t* bufb = (uint8_t*)&buf;
   Rijndael_k32b32_encrypt_x4(ks, &buf, nc);
-  for (size_t i = 0; i < inlen; i++) {
+  size_t i;
+  for (i = 0; i < inlen; i++) {
     outb[i] = bufb[i];
   }
 }

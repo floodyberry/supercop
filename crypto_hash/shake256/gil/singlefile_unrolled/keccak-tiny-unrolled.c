@@ -87,17 +87,19 @@ static inline void keccakf(void* state) {
 
 #define _(S) do { S } while (0)
 #define FOR(i, ST, L, S) \
-  _(for (size_t i = 0; i < L; i += ST) { S; })
+  _(for (i = 0; i < L; i += ST) { S; })
 #define mkapply_ds(NAME, S)                                          \
   static inline void NAME(uint8_t* dst,                              \
                           const uint8_t* src,                        \
                           size_t len) {                              \
+    size_t i;                                                        \
     FOR(i, 1, len, S);                                               \
   }
 #define mkapply_sd(NAME, S)                                          \
   static inline void NAME(const uint8_t* src,                        \
                           uint8_t* dst,                              \
                           size_t len) {                              \
+    size_t i;                                                        \
     FOR(i, 1, len, S);                                               \
   }
 
@@ -136,7 +138,6 @@ static inline int hash(uint8_t* out, size_t outlen,
   // Squeeze output.
   foldP(out, outlen, setout);
   setout(a, out, outlen);
-  memset_s(a, 200, 0, 200);
   return 0;
 }
 

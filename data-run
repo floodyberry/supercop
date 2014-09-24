@@ -544,7 +544,16 @@ do
 	| while read source
 	do
           [ -f "$o/$p/used" ] \
-          && okar-$abi cr "$top/$abi/lib/lib${project}.a" "$top/$abi/$source/compiled"/*.o \
+          && (
+	    okar-$abi t "$top/$abi/lib/lib${project}.a" > "$top/$abi/lib/lib${project}.index"
+	    grep '^'${op}_ "$top/$abi/lib/lib${project}.index" \
+	    | while read existing
+	    do
+	      okar-$abi d "$top/$abi/lib/lib${project}.a" "$existing"
+	    done
+	    rm -f "$top/$abi/lib/lib${project}.index"
+	    okar-$abi cr "$top/$abi/lib/lib${project}.a" "$top/$abi/$source/compiled"/*.o
+	  ) \
           && ( ranlib "$top/$abi/lib/lib${project}.a" || exit 0 ) \
           && cp -p "$top/$abi/$source/compiled/$op.h" "$top/$abi/include/$op.h" \
           && [ -f "$o/$p/selected" ] \

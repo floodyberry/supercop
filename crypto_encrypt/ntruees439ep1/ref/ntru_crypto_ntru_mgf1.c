@@ -60,9 +60,6 @@ ntru_mgf1(
 {
     uint8_t  *ctr = state + md_len;
     uint32_t  retcode;
-    
-    ASSERT(state);
-    ASSERT(out);
 
     /* if seed present, init state */
 
@@ -140,10 +137,6 @@ ntru_mgftp1(
     uint8_t  *octets;
     uint16_t  octets_available;
     uint32_t  retcode;
-
-    ASSERT(seed);
-    ASSERT(buf);
-    ASSERT(mask);
 
     /* generate minimum MGF1 output */
 
