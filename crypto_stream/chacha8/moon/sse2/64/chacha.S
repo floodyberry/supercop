@@ -1,158 +1,8 @@
-#define GLOBAL2(n) .globl n##_sse2; .globl _##n##_sse2
-#define GLOBAL(n) GLOBAL2(n)
-#define FN2(n) .p2align 4,,15; n##_sse2:; _##n##_sse2:
-#define FN(n) FN2(n)
+#include "x86.inc"
 
-/* linux/elf annotations and NX indicator */
-#if defined(__linux__) && defined(__ELF__)
-#define ENDFN(n) .size n##_sse2, .-n##_sse2; .type n##_sse2, @function;
-#define ENDFILE() .section .note.GNU-stack,"",%progbits
-#else
-#define ENDFN(n)
-#define ENDFILE()
-#endif
+SECTION_TEXT
 
-.text
-
-GLOBAL(chacha)
-GLOBAL(xchacha)
-GLOBAL(hchacha)
-GLOBAL(chacha_blocks)
-
-/* Windows 64 calling convention fixups */
-#if defined(_WIN64) || defined(__CYGWIN64__)
-FN(chacha)
-subq $184, %rsp
-movdqa %xmm6, 0(%rsp)
-movdqa %xmm7, 16(%rsp)
-movdqa %xmm8, 32(%rsp)
-movdqa %xmm9, 48(%rsp)
-movdqa %xmm10, 64(%rsp)
-movdqa %xmm11, 80(%rsp)
-movdqa %xmm12, 96(%rsp)
-movdqa %xmm13, 112(%rsp)
-movdqa %xmm14, 128(%rsp)
-movdqa %xmm15, 144(%rsp)
-movq %rdi, 160(%rsp)
-movq %rsi, 168(%rsp)
-movq %rcx, %rdi
-movq %rdx, %rsi
-movq %r8, %rdx
-movq %r9, %rcx
-movq 224(%rsp), %r8
-movq 232(%rsp), %r9
-call chacha_thunk_sse2
-movdqa 0(%rsp), %xmm6
-movdqa 16(%rsp), %xmm7
-movdqa 32(%rsp), %xmm8
-movdqa 48(%rsp), %xmm9
-movdqa 64(%rsp), %xmm10
-movdqa 80(%rsp), %xmm11
-movdqa 96(%rsp), %xmm12
-movdqa 112(%rsp), %xmm13
-movdqa 128(%rsp), %xmm14
-movdqa 144(%rsp), %xmm15
-movq 160(%rsp), %rdi
-movq 168(%rsp), %rsi
-addq $184, %rsp
-ret
-ENDFN(chacha)
-
-FN(xchacha)
-subq $184, %rsp
-movdqa %xmm6, 0(%rsp)
-movdqa %xmm7, 16(%rsp)
-movdqa %xmm8, 32(%rsp)
-movdqa %xmm9, 48(%rsp)
-movdqa %xmm10, 64(%rsp)
-movdqa %xmm11, 80(%rsp)
-movdqa %xmm12, 96(%rsp)
-movdqa %xmm13, 112(%rsp)
-movdqa %xmm14, 128(%rsp)
-movdqa %xmm15, 144(%rsp)
-movq %rdi, 160(%rsp)
-movq %rsi, 168(%rsp)
-movq %rcx, %rdi
-movq %rdx, %rsi
-movq %r8, %rdx
-movq %r9, %rcx
-movq 224(%rsp), %r8
-movq 232(%rsp), %r9
-call xchacha_thunk_sse2
-movdqa 0(%rsp), %xmm6
-movdqa 16(%rsp), %xmm7
-movdqa 32(%rsp), %xmm8
-movdqa 48(%rsp), %xmm9
-movdqa 64(%rsp), %xmm10
-movdqa 80(%rsp), %xmm11
-movdqa 96(%rsp), %xmm12
-movdqa 112(%rsp), %xmm13
-movdqa 128(%rsp), %xmm14
-movdqa 144(%rsp), %xmm15
-movq 160(%rsp), %rdi
-movq 168(%rsp), %rsi
-addq $184, %rsp
-ret
-ENDFN(xchacha)
-
-FN(chacha_blocks)
-subq $184, %rsp
-movdqa %xmm6, 0(%rsp)
-movdqa %xmm7, 16(%rsp)
-movdqa %xmm8, 32(%rsp)
-movdqa %xmm9, 48(%rsp)
-movdqa %xmm10, 64(%rsp)
-movdqa %xmm11, 80(%rsp)
-movdqa %xmm12, 96(%rsp)
-movdqa %xmm13, 112(%rsp)
-movdqa %xmm14, 128(%rsp)
-movdqa %xmm15, 144(%rsp)
-movq %rdi, 160(%rsp)
-movq %rsi, 168(%rsp)
-movq %rcx, %rdi
-movq %rdx, %rsi
-movq %r8, %rdx
-movq %r9, %rcx
-call chacha_blocks_thunk_sse2
-movdqa 0(%rsp), %xmm6
-movdqa 16(%rsp), %xmm7
-movdqa 32(%rsp), %xmm8
-movdqa 48(%rsp), %xmm9
-movdqa 64(%rsp), %xmm10
-movdqa 80(%rsp), %xmm11
-movdqa 96(%rsp), %xmm12
-movdqa 112(%rsp), %xmm13
-movdqa 128(%rsp), %xmm14
-movdqa 144(%rsp), %xmm15
-movq 160(%rsp), %rdi
-movq 168(%rsp), %rsi
-addq $184, %rsp
-ret
-ENDFN(chacha_blocks)
-
-FN(hchacha)
-subq $16, %rsp
-movq %rdi, 0(%rsp)
-movq %rsi, 8(%rsp)
-movq %rcx, %rdi
-movq %rdx, %rsi
-movq %r8, %rdx
-movq %r9, %rcx
-call hchacha_thunk_sse2
-movq 0(%rsp), %rdi
-movq 8(%rsp), %rsi
-addq $16, %rsp
-ret
-ENDFN(hchacha)
-
-#define chacha chacha_thunk
-#define xchacha xchacha_thunk
-#define hchacha hchacha_thunk
-#define chacha_blocks chacha_blocks_thunk
-#endif
-
-
-FN(chacha_blocks)
+GLOBAL_HIDDEN_FN chacha_blocks_sse2
 chacha_blocks_sse2_local:
 pushq %rbx
 pushq %rbp
@@ -752,9 +602,9 @@ movq %rbp, %rsp
 popq %rbp
 popq %rbx
 ret
-ENDFN(chacha_blocks)
+FN_END chacha_blocks_sse2
 
-FN(hchacha)
+GLOBAL_HIDDEN_FN hchacha_sse2
 hchacha_sse2_local:
 movq $0x3320646e61707865, %rax
 movq $0x6b20657479622d32, %r8
@@ -820,9 +670,9 @@ ja hchacha_sse2_mainloop
 movdqu %xmm0, 0(%rdx)
 movdqu %xmm3, 16(%rdx)
 ret
-ENDFN(hchacha)
+FN_END hchacha_sse2
 
-FN(chacha)
+GLOBAL_HIDDEN_FN_EXT chacha_sse2, 6, 16
 pushq %rbp
 movq %rsp, %rbp
 subq $64, %rsp
@@ -848,9 +698,9 @@ movdqa %xmm0, 32(%rsp)
 movq %rbp, %rsp
 popq %rbp
 ret
-ENDFN(chacha)
+FN_END chacha_sse2
 
-FN(xchacha)
+GLOBAL_HIDDEN_FN_EXT xchacha_sse2, 6, 16
 pushq %rbp
 pushq %rbx
 movq %rsp, %rbp
@@ -881,6 +731,5 @@ movq %rbp, %rsp
 popq %rbx
 popq %rbp
 ret
-ENDFN(xchacha)
+FN_END xchacha_sse2
 
-ENDFILE()

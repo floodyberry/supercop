@@ -48,9 +48,9 @@ http://creativecommons.org/publicdomain/zero/1.0/
  */
 #define KeccakF_StateComplementBit KeccakF1600_StateComplementBit
 
-/** Macro to map KeccakF_StatePermute() to KeccakF1600_StatePermute().
+/** Macro to map KeccakF_StatePermute() to KeccakP1600_12_StatePermute().
  */
-#define KeccakF_StatePermute KeccakF1600_StatePermute
+#define KeccakF_StatePermute KeccakP1600_12_StatePermute
 
 /** Macro to map KeccakF_StateExtractBytesInLane() to KeccakF1600_StateExtractBytesInLane().
  */
@@ -68,8 +68,8 @@ http://creativecommons.org/publicdomain/zero/1.0/
  */
 #define KeccakF_StateExtractAndXORLanes KeccakF1600_StateExtractAndXORLanes
 
-/** Macro to map KeccakF_StateXORPermuteExtract() to KeccakF1600_StateXORPermuteExtract().
+/** Macro to map KeccakF_StateXORPermuteExtract() to KeccakP1600_12_StateXORPermuteExtract().
  */
-#define KeccakF_StateXORPermuteExtract KeccakF1600_StateXORPermuteExtract
+#define KeccakF_StateXORPermuteExtract KeccakP1600_12_StateXORPermuteExtract
 
 #endif

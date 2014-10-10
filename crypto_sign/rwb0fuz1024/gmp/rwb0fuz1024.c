@@ -475,10 +475,10 @@ signature_compress(zsig,proot,n);
 /*24:*/
 #line 539 "rwb0fuz1024.w"
 
+memmove(sm+BYTES,m,mlen);
 memset(sm,0,BYTES-1);
 sm[BYTES-1]= (mul_2<<1)|negate;
 mpz_export(sm,NULL,-1,1,1,0,zsig);
-memcpy(sm+BYTES,m,mlen);
 *smlen= mlen+BYTES;
 
 /*:24*/
@@ -586,7 +586,7 @@ goto out;
 
 
 *mlen= smlen-BYTES;
-memcpy(m,sm+BYTES,*mlen);
+memmove(m,sm+BYTES,*mlen);
 
 out:
 mpz_clear(zsig);

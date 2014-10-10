@@ -5,10 +5,8 @@ extern void chacha_avx2(const unsigned char *k, const unsigned char *n, const un
 
 int crypto_stream_xor(unsigned char *out, const unsigned char *in, unsigned long long inlen, const unsigned char *n, const unsigned char *k) {
 	chacha_avx2(k, n, in, out, (size_t)inlen, 20);
-	return 0;
 }
 
 int crypto_stream(unsigned char *out, unsigned long long outlen, const unsigned char *n, const unsigned char *k) {
 	chacha_avx2(k, n, NULL, out, (size_t)outlen, 20);
-	return 0;
 }

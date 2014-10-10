@@ -1,36 +1,8 @@
-#define GLOBAL2(n) .globl n##_ssse3; .globl _##n##_ssse3
-#define GLOBAL(n) GLOBAL2(n)
-#define FN2(n) .p2align 4,,15; n##_ssse3:; _##n##_ssse3:
-#define FN(n) FN2(n)
+#include "x86.inc"
 
-/* linux/elf annotations and NX indicator */
-#if defined(__linux__) && defined(__ELF__)
-#define ENDFN(n) .size n##_ssse3, .-n##_ssse3; .type n##_ssse3, @function;
-#define ENDFILE() .section .note.GNU-stack,"",%progbits
-#else
-#define ENDFN(n)
-#define ENDFILE()
-#endif
+SECTION_TEXT
 
-/* global offset table support */
-#if (defined(_WIN32) || defined(__CYGWIN__)) || (!defined(__pic__) && !defined(__PIC__))
-#define LOAD_GOTREG(reg)
-#define REF_GOTVAR(var, reg) var
-#define CALL_PLT(function) call function
-#else
-#define LOAD_GOTREG(reg) call 1f; 1:; popl reg; leal _GLOBAL_OFFSET_TABLE_ + 1(reg), reg;
-#define REF_GOTVAR(var, reg) var##@GOTOFF(reg)
-#define CALL_PLT(function) call function@PLT
-#endif
-
-.text
-
-GLOBAL(chacha)
-GLOBAL(xchacha)
-GLOBAL(hchacha)
-GLOBAL(chacha_blocks)
-
-FN(chacha_blocks)
+GLOBAL_HIDDEN_FN chacha_blocks_ssse3
 chacha_blocks_ssse3_local:
 movl %esp,%eax
 andl $31,%eax
@@ -46,10 +18,10 @@ movl %ecx,84(%esp)
 movl 8(%esp,%eax),%esi
 movl 12(%esp,%eax),%edx
 movl 16(%esp,%eax),%eax
-LOAD_GOTREG(%ebx)
-movdqa REF_GOTVAR(C+0, %ebx), %xmm0
-movdqa REF_GOTVAR(C+16, %ebx), %xmm5
-movdqa REF_GOTVAR(C+32, %ebx), %xmm6
+LOAD_VAR_PIC chacha_constants, %ebx
+movdqa 0(%ebx), %xmm0
+movdqa 16(%ebx), %xmm5
+movdqa 32(%ebx), %xmm6
 movdqa %xmm5, 128(%esp)
 movdqa %xmm6, 144(%esp)
 movdqu 0(%ecx),%xmm1
@@ -964,16 +936,16 @@ chacha_blocks_ssse3_bytesatleast65:
 subl $64,%eax
 addl $64,%edx
 jmp chacha_blocks_ssse3_bytesbetween1and255
-ENDFN(chacha_blocks)
+FN_END chacha_blocks_ssse3
 
 
 
-FN(hchacha)
+GLOBAL_HIDDEN_FN hchacha_ssse3
 hchacha_ssse3_local:
-LOAD_GOTREG(%eax)
-movdqa REF_GOTVAR(C+0, %eax), %xmm0
-movdqa REF_GOTVAR(C+16, %eax), %xmm5
-movdqa REF_GOTVAR(C+32, %eax), %xmm6
+LOAD_VAR_PIC chacha_constants, %eax
+movdqa 0(%eax), %xmm0
+movdqa 16(%eax), %xmm5
+movdqa 32(%eax), %xmm6
 movl 4(%esp), %eax
 movl 8(%esp), %edx
 movdqu 0(%eax), %xmm1
@@ -1029,9 +1001,9 @@ ja hchacha_ssse3_mainloop
 movdqu %xmm0, 0(%edx)
 movdqu %xmm3, 16(%edx)
 ret
-ENDFN(hchacha)
+FN_END hchacha_ssse3
 
-FN(chacha)
+GLOBAL_HIDDEN_FN chacha_ssse3
 pushl %ebp
 pushl %ebx
 movl %esp, %ebp
@@ -1066,9 +1038,9 @@ movl %ebp, %esp
 popl %ebx
 popl %ebp
 ret
-ENDFN(chacha)
+FN_END chacha_ssse3
 
-FN(xchacha)
+GLOBAL_HIDDEN_FN xchacha_ssse3
 pushl %ebp
 pushl %ebx
 movl %esp, %ebp
@@ -1103,13 +1075,11 @@ movl %ebp, %esp
 popl %ebx
 popl %ebp
 ret
-ENDFN(xchacha)
+FN_END xchacha_ssse3
 
-.section .rodata, "a"
-.p2align 6,,63;
-C:
+.p2align 4,,15
+chacha_constants:
 .long 0x61707865,0x3320646e,0x79622d32,0x6b206574 /* "expand 32-byte k" */
 .byte 2,3,0,1,6,7,4,5,10,11,8,9,14,15,12,13       /* pshufb rotate by 16 */
 .byte 3,0,1,2,7,4,5,6,11,8,9,10,15,12,13,14       /* pshufb rotate by 8 */
 
-ENDFILE()

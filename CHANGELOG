@@ -1,3 +1,13 @@
+Changes from 20140924:
+
+   * New crypto_aead/aezv3.
+   * New blake2b/moon implementation.
+   * New and updated chacha*/moon implementations.
+   * Updated ntruees* checksums.
+   * New and updated paeq* implementations.
+   * Bug fix for *keyak, and optimized lakekeyak implementations.
+   * Upgraded to GMP 6.0.0.
+
 Changes from 20140910:
 
    * Portability fixes for */gil.

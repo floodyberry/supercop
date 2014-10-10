@@ -1,36 +1,8 @@
-#define GLOBAL2(n) .globl n##_xop; .globl _##n##_xop
-#define GLOBAL(n) GLOBAL2(n)
-#define FN2(n) .p2align 4,,15; n##_xop:; _##n##_xop:
-#define FN(n) FN2(n)
+#include "x86.inc"
 
-/* linux/elf annotations and NX indicator */
-#if defined(__linux__) && defined(__ELF__)
-#define ENDFN(n) .size n##_xop, .-n##_xop; .type n##_xop, @function;
-#define ENDFILE() .section .note.GNU-stack,"",%progbits
-#else
-#define ENDFN(n)
-#define ENDFILE()
-#endif
+SECTION_TEXT
 
-/* global offset table support */
-#if (defined(_WIN32) || defined(__CYGWIN__)) || (!defined(__pic__) && !defined(__PIC__))
-#define LOAD_GOTREG(reg)
-#define REF_GOTVAR(var, reg) var
-#define CALL_PLT(function) call function
-#else
-#define LOAD_GOTREG(reg) call 1f; 1:; popl reg; leal _GLOBAL_OFFSET_TABLE_ + 1(reg), reg;
-#define REF_GOTVAR(var, reg) var##@GOTOFF(reg)
-#define CALL_PLT(function) call function@PLT
-#endif
-
-.text
-
-GLOBAL(chacha)
-GLOBAL(xchacha)
-GLOBAL(hchacha)
-GLOBAL(chacha_blocks)
-
-FN(chacha_blocks)
+GLOBAL_HIDDEN_FN chacha_blocks_xop
 chacha_blocks_xop_local:
 pushl %ebp
 movl %esp, %ebp
@@ -44,8 +16,8 @@ movl %ecx,84(%esp)
 movl 12(%ebp),%esi
 movl 16(%ebp),%edx
 movl 20(%ebp),%eax
-LOAD_GOTREG(%ebx)
-vmovdqa REF_GOTVAR(C+0, %ebx), %xmm0
+LOAD_VAR_PIC chacha_constants, %ebx
+vmovdqa 0(%ebx),%xmm0
 vmovdqu 0(%ecx),%xmm1
 vmovdqu 16(%ecx),%xmm2
 vmovdqu 32(%ecx),%xmm3
@@ -565,13 +537,13 @@ chacha_blocks_xop_bytesatleast65:
 subl $64,%eax
 addl $64,%edx
 jmp chacha_blocks_xop_bytesbetween1and255
-ENDFN(chacha_blocks)
+FN_END chacha_blocks_xop
 
 
-FN(hchacha)
+GLOBAL_HIDDEN_FN hchacha_xop
 hchacha_xop_local:
-LOAD_GOTREG(%eax)
-vmovdqa REF_GOTVAR(0+C, %eax), %xmm0
+LOAD_VAR_PIC chacha_constants, %eax
+vmovdqa 0(%eax), %xmm0
 movl 4(%esp), %eax
 movl 8(%esp), %edx
 vmovdqu 0(%eax), %xmm1
@@ -615,9 +587,9 @@ jne hchacha_mainloop_xop
 vmovdqu %xmm0, (%edx)
 vmovdqu %xmm3, 16(%edx)
 ret
-ENDFN(hchacha)
+FN_END hchacha_xop
 
-FN(chacha)
+GLOBAL_HIDDEN_FN chacha_xop
 pushl %ebp
 pushl %ebx
 movl %esp, %ebp
@@ -652,9 +624,9 @@ movl %ebp, %esp
 popl %ebx
 popl %ebp
 ret
-ENDFN(chacha)
+FN_END chacha_xop
 
-FN(xchacha)
+GLOBAL_HIDDEN_FN xchacha_xop
 pushl %ebp
 pushl %ebx
 movl %esp, %ebp
@@ -689,11 +661,8 @@ movl %ebp, %esp
 popl %ebx
 popl %ebp
 ret
-ENDFN(xchacha)
+FN_END xchacha_xop
 
-.section .rodata, "a"
-.p2align 4,,15;
-C:
+.p2align 4,,15
+chacha_constants:
 .long 0x61707865,0x3320646e,0x79622d32,0x6b206574 /* "expand 32-byte k" */
-
-ENDFILE()

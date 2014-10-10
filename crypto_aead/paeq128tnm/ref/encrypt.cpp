@@ -1,4 +1,7 @@
+/* PAEQ-128tnm: reference version*/
+#ifndef NO_SUPERCOP
 #include "crypto_aead.h"
+#endif
 #include "api.h"
 
 #include <stdio.h>
@@ -11,15 +14,17 @@
 
 #define CRYPTO_MBLOCK (64-D_BYTES-CRYPTO_KEYBYTES)  //46 for 16-byte key
 #define CRYPTO_ADBLOCK (64-D_BYTES-2*CRYPTO_KEYBYTES) //30 for 16-byte key
-#define CRYPTO_COUNTERBYTES (64-D_BYTES-CRYPTO_KEYBYTES-CRYPTO_NPUBBYTES)  //34 for 16-byte key and 12-byte nonce
+#define CRYPTO_COUNTERBYTES (64-D_BYTES-CRYPTO_KEYBYTES-CRYPTO_NPUBBYTES)  //14 for 16-byte key and 32-byte nonce
 #define CRYPTO_LENGTH 12 //Maximal length of plaintext/AD length
 
 #define AES_GROUP_ROUNDS 2
 #define AES_GROUPS 10
-#define EXTRANONCE
+//#define EXTRANONCE
 
   //This is the implementation of PPAE instantiated with AESQ permutation
-
+int key_bytes = CRYPTO_KEYBYTES;
+int nonce_bytes = CRYPTO_NPUBBYTES;
+int tag_bytes = CRYPTO_ABYTES;
 
 //AES S-box
 const static unsigned char sbox[256] =   {
@@ -524,7 +529,7 @@ int crypto_aead_encrypt(
 
 				 for(unsigned i=0; i<64-2-CRYPTO_KEYBYTES; ++i)//Adding the output to Z
 				 {
-					 BlockLastInput[i+2] ^= BlockOutput[i];
+					 BlockLastInput[i+2] ^= BlockOutput[i+2];
 				 }
 
 				//Counters increment
@@ -586,17 +591,19 @@ int crypto_aead_encrypt_no_nonce(
 
 		 if(clen==NULL)
 			 return -1;
-		 if((mlen==0) && (adlen==0))
-		 {
-			 *clen=0;
-			 return 0;
-		 }
+		 
 
 		 //Assume that we do encryption and/or authentication so we need a key and a ciphertext pointer valid
 		 if( (k==NULL) || (c==NULL) )
 			 return -2;
 
 		GenerateNonce(npub,m,mlen,ad,adlen,k);
+
+		if ((mlen == 0) && (adlen == 0))
+		{
+			*clen = 0;
+			return 0;
+		}
 
 		 //Initializing constants
 		unsigned char D0[2];
@@ -775,7 +782,7 @@ int crypto_aead_encrypt_no_nonce(
 
 				 for(unsigned i=0; i<64-2-CRYPTO_KEYBYTES; ++i)//Adding the output to Z
 				 {
-					 BlockLastInput[i+2] ^= BlockOutput[i];
+					 BlockLastInput[i+2] ^= BlockOutput[i+2];
 				 }
 
 				//Counters increment
@@ -848,9 +855,9 @@ int crypto_aead_encrypt_no_nonce(
 		 if( (k==NULL) || (m==NULL) )
 			 return -2;
 
-		 /*//Minimum tag length verification
-		 if(clen < CRYPTO_ABYTES)
-			 return -5;*/
+		 //Minimum tag length verification
+		 if (clen < CRYPTO_ABYTES)
+			 return -1;
 
 		 //Initializing constants
 		unsigned char D0[2];
@@ -1020,7 +1027,7 @@ int crypto_aead_encrypt_no_nonce(
 
 				 for(unsigned i=0; i<64-2-CRYPTO_KEYBYTES; ++i)//Adding the output to Z
 				 {
-					 BlockLastInput[i+2] ^= BlockOutput[i];
+					 BlockLastInput[i+2] ^= BlockOutput[i+2];
 				 }
 
 				//Counters increment
@@ -1063,162 +1070,4 @@ int crypto_aead_encrypt_no_nonce(
 		}
        return 0;
      }
-
-
-int genKAT(unsigned long long plaintext_length, unsigned long long ad_length)
-{
-	if((plaintext_length > (1<<31)) || (ad_length> (1<<31)))
-		return 1;
-	Init();   //For generating plaintext
-	unsigned char *key = (unsigned char*)malloc(crypto_aead_KEYBYTES);  
-	unsigned char *nonce = (unsigned char*)malloc(crypto_aead_NPUBBYTES);
-
- 	unsigned char *ciphertext;
-	unsigned long long ciphertext_length;
-	unsigned long long decrypted_length;
-
-	unsigned char *plaintext = (unsigned char*)malloc((size_t)plaintext_length);
-	unsigned char *plaintext_decrypted = (unsigned char*)malloc((size_t)plaintext_length);
-	plaintext_length = (size_t)plaintext_length;
-	if(plaintext==NULL || plaintext_decrypted==NULL)
-		return 1;
-
-	unsigned char *associated_data = (unsigned char*)malloc((size_t)ad_length);
-	if(associated_data==NULL)
-	{
-		free(plaintext);
-		free(plaintext_decrypted);
-		return 1;
-	}
-
-	//Plaintext initialization
-	unsigned char StateIn[64];
-	memset(StateIn,0,64);
-	unsigned char StateOut[64];
-	int counter= (int)plaintext_length;
-	unsigned char *dest_pointer = plaintext;
-	while(counter>0)
-	{
-		FPerm(StateIn,StateOut);
-		unsigned to_copy = (counter<64)?counter:64;
-		memcpy(dest_pointer,StateOut,to_copy);
-		dest_pointer += to_copy;
-		(*((unsigned*)StateIn))++;
-		counter-= to_copy;
-	}
-
-	//AD initialization
-	counter= (int)
-		ad_length;
-	dest_pointer = associated_data;
-	while(counter>0)
-	{
-		FPerm(StateIn,StateOut);
-		unsigned to_copy = (counter<64)?counter:64;
-		memcpy(dest_pointer,StateOut,to_copy);
-		dest_pointer += to_copy;
-		(*((unsigned*)StateIn))++;
-		counter-= to_copy;
-	}
-
-	//Key setting
-	FPerm(StateIn,StateOut);
-	memcpy(key,StateOut,crypto_aead_KEYBYTES);
-	(*((unsigned*)StateIn))++;
-
-	//Nonce setting
-	FPerm(StateIn,StateOut);
-	memcpy(nonce,StateOut,crypto_aead_NPUBBYTES);
-	(*((unsigned*)StateIn))++;
-
-	//Ciphertext memory allocation
-	ciphertext = (unsigned char*)malloc((size_t)(plaintext_length+crypto_aead_ABYTES));
-	if(ciphertext==NULL)
-	{
-		free(plaintext);
-		free(plaintext_decrypted);
-		free(associated_data);
-		return 1;
-	}
-
-	//Writing input
-	FILE *fp=fopen("out.log","w+");
-	fprintf(fp, "PLAINTEXT (%llu bytes):\n",plaintext_length);
-	for(unsigned i=0; i<plaintext_length; ++i)
-	{
-		fprintf(fp, "0x%.02x ",plaintext[i]);
-		if(i%20==19)
-			fprintf(fp, "\n");
-	}
-
-	fprintf(fp, "\nASSOCIATED DATA  (%llu bytes):\n", ad_length);
-	for(unsigned i=0; i<ad_length; ++i)
-	{
-		fprintf(fp, "0x%.02x ",associated_data[i]);
-		if(i%20==19)
-			fprintf(fp, "\n");
-	}
-	fprintf(fp, "\n");
-		fprintf(fp, "\nKEY  (%d bytes):\n", crypto_aead_KEYBYTES);
-	for(unsigned i=0; i<crypto_aead_KEYBYTES; ++i)
-		fprintf(fp, "0x%.02x ",key[i]);
-	fprintf(fp, "\n");
-		 
-
-	//Encryption and decryption
-#ifdef EXTRANONCE 	//ExtraNonce
-	crypto_aead_encrypt_no_nonce(ciphertext,&ciphertext_length,plaintext,plaintext_length,associated_data, ad_length,NULL,nonce,key);
-
-	int result = crypto_aead_decrypt(plaintext_decrypted,&decrypted_length,NULL,ciphertext,ciphertext_length,associated_data, ad_length,nonce,key);
-	
-#else	   	//Normal nonce
-	crypto_aead_encrypt(ciphertext,&ciphertext_length,plaintext,plaintext_length,associated_data, ad_length,NULL,nonce,key);
-	int result = crypto_aead_decrypt(plaintext_decrypted,&decrypted_length,NULL,ciphertext,ciphertext_length,associated_data, ad_length,nonce,key);
-	
-#endif
-
-	if(decrypted_length != plaintext_length)
-		printf("Plaintext length mismatch\n");
-
-	//Writing outputs
-	fprintf(fp, "\nNONCE  (%d bytes):\n", crypto_aead_NPUBBYTES);
-	for(unsigned i=0; i<crypto_aead_NPUBBYTES; ++i)
-		fprintf(fp, "0x%.02x ",nonce[i]);
-	fprintf(fp, ".\n");
-	printf("Decryption result: %d\n",result);
-
-	  
-	fprintf(fp, "\nCIPHERTEXT (%llu bytes):\n", ciphertext_length);
-	for(unsigned i=0; i<ciphertext_length; ++i)
-	{
-		fprintf(fp, "0x%.02x ",ciphertext[i]);
-		if(i%20==19)
-			fprintf(fp, "\n");
-		if(i == ciphertext_length - crypto_aead_ABYTES-1)
-			fprintf(fp, " || ");
-	}
-	fprintf(fp, ".\n");
-
-	fprintf(fp, "\nDECRYPTED PLAINTEXT  (%llu bytes):\n", decrypted_length);
-	for(unsigned i=0; i<decrypted_length; ++i)
-	{
-		fprintf(fp, "0x%.02x ",plaintext_decrypted[i]);
-		if(i%20==19)
-			fprintf(fp, "\n");
-	}
-	fprintf(fp, ".\n");
-	fclose(fp);
-
-
-	free(plaintext);
-	free(ciphertext);
-	free(plaintext_decrypted);
-	free(associated_data);
-		return 0;
-
-
-
-}
-
-
 

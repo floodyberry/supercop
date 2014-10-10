@@ -1,5 +1,10 @@
+/* PAEQ-128: reference  version*/
+
+#ifndef NO_SUPERCOP
 #include "crypto_aead.h"
+#endif
 #include "api.h"
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +24,9 @@
 //#define EXTRANONCE
 
   //This is the implementation of PPAE instantiated with AESQ permutation
-
+int key_bytes = CRYPTO_KEYBYTES;
+int nonce_bytes = CRYPTO_NPUBBYTES;
+int tag_bytes = CRYPTO_ABYTES;
 
 //AES S-box
 const static unsigned char sbox[256] =   {
@@ -122,65 +129,6 @@ void FPerm(const unsigned char* input, unsigned char* output)//AESQ permutation
 
 }
 
-/*
-void FPermAsm(const unsigned char* input, unsigned char* output)//AESQ permutation
-{
-
-	//Round Key initialization
-	__m128i roundkey0,roundkey1,roundkey2,roundkey3, roundkeyUpdateConstant;
-	roundkey0.m128i_i64[0] = roundkey0.m128i_i64[1] = 0x0000000100000001;
-	roundkey1.m128i_i64[0] = roundkey1.m128i_i64[1] = 0x0000000200000002;
-	roundkey2.m128i_i64[0] = roundkey2.m128i_i64[1] = 0x0000000300000003;
-	roundkey3.m128i_i64[0] = roundkey3.m128i_i64[1] = 0x0000000400000004;
-	roundkeyUpdateConstant.m128i_i64[0] = roundkeyUpdateConstant.m128i_i64[1] = 0x0000000400000004;
-
-	__m128i acc0,acc1,acc2,acc3,mixTmp;
-	for(unsigned i=0; i<16; ++i)
-	{
-		acc0.m128i_i8[i] = input[i];
-		acc1.m128i_i8[i] = input[i+16];
-		acc2.m128i_i8[i] = input[i+32];
-		acc3.m128i_i8[i] = input[i+48];
-	}
-	
-
-	for(unsigned i=0; i<AES_GROUPS; ++i)
-	{
-		for(unsigned j=0; j<AES_GROUP_ROUNDS; ++j)
-		{
-			//SubRounds
-			acc0 = _mm_aesenc_si128(acc0, roundkey0);
-			acc1 = _mm_aesenc_si128(acc1, roundkey1);
-			acc2 = _mm_aesenc_si128(acc2, roundkey2);
-			acc3 = _mm_aesenc_si128(acc3, roundkey3);
-
-			//Update Constant
-			roundkey0 = _mm_add_epi64(roundkeyUpdateConstant,roundkey0);
-			roundkey1 = _mm_add_epi64(roundkeyUpdateConstant,roundkey1);
-			roundkey2 = _mm_add_epi64(roundkeyUpdateConstant,roundkey2);
-			roundkey3 = _mm_add_epi64(roundkeyUpdateConstant,roundkey3);
-
-
-		}
-		//Mixing
-		mixTmp = _mm_unpackhi_epi32(acc1,acc0);//INV
-		acc0 = _mm_unpacklo_epi32(acc1,acc0);//INV
-		acc1 = _mm_unpackhi_epi32(acc3,acc2);//INV
-		acc2 = _mm_unpacklo_epi32(acc3,acc2);//INV
-		acc3 = _mm_unpackhi_epi32(acc2,acc0);//INV
-		acc0 = _mm_unpacklo_epi32(acc2,acc0);//INV
-		acc2 = _mm_unpacklo_epi32(mixTmp,acc1);//INV
-		acc1 = _mm_unpackhi_epi32(mixTmp,acc1);//INV
-	}
-	for(unsigned i=0; i<16; ++i)
-	{
-		output[i] = acc0.m128i_i8[i];
-		output[i+16] = acc1.m128i_i8[i];
-		output[i+32] = acc2.m128i_i8[i];
-		output[i+48] = acc3.m128i_i8[i];
-	}
-}
-*/
 //GF(256) multiplication
 
 unsigned char gmul_o(unsigned char a, unsigned char b) {
@@ -218,7 +166,7 @@ void Init()
 
 
 
-int GenerateNonce(unsigned char* output, const unsigned char *m,unsigned long long mlen,
+int GenerateNonceRef(unsigned char* output, const unsigned char *m,unsigned long long mlen,
        const unsigned char *ad,unsigned long long adlen,
        const unsigned char *k)
 	   //Generate a nonce as a hash of the plaintext & AD by the AESQ-sponge function
@@ -318,11 +266,12 @@ int GenerateNonce(unsigned char* output, const unsigned char *m,unsigned long lo
 
 }
 
-int crypto_aead_encrypt(
+
+
+int PAEQ128_ref_encrypt(
        unsigned char *c,unsigned long long *clen,
        const unsigned char *m,unsigned long long mlen,
        const unsigned char *ad,unsigned long long adlen,
-       const unsigned char *nsec,
        const unsigned char *npub,
        const unsigned char *k
      )
@@ -416,7 +365,7 @@ int crypto_aead_encrypt(
 				 {
 					 for(unsigned i=0; i<CRYPTO_MBLOCK; ++i)
 					 {
-						 BlockMiddle[i+2] ^= m[encrypted_bytes+i];
+						 BlockMiddle[i+2] ^= m[encrypted_bytes+i];	
 						 c[encrypted_bytes+i] = BlockMiddle[i+2];
 						 
 					 }
@@ -524,7 +473,8 @@ int crypto_aead_encrypt(
 
 				 for(unsigned i=0; i<64-2-CRYPTO_KEYBYTES; ++i)//Adding the output to Z
 				 {
-					 BlockLastInput[i+2] ^= BlockOutput[i];
+					 //BlockLastInput[i+2] ^= BlockOutput[i];  CHANGED IN V1.1 !
+					 BlockLastInput[i + 2] ^= BlockOutput[i+2];
 				 }
 
 				//Counters increment
@@ -570,264 +520,54 @@ int crypto_aead_encrypt(
 	   
 		return 0;
      }
-	  
-int crypto_aead_encrypt_no_nonce(
-       unsigned char *c,unsigned long long *clen,
-       const unsigned char *m,unsigned long long mlen,
-       const unsigned char *ad,unsigned long long adlen,
-       const unsigned char *nsec,
-       unsigned char *npub,
-       const unsigned char *k
-     )
-	 //Generates nonce out of plaintext and AD and put it into npub
+	 int crypto_aead_encrypt(
+		 unsigned char *c, unsigned long long *clen,
+		 const unsigned char *m, unsigned long long mlen,
+		 const unsigned char *ad, unsigned long long adlen,
+		 const unsigned char *nsec,
+		 const unsigned char *npub,
+		 const unsigned char *k
+		 )
 
-     {
+	 {
+		 return PAEQ128_ref_encrypt(c, clen, m, mlen, ad, adlen, npub, k);
+	 }
+
+	 int crypto_aead_encrypt_no_nonce(
+		 unsigned char *c, unsigned long long *clen,
+		 const unsigned char *m, unsigned long long mlen,
+		 const unsigned char *ad, unsigned long long adlen,
+		 const unsigned char *nsec,
+		 unsigned char *npub,
+		 const unsigned char *k
+		 )
+		 //Generates nonce out of plaintext and AD and put it into npub
+
+	 {
 		 Init();//Initializing GF(256) multiplication table for AES
 
-		 if(clen==NULL)
+		 if (clen == NULL)
 			 return -1;
-		 if((mlen==0) && (adlen==0))
+		 if ((mlen == 0) && (adlen == 0))
 		 {
-			 *clen=0;
+			 *clen = 0;
 			 return 0;
 		 }
 
 		 //Assume that we do encryption and/or authentication so we need a key and a ciphertext pointer valid
-		 if( (k==NULL) || (c==NULL) )
+		 if ((k == NULL) || (c == NULL))
 			 return -2;
 
-		GenerateNonce(npub,m,mlen,ad,adlen,k);
-
-		 //Initializing constants
-		unsigned char D0[2];
-		D0[0] = CRYPTO_NPUBBYTES*8; //nonce length in bits, zero for 256-bit nonce
-		D0[1] = CRYPTO_KEYBYTES*8; //key length in bits
-		(*clen)=0;
-		 
-		 //Block variables
-		 unsigned char BlockInput[64];  //V1 - input to the first layer call of F
-			 unsigned char BlockMiddle[64];  //W1 - output of the first layer call of F
-			 unsigned char BlockOutput[64];  //Y1 - output of the second layer call of F
-			
-		 unsigned char BlockLastInput[64];  //Z1 - input to the last call of F
-		 memset(BlockLastInput,0,64);
-		 unsigned char Tag[64]; //Tag output
-		 
-		 unsigned long long encrypted_bytes=0;//Encrypted bytes counter
-		 
-
-		 //Encryption part
-		 if(mlen!=0)
-		 {
-			 if(m==NULL)
-			 {
-				 //Clearing variables
-				for(unsigned i=0; i<64; ++i)
-					BlockInput[i] = BlockMiddle[i] = BlockOutput[i] = BlockLastInput[i] = 0;
-				return -3;
-			 }
-				 
-			 unsigned long long mblock_counter=1;   //Message block counter
-			 
-			 while((mlen>0))
-			 {
-				 /* I. First layer */
-
-				 //1. Domain-separation constant
-				 BlockInput[1] = D0[1]; 
-				 if(mlen>= CRYPTO_MBLOCK)
-					 BlockInput[0] = D0[0];
-				 else //Last incomplete block
-					 BlockInput[0] = D0[0]+1;
-
-				 //2. Counter
-				 for(unsigned i=0; i<CRYPTO_COUNTERBYTES; ++i)
-				 {
-					 BlockInput[i+2] = (i<sizeof(mblock_counter))?(mblock_counter>>(8*i))&0xff :0;//copying counter bytewise
-				 }
-				 
-				 //3. Nonce
-				 for(unsigned i=0; i<CRYPTO_NPUBBYTES; ++i) 
-				 {
-					 BlockInput[i+2+CRYPTO_COUNTERBYTES] = npub[i];
-				 }
-
-				 //4. Key
-				 for(unsigned i=0; i<CRYPTO_KEYBYTES; ++i) 
-				 {
-					 BlockInput[i+2+CRYPTO_COUNTERBYTES+CRYPTO_NPUBBYTES] = k[i];
-				 }	 
-
-				 //5. Permutation call
-				 FPerm(BlockInput, BlockMiddle); //First layer call to F
-
-				 /* II. Encryption*/
-
-				 if(mlen>=CRYPTO_MBLOCK)//Full block encryption
-				 {
-					 for(unsigned i=0; i<CRYPTO_MBLOCK; ++i)
-					 {
-						 BlockMiddle[i+2] ^= m[encrypted_bytes+i];
-						 c[encrypted_bytes+i] = BlockMiddle[i+2];
-						 
-					 }
-					 BlockMiddle[1] =  D0[1];
-					 BlockMiddle[0] = D0[0]+2;  //New Di constant
-
-				 }
-
-				 else //Last incomplete block
-				 {
-					 for(unsigned i=0; i<(unsigned)mlen; ++i)//Incomplete block Encryption
-					 {
-						 BlockMiddle[i+2] ^= m[encrypted_bytes+i];
-						 c[encrypted_bytes+i] = BlockMiddle[i+2];						 
-					 }
-					 for(unsigned i=(unsigned)mlen; i<CRYPTO_MBLOCK; ++i)
-					 {
-						 BlockMiddle[i+2] ^=  (unsigned char)mlen;  //Extra Padding: extra bytes filled with the last block length in bytes
-					 }
-
-					 BlockMiddle[1] =  D0[1];
-					 BlockMiddle[0] = D0[0]+3;  //New Di constant
-				 }
-
-				 //III. Second permutation call
-				 //1. Call
-				 FPerm(BlockMiddle, BlockOutput); //Second layer call to F
-				 
-				 //2. Buffer update
-				 for(unsigned i=0; i<64-2-CRYPTO_KEYBYTES; ++i)//Adding the output to tag preparation buffer
-				 {
-					 BlockLastInput[i+2] ^= BlockOutput[i+2];
-				 }
-
-
-				 //Counters increment
-				 mblock_counter++;
-				 if(mlen>=CRYPTO_MBLOCK)
-				 {					 
-					 encrypted_bytes += CRYPTO_MBLOCK;
-					 mlen-=CRYPTO_MBLOCK;
-				 }
-				 else 
-				 {
-					 encrypted_bytes += mlen;
-					 mlen=0;
-				 }
-				 (*clen) = encrypted_bytes;
-			 }
-		 }
-
-		//Associated data part	  
-		if(adlen!=0)
-		{
-			if(ad==NULL)
-			{
-				//Clearing variables
-				for(unsigned i=0; i<64; ++i)
-					BlockInput[i] = BlockMiddle[i] = BlockOutput[i] = BlockLastInput[i] = 0;
-				return -4;
-			}
-
-			 unsigned long long adblock_counter=1;   //AD block counter
-			 unsigned long long auth_bytes=0;
-
-			while(adlen>0)
-			{
-				//1. Constant
-				BlockInput[1] = D0[1];
-				if(adlen>= CRYPTO_ADBLOCK)
-					 BlockInput[0] = D0[0]+4;
-				 else //Last incomplete block
-					 BlockInput[0] = D0[0]+5;
-
-
-				//2. Counter
-				for(unsigned i=0; i<CRYPTO_KEYBYTES; ++i)
-					BlockInput[i+2] = (i<sizeof(adblock_counter))? (adblock_counter>>(8*i))&0xff:0;//copying counter bytewise
-
-				//3. AD block
-				if(adlen >= CRYPTO_ADBLOCK) //Filling AD block
-				{
-					for(unsigned i=0; i<CRYPTO_ADBLOCK; ++i)
-						BlockInput[i+2+CRYPTO_KEYBYTES] = ad[auth_bytes+i];
-					
-				}
-				else //Last incomplete block
-				{
-					for(unsigned i=0; i<adlen; ++i)
-						BlockInput[i+2+CRYPTO_KEYBYTES] = ad[auth_bytes+i];
-					for(unsigned i=(unsigned)adlen; i<CRYPTO_ADBLOCK; ++i)
-						BlockInput[i+2+CRYPTO_KEYBYTES] = (unsigned char)adlen;
-				}
-
-				//4. Key
-				for(unsigned i=0; i<CRYPTO_KEYBYTES; ++i) 
-				{
-					 BlockInput[i+CRYPTO_ADBLOCK+CRYPTO_KEYBYTES+2] = k[i];
-				}
-				
-
-				//5.Call to the F permutation
-
-				FPerm(BlockInput,BlockOutput);//Call to the F permutation
-
-				 for(unsigned i=0; i<64-2-CRYPTO_KEYBYTES; ++i)//Adding the output to Z
-				 {
-					 BlockLastInput[i+2] ^= BlockOutput[i];
-				 }
-
-				//Counters increment
-				 adblock_counter++;
-				 if(adlen>=CRYPTO_ADBLOCK)
-				 {
-					 auth_bytes += CRYPTO_ADBLOCK;
-					 adlen-=CRYPTO_ADBLOCK;
-				 }
-				 else 
-				 {
-					 auth_bytes += adlen;
-					 adlen=0;
-				 }
-			}
-		}
-
-		// Tag production 
-		for(unsigned i=0; i<CRYPTO_KEYBYTES; ++i) //Key to the Z input
-			BlockLastInput[64-CRYPTO_KEYBYTES+i] = k[i];
-		 BlockLastInput[0] = D0[0]+6;
-		 BlockLastInput[1] = D0[1];
-
-		//1. Permutation call
-		FPerm(BlockLastInput,Tag);
-		//2. Key injection
-		for(unsigned i=0; i<CRYPTO_KEYBYTES; ++i) 
-		{
-				Tag[64-CRYPTO_KEYBYTES+i] ^= k[i];
-		}
-
-		//3. Truncation
-		for(unsigned i=0; i<CRYPTO_ABYTES; ++i)
-			c[(*clen)+i] = Tag[i];
-		*clen += CRYPTO_ABYTES;
-
-
-		//Clearing variables
-		for(unsigned i=0; i<64; ++i)
-			BlockInput[i] = BlockMiddle[i] = BlockOutput[i] = BlockLastInput[i] = 0;
-		
-
-	   
-		return 0;
-     }
+		 GenerateNonceRef(npub, m, mlen, ad, adlen, k);
+		 return PAEQ128_ref_encrypt(c, clen, m, mlen, ad, adlen, npub, k);
+	 }
+	
 	  
      
+	 
 
-
-     int crypto_aead_decrypt(
+	 int PAEQ128_ref_decrypt(
        unsigned char *m,unsigned long long *mlen,
-       unsigned char *nsec,
        const unsigned char *c,unsigned long long clen,
        const unsigned char *ad,unsigned long long adlen,
        const unsigned char *npub,
@@ -847,10 +587,10 @@ int crypto_aead_encrypt_no_nonce(
 		 //Here we do decryption and/or authentication so we need a key and a plaintext pointer valid
 		 if( (k==NULL) || (m==NULL) )
 			 return -2;
-
-		 /*//Minimum tag length verification
-		 if(clen < CRYPTO_ABYTES)
-			 return -5;*/
+		 
+		 //Minimum tag length verification
+		 if (clen < CRYPTO_ABYTES)
+			 return -1;
 
 		 //Initializing constants
 		unsigned char D0[2];
@@ -1020,7 +760,7 @@ int crypto_aead_encrypt_no_nonce(
 
 				 for(unsigned i=0; i<64-2-CRYPTO_KEYBYTES; ++i)//Adding the output to Z
 				 {
-					 BlockLastInput[i+2] ^= BlockOutput[i];
+					 BlockLastInput[i+2] ^= BlockOutput[i+2];
 				 }
 
 				//Counters increment
@@ -1063,163 +803,16 @@ int crypto_aead_encrypt_no_nonce(
 		}
        return 0;
      }
+	 
 
-
-int genKAT(unsigned long long plaintext_length, unsigned long long ad_length)
-{
-	if((plaintext_length > (1<<31)) || (ad_length> (1<<31)))
-		return 1;
-	Init();   //For generating plaintext
-	unsigned char *key = (unsigned char*)malloc(crypto_aead_KEYBYTES);  
-	unsigned char *nonce = (unsigned char*)malloc(crypto_aead_NPUBBYTES);
-
- 	unsigned char *ciphertext;
-	unsigned long long ciphertext_length;
-	unsigned long long decrypted_length;
-
-	unsigned char *plaintext = (unsigned char*)malloc((size_t)plaintext_length);
-	unsigned char *plaintext_decrypted = (unsigned char*)malloc((size_t)plaintext_length);
-	plaintext_length = (size_t)plaintext_length;
-	if(plaintext==NULL || plaintext_decrypted==NULL)
-		return 1;
-
-	unsigned char *associated_data = (unsigned char*)malloc((size_t)ad_length);
-	if(associated_data==NULL)
-	{
-		free(plaintext);
-		free(plaintext_decrypted);
-		return 1;
-	}
-
-	//Plaintext initialization
-	unsigned char StateIn[64];
-	memset(StateIn,0,64);
-	unsigned char StateOut[64];
-	int counter= (int)plaintext_length;
-	unsigned char *dest_pointer = plaintext;
-	while(counter>0)
-	{
-		FPerm(StateIn,StateOut);
-		unsigned to_copy = (counter<64)?counter:64;
-		memcpy(dest_pointer,StateOut,to_copy);
-		dest_pointer += to_copy;
-		(*((unsigned*)StateIn))++;
-		counter-= to_copy;
-	}
-
-	//AD initialization
-	counter= (int)
-		ad_length;
-	dest_pointer = associated_data;
-	while(counter>0)
-	{
-		FPerm(StateIn,StateOut);
-		unsigned to_copy = (counter<64)?counter:64;
-		memcpy(dest_pointer,StateOut,to_copy);
-		dest_pointer += to_copy;
-		(*((unsigned*)StateIn))++;
-		counter-= to_copy;
-	}
-
-	//Key setting
-	FPerm(StateIn,StateOut);
-	memcpy(key,StateOut,crypto_aead_KEYBYTES);
-	(*((unsigned*)StateIn))++;
-
-	//Nonce setting
-	FPerm(StateIn,StateOut);
-	memcpy(nonce,StateOut,crypto_aead_NPUBBYTES);
-	(*((unsigned*)StateIn))++;
-
-	//Ciphertext memory allocation
-	ciphertext = (unsigned char*)malloc((size_t)(plaintext_length+crypto_aead_ABYTES));
-	if(ciphertext==NULL)
-	{
-		free(plaintext);
-		free(plaintext_decrypted);
-		free(associated_data);
-		return 1;
-	}
-
-	//Writing input
-	FILE *fp=fopen("out.log","w+");
-	fprintf(fp, "PLAINTEXT (%llu bytes):\n",plaintext_length);
-	for(unsigned i=0; i<plaintext_length; ++i)
-	{
-		fprintf(fp, "0x%.02x ",plaintext[i]);
-		if(i%20==19)
-			fprintf(fp, "\n");
-	}
-
-	fprintf(fp, "\nASSOCIATED DATA  (%llu bytes):\n", ad_length);
-	for(unsigned i=0; i<ad_length; ++i)
-	{
-		fprintf(fp, "0x%.02x ",associated_data[i]);
-		if(i%20==19)
-			fprintf(fp, "\n");
-	}
-	fprintf(fp, "\n");
-		fprintf(fp, "\nKEY  (%d bytes):\n", crypto_aead_KEYBYTES);
-	for(unsigned i=0; i<crypto_aead_KEYBYTES; ++i)
-		fprintf(fp, "0x%.02x ",key[i]);
-	fprintf(fp, "\n");
-		 
-
-	//Encryption and decryption
-#ifdef EXTRANONCE 	//ExtraNonce
-	crypto_aead_encrypt_no_nonce(ciphertext,&ciphertext_length,plaintext,plaintext_length,associated_data, ad_length,NULL,nonce,key);
-
-	int result = crypto_aead_decrypt(plaintext_decrypted,&decrypted_length,NULL,ciphertext,ciphertext_length,associated_data, ad_length,nonce,key);
-	
-#else	   	//Normal nonce
-	crypto_aead_encrypt(ciphertext,&ciphertext_length,plaintext,plaintext_length,associated_data, ad_length,NULL,nonce,key);
-	int result = crypto_aead_decrypt(plaintext_decrypted,&decrypted_length,NULL,ciphertext,ciphertext_length,associated_data, ad_length,nonce,key);
-	
-#endif
-
-	if(decrypted_length != plaintext_length)
-		printf("Plaintext length mismatch\n");
-
-	//Writing outputs
-	fprintf(fp, "\nNONCE  (%d bytes):\n", crypto_aead_NPUBBYTES);
-	for(unsigned i=0; i<crypto_aead_NPUBBYTES; ++i)
-		fprintf(fp, "0x%.02x ",nonce[i]);
-	fprintf(fp, ".\n");
-	printf("Decryption result: %d\n",result);
-
-	  
-	fprintf(fp, "\nCIPHERTEXT (%llu bytes):\n", ciphertext_length);
-	for(unsigned i=0; i<ciphertext_length; ++i)
-	{
-		fprintf(fp, "0x%.02x ",ciphertext[i]);
-		if(i%20==19)
-			fprintf(fp, "\n");
-		if(i == ciphertext_length - crypto_aead_ABYTES-1)
-			fprintf(fp, " || ");
-	}
-	fprintf(fp, ".\n");
-
-	fprintf(fp, "\nDECRYPTED PLAINTEXT  (%llu bytes):\n", decrypted_length);
-	for(unsigned i=0; i<decrypted_length; ++i)
-	{
-		fprintf(fp, "0x%.02x ",plaintext_decrypted[i]);
-		if(i%20==19)
-			fprintf(fp, "\n");
-	}
-	fprintf(fp, ".\n");
-	fclose(fp);
-
-
-	free(plaintext);
-	free(ciphertext);
-	free(plaintext_decrypted);
-	free(associated_data);
-		return 0;
-
-
-
-}
-
-
-
-
+	 int crypto_aead_decrypt(
+		 unsigned char *m, unsigned long long *mlen,
+		 unsigned char *nsec,
+		 const unsigned char *c, unsigned long long clen,
+		 const unsigned char *ad, unsigned long long adlen,
+		 const unsigned char *npub,
+		 const unsigned char *k
+		 )
+	 {
+		 return PAEQ128_ref_decrypt(m, mlen, c, clen, ad, adlen, npub, k);
+	 }
