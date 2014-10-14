@@ -681,6 +681,8 @@ popq %rbp
 ret
 FN_END xchacha_ssse3
 
+SECTION_RODATA
+
 .p2align 4,,15
 chacha_constants:
 .long 0x61707865,0x3320646e,0x79622d32,0x6b206574 /* "expand 32-byte k" */

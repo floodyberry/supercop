@@ -2,6 +2,10 @@
 	.text
 .endm
 
+.macro SECTION_RODATA
+	.text
+.endm
+
 .macro FN name
 	\name:
 	_\name:
@@ -23,6 +27,12 @@
 .endm
 
 .macro GLOBAL_HIDDEN_FN name
+	GLOBAL \name
+	HIDDEN \name
+	FN \name
+.endm
+
+.macro GLOBAL_HIDDEN_FN_EXT name, args, xmmused
 	GLOBAL \name
 	HIDDEN \name
 	FN \name

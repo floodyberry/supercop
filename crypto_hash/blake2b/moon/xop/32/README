@@ -1,0 +1,1 @@
+This is non-portable on its own! It is part of https://github.com/floodyberry/blake2b-opt, a portable, dynamically dispatched BLAKE2b library

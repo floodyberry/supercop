@@ -442,11 +442,8 @@ goldilocks_verify (
         goldilocks_global.wnafs, WNAF_PRECMP_BITS );
     
     untwist_and_double_and_serialize( &pk, &pk_text );
-    field_sub(&eph, &eph, &pk);
-    field_bias(&eph, 2);
-    
-    succ = field_is_zero(&eph);
-    
+
+    succ = field_eq(&eph, &pk);
     return succ ? 0 : GOLDI_EINVAL;
 }
 #endif
@@ -533,11 +530,8 @@ goldilocks_verify_precomputed (
     if (!succ) return GOLDI_EINVAL;
     
     untwist_and_double_and_serialize( &pk, &pk_text );
-    field_sub(&eph, &eph, &pk);
-    field_bias(&eph, 2);
-    
-    succ = field_is_zero(&eph);
-    
+
+    succ = field_eq(&eph, &pk);
     return succ ? 0 : GOLDI_EINVAL;
 }
 

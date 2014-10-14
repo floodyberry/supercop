@@ -1,3 +1,11 @@
+Changes from 20141010:
+
+   * Updated ed448goldilocks implementations.
+   * Added nistp256/mj32 implementation.
+   * Fixed nistp256/wbl implementation.
+   * Fixed chacha*/moon implementation.
+   * New and updated blake*/moon implementations.
+
 Changes from 20140924:
 
    * New crypto_aead/aezv3.

@@ -24,6 +24,7 @@
 #define field_cond_neg       p448_cond_neg
 #define field_serialize      p448_serialize
 #define field_deserialize    p448_deserialize
+#define field_eq             p448_eq
 #define field_is_zero        p448_is_zero
 #define simultaneous_invert  simultaneous_invert_p448 /* FUTURE: consistency */
 

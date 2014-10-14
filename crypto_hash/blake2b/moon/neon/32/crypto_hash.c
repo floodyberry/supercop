@@ -34,10 +34,12 @@ int crypto_hash(unsigned char *hash, const unsigned char *in, unsigned long long
 		size_t want = ((bytes - 1) & ~((size_t)BLAKE2B_BLOCKBYTES - 1));
 		blake2b_blocks_fn(&ctx, in, want, BLAKE2B_STRIDE);
 		bytes -= want;
+		in += want;
 	}
 
 	ctx.f[0] = ~(crypto_uint64)0;
 	blake2b_blocks_fn(&ctx, in, bytes, BLAKE2B_STRIDE);
 	memcpy(hash, ctx.h, BLAKE2B_HASHBYTES);
+	return 0;
 }
 

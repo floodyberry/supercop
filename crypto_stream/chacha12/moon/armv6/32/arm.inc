@@ -2,6 +2,10 @@
 	.text
 .endm
 
+.macro SECTION_RODATA
+	.text
+.endm
+
 .macro FN name
 	.align 2
 	\name:

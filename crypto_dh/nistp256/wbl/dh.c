@@ -14,15 +14,15 @@ crypto_dh_nistp256_wbl_keypair(unsigned char *pk, unsigned char *sk)
 }
 
 int
-crypto_dh_nistp256_wbl(unsigned char *out, const unsigned char *n,
-                                const unsigned char *p)
+crypto_dh_nistp256_wbl(unsigned char *out, const unsigned char *pk,
+                                const unsigned char *sk)
 {
         point temp;
-        p256unpack(&temp, p);
+        p256unpack(&temp, pk);
         if(!p256oncurvefinite(&temp)){ //we don't have a good point
-                p256scalarmult_base(&temp, n); //use the basepoint instead
+                p256scalarmult_base(&temp, sk); //use the basepoint instead
         } else {
-                p256scalarmult(&temp, &temp, n);
+                p256scalarmult(&temp, &temp, sk);
 	}
         p256pack(out, &temp);
         return 0;

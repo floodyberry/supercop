@@ -1,12 +1,16 @@
-#include "crypto_sign.h"
+/**
+ * @file sizes.h
+ * @copyright
+ *   Copyright (c) 2014 Cryptography Research, Inc.  \n
+ *   Released under the MIT License.  See LICENSE.txt for license information.
+ * @author Mike Hamburg
+ * @brief BATMAN / SUPERCOP glue for benchmarking.
+ */
 
-static inline int timingattacks() { return 0; }
-static inline int copyrightclaims() { return 0; }
-static inline int patentclaims() {
-    /* Until the end of July 2014, point compression
-     * is patented. */
-    return 20;
-}
+#include <stdlib.h>
+#include <string.h>
+#include "api.h"
+#include "crypto_sign.h"
 
 int crypto_sign_keypair (
     unsigned char pk[SECRETKEY_BYTES],

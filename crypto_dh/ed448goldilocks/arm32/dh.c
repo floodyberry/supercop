@@ -8,6 +8,8 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
+#include "api.h"
 #include "crypto_dh.h"
 
 int crypto_dh_keypair (

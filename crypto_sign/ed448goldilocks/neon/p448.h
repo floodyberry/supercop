@@ -13,6 +13,9 @@ typedef struct p448_t {
   uint32_t limb[16];
 } __attribute__((aligned(32))) p448_t;
 
+#define LIMBPERM(x) (((x)<<1 | (x)>>3) & 15)
+#define USE_NEON_PERM 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -173,11 +176,11 @@ p448_set_ui (
     uint64_t x
 ) {
     int i;
-    out->limb[0] = x & ((1<<28)-1);
-    out->limb[1] = x>>28;
-    for (i=2; i<16; i++) {
+    for (i=0; i<16; i++) {
       out->limb[i] = 0;
     }
+    out->limb[0] = x & ((1<<28)-1);
+    out->limb[2] = x>>28;
 }
             
 void
@@ -208,12 +211,6 @@ p448_add (
     for (i=0; i<sizeof(*out)/sizeof(uint32xn_t); i++) {
         ((uint32xn_t*)out)[i] = ((const uint32xn_t*)a)[i] + ((const uint32xn_t*)b)[i];
     }
-    /*
-    unsigned int i;
-    for (i=0; i<sizeof(*out)/sizeof(out->limb[0]); i++) {
-        out->limb[i] = a->limb[i] + b->limb[i];
-    }
-    */
 }
 
 void
@@ -300,26 +297,27 @@ p448_bias (
     int amt
 ) {
     uint32_t co1 = ((1ull<<28)-1)*amt, co2 = co1-amt;
-    uint32x4_t lo = {co1,co1,co1,co1}, hi = {co2,co1,co1,co1};
+    uint32x4_t lo = {co1,co2,co1,co1}, hi = {co1,co1,co1,co1};
     uint32x4_t *aa = (uint32x4_t*) a;
     aa[0] += lo;
-    aa[1] += lo;
+    aa[1] += hi;
     aa[2] += hi;
-    aa[3] += lo;
+    aa[3] += hi;
 }
 
 void
 p448_weak_reduce (
     p448_t *a
 ) {
-    uint64_t mask = (1ull<<28) - 1;
-    uint64_t tmp = a->limb[15] >> 28;
+
+    uint32x2_t *aa = (uint32x2_t*) a, vmask = {(1ull<<28)-1, (1ull<<28)-1}, vm2 = {0,-1},
+       tmp = vshr_n_u32(aa[7],28);
+       
     int i;
-    a->limb[8] += tmp;
-    for (i=15; i>0; i--) {
-        a->limb[i] = (a->limb[i] & mask) + (a->limb[i-1]>>28);
+    for (i=7; i>=1; i--) {
+        aa[i] = vsra_n_u32(aa[i] & vmask, aa[i-1], 28);
     }
-    a->limb[0] = (a->limb[0] & mask) + tmp;
+    aa[0] = (aa[0] & vmask) + vrev64_u32(tmp) + (tmp&vm2);
 }
 
 void
