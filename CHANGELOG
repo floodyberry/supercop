@@ -1,3 +1,10 @@
+Changes from 20141014:
+
+   * Updated poly1305/moon.
+   * Updated nistp256/wbl.
+   * New and updated crypto_stream/*/dolbeau.
+   * New reduced-round picipher.
+
 Changes from 20141010:
 
    * Updated ed448goldilocks implementations.

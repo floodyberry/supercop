@@ -1,5 +1,5 @@
 /*
-u4.h version $Date: 2014/09/07 16:11:02 $
+u4.h version $Date: 2014/09/24 12:11:29 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -78,8 +78,8 @@ if (bytes >= 256)
     in8 = x[8];
     in9 = x[13]; // see arrays above for the address translation
     u64 in89 = ((u64)in8) | (((u64)in9) << 32);
-    t8 = _mm_broadcastq_epi64(_mm_cvtsi64_si128(in89));
-    t9 = _mm_broadcastq_epi64(_mm_cvtsi64_si128(in89));
+    t8 = _mm_set1_epi64x(in89);
+    t9 = _mm_set1_epi64x(in89);
 
     z8 = _mm_add_epi64(addv8, t8);
     z9 = _mm_add_epi64(addv9, t9);

@@ -19,6 +19,7 @@ unsigned char paramb[32]={0x5a, 0xc6, 0x35, 0xd8, 0xaa, 0x3a, 0x93, 0xe7,
                           0xb3, 0xeb, 0xbd, 0x55, 0x76, 0x98, 0x86, 0xbc,
                           0x65, 0x1d, 0x06, 0xb0, 0xcc, 0x53, 0xb0, 0xf6,
                           0x3b, 0xce, 0x3c, 0x3e, 0x27, 0xd2, 0x60,  0x4b};
+#include "table.h"
 
 void p256add(point *c, point *a, point *b){
   /*EFD/g1p/auto-code/shortw/jacobian-3/additon/add-2007-bl.op3*/
@@ -53,6 +54,37 @@ void p256add(point *c, point *a, point *b){
   fep256sub(&t13, &t12, &z1z1);
   fep256sub(&t14, &t13, &z2z2);
   fep256mul(&c->z, &t14, &h);
+}
+
+void p256madd(point *c, point *a, point *b){
+  /*b has z coordinate=1, as is from precomputed table*/
+  /*EFD/g1p/auto-code/shortw/jacobian-3/addition/madd-2007-bl.op3*/
+  fep256 z1z1, u2, t0, s2, h, hh, i, j, t1, r, v, t2, t3, t4, t5, t6,t7, t8,
+    t9, t10, t11;
+  fep256sqr(&z1z1, &a->z);
+  fep256mul(&u2, &b->x, &z1z1);
+  fep256mul(&t0, &a->z, &z1z1);
+  fep256mul(&s2, &b->y, &t0);
+  fep256sub(&h, &u2, &a->x);
+  fep256sqr(&hh, &h);
+  fep256scalar(&i, &hh, 4);
+  fep256mul(&j, &i, &h);
+  fep256sub(&t1, &s2, &a->y);
+  fep256scalar(&r, &t1, 2);
+  fep256mul(&v, &a->x, &i);
+  fep256sqr(&t2, &r);
+  fep256scalar(&t3, &v, 2);
+  fep256sub(&t4, &t2, &j);
+  fep256sub(&c->x, &t4, &t3);
+  fep256sub(&t5, &v, &c->x);
+  fep256mul(&t6, &a->y, &j);
+  fep256scalar(&t7, &t6, 2);
+  fep256mul(&t8, &r, &t5);
+  fep256sub(&c->y, &t8, &t7);
+  fep256add(&t9, &a->z, &h);
+  fep256sqr(&t10, &t9);
+  fep256sub(&t11, &t10, &z1z1);
+  fep256sub(&c->z, &t11, &hh);
 }
 
 void p256dbl(point *c, point *a){
@@ -137,34 +169,73 @@ void p256scalarmult(point *c, point *a, const unsigned char e[32]){
   unsigned int seen=0;
   unsigned int bit=0;
   unsigned int index=0;
+  unsigned int first=1;
   point current;
   point temp;
   point p;
   point table[16];//let's do 2 bit first, then increase
-  int i;
-  int j;
-  int k;
   p256cmov(&table[1], a, 1);
   p256dbl(&table[2], a);
-  for(i=3; i<16; i++){
+  for(int i=3; i<16; i++){
     p256add(&table[i], &table[i-1], a);
   }
-  for(i=0; i<32; i++){ //make it big endian, and high bit first
-    for(j=4; j>=0; j-=4){
+  for(int i=0; i<32; i++){ //make it big endian, and high bit first
+    for(int j=4; j>=0; j-=4){
       index=(e[i]>>j)&0x0f; //Constant time
       bit=(index!=0);
-      p256dbl(&current, &current);
-      p256dbl(&current, &current);
-      p256dbl(&current, &current);
-      p256dbl(&current, &current);
+      if(!first){
+        p256dbl(&current, &current);
+        p256dbl(&current, &current);
+        p256dbl(&current, &current);
+        p256dbl(&current, &current);
+      }
+      first = 0;
       //load table[index] in constant time
-      for(k=0; k<16; k++){
+      for(int k=0; k<16; k++){
         p256cmov(&p, &table[k], (k==index));
       }
       p256add(&temp, &current, &p);
       p256cmov(&current, &p, bit*(1-seen));
       p256cmov(&current, &temp, bit*seen);
       seen = seen + (1-seen)*bit;
+    }
+  }
+  p256cmov(c, &current, 1);
+}
+void p256scalarmult_base_fast(point *c, const unsigned char e[32]);
+void p256scalarmult_base(point *c, const unsigned char e[32]){
+        /* point a;
+        p256unpack(&a, basep);
+        p256scalarmult(c, &a, e); */
+        p256scalarmult_base_fast(c, e);
+}
+
+void p256scalarmult_base_fast(point *c, const unsigned char e[32]){
+  unsigned int seen = 0;
+  unsigned int bit = 0;
+  unsigned int index;
+  point current;
+  point temp;
+  point tablent;
+  int i,j,k;
+  /*The comb method*/
+  for(j=4; j>=0; j-=4){
+    for(i=0; i<32; i++){
+      index=(e[i]>>j)&0x0f;
+      bit = (index!=0);
+      for(k=0; k<16; k++){
+        p256unpack(&temp, precomp[31-i][k]);
+        p256cmov(&tablent, &temp, k==index);
+      }
+      p256madd(&temp, &current, &tablent);
+      p256cmov(&current, &tablent, bit*(1-seen));
+      p256cmov(&current, &temp, bit*seen);
+      seen = seen + (1-seen)*bit;
+    }
+    if (j==4) {
+      for(k=0; k<4; k++){
+        p256dbl(&current, &current);
+      }
     }
   }
   p256cmov(c, &current, 1);
@@ -177,24 +248,22 @@ void p256dblmult_base(point *c, point *a, const unsigned char ea[32],
   point bp;
   point table[16];
   int index;
-  int i;
-  int j;
   p256unpack(&bp, basep);
   p256identity(&current);
   p256identity(&table[0]);
   /*Ebase changes faster: 4*ebasebits+eabits*/
-  for(i=1; i<4; i++){
+  for(int i=1; i<4; i++){
     p256add_total(&table[i], &table[i-1], a);
   }
-  for(j=1; j<4; j++){
+  for(int j=1; j<4; j++){
     p256add_total(&table[4*j], &table[4*(j-1)], &bp);
-    for(i=1; i<4; i++){
+    for(int i=1; i<4; i++){
       p256add_total(&table[4*j+i], &table[4*j+i-1], a);
     }
   }
 
-  for(i=0; i<32; i++){
-    for(j=6; j>=0; j-=2){
+  for(int i=0; i<32; i++){
+    for(int j=6; j>=0; j-=2){
       p256dbl_total(&current, &current);
       p256dbl_total(&current, &current);
       index = 4*((ebase[i]>>j)&0x03) + ((ea[i]>>j)&0x03);
@@ -224,12 +293,6 @@ void p256unpack(point *c, const unsigned char in[64]){
 
 void p256base(point *a){
   p256unpack(a, basep);
-}
-
-void p256scalarmult_base(point *c, const unsigned char e[32]){
-  point a;
-  p256unpack(&a, basep);
-  p256scalarmult(c, &a, e);
 }
 
 void p256xpack(unsigned char c[32], point *a){

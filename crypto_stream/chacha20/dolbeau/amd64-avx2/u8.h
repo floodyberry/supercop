@@ -1,5 +1,5 @@
 /*
-u8.h version $Date: 2014/09/07 16:10:57 $
+u8.h version $Date: 2014/09/24 12:07:03 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.

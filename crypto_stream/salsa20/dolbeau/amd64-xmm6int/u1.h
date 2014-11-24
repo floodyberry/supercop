@@ -1,5 +1,5 @@
 /*
-u1.h version $Date: 2014/09/07 16:11:01 $
+u1.h version $Date: 2014/09/24 12:07:11 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.

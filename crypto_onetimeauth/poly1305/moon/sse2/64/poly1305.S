@@ -1,986 +1,739 @@
-#define IS_LINUX_ELF (defined(__linux__) && defined(__ELF__))
-#define IS_WIN64 (defined(_WIN64) || defined(__CYGWIN64__))
+#include "x86.inc"
 
-#define GLOBAL3(n,s) .globl n##_##s; .globl _##n##_##s
-#define GLOBAL2(n,s) GLOBAL3(n,s)
-#define GLOBAL(n) GLOBAL2(n,POLY1305_SUFFIX)
+SECTION_TEXT
 
-#define FN3(n,s) .p2align 4,,15; n##_##s:; _##n##_##s:
-#define FN2(n,s) FN3(n,s)
-#define FN(n) FN2(n,POLY1305_SUFFIX)
-
-#if (IS_LINUX_ELF)
-#define ENDFN3(n,s) .size n##_##s, .-n##_##s; .type n##_##s, @function;
-#define ENDFN2(n,s) ENDFN3(n,s)
-#define ENDFN(n) ENDFN2(n,POLY1305_SUFFIX)
-#else
-#define ENDFN(n)
-#endif
-
-#if IS_WIN64
-
-/* thunk to support win64. this assumes that there will be at most
-   4 paramaters, aka no paramters passed on the stack! */
-#undef FN3
-#define FN3(n,s)                      \
-.p2align 4,,15                       ;\
-n##_##s:                             ;\
-_##n##_##s:                          ;\
-subq $184, %rsp                      ;\
-movdqa %xmm6, 0(%rsp)                ;\
-movdqa %xmm7, 16(%rsp)               ;\
-movdqa %xmm8, 32(%rsp)               ;\
-movdqa %xmm9, 48(%rsp)               ;\
-movdqa %xmm10, 64(%rsp)              ;\
-movdqa %xmm11, 80(%rsp)              ;\
-movdqa %xmm12, 96(%rsp)              ;\
-movdqa %xmm13, 112(%rsp)             ;\
-movdqa %xmm14, 128(%rsp)             ;\
-movdqa %xmm15, 144(%rsp)             ;\
-movq %rdi, 160(%rsp)                 ;\
-movq %rsi, 168(%rsp)                 ;\
-movq %rcx, %rdi                      ;\
-movq %rdx, %rsi                      ;\
-movq %r8, %rdx                       ;\
-movq %r9, %rcx                       ;\
-call n##_thunk_##s                   ;\
-movdqa 0(%rsp), %xmm6                ;\
-movdqa 16(%rsp), %xmm7               ;\
-movdqa 32(%rsp), %xmm8               ;\
-movdqa 48(%rsp), %xmm9               ;\
-movdqa 64(%rsp), %xmm10              ;\
-movdqa 80(%rsp), %xmm11              ;\
-movdqa 96(%rsp), %xmm12              ;\
-movdqa 112(%rsp), %xmm13             ;\
-movdqa 128(%rsp), %xmm14             ;\
-movdqa 144(%rsp), %xmm15             ;\
-movq 160(%rsp), %rdi                 ;\
-movq 168(%rsp), %rsi                 ;\
-addq $184, %rsp                      ;\
-ret                                  ;\
-.p2align 4,,15;                      ;\
-n##_thunk_##s:
-
-#endif /* IS_WIN64 */
-
-/* NX indicator */
-#if (IS_LINUX_ELF)
-	#define ENDFILE() .section .note.GNU-stack,"",%progbits
-#else
-	#define ENDFILE()
-#endif
-
-#define POLY1305_SUFFIX sse2
-
-
-.text
-
-GLOBAL(poly1305_block_size)
-GLOBAL(poly1305_init_ext)
-GLOBAL(poly1305_blocks)
-GLOBAL(poly1305_finish_ext)
-GLOBAL(poly1305_auth)
-
-FN(poly1305_block_size)
+GLOBAL_HIDDEN_FN poly1305_block_size_sse2
 movl $32, %eax
 ret
-ENDFN(poly1305_block_size)
+FN_END poly1305_block_size_sse2
 
-
-FN(poly1305_init_ext)
+GLOBAL_HIDDEN_FN poly1305_init_ext_sse2
 poly1305_init_ext_sse2_local:
-pushq %r12
-pushq %r13
+pushq %r15
+xorps %xmm0, %xmm0
+testq %rdx, %rdx
 pushq %r14
-movq %rdx, %r10
-movq $-1, %rcx
-testq %r10, %r10
-pxor %xmm0, %xmm0
-movq $0xfffffc0ffff, %r9
-movdqa %xmm0, (%rdi)
-cmove %rcx, %r10
-movdqa %xmm0, 16(%rdi)
-movq $0xffc0fffffff, %rcx
-movdqa %xmm0, 32(%rdi)
-movdqa %xmm0, 48(%rdi)
-movdqa %xmm0, 64(%rdi)
-movq 8(%rsi), %r11
-movq %r11, %r8
-movq (%rsi), %r12
-andq %r12, %rcx
-shrq $44, %r12
-shlq $20, %r8
-shrq $24, %r11
-orq %r8, %r12
-movq $0xffffffc0f, %r8
-andq %r9, %r12
-andq %r8, %r11
-movl %ecx, %r8d
-andl $67108863, %r8d
-movq %rcx, %r9
-movl %r8d, 84(%rdi)
-movq %r12, %r8
-shrq $26, %r9
-shlq $18, %r8
-orq %r8, %r9
-movq %r12, %r8
-shrq $8, %r8
-andl $67108863, %r9d
-andl $67108863, %r8d
-movl %r9d, 92(%rdi)
-movq %r12, %r9
-movl %r8d, 100(%rdi)
-movq %r11, %r8
-shrq $34, %r9
-shlq $10, %r8
-orq %r8, %r9
-movq %r11, %r8
-shrq $16, %r8
-andl $67108863, %r9d
-movl %r9d, 108(%rdi)
-cmpq $16, %r10
-movl %r8d, 116(%rdi)
-movl 16(%rsi), %r8d
-movl %r8d, 124(%rdi)
-movl 20(%rsi), %r8d
-movl %r8d, 132(%rdi)
-movl 24(%rsi), %r8d
-movl %r8d, 140(%rdi)
-movl 28(%rsi), %esi
-movl %esi, 148(%rdi)
-jbe poly1305_init_ext_sse2_done
-lea (%r11,%r11,4), %r14
-shlq $2, %r14
-lea (%r12,%r12), %rax
-mulq %r14
-movq %rax, %r13
-movq %rcx, %rax
-movq %rdx, %r8
-mulq %rcx
-addq %rax, %r13
-lea (%rcx,%rcx), %rax
-movq %r13, %r9
-adcq %rdx, %r8
-mulq %r12
-shlq $20, %r8
-movq %rax, %rsi
-shrq $44, %r9
-movq %r11, %rax
-orq %r9, %r8
-movq %rdx, %r9
-mulq %r14
-addq %rax, %rsi
-movq %rcx, %rax
-adcq %rdx, %r9
-addq %r11, %r11
-mulq %r11
-addq %rsi, %r8
-movq %rax, %r11
-movq %r12, %rax
-movq %rdx, %rcx
-adcq $0, %r9
-mulq %r12
-addq %rax, %r11
-movq %r8, %rsi
-adcq %rdx, %rcx
-shlq $20, %r9
-shrq $44, %rsi
-orq %rsi, %r9
-movq $0xfffffffffff, %rsi
-addq %r11, %r9
-movq %r9, %r12
-adcq $0, %rcx
-andq %rsi, %r13
-shlq $22, %rcx
-andq %rsi, %r8
-shrq $42, %r12
-orq %r12, %rcx
-movq %rsi, %r12
-lea (%rcx,%rcx,4), %rcx
-addq %rcx, %r13
-movq %rsi, %rcx
-andq %r13, %rcx
-shrq $44, %r13
-movq %rcx, %r14
-addq %r13, %r8
-movq $0x3ffffffffff, %r13
-andq %r8, %r12
-andq %r13, %r9
-shrq $44, %r8
-movq %r12, %r11
-addq %r8, %r9
-movq %r12, %rax
-movq %r9, %r13
-movl %ecx, %r8d
-shrq $26, %r14
-andl $67108863, %r8d
-shlq $18, %r11
-shrq $34, %rax
-orq %r11, %r14
-shlq $10, %r13
-movq %r12, %r11
-orq %r13, %rax
-movq %r9, %r13
-shrq $8, %r11
-shrq $16, %r13
-andl $67108863, %r14d
-andl $67108863, %r11d
-andl $67108863, %eax
-movl %r8d, 88(%rdi)
-cmpq $64, %r10
-movl %r8d, 80(%rdi)
-movl %r14d, 104(%rdi)
-movl %r14d, 96(%rdi)
-movl %r11d, 120(%rdi)
-movl %r11d, 112(%rdi)
-movl %eax, 136(%rdi)
-movl %eax, 128(%rdi)
-movl %r13d, 152(%rdi)
-movl %r13d, 144(%rdi)
-jbe poly1305_init_ext_sse2_done
-lea (%r9,%r9,4), %r14
-shlq $2, %r14
-lea (%r12,%r12), %rax
-mulq %r14
-movq %rax, %r8
-movq %rcx, %rax
-movq %rdx, %r10
-mulq %rcx
-addq %rax, %r8
-lea (%rcx,%rcx), %rax
-movq %r8, %r11
-adcq %rdx, %r10
-andq %rsi, %r8
-mulq %r12
-shlq $20, %r10
-movq %rax, %r13
-shrq $44, %r11
-movq %r9, %rax
-orq %r11, %r10
 movq %rdx, %r11
-mulq %r14
-addq %rax, %r13
-movq %rcx, %rax
-adcq %rdx, %r11
-addq %r9, %r9
-mulq %r9
-addq %r13, %r10
-movq %rax, %r9
-movq %r12, %rax
-movq %rdx, %rcx
-adcq $0, %r11
-mulq %r12
-addq %rax, %r9
-movq %r10, %r13
-adcq %rdx, %rcx
-andq %rsi, %r10
-shlq $20, %r11
-shrq $44, %r13
-orq %r13, %r11
-addq %r9, %r11
-movq %rsi, %r9
-movq %r11, %r12
-adcq $0, %rcx
-shlq $22, %rcx
-shrq $42, %r12
-orq %r12, %rcx
-lea (%rcx,%rcx,4), %rcx
-addq %rcx, %r8
-andq %r8, %r9
-shrq $44, %r8
-movl %r9d, %eax
-addq %r8, %r10
-movq $0x3ffffffffff, %r8
-andq %r10, %rsi
-andq %r8, %r11
-shrq $44, %r10
-movq %rsi, %r8
-addq %r10, %r11
-andl $67108863, %eax
-shrq $26, %r9
-movq %r11, %r10
-shlq $18, %r8
-shlq $10, %r10
-orq %r8, %r9
-movq %rsi, %r8
-shrq $34, %rsi
-andl $67108863, %r9d
-shrq $8, %r8
-orq %r10, %rsi
-shrq $16, %r11
-andl $67108863, %r8d
-andl $67108863, %esi
-movl %eax, 168(%rdi)
-movl %eax, 160(%rdi)
-movl %r9d, 184(%rdi)
-movl %r9d, 176(%rdi)
-movl %r8d, 200(%rdi)
-movl %r8d, 192(%rdi)
-movl %esi, 216(%rdi)
-movl %esi, 208(%rdi)
-movl %r11d, 232(%rdi)
-movl %r11d, 224(%rdi)
-poly1305_init_ext_sse2_done:
-movq $0, 240(%rdi)
-popq %r14
-popq %r13
-popq %r12
-ret
-ENDFN(poly1305_init_ext)
-
-FN(poly1305_finish_ext)
-poly1305_finish_ext_sse2_local:
+movq $-1, %rax
+cmove %rax, %r11
+pushq %r13
+movabsq $17575274610687, %r9
+pushq %r12
 pushq %rbp
-movq %rsp, %rbp
-subq $64, %rsp
-andq $~63, %rsp
-movq %rdx, 32(%rsp)
-movq %rcx, 40(%rsp)
-andq %rdx, %rdx
-jz poly1305_finish_sse2_no_leftover
-pxor %xmm0, %xmm0
-movdqa %xmm0, 0+0(%rsp)
-movdqa %xmm0, 16+0(%rsp)
-leaq 0(%rsp), %r8
-testq $16, %rdx
-jz poly1305_finish_sse2_skip16
-movdqu 0(%rsi), %xmm0
-movdqa %xmm0, 0(%r8)
-addq $16, %rsi
-addq $16, %r8
-poly1305_finish_sse2_skip16:
-testq $8, %rdx
-jz poly1305_finish_sse2_skip8
-movq 0(%rsi), %rax
-movq %rax, 0(%r8)
-addq $8, %rsi
-addq $8, %r8
-poly1305_finish_sse2_skip8:
-testq $4, %rdx
-jz poly1305_finish_sse2_skip4
-movl 0(%rsi), %eax
-movl %eax, 0(%r8)
-addq $4, %rsi
-addq $4, %r8
-poly1305_finish_sse2_skip4:
-testq $2, %rdx
-jz poly1305_finish_sse2_skip2
-movw 0(%rsi), %ax
-movw %ax, 0(%r8)
-addq $2, %rsi
-addq $2, %r8
-poly1305_finish_sse2_skip2:
-testq $1, %rdx
-jz poly1305_finish_sse2_skip1
-movb 0(%rsi), %al
-movb %al, 0(%r8)
-addq $1, %r8
-poly1305_finish_sse2_skip1:
-cmpq $16, %rdx
-je poly1305_finish_sse2_is16
-movb $1, 0(%r8)
-poly1305_finish_sse2_is16:
-movq $4, %rax
-jae poly1305_finish_sse2_16andover
-movq $8, %rax
-poly1305_finish_sse2_16andover:
-orq %rax, 240(%rdi)
-leaq 0(%rsp), %rsi
-movq $32, %rdx
-callq poly1305_blocks_sse2_local
-poly1305_finish_sse2_no_leftover:
-testq $1, 240(%rdi)
-jz poly1305_finish_sse2_not_started
-movq 32(%rsp), %rdx
-andq %rdx, %rdx
-jz poly1305_finish_sse2_r2r
-cmpq $16, %rdx
-jg poly1305_finish_sse2_r2r
-xorl %r10d, %r10d
-movl 84(%rdi), %eax
-movl 92(%rdi), %ecx
-movl 100(%rdi), %edx
-movl 108(%rdi), %r8d
-movl 116(%rdi), %r9d
-movl %eax, 80(%rdi)
-movl $1, 8+80(%rdi)
-movl %ecx, 96(%rdi)
-movl %r10d, 8+96(%rdi)
-movl %edx, 112(%rdi)
-movl %r10d, 8+112(%rdi)
-movl %r8d, 128(%rdi)
-movl %r10d, 8+128(%rdi)
-movl %r9d, 144(%rdi)
-movl %r10d, 8+144(%rdi)
-jmp poly1305_finish_sse2_combine
-poly1305_finish_sse2_r2r:
-movl 84(%rdi), %eax
-movl 92(%rdi), %ecx
-movl 100(%rdi), %edx
-movl 108(%rdi), %r8d
-movl 116(%rdi), %r9d
-movl %eax, 8+80(%rdi)
-movl %ecx, 8+96(%rdi)
-movl %edx, 8+112(%rdi)
-movl %r8d, 8+128(%rdi)
-movl %r9d, 8+144(%rdi)
-poly1305_finish_sse2_combine:
-xorq %rsi, %rsi
-movq $32, %rdx
-callq poly1305_blocks_sse2_local
-poly1305_finish_sse2_not_started:
-movq 0(%rdi), %r8
-movq 8(%rdi), %r9
-movq %r9, %r10
-movq 16(%rdi), %r11
-shlq $44, %r9
-shrq $20, %r10
-shlq $24, %r11
-orq %r9, %r8
-orq %r11, %r10
-pxor %xmm0, %xmm0
-movl 124(%rdi), %eax
-movl 132(%rdi), %ecx
-movl 140(%rdi), %edx
-movl 148(%rdi), %esi
-movq 40(%rsp), %r11
-shlq $32, %rcx
-shlq $32, %rsi
-orq %rcx, %rax
-orq %rsi, %rdx
-addq %r8, %rax
-adcq %r10, %rdx
-movq %rax, 0(%r11)
-movq %rdx, 8(%r11)
-movq %rbp, %rsp
-movdqa %xmm0, 0(%rdi)
-movdqa %xmm0, 16(%rdi)
-movdqa %xmm0, 32(%rdi)
-movdqa %xmm0, 48(%rdi)
-movdqa %xmm0, 64(%rdi)
-movdqa %xmm0, 80(%rdi)
-movdqa %xmm0, 96(%rdi)
-movdqa %xmm0, 112(%rdi)
-movdqa %xmm0, 128(%rdi)
-movdqa %xmm0, 144(%rdi)
-movdqa %xmm0, 160(%rdi)
-movdqa %xmm0, 176(%rdi)
-movdqa %xmm0, 192(%rdi)
-movdqa %xmm0, 208(%rdi)
-movdqa %xmm0, 224(%rdi)
+movq %r11, %r13
+movabsq $17592186044415, %rbp
+pushq %rbx
+xorl %ebx, %ebx
+movdqu %xmm0, 32(%rdi)
+movdqu %xmm0, (%rdi)
+movdqu %xmm0, 16(%rdi)
+movq 8(%rsi), %rcx
+movq (%rsi), %rax
+movq %rcx, %rdx
+shrq $24, %rcx
+andq %rax, %r9
+salq $20, %rdx
+shrq $44, %rax
+movq %r9, %r8
+orq %rax, %rdx
+shrq $26, %r8
+movabsq $17592181915647, %rax
+andq %rax, %rdx
+movabsq $68719475727, %rax
+andq %rax, %rcx
+movl %r9d, %eax
+andl $67108863, %eax
+movl %eax, 40(%rdi)
+movl %edx, %eax
+sall $18, %eax
+orl %r8d, %eax
+movq %rdx, %r8
+andl $67108863, %eax
+shrq $34, %r8
+movl %eax, 44(%rdi)
+movq %rdx, %rax
+shrq $8, %rax
+andl $67108863, %eax
+movl %eax, 48(%rdi)
+movl %ecx, %eax
+sall $10, %eax
+orl %r8d, %eax
+movq %rdi, %r8
+andl $67108863, %eax
+movl %eax, 52(%rdi)
+movq %rcx, %rax
+shrq $16, %rax
+movl %eax, 56(%rdi)
+movq 16(%rsi), %rax
+movq %rax, 104(%rdi)
+movq 24(%rsi), %rax
+movq %rdx, %rsi
+movq %rax, 112(%rdi)
+poly1305_init_ext_sse2_7:
+testq %rbx, %rbx
+jne poly1305_init_ext_sse2_4
+cmpq $16, %r13
+jbe poly1305_init_ext_sse2_5
+leaq 60(%r8), %rdi
+jmp poly1305_init_ext_sse2_6
+poly1305_init_ext_sse2_4:
+cmpq $96, %r13
+jb poly1305_init_ext_sse2_5
+leaq 80(%r8), %rdi
+poly1305_init_ext_sse2_6:
+imulq $20, %rcx, %r10
+movq $0, -48(%rsp)
+movq $0, -32(%rsp)
+leaq (%rsi,%rsi), %r14
+leaq (%r9,%r9), %r11
+movq %r10, %rax
+mulq %r14
+movq %rax, %r14
+movq %r9, %rax
+movq %rdx, %r15
+mulq %r9
+addq %rax, %r14
+movq %r14, %rax
+adcq %rdx, %r15
+leaq (%rcx,%rcx), %rdx
+andq %rbp, %rax
+movq %rax, -16(%rsp)
+movq %r11, %rax
+movq %rdx, -24(%rsp)
+mulq %rsi
+movq %rax, %r11
+movq %r10, %rax
+movq %rdx, %r12
+mulq %rcx
+movq -16(%rsp), %rcx
+addq %rax, %r11
+movq %r14, %rax
+adcq %rdx, %r12
+shrdq $44, %r15, %rax
+movq %rax, -56(%rsp)
+movq -24(%rsp), %rax
+addq -56(%rsp), %r11
+adcq -48(%rsp), %r12
+mulq %r9
+movq %r11, %r14
+andq %rbp, %r14
+movq %rax, %r9
+movq %rsi, %rax
+movq %rdx, %r10
+mulq %rsi
+addq %rax, %r9
+movq %r11, %rax
+adcq %rdx, %r10
+shrdq $44, %r12, %rax
+movq %rax, -40(%rsp)
+movabsq $4398046511103, %rax
+addq -40(%rsp), %r9
+adcq -32(%rsp), %r10
+andq %r9, %rax
+incq %rbx
+shrdq $42, %r10, %r9
+leaq (%r9,%r9,4), %r9
+addq %r9, %rcx
+movq %rcx, %r9
+shrq $44, %rcx
+addq %r14, %rcx
+andq %rbp, %r9
+movq %rcx, %rsi
+shrq $44, %rcx
+movq %r9, %rdx
+addq %rax, %rcx
+movl %r9d, %eax
+andq %rbp, %rsi
+andl $67108863, %eax
+shrq $26, %rdx
+movl %eax, (%rdi)
+movl %esi, %eax
+sall $18, %eax
+orl %edx, %eax
+movq %rsi, %rdx
+andl $67108863, %eax
+shrq $34, %rdx
+movl %eax, 4(%rdi)
+movq %rsi, %rax
+shrq $8, %rax
+andl $67108863, %eax
+movl %eax, 8(%rdi)
+movl %ecx, %eax
+sall $10, %eax
+orl %edx, %eax
+andl $67108863, %eax
+movl %eax, 12(%rdi)
+movq %rcx, %rax
+shrq $16, %rax
+cmpq $2, %rbx
+movl %eax, 16(%rdi)
+jne poly1305_init_ext_sse2_7
+poly1305_init_ext_sse2_5:
+movq $0, 120(%r8)
+popq %rbx
 popq %rbp
+popq %r12
+popq %r13
+popq %r14
+popq %r15
 ret
-ENDFN(poly1305_finish_ext)
+FN_END poly1305_init_ext_sse2
 
-FN(poly1305_blocks)
+
+GLOBAL_HIDDEN_FN poly1305_blocks_sse2
 poly1305_blocks_sse2_local:
 pushq %rbp
 movq %rsp, %rbp
 pushq %rbx
 andq $-64, %rsp
 subq $328, %rsp
-movq 240(%rdi), %rax
-movl $(1<<24), %r8d
-movl $((1<<26)-1), %r9d
-movd %r8, %xmm0
-movd %r9, %xmm5
-pshufd $0x44, %xmm0, %xmm0
-pshufd $0x44, %xmm5, %xmm5
+movq $(1 << 24), %rax
+movd %rax, %xmm1
+movq $((1 << 26) - 1), %rax
+movd %rax, %xmm0
+pshufd $68, %xmm1, %xmm1
+pshufd $68, %xmm0, %xmm0
+movq 120(%rdi), %rax
+movaps %xmm1, 312(%rsp)
 testb $4, %al
-je poly1305_blocks_sse2_3
-psrldq $8, %xmm0
-poly1305_blocks_sse2_3:
+je poly1305_blocks_sse2_11
+movaps 312(%rsp), %xmm1
+psrldq $8, %xmm1
+movaps %xmm1, 312(%rsp)
+poly1305_blocks_sse2_11:
 testb $8, %al
-je poly1305_blocks_sse2_4
-pxor %xmm0, %xmm0
-poly1305_blocks_sse2_4:
-movdqa %xmm0, 168(%rsp)
+je poly1305_blocks_sse2_12
+xorps %xmm1, %xmm1
+movaps %xmm1, 312(%rsp)
+poly1305_blocks_sse2_12:
 testb $1, %al
-jne poly1305_blocks_sse2_5
-movq 16(%rsi), %xmm0
-movdqa %xmm5, %xmm7
-movdqa %xmm5, %xmm10
-movq (%rsi), %xmm6
+jne poly1305_blocks_sse2_13
+movq 16(%rsi), %xmm1
+movaps %xmm0, %xmm3
+movaps %xmm0, %xmm9
+movq (%rsi), %xmm15
 orq $1, %rax
 subq $32, %rdx
-movq 8(%rsi), %xmm1
-punpcklqdq %xmm0, %xmm6
-movq 24(%rsi), %xmm0
-pand %xmm6, %xmm7
-movdqa %xmm6, %xmm9
-psrlq $52, %xmm6
+movq 8(%rsi), %xmm12
+punpcklqdq %xmm1, %xmm15
+movq 24(%rsi), %xmm1
+movaps %xmm15, %xmm8
+pand %xmm15, %xmm3
+psrlq $52, %xmm15
 addq $32, %rsi
-punpcklqdq %xmm0, %xmm1
-movdqa %xmm1, %xmm0
-psrlq $26, %xmm9
-psllq $12, %xmm0
-movq %rax, 240(%rdi)
-pand %xmm5, %xmm9
-por %xmm0, %xmm6
-psrlq $40, %xmm1
-pand %xmm6, %xmm10
-por 168(%rsp), %xmm1
-psrlq $26, %xmm6
-pand %xmm5, %xmm6
-poly1305_blocks_sse2_6:
-movdqa 80(%rdi), %xmm13
-cmpq $63, %rdx
-movl $(5), %r8d
-movd %r8, %xmm14
-pshufd $0x44, %xmm14, %xmm14
-movdqa 96(%rdi), %xmm15
-movdqa %xmm13, -8(%rsp)
-movdqa 112(%rdi), %xmm0
-movdqa %xmm14, 136(%rsp)
-movdqa 128(%rdi), %xmm3
-movdqa %xmm15, 312(%rsp)
-pmuludq %xmm14, %xmm15
-movdqa 144(%rdi), %xmm13
-movdqa %xmm0, 232(%rsp)
-pmuludq %xmm14, %xmm0
-movdqa %xmm3, 152(%rsp)
-pmuludq %xmm14, %xmm3
-movdqa %xmm13, 56(%rsp)
-pmuludq %xmm14, %xmm13
-movdqa %xmm15, 40(%rsp)
-movdqa %xmm0, -24(%rsp)
-movdqa %xmm3, -40(%rsp)
-movdqa %xmm13, -56(%rsp)
-jbe poly1305_blocks_sse2_7
-movdqa 192(%rdi), %xmm15
-leaq 32(%rsi), %rax
-movq %rdx, %rcx
-movdqa 176(%rdi), %xmm14
-movdqa %xmm15, %xmm2
-movdqa 208(%rdi), %xmm0
-movdqa %xmm15, 216(%rsp)
-movdqa %xmm14, 296(%rsp)
-movdqa 224(%rdi), %xmm3
-pmuludq 136(%rsp), %xmm14
-movdqa -24(%rsp), %xmm13
-movdqa %xmm14, 8(%rsp)
-pmuludq 136(%rsp), %xmm2
-movdqa -40(%rsp), %xmm14
-movdqa %xmm0, 120(%rsp)
-pmuludq 136(%rsp), %xmm0
-movdqa %xmm3, 24(%rsp)
-movdqa 160(%rdi), %xmm12
-movdqa %xmm0, %xmm8
-movdqa -56(%rsp), %xmm15
-movdqa %xmm13, 88(%rsp)
-pmuludq 136(%rsp), %xmm3
-movdqa %xmm2, 104(%rsp)
-movdqa %xmm0, %xmm13
-movdqa -8(%rsp), %xmm11
-movdqa %xmm3, 280(%rsp)
-movdqa %xmm2, %xmm3
-movdqa %xmm0, 200(%rsp)
-movdqa %xmm14, 184(%rsp)
-movdqa %xmm15, 264(%rsp)
-jmp poly1305_blocks_sse2_8
-.p2align 6,,63
+punpcklqdq %xmm1, %xmm12
+movaps %xmm12, %xmm1
+psrlq $26, %xmm8
+psllq $12, %xmm1
+pand %xmm0, %xmm8
+movq %rax, 120(%rdi)
+por %xmm1, %xmm15
+psrlq $40, %xmm12
+pand %xmm15, %xmm9
+por 312(%rsp), %xmm12
+psrlq $26, %xmm15
+pand %xmm0, %xmm15
+jmp poly1305_blocks_sse2_14
 poly1305_blocks_sse2_13:
-movdqa 200(%rsp), %xmm13
-movdqa %xmm3, %xmm6
-movdqa 200(%rsp), %xmm8
-movdqa 104(%rsp), %xmm3
-poly1305_blocks_sse2_8:
-movdqa 8(%rsp), %xmm4
-pmuludq %xmm6, %xmm3
+movdqu (%rdi), %xmm8
+movdqu 16(%rdi), %xmm15
+movdqu 32(%rdi), %xmm12
+pshufd $80, %xmm8, %xmm3
+pshufd $250, %xmm8, %xmm8
+pshufd $80, %xmm15, %xmm9
+pshufd $250, %xmm15, %xmm15
+pshufd $80, %xmm12, %xmm12
+poly1305_blocks_sse2_14:
+movq 120(%rdi), %rax
+testb $48, %al
+je poly1305_blocks_sse2_15
+testb $16, %al
+movd 56(%rdi), %xmm2
+leaq 40(%rdi), %rax
+je poly1305_blocks_sse2_16
+movdqu 60(%rdi), %xmm1
+movdqu (%rax), %xmm4
+movd %xmm2, %eax
+movd 76(%rdi), %xmm2
+movaps %xmm1, %xmm7
+movd %eax, %xmm5
+punpckldq %xmm4, %xmm7
+punpckhdq %xmm4, %xmm1
+punpcklqdq %xmm5, %xmm2
+jmp poly1305_blocks_sse2_17
+poly1305_blocks_sse2_16:
+movdqu (%rax), %xmm1
+movl $1, %r8d
+movd %r8d, %xmm4
+movaps %xmm1, %xmm7
+punpckldq %xmm4, %xmm7
+punpckhdq %xmm4, %xmm1
+poly1305_blocks_sse2_17:
+pshufd $80, %xmm7, %xmm11
+pshufd $80, %xmm1, %xmm4
+pshufd $250, %xmm7, %xmm7
+movaps %xmm11, 168(%rsp)
+pshufd $250, %xmm1, %xmm1
+jmp poly1305_blocks_sse2_18
+poly1305_blocks_sse2_15:
+movdqu 60(%rdi), %xmm1
+movd 76(%rdi), %xmm2
+pshufd $0, %xmm2, %xmm2
+pshufd $0, %xmm1, %xmm11
+pshufd $85, %xmm1, %xmm7
+pshufd $170, %xmm1, %xmm4
+movaps %xmm11, 168(%rsp)
+pshufd $255, %xmm1, %xmm1
+poly1305_blocks_sse2_18:
+movaps %xmm1, %xmm14
+movaps %xmm7, %xmm5
+movaps %xmm4, %xmm13
+movaps %xmm1, 264(%rsp)
+movaps %xmm2, %xmm1
+cmpq $63, %rdx
+movq $(5), %r8
+movd %r8, %xmm6
+pshufd $68, %xmm6, %xmm6
+pmuludq %xmm6, %xmm5
+movaps %xmm4, 296(%rsp)
+pmuludq %xmm6, %xmm13
+movaps %xmm2, 152(%rsp)
+pmuludq %xmm6, %xmm14
+pmuludq %xmm6, %xmm1
+movaps %xmm5, 88(%rsp)
+movaps %xmm13, 72(%rsp)
+movaps %xmm14, 56(%rsp)
+movaps %xmm1, 40(%rsp)
+jbe poly1305_blocks_sse2_19
+movdqu 80(%rdi), %xmm1
+movd 96(%rdi), %xmm2
+movq %rdx, %rcx
+pshufd $0, %xmm2, %xmm2
+movaps %xmm2, 24(%rsp)
+pmuludq %xmm6, %xmm2
+pshufd $85, %xmm1, %xmm4
+movaps %xmm4, 280(%rsp)
+pmuludq %xmm6, %xmm4
+pshufd $255, %xmm1, %xmm13
+pshufd $170, %xmm1, %xmm5
+movaps 72(%rsp), %xmm14
+movaps %xmm5, 216(%rsp)
+pmuludq %xmm6, %xmm5
+movq %rsi, %rax
+movaps %xmm4, -24(%rsp)
+movaps %xmm13, %xmm4
+pshufd $0, %xmm1, %xmm1
+pmuludq %xmm6, %xmm4
+movaps %xmm14, -8(%rsp)
+movaps %xmm5, 8(%rsp)
+movaps 168(%rsp), %xmm5
+movaps %xmm1, 248(%rsp)
+movaps 56(%rsp), %xmm1
+movaps %xmm4, 120(%rsp)
+movaps 40(%rsp), %xmm4
+movaps %xmm13, 136(%rsp)
+movaps %xmm2, 200(%rsp)
+movaps %xmm1, 104(%rsp)
+movaps %xmm4, 184(%rsp)
+movaps %xmm5, 232(%rsp)
+jmp poly1305_blocks_sse2_20
+.p2align 6
+poly1305_blocks_sse2_20:
+movaps -24(%rsp), %xmm5
+movaps %xmm8, %xmm13
 subq $64, %rcx
-pmuludq %xmm10, %xmm8
-movdqa 104(%rsp), %xmm2
-movdqa 200(%rsp), %xmm0
-pmuludq %xmm1, %xmm4
-movdqa 280(%rsp), %xmm15
-pmuludq %xmm6, %xmm13
-movdqa 280(%rsp), %xmm14
-pmuludq %xmm1, %xmm0
-paddq %xmm3, %xmm4
-pmuludq %xmm1, %xmm2
-movdqa 280(%rsp), %xmm3
-paddq %xmm8, %xmm4
-pmuludq %xmm9, %xmm15
-movdqa 280(%rsp), %xmm8
-pmuludq %xmm10, %xmm14
-pmuludq %xmm6, %xmm8
-paddq %xmm13, %xmm2
-movdqa %xmm6, %xmm13
-pmuludq %xmm1, %xmm3
-paddq %xmm15, %xmm4
-movdqa 296(%rsp), %xmm15
-pmuludq %xmm12, %xmm13
-paddq %xmm14, %xmm2
-movdqa %xmm7, %xmm14
-paddq %xmm8, %xmm0
-pmuludq %xmm12, %xmm14
-movdqa %xmm9, %xmm8
-pmuludq 296(%rsp), %xmm6
-pmuludq %xmm12, %xmm8
-movdqa %xmm6, 248(%rsp)
-pmuludq %xmm10, %xmm15
-movq -16(%rax), %xmm6
-paddq %xmm13, %xmm3
-movdqa %xmm10, %xmm13
-paddq %xmm14, %xmm4
-movq -8(%rax), %xmm14
-paddq %xmm8, %xmm2
-movq -32(%rax), %xmm8
-pmuludq %xmm12, %xmm13
-paddq %xmm15, %xmm3
+movaps 8(%rsp), %xmm4
+movaps 120(%rsp), %xmm10
+pmuludq %xmm12, %xmm5
+pmuludq %xmm15, %xmm4
+movaps 8(%rsp), %xmm2
+pmuludq %xmm9, %xmm10
+movaps 120(%rsp), %xmm11
+movaps 200(%rsp), %xmm14
+pmuludq %xmm12, %xmm2
+paddq %xmm4, %xmm5
+pmuludq %xmm15, %xmm11
+movaps 120(%rsp), %xmm1
+paddq %xmm10, %xmm5
+pmuludq %xmm8, %xmm14
+movaps 200(%rsp), %xmm10
+movaps 200(%rsp), %xmm4
 pmuludq %xmm12, %xmm1
-movdqa 216(%rsp), %xmm15
-pmuludq 216(%rsp), %xmm10
-punpcklqdq %xmm6, %xmm8
-movq -24(%rax), %xmm6
-pmuludq %xmm9, %xmm15
-paddq %xmm13, %xmm0
-movdqa 296(%rsp), %xmm13
-paddq 248(%rsp), %xmm1
-punpcklqdq %xmm14, %xmm6
-movdqa 296(%rsp), %xmm14
-pmuludq %xmm9, %xmm13
-pmuludq 120(%rsp), %xmm9
-movdqa %xmm15, 72(%rsp)
+movaps 248(%rsp), %xmm8
+pmuludq %xmm15, %xmm10
+paddq %xmm11, %xmm2
+pmuludq %xmm12, %xmm4
+paddq %xmm14, %xmm5
+movaps 200(%rsp), %xmm11
+movaps 248(%rsp), %xmm14
+pmuludq %xmm15, %xmm8
+pmuludq 248(%rsp), %xmm12
+pmuludq %xmm9, %xmm11
 paddq %xmm10, %xmm1
-movdqa 216(%rsp), %xmm15
-pmuludq %xmm7, %xmm14
-movdqa %xmm6, %xmm10
-paddq %xmm9, %xmm1
-pmuludq %xmm7, %xmm15
-paddq %xmm13, %xmm0
-paddq 72(%rsp), %xmm3
-movdqa 120(%rsp), %xmm13
-psllq $12, %xmm10
-paddq %xmm14, %xmm2
-movdqa %xmm5, %xmm14
-pand %xmm8, %xmm14
-pmuludq %xmm7, %xmm13
-paddq %xmm15, %xmm0
-movdqa %xmm14, 248(%rsp)
-movdqa %xmm8, %xmm14
-psrlq $52, %xmm8
-movdqu (%rax), %xmm9
-por %xmm10, %xmm8
-pmuludq 24(%rsp), %xmm7
-movdqu 16(%rax), %xmm10
-paddq %xmm13, %xmm3
-pxor %xmm13, %xmm13
-movdqa %xmm9, %xmm15
-paddq %xmm7, %xmm1
-movdqa %xmm6, %xmm7
-movdqa %xmm10, -72(%rsp)
-punpckldq %xmm10, %xmm15
-movdqa %xmm15, %xmm10
-punpckldq %xmm13, %xmm10
-punpckhdq -72(%rsp), %xmm9
-psrlq $40, %xmm6
-movdqa %xmm10, 72(%rsp)
-movdqa %xmm9, %xmm10
-punpckhdq %xmm13, %xmm9
-psllq $18, %xmm9
-paddq 72(%rsp), %xmm4
-addq $64, %rax
-paddq %xmm9, %xmm3
-movdqa 40(%rsp), %xmm9
-cmpq $63, %rcx
-punpckhdq %xmm13, %xmm15
-psllq $6, %xmm15
-punpckldq %xmm13, %xmm10
-paddq %xmm15, %xmm2
-psllq $12, %xmm10
-por 168(%rsp), %xmm6
-pmuludq %xmm6, %xmm9
-movdqa 88(%rsp), %xmm15
-paddq %xmm10, %xmm0
-movdqa 88(%rsp), %xmm13
-psrlq $14, %xmm7
-pand %xmm5, %xmm8
-movdqa 184(%rsp), %xmm10
-pand %xmm5, %xmm7
-pmuludq %xmm7, %xmm15
-paddq %xmm9, %xmm4
-pmuludq %xmm6, %xmm13
-movdqa 184(%rsp), %xmm9
-paddq 168(%rsp), %xmm1
-pmuludq %xmm7, %xmm10
-pmuludq %xmm6, %xmm9
-paddq %xmm15, %xmm4
-movdqa 184(%rsp), %xmm15
-paddq %xmm13, %xmm2
-psrlq $26, %xmm14
-movdqa 264(%rsp), %xmm13
+movaps 248(%rsp), %xmm10
+pmuludq 280(%rsp), %xmm15
+pmuludq %xmm3, %xmm14
+paddq %xmm15, %xmm12
+paddq %xmm8, %xmm4
+pmuludq %xmm13, %xmm10
+movq 24(%rax), %xmm15
+movaps 248(%rsp), %xmm8
+paddq %xmm11, %xmm2
+movaps %xmm3, %xmm11
+movaps 280(%rsp), %xmm3
+paddq %xmm14, %xmm5
+pmuludq %xmm9, %xmm8
 paddq %xmm10, %xmm2
-pmuludq %xmm8, %xmm15
-pand %xmm5, %xmm14
-paddq %xmm9, %xmm0
-pmuludq %xmm6, %xmm13
-movdqa 264(%rsp), %xmm9
-movdqa 264(%rsp), %xmm10
-pmuludq %xmm11, %xmm6
-pmuludq %xmm8, %xmm9
-paddq %xmm15, %xmm4
-movdqa 264(%rsp), %xmm15
-pmuludq %xmm14, %xmm10
-paddq %xmm13, %xmm3
-movdqa %xmm7, %xmm13
-pmuludq %xmm7, %xmm15
-paddq %xmm6, %xmm1
-movdqa 312(%rsp), %xmm6
-paddq %xmm9, %xmm2
-pmuludq %xmm11, %xmm13
-movdqa 248(%rsp), %xmm9
-paddq %xmm10, %xmm4
-pmuludq %xmm8, %xmm6
-pmuludq 312(%rsp), %xmm7
-paddq %xmm15, %xmm0
-movdqa %xmm9, %xmm10
-movdqa %xmm14, %xmm15
-pmuludq %xmm11, %xmm10
-paddq %xmm13, %xmm3
-movdqa %xmm8, %xmm13
-pmuludq %xmm11, %xmm13
-paddq %xmm6, %xmm3
-paddq %xmm7, %xmm1
-movdqa 232(%rsp), %xmm6
-pmuludq %xmm11, %xmm15
-pmuludq 232(%rsp), %xmm8
-paddq %xmm10, %xmm4
+movq 16(%rax), %xmm14
+movaps 280(%rsp), %xmm10
+pmuludq %xmm9, %xmm3
+pmuludq 216(%rsp), %xmm9
+paddq %xmm9, %xmm12
 paddq %xmm8, %xmm1
-movdqa 312(%rsp), %xmm10
-paddq %xmm13, %xmm0
-pmuludq %xmm14, %xmm6
-movdqa 312(%rsp), %xmm13
-pmuludq %xmm9, %xmm10
-paddq %xmm15, %xmm2
-movdqa 232(%rsp), %xmm7
-pmuludq %xmm14, %xmm13
-pmuludq 152(%rsp), %xmm14
-paddq %xmm14, %xmm1
-pmuludq %xmm9, %xmm7
-paddq %xmm6, %xmm3
+movq (%rax), %xmm8
+pmuludq %xmm11, %xmm10
+paddq %xmm3, %xmm4
+movaps 216(%rsp), %xmm3
+punpcklqdq %xmm14, %xmm8
+movaps 280(%rsp), %xmm14
+pmuludq %xmm13, %xmm3
 paddq %xmm10, %xmm2
-movdqa 152(%rsp), %xmm10
-paddq %xmm13, %xmm0
-pmuludq %xmm9, %xmm10
-paddq %xmm7, %xmm0
-movdqa %xmm4, %xmm7
-psrlq $26, %xmm7
-pmuludq 56(%rsp), %xmm9
-pand %xmm5, %xmm4
-paddq %xmm7, %xmm2
+movq 8(%rax), %xmm10
+pmuludq %xmm13, %xmm14
+pmuludq 136(%rsp), %xmm13
+paddq %xmm13, %xmm12
+punpcklqdq %xmm15, %xmm10
+movaps %xmm10, %xmm9
+movaps 216(%rsp), %xmm15
+paddq %xmm3, %xmm4
+psllq $12, %xmm9
+movaps %xmm0, %xmm3
+paddq %xmm14, %xmm1
+pmuludq %xmm11, %xmm15
+pand %xmm8, %xmm3
+movaps 136(%rsp), %xmm14
+movaps %xmm3, -40(%rsp)
+movaps %xmm8, %xmm3
+movdqu 48(%rax), %xmm13
+psrlq $52, %xmm8
+pmuludq %xmm11, %xmm14
+paddq %xmm15, %xmm1
+por %xmm9, %xmm8
+pmuludq 24(%rsp), %xmm11
+paddq %xmm11, %xmm12
+movdqu 32(%rax), %xmm11
+movaps %xmm10, %xmm9
+psrlq $40, %xmm10
+pand %xmm0, %xmm8
+movaps %xmm11, %xmm15
+paddq %xmm14, %xmm4
+xorps %xmm14, %xmm14
+punpckldq %xmm13, %xmm15
+psrlq $14, %xmm9
+addq $64, %rax
+pand %xmm0, %xmm9
+psrlq $26, %xmm3
+cmpq $63, %rcx
+por 312(%rsp), %xmm10
+movaps %xmm13, -72(%rsp)
+movaps %xmm15, %xmm13
+punpckldq %xmm14, %xmm13
+punpckhdq -72(%rsp), %xmm11
+movaps %xmm13, -56(%rsp)
+movaps %xmm11, %xmm13
+punpckhdq %xmm14, %xmm11
+pand %xmm0, %xmm3
+psllq $18, %xmm11
+punpckhdq %xmm14, %xmm15
+punpckldq %xmm14, %xmm13
+paddq %xmm11, %xmm4
+movaps -8(%rsp), %xmm11
+psllq $6, %xmm15
+psllq $12, %xmm13
+movaps 88(%rsp), %xmm14
+paddq %xmm15, %xmm2
+pmuludq %xmm10, %xmm11
+paddq %xmm13, %xmm1
+movaps -8(%rsp), %xmm13
+pmuludq %xmm10, %xmm14
+paddq -56(%rsp), %xmm5
+paddq 312(%rsp), %xmm12
+pmuludq %xmm9, %xmm13
+movaps 104(%rsp), %xmm15
+paddq %xmm11, %xmm2
+movaps 184(%rsp), %xmm11
+paddq %xmm14, %xmm5
+movaps 104(%rsp), %xmm14
+pmuludq %xmm9, %xmm15
+pmuludq %xmm10, %xmm11
+paddq %xmm13, %xmm5
+movaps 104(%rsp), %xmm13
+pmuludq %xmm10, %xmm14
+pmuludq 232(%rsp), %xmm10
+paddq %xmm10, %xmm12
+pmuludq %xmm8, %xmm13
+paddq %xmm15, %xmm2
+movaps %xmm8, %xmm10
+paddq %xmm11, %xmm4
+pmuludq %xmm7, %xmm10
+movaps 232(%rsp), %xmm11
+movaps 184(%rsp), %xmm15
+paddq %xmm14, %xmm1
+pmuludq %xmm9, %xmm11
+paddq %xmm13, %xmm5
+movaps 184(%rsp), %xmm13
+movaps 184(%rsp), %xmm14
+pmuludq %xmm3, %xmm15
+pmuludq %xmm9, %xmm13
+paddq %xmm11, %xmm4
+pmuludq %xmm8, %xmm14
+movaps 232(%rsp), %xmm11
+paddq %xmm10, %xmm4
+paddq %xmm15, %xmm5
+pmuludq %xmm7, %xmm9
+pmuludq %xmm8, %xmm11
+paddq %xmm13, %xmm1
+movaps 232(%rsp), %xmm13
+movaps 296(%rsp), %xmm10
+paddq %xmm14, %xmm2
+pmuludq 296(%rsp), %xmm8
+movaps -40(%rsp), %xmm14
+pmuludq %xmm3, %xmm13
+paddq %xmm9, %xmm12
+paddq %xmm11, %xmm1
+movaps %xmm3, %xmm11
+paddq %xmm8, %xmm12
+movaps 232(%rsp), %xmm15
+pmuludq %xmm7, %xmm11
+pmuludq %xmm3, %xmm10
+paddq %xmm13, %xmm2
+movaps %xmm14, %xmm13
+movaps 296(%rsp), %xmm9
+pmuludq %xmm14, %xmm15
+pmuludq 264(%rsp), %xmm3
+paddq %xmm11, %xmm1
+pmuludq %xmm7, %xmm13
+paddq %xmm3, %xmm12
+movaps 264(%rsp), %xmm11
+paddq %xmm10, %xmm4
+pmuludq %xmm14, %xmm9
+paddq %xmm15, %xmm5
+pmuludq %xmm14, %xmm11
+movaps %xmm5, %xmm8
+paddq %xmm13, %xmm2
+psrlq $26, %xmm8
 paddq %xmm9, %xmm1
-paddq %xmm10, %xmm3
-movdqa %xmm2, %xmm7
-movdqa %xmm2, %xmm9
-movdqa %xmm3, %xmm6
-psrlq $26, %xmm7
-pand %xmm5, %xmm3
-psrlq $26, %xmm6
-paddq %xmm7, %xmm0
-pand %xmm5, %xmm9
-paddq %xmm6, %xmm1
-movdqa %xmm0, %xmm10
-movdqa %xmm1, %xmm6
-pand %xmm5, %xmm10
-pand %xmm5, %xmm1
-psrlq $26, %xmm6
-pmuludq 136(%rsp), %xmm6
-paddq %xmm6, %xmm4
-movdqa %xmm0, %xmm6
-psrlq $26, %xmm6
-movdqa %xmm4, %xmm2
-movdqa %xmm4, %xmm7
-paddq %xmm6, %xmm3
+pand %xmm0, %xmm5
+pmuludq 152(%rsp), %xmm14
+paddq %xmm14, %xmm12
+paddq %xmm8, %xmm2
+paddq %xmm11, %xmm4
+movaps %xmm2, %xmm9
+movaps %xmm2, %xmm8
+movaps %xmm4, %xmm3
+psrlq $26, %xmm9
+pand %xmm0, %xmm4
+psrlq $26, %xmm3
+paddq %xmm9, %xmm1
+pand %xmm0, %xmm8
+paddq %xmm3, %xmm12
+movaps %xmm1, %xmm10
+movaps %xmm1, %xmm9
+movaps %xmm12, %xmm3
+psrlq $26, %xmm10
+pand %xmm0, %xmm12
+psrlq $26, %xmm3
+paddq %xmm10, %xmm4
+pand %xmm0, %xmm9
+pmuludq %xmm6, %xmm3
+movaps %xmm4, %xmm1
+movaps %xmm4, %xmm15
+psrlq $26, %xmm1
+pand %xmm0, %xmm15
+paddq %xmm1, %xmm12
+paddq %xmm3, %xmm5
+movaps %xmm5, %xmm2
+movaps %xmm5, %xmm3
 psrlq $26, %xmm2
-pand %xmm5, %xmm7
-movdqa %xmm3, %xmm0
-paddq %xmm2, %xmm9
-pand %xmm5, %xmm3
-psrlq $26, %xmm0
-paddq %xmm0, %xmm1
-ja poly1305_blocks_sse2_13
+pand %xmm0, %xmm3
+paddq %xmm2, %xmm8
+ja poly1305_blocks_sse2_20
 leaq -64(%rdx), %rax
-movdqa %xmm3, %xmm6
 andl $63, %edx
 andq $-64, %rax
 leaq 64(%rsi,%rax), %rsi
-poly1305_blocks_sse2_7:
+poly1305_blocks_sse2_19:
 cmpq $31, %rdx
-jbe poly1305_blocks_sse2_9
-movdqa -24(%rsp), %xmm13
-movdqa %xmm6, %xmm0
-movdqa %xmm6, %xmm3
-movdqa 40(%rsp), %xmm11
-movdqa %xmm1, %xmm12
+jbe poly1305_blocks_sse2_21
+movaps 56(%rsp), %xmm11
+movaps %xmm15, %xmm1
+movaps %xmm15, %xmm14
+movaps 72(%rsp), %xmm5
+movaps %xmm12, %xmm4
+movaps %xmm15, %xmm10
+movaps 88(%rsp), %xmm2
+pmuludq %xmm11, %xmm14
+movaps %xmm8, %xmm15
+pmuludq %xmm5, %xmm1
+movaps 40(%rsp), %xmm13
 testq %rsi, %rsi
-movdqa -40(%rsp), %xmm2
-pmuludq %xmm13, %xmm0
-movdqa %xmm1, %xmm8
-pmuludq %xmm1, %xmm11
-movdqa %xmm10, %xmm4
-movdqa %xmm1, %xmm14
-pmuludq %xmm2, %xmm3
-movdqa %xmm6, %xmm15
-pmuludq %xmm1, %xmm13
-movdqa %xmm7, %xmm1
-pmuludq %xmm2, %xmm12
-paddq %xmm0, %xmm11
-movdqa -56(%rsp), %xmm0
-pmuludq %xmm10, %xmm2
-paddq %xmm3, %xmm13
-pmuludq %xmm0, %xmm4
-movdqa %xmm9, %xmm3
-pmuludq %xmm0, %xmm3
-paddq %xmm2, %xmm11
-pmuludq %xmm0, %xmm8
-movdqa %xmm6, %xmm2
-pmuludq %xmm0, %xmm2
-movdqa -8(%rsp), %xmm0
-paddq %xmm4, %xmm13
-movdqa 312(%rsp), %xmm4
-paddq %xmm3, %xmm11
-pmuludq 312(%rsp), %xmm6
-movdqa 312(%rsp), %xmm3
-pmuludq %xmm0, %xmm1
-paddq %xmm2, %xmm12
-pmuludq %xmm0, %xmm15
-movdqa %xmm9, %xmm2
-pmuludq %xmm0, %xmm2
-pmuludq %xmm7, %xmm3
-paddq %xmm1, %xmm11
-movdqa 232(%rsp), %xmm1
-pmuludq %xmm0, %xmm14
-paddq %xmm15, %xmm8
-pmuludq %xmm10, %xmm0
-paddq %xmm2, %xmm13
-movdqa 312(%rsp), %xmm2
-pmuludq %xmm10, %xmm4
-paddq %xmm3, %xmm13
-movdqa 152(%rsp), %xmm3
-pmuludq %xmm9, %xmm2
-paddq %xmm6, %xmm14
-pmuludq 232(%rsp), %xmm10
-paddq %xmm0, %xmm12
-pmuludq %xmm9, %xmm1
-paddq %xmm10, %xmm14
-movdqa 232(%rsp), %xmm0
-pmuludq %xmm7, %xmm3
-paddq %xmm4, %xmm8
-pmuludq 152(%rsp), %xmm9
-paddq %xmm2, %xmm12
-paddq %xmm9, %xmm14
-pmuludq %xmm7, %xmm0
-paddq %xmm1, %xmm8
-pmuludq 56(%rsp), %xmm7
-paddq %xmm3, %xmm8
-paddq %xmm7, %xmm14
-paddq %xmm0, %xmm12
-je poly1305_blocks_sse2_10
-movdqu (%rsi), %xmm1
-pxor %xmm0, %xmm0
-paddq 168(%rsp), %xmm14
-movdqu 16(%rsi), %xmm2
-movdqa %xmm1, %xmm3
-punpckldq %xmm2, %xmm3
-punpckhdq %xmm2, %xmm1
-movdqa %xmm3, %xmm4
-movdqa %xmm1, %xmm2
-punpckldq %xmm0, %xmm4
-punpckhdq %xmm0, %xmm3
-punpckhdq %xmm0, %xmm1
-punpckldq %xmm0, %xmm2
-movdqa %xmm2, %xmm0
-psllq $6, %xmm3
-paddq %xmm4, %xmm11
-psllq $12, %xmm0
-paddq %xmm3, %xmm13
-psllq $18, %xmm1
-paddq %xmm0, %xmm12
-paddq %xmm1, %xmm8
-poly1305_blocks_sse2_10:
-movdqa %xmm11, %xmm9
-movdqa %xmm8, %xmm1
-movdqa %xmm11, %xmm7
+pmuludq %xmm12, %xmm2
+pmuludq %xmm12, %xmm5
+pmuludq %xmm11, %xmm4
+paddq %xmm1, %xmm2
+pmuludq %xmm9, %xmm11
+movaps %xmm12, %xmm1
+paddq %xmm14, %xmm5
+pmuludq %xmm13, %xmm15
+movaps %xmm9, %xmm14
+pmuludq %xmm13, %xmm14
+pmuludq %xmm13, %xmm1
+paddq %xmm11, %xmm2
+movaps 168(%rsp), %xmm11
+pmuludq %xmm10, %xmm13
+paddq %xmm15, %xmm2
+movaps %xmm9, %xmm15
+paddq %xmm14, %xmm5
+pmuludq %xmm11, %xmm12
+movaps %xmm3, %xmm14
+pmuludq %xmm11, %xmm14
+movaps %xmm13, 248(%rsp)
+movaps %xmm10, %xmm13
+pmuludq %xmm7, %xmm15
+paddq 248(%rsp), %xmm4
+pmuludq %xmm11, %xmm13
+pmuludq %xmm7, %xmm10
+paddq %xmm14, %xmm2
+movaps %xmm13, 280(%rsp)
+movaps %xmm8, %xmm13
+pmuludq %xmm11, %xmm13
+paddq %xmm10, %xmm12
+movaps 296(%rsp), %xmm10
+paddq 280(%rsp), %xmm1
+pmuludq %xmm9, %xmm11
+pmuludq 296(%rsp), %xmm9
+pmuludq %xmm3, %xmm10
+paddq %xmm9, %xmm12
+paddq %xmm13, %xmm5
+movaps %xmm3, %xmm13
+paddq %xmm15, %xmm1
+pmuludq %xmm7, %xmm13
+paddq %xmm11, %xmm4
+movaps 296(%rsp), %xmm11
+pmuludq %xmm8, %xmm7
+pmuludq %xmm8, %xmm11
+pmuludq 264(%rsp), %xmm8
+paddq %xmm8, %xmm12
+paddq %xmm13, %xmm5
+paddq %xmm7, %xmm4
+movaps 264(%rsp), %xmm7
+paddq %xmm11, %xmm1
+paddq %xmm10, %xmm4
+pmuludq %xmm3, %xmm7
+pmuludq 152(%rsp), %xmm3
+paddq %xmm3, %xmm12
+paddq %xmm7, %xmm1
+je poly1305_blocks_sse2_22
+movdqu (%rsi), %xmm7
+xorps %xmm3, %xmm3
+paddq 312(%rsp), %xmm12
+movdqu 16(%rsi), %xmm8
+movaps %xmm7, %xmm9
+punpckldq %xmm8, %xmm9
+punpckhdq %xmm8, %xmm7
+movaps %xmm9, %xmm10
+movaps %xmm7, %xmm8
+punpckldq %xmm3, %xmm10
+punpckhdq %xmm3, %xmm9
+punpckhdq %xmm3, %xmm7
+punpckldq %xmm3, %xmm8
+movaps %xmm8, %xmm3
+psllq $6, %xmm9
+paddq %xmm10, %xmm2
+psllq $12, %xmm3
+paddq %xmm9, %xmm5
+psllq $18, %xmm7
+paddq %xmm3, %xmm4
+paddq %xmm7, %xmm1
+poly1305_blocks_sse2_22:
+movaps %xmm2, %xmm8
+movaps %xmm1, %xmm3
+movaps %xmm1, %xmm15
+psrlq $26, %xmm8
+pand %xmm0, %xmm2
+pand %xmm0, %xmm15
+psrlq $26, %xmm3
+paddq %xmm5, %xmm8
+paddq %xmm12, %xmm3
+movaps %xmm8, %xmm9
+pand %xmm0, %xmm8
+movaps %xmm3, %xmm1
 psrlq $26, %xmm9
-movdqa %xmm8, %xmm6
-pand %xmm5, %xmm7
-paddq %xmm13, %xmm9
+movaps %xmm3, %xmm12
 psrlq $26, %xmm1
-pand %xmm5, %xmm6
-movdqa %xmm9, %xmm10
-paddq %xmm14, %xmm1
-pand %xmm5, %xmm9
-psrlq $26, %xmm10
-movdqa %xmm1, %xmm0
-pand %xmm5, %xmm1
-paddq %xmm12, %xmm10
-psrlq $26, %xmm0
-pmuludq 136(%rsp), %xmm0
-movdqa %xmm10, %xmm2
-paddq %xmm0, %xmm7
-psrlq $26, %xmm2
-movdqa %xmm7, %xmm0
-pand %xmm5, %xmm10
-paddq %xmm2, %xmm6
-psrlq $26, %xmm0
-pand %xmm5, %xmm7
-movdqa %xmm6, %xmm2
-paddq %xmm0, %xmm9
-pand %xmm5, %xmm6
-psrlq $26, %xmm2
-paddq %xmm2, %xmm1
-poly1305_blocks_sse2_9:
+paddq %xmm4, %xmm9
+pand %xmm0, %xmm12
+pmuludq %xmm1, %xmm6
+movaps %xmm9, %xmm3
+pand %xmm0, %xmm9
+psrlq $26, %xmm3
+paddq %xmm3, %xmm15
+paddq %xmm6, %xmm2
+movaps %xmm15, %xmm3
+pand %xmm0, %xmm15
+movaps %xmm2, %xmm1
+psrlq $26, %xmm3
+psrlq $26, %xmm1
+paddq %xmm3, %xmm12
+movaps %xmm0, %xmm3
+paddq %xmm1, %xmm8
+pand %xmm2, %xmm3
+poly1305_blocks_sse2_21:
 testq %rsi, %rsi
-je poly1305_blocks_sse2_11
-movdqa %xmm7, 0(%rdi)
-movdqa %xmm9, 16(%rdi)
-movdqa %xmm10, 32(%rdi)
-movdqa %xmm6, 48(%rdi)
-movdqa %xmm1, 64(%rdi)
-movq -8(%rbp), %rbx
-leave
-ret
-poly1305_blocks_sse2_5:
-movdqa 0(%rdi), %xmm7
-movdqa 16(%rdi), %xmm9
-movdqa 32(%rdi), %xmm10
-movdqa 48(%rdi), %xmm6
-movdqa 64(%rdi), %xmm1
-jmp poly1305_blocks_sse2_6
-poly1305_blocks_sse2_11:
-movdqa %xmm7, %xmm0
-movdqa %xmm9, %xmm2
-movdqa %xmm6, %xmm3
+je poly1305_blocks_sse2_23
+pshufd $8, %xmm3, %xmm3
+pshufd $8, %xmm8, %xmm8
+pshufd $8, %xmm9, %xmm9
+pshufd $8, %xmm15, %xmm15
+pshufd $8, %xmm12, %xmm12
+punpcklqdq %xmm8, %xmm3
+punpcklqdq %xmm15, %xmm9
+movdqu %xmm3, (%rdi)
+movdqu %xmm9, 16(%rdi)
+movq %xmm12, 32(%rdi)
+jmp poly1305_blocks_sse2_10
+poly1305_blocks_sse2_23:
+movaps %xmm3, %xmm0
+movaps %xmm8, %xmm4
+movaps %xmm9, %xmm2
 psrldq $8, %xmm0
-movabsq $4398046511103, %rbx
-paddq %xmm0, %xmm7
+movaps %xmm15, %xmm10
+paddq %xmm0, %xmm3
+psrldq $8, %xmm4
+movaps %xmm12, %xmm0
+movd %xmm3, %edx
+paddq %xmm4, %xmm8
 psrldq $8, %xmm2
-movdqa %xmm10, %xmm0
-movd %xmm7, %edx
-paddq %xmm2, %xmm9
-psrldq $8, %xmm0
 movl %edx, %ecx
-movd %xmm9, %eax
-paddq %xmm0, %xmm10
+movd %xmm8, %eax
+paddq %xmm2, %xmm9
 shrl $26, %ecx
-psrldq $8, %xmm3
-movdqa %xmm1, %xmm0
+psrldq $8, %xmm10
+andl $67108863, %edx
 addl %ecx, %eax
-movd %xmm10, %ecx
-paddq %xmm3, %xmm6
+movd %xmm9, %ecx
+paddq %xmm10, %xmm15
 movl %eax, %r9d
 shrl $26, %eax
 psrldq $8, %xmm0
 addl %ecx, %eax
-movd %xmm6, %ecx
-paddq %xmm0, %xmm1
+movd %xmm15, %ecx
+paddq %xmm0, %xmm12
 movl %eax, %esi
 andl $67108863, %r9d
-movd %xmm1, %r10d
+movd %xmm12, %r10d
 shrl $26, %esi
 andl $67108863, %eax
-andl $67108863, %edx
 addl %ecx, %esi
 salq $8, %rax
 movl %r9d, %ecx
@@ -997,95 +750,215 @@ salq $26, %rcx
 orq %r8, %rsi
 salq $34, %r9
 orq %rdx, %rcx
-movq %rsi, %r8
+movq %rsi, %r11
 shrq $42, %rsi
 movabsq $17592186044415, %rdx
 orq %r9, %rax
-andq %rbx, %r8
-leaq (%rsi,%rsi,4), %rsi
+movabsq $4398046511103, %r8
 andq %rdx, %rcx
 andq %rdx, %rax
-movabsq $-4398046511104, %r10
+andq %r8, %r11
+leaq (%rsi,%rsi,4), %rsi
 addq %rsi, %rcx
-movq %rcx, %rsi
+movq %rcx, %r10
 shrq $44, %rcx
 addq %rcx, %rax
-andq %rdx, %rsi
-movq %rax, %rcx
+andq %rdx, %r10
+movq %rax, %r9
 shrq $44, %rax
-addq %r8, %rax
-andq %rdx, %rcx
-andq %rax, %rbx
+addq %r11, %rax
+andq %rdx, %r9
+movabsq $-4398046511104, %r11
+movq %rax, %rcx
+andq %r8, %rcx
 shrq $42, %rax
-leaq (%rsi,%rax,4), %rsi
-addq %rbx, %r10
-addq %rax, %rsi
+leaq (%rax,%rax,4), %rsi
+addq %rcx, %r11
+addq %r10, %rsi
 movq %rsi, %r8
 shrq $44, %rsi
 andq %rdx, %r8
-addq %rcx, %rsi
+addq %r9, %rsi
 leaq 5(%r8), %r9
-movq %r9, %r11
+movq %r9, %rbx
 andq %rdx, %r9
-shrq $44, %r11
-addq %rsi, %r11
-movq %r11, %rax
-andq %r11, %rdx
+shrq $44, %rbx
+addq %rsi, %rbx
+movq %rbx, %rax
+andq %rbx, %rdx
 shrq $44, %rax
-addq %rax, %r10
-movq %r10, %rax
+addq %rax, %r11
+movq %r11, %rax
 shrq $63, %rax
-subq $1, %rax
-movq %rax, %rcx
+decq %rax
+movq %rax, %r10
 andq %rax, %r9
 andq %rax, %rdx
-notq %rcx
-andq %r10, %rax
-andq %rcx, %r8
-andq %rcx, %rsi
-andq %rbx, %rcx
+notq %r10
+andq %r11, %rax
+andq %r10, %r8
+andq %r10, %rsi
+andq %r10, %rcx
 orq %r9, %r8
 orq %rdx, %rsi
 orq %rax, %rcx
-movq %r8, 0(%rdi)
+movq %r8, (%rdi)
 movq %rsi, 8(%rdi)
 movq %rcx, 16(%rdi)
+poly1305_blocks_sse2_10:
 movq -8(%rbp), %rbx
 leave
 ret
-ENDFN(poly1305_blocks)
+FN_END poly1305_blocks_sse2
 
+GLOBAL_HIDDEN_FN poly1305_finish_ext_sse2
+poly1305_finish_ext_sse2_local:
+pushq %r12
+movq %rcx, %r12
+pushq %rbp
+movq %rdx, %rbp
+pushq %rbx
+movq %rdi, %rbx
+subq $32, %rsp
+testq %rdx, %rdx
+je poly1305_finish_ext_sse2_27
+xorl %eax, %eax
+movq %rsp, %rdi
+movl $8, %ecx
+rep stosl
+subq %rsp, %rsi
+testb $16, %dl
+movq %rsp, %rax
+je poly1305_finish_ext_sse2_28
+movdqu (%rsp,%rsi), %xmm0
+addq $16, %rax
+movaps %xmm0, (%rsp)
+poly1305_finish_ext_sse2_28:
+testb $8, %bpl
+je poly1305_finish_ext_sse2_29
+movq (%rax,%rsi), %rdx
+movq %rdx, (%rax)
+addq $8, %rax
+poly1305_finish_ext_sse2_29:
+testb $4, %bpl
+je poly1305_finish_ext_sse2_30
+movl (%rax,%rsi), %edx
+movl %edx, (%rax)
+addq $4, %rax
+poly1305_finish_ext_sse2_30:
+testb $2, %bpl
+je poly1305_finish_ext_sse2_31
+movw (%rax,%rsi), %dx
+movw %dx, (%rax)
+addq $2, %rax
+poly1305_finish_ext_sse2_31:
+testb $1, %bpl
+je poly1305_finish_ext_sse2_32
+movb (%rax,%rsi), %dl
+movb %dl, (%rax)
+poly1305_finish_ext_sse2_32:
+cmpq $16, %rbp
+je poly1305_finish_ext_sse2_33
+movb $1, (%rsp,%rbp)
+poly1305_finish_ext_sse2_33:
+cmpq $16, %rbp
+movl $32, %edx
+movq %rsp, %rsi
+sbbq %rax, %rax
+movq %rbx, %rdi
+andl $4, %eax
+addq $4, %rax
+orq %rax, 120(%rbx)
+call poly1305_blocks_sse2_local
+poly1305_finish_ext_sse2_27:
+movq 120(%rbx), %rax
+testb $1, %al
+je poly1305_finish_ext_sse2_35
+decq %rbp
+cmpq $15, %rbp
+jbe poly1305_finish_ext_sse2_36
+orq $16, %rax
+jmp poly1305_finish_ext_sse2_40
+poly1305_finish_ext_sse2_36:
+orq $32, %rax
+poly1305_finish_ext_sse2_40:
+movq %rax, 120(%rbx)
+movl $32, %edx
+xorl %esi, %esi
+movq %rbx, %rdi
+call poly1305_blocks_sse2_local
+poly1305_finish_ext_sse2_35:
+movq 8(%rbx), %rax
+movq 112(%rbx), %rsi
+movq %rax, %rdx
+movq %rax, %rcx
+movq 16(%rbx), %rax
+shrq $20, %rcx
+salq $44, %rdx
+orq (%rbx), %rdx
+salq $24, %rax
+orq %rcx, %rax
+movq 104(%rbx), %rcx
+addq %rcx, %rdx
+adcq %rsi, %rax
+xorps %xmm0, %xmm0
+movdqu %xmm0, (%rbx)
+movdqu %xmm0, 16(%rbx)
+movdqu %xmm0, 32(%rbx)
+movdqu %xmm0, 48(%rbx)
+movdqu %xmm0, 64(%rbx)
+movdqu %xmm0, 80(%rbx)
+movdqu %xmm0, 96(%rbx)
+movdqu %xmm0, 112(%rbx)
+movq %rdx, (%r12)
+movq %rax, 8(%r12)
+addq $32, %rsp
+popq %rbx
+popq %rbp
+popq %r12
+ret
+FN_END poly1305_finish_ext_sse2
 
-FN(poly1305_auth)
+GLOBAL_HIDDEN_FN poly1305_auth_sse2
 pushq %rbp
 movq %rsp, %rbp
-subq $272, %rsp
-andq $~63, %rsp
-movq %rdi, 248(%rsp)
-movq %rsi, 256(%rsp)
-movq %rdx, 264(%rsp)
-movq %rsp, %rdi
+pushq %r14
+pushq %r13
+movq %rdi, %r13
+pushq %r12
+movq %rsi, %r12
 movq %rcx, %rsi
-callq poly1305_init_ext_sse2_local
+pushq %rbx
+movq %rdx, %rbx
+andq $-64, %rsp
+movq %rbx, %r14
+addq $-128, %rsp
 movq %rsp, %rdi
-movq 256(%rsp), %rsi
-movq 264(%rsp), %rdx
-andq $~31, %rdx
-jz poly1305_auth_sse2_no_data
-callq poly1305_blocks_sse2_local
-poly1305_auth_sse2_no_data:
+call poly1305_init_ext_sse2_local
+andq $-32, %r14
+je poly1305_auth_sse2_42
+movq %r12, %rsi
+movq %r14, %rdx
 movq %rsp, %rdi
-movq 256(%rsp), %rsi
-movq 264(%rsp), %rdx
-movq %rdx, %rax
-andq $~31, %rax
-andq $31, %rdx
-addq %rax, %rsi
-movq 248(%rsp), %rcx
-callq poly1305_finish_ext_sse2_local
-movq %rbp, %rsp
+call poly1305_blocks_sse2_local
+addq %r14, %r12
+subq %r14, %rbx
+poly1305_auth_sse2_42:
+movq %r13, %rcx
+movq %rbx, %rdx
+movq %r12, %rsi
+movq %rsp, %rdi
+call poly1305_finish_ext_sse2_local
+leaq -32(%rbp), %rsp
+popq %rbx
+popq %r12
+popq %r13
+popq %r14
 popq %rbp
 ret
-ENDFN(poly1305_auth)
+FN_END poly1305_auth_sse2
 
-ENDFILE()
+
+
+
+

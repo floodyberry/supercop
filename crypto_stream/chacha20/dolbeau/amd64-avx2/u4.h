@@ -1,5 +1,5 @@
 /*
-u4.h version $Date: 2014/09/07 16:10:57 $
+u4.h version $Date: 2014/09/24 12:09:52 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -98,8 +98,8 @@ if (bytes>=256) {
     in12 = x[12];
     in13 = x[13];
     u64 in1213 = ((u64)in12) | (((u64)in13) << 32);
-    t12 = _mm_broadcastq_epi64(_mm_cvtsi64_si128(in1213));
-    t13 = _mm_broadcastq_epi64(_mm_cvtsi64_si128(in1213));
+    t12 = _mm_set1_epi64x(in1213);
+    t13 = _mm_set1_epi64x(in1213);
 
     x_12 = _mm_add_epi64(addv12, t12);
     x_13 = _mm_add_epi64(addv13, t13);

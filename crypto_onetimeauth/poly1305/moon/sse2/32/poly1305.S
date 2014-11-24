@@ -1,44 +1,904 @@
-#define IS_LINUX_ELF (defined(__linux__) && defined(__ELF__))
+#include "x86.inc"
 
-#define GLOBAL3(n,s) .globl n##_##s; .globl _##n##_##s
-#define GLOBAL2(n,s) GLOBAL3(n,s)
-#define GLOBAL(n) GLOBAL2(n,POLY1305_SUFFIX)
+SECTION_TEXT
 
-#define FN3(n,s) .p2align 4,,15; n##_##s:; _##n##_##s:
-#define FN2(n,s) FN3(n,s)
-#define FN(n) FN2(n,POLY1305_SUFFIX)
-
-#if (IS_LINUX_ELF)
-#define ENDFN3(n,s) .size n##_##s, .-n##_##s; .type n##_##s, @function;
-#define ENDFN2(n,s) ENDFN3(n,s)
-#define ENDFN(n) ENDFN2(n,POLY1305_SUFFIX)
-#else
-#define ENDFN(n)
-#endif
-
-/* NX indicator */
-#if (IS_LINUX_ELF)
-	#define ENDFILE() .section .note.GNU-stack,"",%progbits
-#else
-	#define ENDFILE()
-#endif
-
-#define POLY1305_SUFFIX sse2
-
-.text
-
-GLOBAL(poly1305_block_size)
-GLOBAL(poly1305_init_ext)
-GLOBAL(poly1305_blocks)
-GLOBAL(poly1305_finish_ext)
-GLOBAL(poly1305_auth)
-
-FN(poly1305_block_size)
+GLOBAL_HIDDEN_FN poly1305_block_size_sse2
 movl $32, %eax
 ret
-ENDFN(poly1305_block_size)
+FN_END poly1305_block_size_sse2
 
-FN(poly1305_init_ext)
+GLOBAL_HIDDEN_FN poly1305_auth_sse2
+poly1305_auth_sse2_local:
+pushl %ebp
+movl %esp, %ebp
+andl $-64, %esp
+pushl %esi
+pushl %edi
+pushl %ebx
+subl $244, %esp
+movl 16(%ebp), %esi
+lea 64(%esp), %eax
+movl %esi, %ecx
+movl 20(%ebp), %edx
+movl 12(%ebp), %edi
+call poly1305_init_ext_sse2_local
+poly1305_auth_sse2_2:
+movl %esi, %ebx
+andl $-32, %ebx
+je poly1305_auth_sse2_5
+poly1305_auth_sse2_3:
+movl %edi, %edx
+lea 64(%esp), %eax
+movl %ebx, %ecx
+call poly1305_blocks_sse2_local
+poly1305_auth_sse2_4:
+addl %ebx, %edi
+subl %ebx, %esi
+poly1305_auth_sse2_5:
+pushl 8(%ebp)
+pushl %esi
+pushl %edi
+lea 76(%esp), %eax
+pushl %eax
+call poly1305_finish_ext_sse2_local
+poly1305_auth_sse2_6:
+addl $260, %esp
+popl %ebx
+popl %edi
+popl %esi
+movl %ebp, %esp
+popl %ebp
+ret
+FN_END poly1305_auth_sse2
+
+GLOBAL_HIDDEN_FN poly1305_finish_ext_sse2
+poly1305_finish_ext_sse2_local:
+pushl %esi
+pushl %edi
+pushl %ebx
+pushl %ebp
+subl $60, %esp
+movl 88(%esp), %ebp
+testl %ebp, %ebp
+movl 80(%esp), %ebx
+je poly1305_finish_ext_sse2_18
+poly1305_finish_ext_sse2_2:
+pxor %xmm0, %xmm0
+movaps %xmm0, 16(%esp)
+movaps %xmm0, 32(%esp)
+poly1305_finish_ext_sse2_3:
+movl 84(%esp), %ecx
+lea 16(%esp), %edx
+subl %edx, %ecx
+testl $16, %ebp
+je poly1305_finish_ext_sse2_5
+poly1305_finish_ext_sse2_4:
+lea 32(%esp), %edx
+movdqu 16(%esp,%ecx), %xmm0
+movdqa %xmm0, 16(%esp)
+poly1305_finish_ext_sse2_5:
+testl $8, %ebp
+je poly1305_finish_ext_sse2_7
+poly1305_finish_ext_sse2_6:
+movl (%edx,%ecx), %esi
+movl 4(%edx,%ecx), %edi
+movl %esi, (%edx)
+movl %edi, 4(%edx)
+addl $8, %edx
+poly1305_finish_ext_sse2_7:
+testl $4, %ebp
+je poly1305_finish_ext_sse2_9
+poly1305_finish_ext_sse2_8:
+movl (%edx,%ecx), %esi
+movl %esi, (%edx)
+addl $4, %edx
+poly1305_finish_ext_sse2_9:
+testl $2, %ebp
+je poly1305_finish_ext_sse2_11
+poly1305_finish_ext_sse2_10:
+movzwl (%edx,%ecx), %esi
+movw %si, (%edx)
+addl $2, %edx
+poly1305_finish_ext_sse2_11:
+testl $1, %ebp
+je poly1305_finish_ext_sse2_13
+poly1305_finish_ext_sse2_12:
+movzbl (%edx,%ecx), %ecx
+movb %cl, (%edx)
+poly1305_finish_ext_sse2_13:
+cmpl $16, %ebp
+je poly1305_finish_ext_sse2_16
+poly1305_finish_ext_sse2_14:
+movb $1, 16(%esp,%ebp)
+jae poly1305_finish_ext_sse2_16
+poly1305_finish_ext_sse2_15:
+movl $8, %edx
+jmp poly1305_finish_ext_sse2_17
+poly1305_finish_ext_sse2_16:
+movl $4, %edx
+poly1305_finish_ext_sse2_17:
+orl %edx, 116(%ebx)
+movl %ebx, %eax
+movl $32, %ecx
+lea 16(%esp), %edx
+call poly1305_blocks_sse2_local
+poly1305_finish_ext_sse2_18:
+movl 116(%ebx), %edx
+testb $1, %dl
+je poly1305_finish_ext_sse2_24
+poly1305_finish_ext_sse2_19:
+testl %ebp, %ebp
+je poly1305_finish_ext_sse2_21
+poly1305_finish_ext_sse2_20:
+cmpl $16, %ebp
+jbe poly1305_finish_ext_sse2_22
+poly1305_finish_ext_sse2_21:
+orl $16, %edx
+movl %edx, 116(%ebx)
+jmp poly1305_finish_ext_sse2_23
+poly1305_finish_ext_sse2_22:
+orl $32, %edx
+movl %edx, 116(%ebx)
+poly1305_finish_ext_sse2_23:
+movl %ebx, %eax
+xorl %edx, %edx
+movl $32, %ecx
+call poly1305_blocks_sse2_local
+poly1305_finish_ext_sse2_24:
+movl 8(%ebx), %edx
+movl %edx, %eax
+movl 4(%ebx), %ecx
+movl %ecx, %esi
+shrl $6, %ecx
+shll $20, %eax
+pxor %xmm0, %xmm0
+movl 12(%ebx), %ebp
+orl %eax, %ecx
+movl %ebp, %eax
+shrl $12, %edx
+shll $14, %eax
+orl %eax, %edx
+movl 16(%ebx), %eax
+shll $26, %esi
+shrl $18, %ebp
+shll $8, %eax
+movl 92(%esp), %edi
+orl %eax, %ebp
+orl (%ebx), %esi
+addl 100(%ebx), %esi
+adcl 104(%ebx), %ecx
+adcl 108(%ebx), %edx
+adcl 112(%ebx), %ebp
+movdqu %xmm0, (%ebx)
+movdqu %xmm0, 16(%ebx)
+movdqu %xmm0, 32(%ebx)
+movdqu %xmm0, 48(%ebx)
+movdqu %xmm0, 64(%ebx)
+movdqu %xmm0, 80(%ebx)
+movdqu %xmm0, 96(%ebx)
+movdqu %xmm0, 112(%ebx)
+movl %esi, (%edi)
+movl %ecx, 4(%edi)
+movl %edx, 8(%edi)
+movl %ebp, 12(%edi)
+addl $60, %esp
+popl %ebp
+popl %ebx
+popl %edi
+popl %esi
+ret
+FN_END poly1305_finish_ext_sse2
+
+
+GLOBAL_HIDDEN_FN poly1305_blocks_sse2
+movl 4(%esp), %eax
+movl 8(%esp), %edx
+movl 12(%esp), %ecx
+poly1305_blocks_sse2_local:
+pushl %esi
+pushl %edi
+pushl %ebx
+subl $544, %esp
+movl $16777216, %ebx
+movl $67108863, %esi
+movl $5, %edi
+movd %ebx, %xmm0
+movd %esi, %xmm2
+movd %edi, %xmm4
+movl 116(%eax), %ebx
+testb $4, %bl
+pshufd $68, %xmm0, %xmm1
+pshufd $68, %xmm2, %xmm3
+pshufd $68, %xmm4, %xmm5
+movdqa %xmm1, 272(%esp)
+movdqa %xmm3, 256(%esp)
+movdqa %xmm5, 160(%esp)
+je poly1305_blocks_sse2_3
+poly1305_blocks_sse2_2:
+movdqa 272(%esp), %xmm0
+psrldq $8, %xmm0
+movdqa %xmm0, 272(%esp)
+poly1305_blocks_sse2_3:
+testb $8, %bl
+je poly1305_blocks_sse2_5
+poly1305_blocks_sse2_4:
+pxor %xmm0, %xmm0
+movdqa %xmm0, 272(%esp)
+poly1305_blocks_sse2_5:
+testb $1, %bl
+jne poly1305_blocks_sse2_7
+poly1305_blocks_sse2_6:
+movq 8(%edx), %xmm0
+orl $1, %ebx
+movq (%edx), %xmm1
+addl $-32, %ecx
+movhpd 24(%edx), %xmm0
+movdqa 256(%esp), %xmm4
+movaps %xmm0, %xmm2
+movhpd 16(%edx), %xmm1
+movdqa %xmm4, %xmm7
+pand %xmm1, %xmm7
+movaps %xmm1, %xmm6
+psrlq $52, %xmm1
+psllq $12, %xmm2
+por %xmm2, %xmm1
+movdqa %xmm4, %xmm3
+psrlq $26, %xmm6
+pand %xmm1, %xmm3
+psrlq $26, %xmm1
+psrlq $40, %xmm0
+movdqa %xmm3, 32(%esp)
+pand %xmm4, %xmm6
+por 272(%esp), %xmm0
+pand %xmm4, %xmm1
+movl %ebx, 116(%eax)
+addl $32, %edx
+jmp poly1305_blocks_sse2_8
+poly1305_blocks_sse2_7:
+movdqu 16(%eax), %xmm0
+movdqu (%eax), %xmm6
+movdqu 32(%eax), %xmm2
+pshufd $80, %xmm0, %xmm1
+pshufd $80, %xmm6, %xmm7
+pshufd $250, %xmm6, %xmm6
+movdqa %xmm1, 32(%esp)
+pshufd $250, %xmm0, %xmm1
+pshufd $80, %xmm2, %xmm0
+poly1305_blocks_sse2_8:
+testb $48, %bl
+je poly1305_blocks_sse2_13
+poly1305_blocks_sse2_9:
+movdqu 40(%eax), %xmm2
+movl 56(%eax), %esi
+testb $16, %bl
+je poly1305_blocks_sse2_11
+poly1305_blocks_sse2_10:
+movdqu 60(%eax), %xmm4
+movdqa %xmm4, %xmm5
+movd 76(%eax), %xmm3
+punpckldq %xmm2, %xmm5
+punpckhdq %xmm2, %xmm4
+movd %esi, %xmm2
+punpcklqdq %xmm2, %xmm3
+movdqa %xmm3, 240(%esp)
+jmp poly1305_blocks_sse2_12
+poly1305_blocks_sse2_11:
+movl $1, %ebx
+movdqa %xmm2, %xmm5
+movdqa %xmm2, %xmm4
+movd %esi, %xmm2
+movdqa %xmm2, 240(%esp)
+movd %ebx, %xmm3
+punpckldq %xmm3, %xmm5
+punpckhdq %xmm3, %xmm4
+poly1305_blocks_sse2_12:
+pshufd $80, %xmm5, %xmm2
+pshufd $250, %xmm5, %xmm3
+pshufd $80, %xmm4, %xmm5
+pshufd $250, %xmm4, %xmm4
+movdqa %xmm2, 176(%esp)
+movdqa %xmm3, 224(%esp)
+movdqa %xmm5, 208(%esp)
+movdqa %xmm4, 192(%esp)
+jmp poly1305_blocks_sse2_14
+poly1305_blocks_sse2_13:
+movdqu 60(%eax), %xmm3
+movd 76(%eax), %xmm2
+pshufd $0, %xmm3, %xmm4
+movdqa %xmm4, 176(%esp)
+pshufd $85, %xmm3, %xmm5
+pshufd $170, %xmm3, %xmm4
+pshufd $255, %xmm3, %xmm3
+pshufd $0, %xmm2, %xmm2
+movdqa %xmm5, 224(%esp)
+movdqa %xmm4, 208(%esp)
+movdqa %xmm3, 192(%esp)
+movdqa %xmm2, 240(%esp)
+poly1305_blocks_sse2_14:
+movdqa 160(%esp), %xmm2
+cmpl $64, %ecx
+movdqa 192(%esp), %xmm5
+pmuludq %xmm2, %xmm5
+movdqa %xmm5, 320(%esp)
+movdqa 224(%esp), %xmm4
+movdqa 208(%esp), %xmm3
+movdqa 240(%esp), %xmm5
+pmuludq %xmm2, %xmm4
+pmuludq %xmm2, %xmm3
+pmuludq %xmm2, %xmm5
+movdqa 320(%esp), %xmm2
+jb poly1305_blocks_sse2_18
+poly1305_blocks_sse2_15:
+movdqa %xmm3, 304(%esp)
+movdqu 80(%eax), %xmm3
+movaps %xmm0, 400(%esp)
+movd 96(%eax), %xmm0
+movdqa %xmm2, 320(%esp)
+pshufd $85, %xmm3, %xmm2
+movdqa %xmm2, 128(%esp)
+pshufd $0, %xmm0, %xmm2
+movdqa 160(%esp), %xmm0
+movdqa %xmm5, 336(%esp)
+pshufd $0, %xmm3, %xmm5
+movdqa %xmm5, (%esp)
+movdqa %xmm0, %xmm5
+pmuludq 128(%esp), %xmm5
+movdqa %xmm4, 288(%esp)
+pshufd $170, %xmm3, %xmm4
+movdqa %xmm5, 80(%esp)
+movdqa %xmm0, %xmm5
+movdqa %xmm4, 112(%esp)
+pshufd $255, %xmm3, %xmm3
+pmuludq %xmm4, %xmm5
+movdqa %xmm0, %xmm4
+pmuludq %xmm3, %xmm4
+pmuludq %xmm2, %xmm0
+movdqa %xmm3, 144(%esp)
+movdqa %xmm2, 96(%esp)
+movdqa %xmm5, 64(%esp)
+movdqa %xmm4, 48(%esp)
+movdqa %xmm0, 16(%esp)
+movaps 400(%esp), %xmm0
+movaps %xmm1, 384(%esp)
+movdqa %xmm6, 368(%esp)
+movdqa %xmm7, 352(%esp)
+poly1305_blocks_sse2_16:
+movq 8(%edx), %xmm6
+addl $-64, %ecx
+movq (%edx), %xmm2
+movhpd 24(%edx), %xmm6
+movdqa 256(%esp), %xmm1
+movaps %xmm6, %xmm7
+movhpd 16(%edx), %xmm2
+movdqa %xmm1, %xmm4
+pand %xmm2, %xmm4
+movaps %xmm2, %xmm3
+movaps %xmm6, %xmm5
+psrlq $52, %xmm2
+psllq $12, %xmm7
+psrlq $26, %xmm3
+psrlq $14, %xmm5
+por %xmm7, %xmm2
+pand %xmm1, %xmm3
+pand %xmm1, %xmm5
+pand %xmm1, %xmm2
+psrlq $40, %xmm6
+movdqu 32(%edx), %xmm1
+movdqu 48(%edx), %xmm7
+movdqa %xmm4, 416(%esp)
+movdqa %xmm1, %xmm4
+punpckldq %xmm7, %xmm4
+addl $64, %edx
+punpckhdq %xmm7, %xmm1
+cmpl $64, %ecx
+movaps 384(%esp), %xmm7
+movaps %xmm0, 400(%esp)
+pmuludq 80(%esp), %xmm0
+pmuludq 64(%esp), %xmm7
+movdqa %xmm1, 480(%esp)
+movdqa 32(%esp), %xmm1
+pmuludq 48(%esp), %xmm1
+paddq %xmm7, %xmm0
+movdqa 368(%esp), %xmm7
+pmuludq 16(%esp), %xmm7
+paddq %xmm1, %xmm0
+movdqa 352(%esp), %xmm1
+paddq %xmm7, %xmm0
+movdqa (%esp), %xmm7
+pmuludq %xmm7, %xmm1
+por 272(%esp), %xmm6
+paddq %xmm1, %xmm0
+movdqa 288(%esp), %xmm1
+pmuludq %xmm6, %xmm1
+paddq %xmm1, %xmm0
+movdqa 304(%esp), %xmm1
+pmuludq %xmm5, %xmm1
+paddq %xmm1, %xmm0
+movdqa 320(%esp), %xmm1
+pmuludq %xmm2, %xmm1
+movaps %xmm2, 448(%esp)
+movdqa 336(%esp), %xmm2
+paddq %xmm1, %xmm0
+movdqa %xmm2, %xmm1
+pmuludq %xmm3, %xmm1
+paddq %xmm1, %xmm0
+movdqa 176(%esp), %xmm1
+movdqa %xmm3, 432(%esp)
+movdqa %xmm1, %xmm3
+pmuludq 416(%esp), %xmm3
+pmuludq %xmm5, %xmm1
+paddq %xmm3, %xmm0
+pxor %xmm3, %xmm3
+movdqa %xmm4, 464(%esp)
+punpckldq %xmm3, %xmm4
+paddq %xmm4, %xmm0
+movdqa %xmm0, 496(%esp)
+movaps 400(%esp), %xmm4
+movaps 384(%esp), %xmm0
+pmuludq 16(%esp), %xmm4
+pmuludq %xmm7, %xmm0
+movdqa 32(%esp), %xmm7
+pmuludq 128(%esp), %xmm7
+paddq %xmm0, %xmm4
+movdqa 368(%esp), %xmm0
+pmuludq 112(%esp), %xmm0
+paddq %xmm7, %xmm4
+movdqa 352(%esp), %xmm7
+pmuludq 144(%esp), %xmm7
+paddq %xmm0, %xmm4
+movdqa %xmm2, %xmm0
+pmuludq %xmm6, %xmm0
+paddq %xmm7, %xmm4
+movdqa 224(%esp), %xmm7
+paddq %xmm0, %xmm4
+movaps 448(%esp), %xmm0
+pmuludq %xmm0, %xmm7
+pmuludq %xmm0, %xmm2
+paddq %xmm1, %xmm4
+movdqa 208(%esp), %xmm1
+pmuludq 432(%esp), %xmm1
+paddq %xmm7, %xmm4
+movdqa 192(%esp), %xmm7
+paddq %xmm1, %xmm4
+movdqa 416(%esp), %xmm1
+pmuludq %xmm1, %xmm7
+paddq %xmm7, %xmm4
+movdqa 480(%esp), %xmm7
+punpckhdq %xmm3, %xmm7
+psllq $18, %xmm7
+paddq %xmm7, %xmm4
+movdqa %xmm4, 512(%esp)
+movaps 400(%esp), %xmm4
+movaps 384(%esp), %xmm3
+pmuludq 64(%esp), %xmm4
+pmuludq 48(%esp), %xmm3
+movdqa 32(%esp), %xmm7
+pmuludq 16(%esp), %xmm7
+paddq %xmm3, %xmm4
+movdqa 368(%esp), %xmm3
+pmuludq (%esp), %xmm3
+paddq %xmm7, %xmm4
+movdqa 352(%esp), %xmm7
+paddq %xmm3, %xmm4
+movdqa 128(%esp), %xmm3
+pmuludq %xmm3, %xmm7
+paddq %xmm7, %xmm4
+movdqa 304(%esp), %xmm7
+pmuludq %xmm6, %xmm7
+paddq %xmm7, %xmm4
+movdqa 320(%esp), %xmm7
+pmuludq %xmm5, %xmm7
+paddq %xmm7, %xmm4
+movdqa 176(%esp), %xmm7
+movdqa %xmm7, %xmm0
+pmuludq 432(%esp), %xmm0
+paddq %xmm2, %xmm4
+movdqa 224(%esp), %xmm2
+paddq %xmm0, %xmm4
+movdqa %xmm2, %xmm0
+pmuludq %xmm1, %xmm0
+pmuludq %xmm5, %xmm2
+pmuludq 336(%esp), %xmm5
+paddq %xmm0, %xmm4
+movdqa 464(%esp), %xmm0
+pxor %xmm1, %xmm1
+punpckhdq %xmm1, %xmm0
+psllq $6, %xmm0
+movdqa 496(%esp), %xmm1
+paddq %xmm0, %xmm4
+psrlq $26, %xmm1
+paddq %xmm1, %xmm4
+movdqa %xmm4, 528(%esp)
+movaps 400(%esp), %xmm4
+movaps 384(%esp), %xmm1
+movaps %xmm4, %xmm0
+pmuludq (%esp), %xmm0
+pmuludq %xmm3, %xmm1
+pmuludq 48(%esp), %xmm4
+paddq %xmm1, %xmm0
+movdqa 32(%esp), %xmm3
+pmuludq 112(%esp), %xmm3
+paddq %xmm3, %xmm0
+movdqa 368(%esp), %xmm3
+movdqa %xmm3, %xmm1
+pmuludq 144(%esp), %xmm1
+pmuludq 128(%esp), %xmm3
+paddq %xmm1, %xmm0
+movdqa 352(%esp), %xmm1
+pmuludq 96(%esp), %xmm1
+paddq %xmm1, %xmm0
+movdqa %xmm7, %xmm1
+pmuludq %xmm6, %xmm1
+pmuludq 320(%esp), %xmm6
+paddq %xmm1, %xmm0
+movdqa 208(%esp), %xmm1
+pmuludq 448(%esp), %xmm1
+paddq %xmm2, %xmm0
+movdqa 192(%esp), %xmm2
+pmuludq 432(%esp), %xmm2
+paddq %xmm1, %xmm0
+movdqa 416(%esp), %xmm1
+paddq %xmm2, %xmm0
+movdqa 240(%esp), %xmm2
+pmuludq %xmm1, %xmm2
+pmuludq 208(%esp), %xmm1
+paddq %xmm2, %xmm0
+movdqa 512(%esp), %xmm2
+paddq 272(%esp), %xmm0
+psrlq $26, %xmm2
+paddq %xmm2, %xmm0
+movaps 384(%esp), %xmm2
+pmuludq 16(%esp), %xmm2
+paddq %xmm2, %xmm4
+movdqa 32(%esp), %xmm2
+pmuludq (%esp), %xmm2
+paddq %xmm2, %xmm4
+paddq %xmm3, %xmm4
+movdqa 352(%esp), %xmm3
+pmuludq 112(%esp), %xmm3
+paddq %xmm3, %xmm4
+paddq %xmm6, %xmm4
+movaps 448(%esp), %xmm6
+movdqa %xmm0, %xmm3
+pmuludq %xmm7, %xmm6
+psrlq $26, %xmm3
+pmuludq 160(%esp), %xmm3
+paddq %xmm5, %xmm4
+movdqa 432(%esp), %xmm5
+pmuludq 224(%esp), %xmm5
+paddq %xmm6, %xmm4
+paddq %xmm5, %xmm4
+movdqa 480(%esp), %xmm7
+pxor %xmm5, %xmm5
+punpckldq %xmm5, %xmm7
+paddq %xmm1, %xmm4
+movdqa 528(%esp), %xmm2
+psllq $12, %xmm7
+movdqa %xmm2, %xmm1
+paddq %xmm7, %xmm4
+psrlq $26, %xmm1
+paddq %xmm1, %xmm4
+movdqa 256(%esp), %xmm5
+movaps %xmm4, %xmm1
+movdqa 496(%esp), %xmm6
+psrlq $26, %xmm1
+movdqa 512(%esp), %xmm7
+pand %xmm5, %xmm6
+pand %xmm5, %xmm7
+pand %xmm5, %xmm2
+paddq %xmm3, %xmm6
+paddq %xmm1, %xmm7
+movdqa %xmm5, %xmm3
+movdqa %xmm5, %xmm1
+pand %xmm6, %xmm3
+psrlq $26, %xmm6
+pand %xmm4, %xmm1
+movdqa %xmm5, %xmm4
+paddq %xmm6, %xmm2
+pand %xmm7, %xmm4
+pand %xmm5, %xmm0
+psrlq $26, %xmm7
+movdqa %xmm3, 352(%esp)
+movdqa %xmm2, 368(%esp)
+movdqa %xmm1, 32(%esp)
+movaps %xmm4, 384(%esp)
+paddq %xmm7, %xmm0
+jae poly1305_blocks_sse2_16
+poly1305_blocks_sse2_17:
+movdqa 336(%esp), %xmm5
+movdqa 320(%esp), %xmm2
+movdqa 304(%esp), %xmm3
+movdqa 288(%esp), %xmm4
+movaps 384(%esp), %xmm1
+movdqa 368(%esp), %xmm6
+movdqa 352(%esp), %xmm7
+poly1305_blocks_sse2_18:
+cmpl $32, %ecx
+jb poly1305_blocks_sse2_22
+poly1305_blocks_sse2_19:
+movaps %xmm1, 384(%esp)
+testl %edx, %edx
+pmuludq %xmm0, %xmm4
+pmuludq %xmm3, %xmm1
+pmuludq %xmm0, %xmm3
+paddq %xmm1, %xmm4
+movdqa 32(%esp), %xmm1
+pmuludq %xmm2, %xmm1
+paddq %xmm1, %xmm4
+movdqa %xmm6, %xmm1
+pmuludq %xmm5, %xmm1
+paddq %xmm1, %xmm4
+movdqa 176(%esp), %xmm1
+movdqa %xmm7, 352(%esp)
+pmuludq %xmm1, %xmm7
+paddq %xmm7, %xmm4
+movdqa %xmm4, 288(%esp)
+movaps 384(%esp), %xmm4
+movaps %xmm4, %xmm7
+pmuludq %xmm2, %xmm7
+pmuludq %xmm0, %xmm2
+paddq %xmm7, %xmm3
+movdqa 32(%esp), %xmm7
+pmuludq %xmm5, %xmm7
+movdqa %xmm6, 368(%esp)
+pmuludq %xmm1, %xmm6
+paddq %xmm7, %xmm3
+paddq %xmm6, %xmm3
+movdqa 352(%esp), %xmm7
+movdqa 224(%esp), %xmm6
+pmuludq %xmm6, %xmm7
+paddq %xmm7, %xmm3
+movdqa %xmm3, 304(%esp)
+movaps %xmm4, %xmm3
+pmuludq %xmm5, %xmm3
+pmuludq %xmm0, %xmm5
+pmuludq %xmm1, %xmm0
+paddq %xmm3, %xmm2
+movdqa 32(%esp), %xmm3
+movdqa %xmm3, %xmm7
+pmuludq %xmm1, %xmm7
+paddq %xmm7, %xmm2
+movdqa 368(%esp), %xmm7
+pmuludq %xmm6, %xmm7
+movdqa 352(%esp), %xmm6
+paddq %xmm7, %xmm2
+movdqa 208(%esp), %xmm7
+pmuludq %xmm7, %xmm6
+paddq %xmm6, %xmm2
+movdqa %xmm2, 320(%esp)
+movaps %xmm4, %xmm2
+pmuludq %xmm1, %xmm2
+paddq %xmm2, %xmm5
+movdqa 224(%esp), %xmm6
+movdqa %xmm3, %xmm2
+pmuludq %xmm6, %xmm2
+pmuludq %xmm6, %xmm4
+pmuludq 208(%esp), %xmm3
+paddq %xmm2, %xmm5
+paddq %xmm4, %xmm0
+movdqa 368(%esp), %xmm2
+pmuludq %xmm7, %xmm2
+paddq %xmm3, %xmm0
+paddq %xmm2, %xmm5
+movdqa 192(%esp), %xmm2
+movdqa 368(%esp), %xmm4
+pmuludq %xmm2, %xmm4
+movdqa 352(%esp), %xmm7
+movdqa 352(%esp), %xmm1
+pmuludq 240(%esp), %xmm1
+pmuludq %xmm2, %xmm7
+paddq %xmm4, %xmm0
+paddq %xmm7, %xmm5
+paddq %xmm1, %xmm0
+movdqa 288(%esp), %xmm4
+movdqa 304(%esp), %xmm3
+movdqa 320(%esp), %xmm2
+je poly1305_blocks_sse2_21
+poly1305_blocks_sse2_20:
+movdqu (%edx), %xmm1
+movdqu 16(%edx), %xmm7
+movdqa %xmm1, %xmm6
+movaps %xmm0, 400(%esp)
+punpckldq %xmm7, %xmm6
+pxor %xmm0, %xmm0
+punpckhdq %xmm7, %xmm1
+movdqa %xmm6, %xmm7
+punpckhdq %xmm0, %xmm6
+psllq $6, %xmm6
+paddq %xmm6, %xmm3
+movdqa %xmm1, %xmm6
+punpckldq %xmm0, %xmm6
+punpckhdq %xmm0, %xmm1
+psllq $12, %xmm6
+punpckldq %xmm0, %xmm7
+psllq $18, %xmm1
+movaps 400(%esp), %xmm0
+paddq 272(%esp), %xmm0
+paddq %xmm7, %xmm4
+paddq %xmm6, %xmm2
+paddq %xmm1, %xmm5
+poly1305_blocks_sse2_21:
+movdqa %xmm5, %xmm6
+movdqa %xmm4, %xmm7
+psrlq $26, %xmm6
+psrlq $26, %xmm7
+paddq %xmm6, %xmm0
+paddq %xmm7, %xmm3
+movaps %xmm0, %xmm7
+movdqa %xmm3, %xmm1
+psrlq $26, %xmm7
+psrlq $26, %xmm1
+pmuludq 160(%esp), %xmm7
+paddq %xmm1, %xmm2
+movdqa 256(%esp), %xmm1
+movdqa %xmm2, %xmm6
+pand 256(%esp), %xmm5
+psrlq $26, %xmm6
+pand %xmm1, %xmm3
+pand 256(%esp), %xmm4
+paddq %xmm6, %xmm5
+paddq %xmm7, %xmm4
+movdqa %xmm3, %xmm6
+movdqa %xmm1, %xmm3
+movdqa %xmm1, %xmm7
+pand %xmm2, %xmm3
+movdqa %xmm1, %xmm2
+pand %xmm4, %xmm7
+psrlq $26, %xmm4
+pand %xmm5, %xmm1
+pand %xmm2, %xmm0
+psrlq $26, %xmm5
+paddq %xmm4, %xmm6
+paddq %xmm5, %xmm0
+movdqa %xmm3, 32(%esp)
+poly1305_blocks_sse2_22:
+testl %edx, %edx
+je poly1305_blocks_sse2_24
+poly1305_blocks_sse2_23:
+pshufd $8, %xmm7, %xmm2
+pshufd $8, %xmm6, %xmm6
+pshufd $8, 32(%esp), %xmm3
+pshufd $8, %xmm1, %xmm1
+punpcklqdq %xmm6, %xmm2
+punpcklqdq %xmm1, %xmm3
+pshufd $8, %xmm0, %xmm0
+movdqu %xmm2, (%eax)
+movdqu %xmm3, 16(%eax)
+movq %xmm0, 32(%eax)
+addl $544, %esp
+popl %ebx
+popl %edi
+popl %esi
+ret
+poly1305_blocks_sse2_24:
+movdqa %xmm7, %xmm2
+movdqa %xmm6, %xmm3
+psrldq $8, %xmm2
+paddq %xmm2, %xmm7
+psrldq $8, %xmm3
+movd %xmm7, %ecx
+paddq %xmm3, %xmm6
+movdqa 32(%esp), %xmm5
+movl %ecx, %esi
+movdqa %xmm5, %xmm4
+andl $67108863, %ecx
+movd %xmm6, %ebx
+movaps %xmm1, %xmm6
+psrldq $8, %xmm4
+paddq %xmm4, %xmm5
+shrl $26, %esi
+addl %esi, %ebx
+psrldq $8, %xmm6
+movd %xmm5, %edi
+paddq %xmm6, %xmm1
+movl %eax, (%esp)
+movl %ebx, %eax
+shrl $26, %eax
+andl $67108863, %ebx
+addl %eax, %edi
+movd %xmm1, %eax
+movaps %xmm0, %xmm1
+psrldq $8, %xmm1
+paddq %xmm1, %xmm0
+movl %edi, %edx
+andl $67108863, %edi
+shrl $26, %edx
+addl %edx, %eax
+movd %xmm0, %edx
+movl %eax, %esi
+shrl $26, %esi
+andl $67108863, %eax
+addl %esi, %edx
+movl %edx, %esi
+andl $67108863, %edx
+shrl $26, %esi
+lea (%esi,%esi,4), %esi
+addl %esi, %ecx
+movl %ecx, %esi
+andl $67108863, %ecx
+shrl $26, %esi
+addl %esi, %ebx
+movl %ebx, %esi
+andl $67108863, %ebx
+shrl $26, %esi
+addl %esi, %edi
+movl %edi, %esi
+shrl $26, %edi
+andl $67108863, %esi
+addl %edi, %eax
+movl %eax, %edi
+shrl $26, %eax
+andl $67108863, %edi
+addl %eax, %edx
+movl %edx, %eax
+shrl $26, %edx
+andl $67108863, %eax
+movl %eax, 8(%esp)
+movl %edi, 4(%esp)
+lea (%edx,%edx,4), %edx
+addl %edx, %ecx
+movl %ecx, %edx
+andl $67108863, %edx
+shrl $26, %ecx
+addl %ecx, %ebx
+lea 5(%edx), %ecx
+movl %ecx, 12(%esp)
+shrl $26, %ecx
+addl %ebx, %ecx
+movl %ecx, 16(%esp)
+shrl $26, %ecx
+addl %esi, %ecx
+movl %ecx, 20(%esp)
+shrl $26, %ecx
+addl %edi, %ecx
+movl %ecx, 24(%esp)
+shrl $26, %ecx
+movl 12(%esp), %edi
+andl $67108863, %edi
+lea -67108864(%ecx,%eax), %eax
+movl %eax, 28(%esp)
+shrl $31, %eax
+decl %eax
+movl %eax, %ecx
+andl %eax, %edi
+notl %ecx
+andl %ecx, %edx
+andl %ecx, %ebx
+orl %edi, %edx
+andl %ecx, %esi
+movl (%esp), %edi
+movl %edx, (%edi)
+movl 16(%esp), %edx
+andl $67108863, %edx
+andl %eax, %edx
+orl %edx, %ebx
+movl %ebx, 4(%edi)
+movl 20(%esp), %ebx
+andl $67108863, %ebx
+andl %eax, %ebx
+movl 24(%esp), %edx
+orl %ebx, %esi
+andl $67108863, %edx
+movl %esi, 8(%edi)
+andl %eax, %edx
+movl 4(%esp), %esi
+andl %ecx, %esi
+orl %edx, %esi
+movl 28(%esp), %edx
+andl 8(%esp), %ecx
+andl %eax, %edx
+orl %edx, %ecx
+movl %esi, 12(%edi)
+movl %ecx, 16(%edi)
+poly1305_blocks_sse2_25:
+addl $544, %esp
+popl %ebx
+popl %edi
+popl %esi
+ret
+FN_END poly1305_blocks_sse2
+
+GLOBAL_HIDDEN_FN poly1305_init_ext_sse2
 movl 4(%esp), %eax
 movl 8(%esp), %edx
 movl 12(%esp), %ecx
@@ -47,1108 +907,262 @@ pushl %esi
 pushl %edi
 pushl %ebx
 pushl %ebp
-movl 32(%esp), %edi
 subl $76, %esp
-movl $-1, %ebx
+movl %edx, %ebx
+movl $-1, %edx
 testl %ecx, %ecx
 pxor %xmm0, %xmm0
-cmove %ebx, %ecx
-movdqa %xmm0, (%eax)
-testl %edi, %edi
-movdqa %xmm0, 16(%eax)
-movdqa %xmm0, 32(%eax)
-movdqa %xmm0, 48(%eax)
-cmovnz %ebx, %ecx
-movdqa %xmm0, 64(%eax)
-movl %ecx, (%esp)
-movl 4(%edx), %ecx
-movl (%edx), %edi
-movl %edi, %ebp
-movl 8(%edx), %ebx
-andl $67108863, %ebp
-movl 12(%edx), %esi
-movl %edx, 4(%esp)
-movl %ecx, %edx
+movdqu %xmm0, (%eax)
+movdqu %xmm0, 16(%eax)
+movdqu %xmm0, 32(%eax)
+cmove %edx, %ecx
+movl 4(%ebx), %edx
+movl %edx, %ebp
+movl (%ebx), %edi
+movl %edi, %esi
 shrl $26, %edi
-shll $6, %edx
-orl %edx, %edi
-movl %ebx, %edx
-shrl $20, %ecx
+andl $67108863, %esi
+shll $6, %ebp
+movl %ecx, 12(%esp)
+orl %ebp, %edi
+movl 8(%ebx), %ecx
+movl %ecx, %ebp
+shrl $20, %edx
 andl $67108611, %edi
-shll $12, %edx
-orl %edx, %ecx
-movl %esi, %edx
-shrl $14, %ebx
-andl $67092735, %ecx
-shll $18, %edx
-orl %edx, %ebx
-movl 4(%esp), %edx
-andl $66076671, %ebx
-shrl $8, %esi
-andl $1048575, %esi
-movl %ebp, 84(%eax)
-movl %edi, 92(%eax)
-movl %ecx, 100(%eax)
-movl %ebx, 108(%eax)
-movl %esi, 116(%eax)
-movl %ebp, 8(%esp)
-movl 16(%edx), %ebp
-movl %ebp, 124(%eax)
-movl %edi, 12(%esp)
-movl 20(%edx), %edi
-movl %edi, 132(%eax)
-movl 24(%edx), %ebp
-movl %ebp, 140(%eax)
-movl 28(%edx), %edx
+shll $12, %ebp
+movl %ebx, (%esp)
+orl %ebp, %edx
+movl 12(%ebx), %ebx
+movl %ebx, %ebp
+shrl $14, %ecx
+andl $67092735, %edx
+shll $18, %ebp
+orl %ebp, %ecx
 movl (%esp), %ebp
-movl %edx, 148(%eax)
-cmpl $16, %ebp
-jb poly1305_init_ext_sse2_7
-xorl %edx, %edx
-movl %edx, 16(%esp)
+andl $66076671, %ecx
+shrl $8, %ebx
+andl $1048575, %ebx
+movl %esi, 40(%eax)
+movl %edi, 44(%eax)
+movl %edx, 48(%eax)
+movl %ecx, 52(%eax)
+movl %ebx, 56(%eax)
 movl %esi, 20(%esp)
-movl %ebx, 28(%esp)
-movl %ecx, 24(%esp)
-movl %ebp, (%esp)
+movl 16(%ebp), %esi
+movl %esi, 100(%eax)
+movl %edi, 24(%esp)
+movl 20(%ebp), %edi
+movl %edi, 104(%eax)
+movl 24(%ebp), %esi
+movl %esi, 108(%eax)
+lea 80(%eax), %esi
+movl 28(%ebp), %ebp
+movl 12(%esp), %edi
+cmpl $16, %edi
+movl %ebp, 112(%eax)
+lea 60(%eax), %ebp
+movl $0, 28(%esp)
+movl %ebp, 16(%esp)
+jbe poly1305_init_ext_sse2_9
+poly1305_init_ext_sse2_2:
+movl %ebp, 8(%esp)
+movl %esi, (%esp)
+movl %ebx, 32(%esp)
+movl %ecx, 40(%esp)
+movl %edx, 36(%esp)
+movl %edi, 12(%esp)
 movl %eax, 4(%esp)
 poly1305_init_ext_sse2_3:
-movl 8(%esp), %eax
-mull %eax
-movl 20(%esp), %esi
-movl %edx, %edi
-movl 12(%esp), %ebx
-movl 28(%esp), %ebp
-lea (%esi,%esi), %ecx
-movl %eax, %esi
-movl %ecx, 32(%esp)
-lea (%ebx,%ebx,4), %eax
-mull %ecx
-movl 24(%esp), %ecx
-addl %eax, %esi
-movl %ecx, 48(%esp)
-lea (%ebp,%ebp,4), %ebp
-adcl %edx, %edi
-movl %ebp, 36(%esp)
-lea (%ecx,%ecx), %eax
-mull %ebp
-addl %eax, %esi
-lea (%ebx,%ebx), %ebp
-movl 28(%esp), %ebx
-movl 8(%esp), %eax
-adcl %edx, %edi
-movl %ebp, 44(%esp)
-movl %esi, 40(%esp)
-addl %ebx, %ebx
-movl %ebx, 52(%esp)
-lea (%eax,%eax), %ebx
-mull %ebp
-movl %ebx, 56(%esp)
-movl %eax, %ebx
-movl %edx, %ebp
-lea (%ecx,%ecx,4), %eax
-mull 32(%esp)
-addl %eax, %ebx
-movl 28(%esp), %eax
-movl 36(%esp), %ecx
-adcl %edx, %ebp
-mull %ecx
-shll $6, %edi
-shrl $26, %esi
-orl %esi, %edi
-addl %edi, %eax
-adcl $0, %edx
-addl %eax, %ebx
-movl 12(%esp), %eax
-adcl %edx, %ebp
-mull %eax
-movl %eax, %edi
-movl %edx, %esi
-movl 48(%esp), %eax
-mull 56(%esp)
-addl %eax, %edi
-movl 32(%esp), %eax
-adcl %edx, %esi
-mull %ecx
-movl %ebx, 60(%esp)
-shll $6, %ebp
-shrl $26, %ebx
-orl %ebx, %ebp
-addl %ebp, %eax
-movl 48(%esp), %ecx
-adcl $0, %edx
-addl %eax, %edi
-movl 44(%esp), %eax
-movl %edi, %ebp
-adcl %edx, %esi
-andl $67108863, %ebp
-mull %ecx
-shll $6, %esi
-shrl $26, %edi
-movl 52(%esp), %ebx
-orl %edi, %esi
-movl %ebp, 24(%esp)
-movl %eax, %ebp
-movl 8(%esp), %eax
-movl %edx, %edi
-mull %ebx
-addl %eax, %ebp
+movl 40(%esp), %ebp
 movl 20(%esp), %eax
-adcl %edx, %edi
+mull %eax
+movl 32(%esp), %ebx
+lea (%ebp,%ebp,4), %esi
+movl 24(%esp), %ebp
+movl %eax, %ecx
+movl %esi, 48(%esp)
+lea (%ebx,%ebx), %edi
+movl %edx, %ebx
+movl %edi, 44(%esp)
+lea (%ebp,%ebp,4), %eax
+mull %edi
+movl 36(%esp), %edi
+addl %eax, %ecx
+movl %edi, 60(%esp)
+adcl %edx, %ebx
+lea (%edi,%edi), %eax
+mull %esi
+addl %eax, %ecx
+lea (%ebp,%ebp), %esi
+movl 20(%esp), %eax
+adcl %edx, %ebx
+movl 40(%esp), %ebp
+movl %esi, 56(%esp)
+lea (%eax,%eax), %edx
+movl %edx, 68(%esp)
+mull %esi
+movl %edx, %esi
+addl %ebp, %ebp
+movl %ebp, 64(%esp)
+movl %eax, %ebp
+movl %ecx, 52(%esp)
+lea (%edi,%edi,4), %eax
+mull 44(%esp)
+addl %eax, %ebp
+movl 40(%esp), %eax
+movl 48(%esp), %edi
+adcl %edx, %esi
+mull %edi
+shll $6, %ebx
+shrl $26, %ecx
+orl %ecx, %ebx
+addl %ebx, %eax
+adcl $0, %edx
+addl %eax, %ebp
+movl 24(%esp), %eax
+adcl %edx, %esi
+mull %eax
+movl %eax, %ecx
+movl %edx, %ebx
+movl 60(%esp), %eax
+mull 68(%esp)
+addl %eax, %ecx
+movl 44(%esp), %eax
+adcl %edx, %ebx
+mull %edi
+movl %ebp, 72(%esp)
+shll $6, %esi
+shrl $26, %ebp
+orl %ebp, %esi
+addl %esi, %eax
+adcl $0, %edx
+addl %eax, %ecx
+movl %ecx, %edi
+adcl %edx, %ebx
+andl $67108863, %edi
+shll $6, %ebx
+shrl $26, %ecx
+movl 56(%esp), %eax
+orl %ecx, %ebx
+movl 60(%esp), %ecx
+mull %ecx
+movl %edi, 36(%esp)
+movl %eax, %esi
+movl 20(%esp), %eax
+movl %edx, %ebp
+movl 64(%esp), %edi
+mull %edi
+addl %eax, %esi
+movl 32(%esp), %eax
+adcl %edx, %ebp
 lea (%eax,%eax,4), %edx
 mull %edx
-addl %eax, %ebp
+addl %eax, %esi
 movl %ecx, %eax
-adcl %edx, %edi
-addl %ebp, %esi
-movl %esi, %ebp
-adcl $0, %edi
-andl $67108863, %ebp
-mull %ecx
-shll $6, %edi
-movl %edx, %ecx
-shrl $26, %esi
-orl %esi, %edi
-movl %eax, %esi
-movl %ebx, %eax
-mull 12(%esp)
-addl %eax, %esi
-movl 56(%esp), %eax
-adcl %edx, %ecx
-mull 20(%esp)
-addl %eax, %esi
-movl 40(%esp), %ebx
-adcl %edx, %ecx
-addl %esi, %edi
-movl %edi, %esi
-adcl $0, %ecx
-andl $67108863, %ebx
-shll $6, %ecx
+adcl %edx, %ebp
+addl %esi, %ebx
+movl %ebx, %esi
+adcl $0, %ebp
 andl $67108863, %esi
-shrl $26, %edi
-orl %edi, %ecx
-movl 60(%esp), %edx
-andl $67108863, %edx
-movl %ebp, 28(%esp)
-movl %esi, 20(%esp)
-lea (%ecx,%ecx,4), %edi
-addl %edi, %ebx
-movl %ebx, %eax
+mull %ecx
+shll $6, %ebp
+movl %eax, %ecx
 shrl $26, %ebx
-andl $67108863, %eax
-movl 4(%esp), %edi
-movl %eax, 8(%esp)
-addl %edx, %ebx
-movl 16(%esp), %edx
-movl %ebx, 12(%esp)
-lea (%edx,%edx,4), %ecx
-incl %edx
-shll $4, %ecx
-movl %edx, 16(%esp)
-movl %eax, 88(%edi,%ecx)
-movl %eax, 80(%edi,%ecx)
-movl 24(%esp), %eax
-movl %ebx, 104(%edi,%ecx)
-movl %ebx, 96(%edi,%ecx)
-movl %eax, 120(%edi,%ecx)
-movl %eax, 112(%edi,%ecx)
-movl %ebp, 136(%edi,%ecx)
-movl %ebp, 128(%edi,%ecx)
-movl %esi, 152(%edi,%ecx)
-movl %esi, 144(%edi,%ecx)
-cmpl $2, %edx
-jae poly1305_init_ext_sse2_6
-cmpl $0, 16(%esp)
-je poly1305_init_ext_sse2_3
-cmpl $64, (%esp)
-jae poly1305_init_ext_sse2_3
-poly1305_init_ext_sse2_6:
 movl %edi, %eax
+orl %ebx, %ebp
+movl %edx, %ebx
+mull 24(%esp)
+addl %eax, %ecx
+movl 68(%esp), %eax
+adcl %edx, %ebx
+mull 32(%esp)
+addl %eax, %ecx
+movl 52(%esp), %edi
+adcl %edx, %ebx
+addl %ecx, %ebp
+movl %ebp, %ecx
+adcl $0, %ebx
+andl $67108863, %edi
+shll $6, %ebx
+andl $67108863, %ecx
+shrl $26, %ebp
+orl %ebp, %ebx
+movl 72(%esp), %eax
+andl $67108863, %eax
+movl %ecx, 32(%esp)
+movl 28(%esp), %ecx
+lea (%ebx,%ebx,4), %ebx
+addl %ebx, %edi
+incl %ecx
+movl %edi, %ebp
+shrl $26, %edi
+andl $67108863, %ebp
+movl %esi, 40(%esp)
+cmpl $2, %ecx
+movl %ebp, 20(%esp)
+movl %ecx, 28(%esp)
+lea (%eax,%edi), %edx
+movl %edx, 24(%esp)
+jae poly1305_init_ext_sse2_8
+poly1305_init_ext_sse2_4:
+cmpl $0, 28(%esp)
+jne poly1305_init_ext_sse2_6
+poly1305_init_ext_sse2_5:
+movl 8(%esp), %esi
+movl 32(%esp), %eax
+movl 40(%esp), %edx
+movl 36(%esp), %ecx
+movl 24(%esp), %ebx
+movl 16(%esp), %edi
+movl %eax, 16(%esi)
+movl %edx, 12(%esi)
+movl %ecx, 8(%esi)
+movl %ebx, 4(%esi)
+movl %ebp, (%esi)
+movl %edi, 8(%esp)
+jmp poly1305_init_ext_sse2_3
+poly1305_init_ext_sse2_6:
+cmpl $1, 28(%esp)
+jne poly1305_init_ext_sse2_3
 poly1305_init_ext_sse2_7:
-movl $0, 240(%eax)
+movl 8(%esp), %esi
+movl 32(%esp), %eax
+movl 40(%esp), %edx
+movl 36(%esp), %ecx
+movl 24(%esp), %ebx
+movl (%esp), %edi
+movl %eax, 16(%esi)
+movl %edx, 12(%esi)
+movl %ecx, 8(%esi)
+movl %ebx, 4(%esi)
+movl %ebp, (%esi)
+movl %edi, 8(%esp)
+cmpl $96, 12(%esp)
+jae poly1305_init_ext_sse2_3
+jmp poly1305_init_ext_sse2_10
+poly1305_init_ext_sse2_8:
+movl 8(%esp), %ebp
+movl %esi, %ecx
+movl 36(%esp), %edx
+movl %ecx, 12(%ebp)
+movl %edx, 8(%ebp)
+movl 32(%esp), %ebx
+movl 24(%esp), %edx
+movl 20(%esp), %ecx
+movl 4(%esp), %eax
+movl %ebx, 16(%ebp)
+movl %edx, 4(%ebp)
+movl %ecx, (%ebp)
+poly1305_init_ext_sse2_9:
+movl $0, 116(%eax)
 addl $76, %esp
 popl %ebp
 popl %ebx
 popl %edi
 popl %esi
 ret
-ENDFN(poly1305_init_ext)
-
-FN(poly1305_blocks)
+poly1305_init_ext_sse2_10:
 movl 4(%esp), %eax
-movl 8(%esp), %edx
-movl 12(%esp), %ecx
-poly1305_blocks_sse2_local:
-pushl %ebp
-movl %esp, %ebp
-andl $~63, %ebp
-subl $8, %ebp
-subl $(568+8+63), %esp
-movl %esi, -4(%ebp)
-movl $16777216, %esi
-movl %edi, -8(%ebp)
-movl $67108863, %edi
-movd %esi, %xmm0
-movl $5, %esi
-movd %edi, %xmm2
-pshufd $68, %xmm0, %xmm1
-pshufd $68, %xmm2, %xmm3
-movd %esi, %xmm4
-movl 240(%eax), %esi
-pshufd $68, %xmm4, %xmm5
-movdqa %xmm1, -456(%ebp)
-movdqa %xmm3, -344(%ebp)
-movdqa %xmm5, -552(%ebp)
-testl $4, %esi
-je poly1305_blocks_sse2_3
-poly1305_blocks_sse2_2:
-movdqa -456(%ebp), %xmm0
-psrldq $8, %xmm0
-movdqa %xmm0, -456(%ebp)
-poly1305_blocks_sse2_3:
-testl $8, %esi
-je poly1305_blocks_sse2_5
-poly1305_blocks_sse2_4:
-pxor %xmm0, %xmm0
-movdqa %xmm0, -456(%ebp)
-poly1305_blocks_sse2_5:
-btsl $0, %esi
-jc poly1305_blocks_sse2_7
-poly1305_blocks_sse2_6:
-movq 8(%edx), %xmm0
-addl $-32, %ecx
-movq (%edx), %xmm3
-movhpd 24(%edx), %xmm0
-movdqa -344(%ebp), %xmm6
-movaps %xmm0, %xmm4
-movhpd 16(%edx), %xmm3
-movdqa %xmm6, %xmm1
-pand %xmm3, %xmm1
-movaps %xmm3, %xmm2
-psrlq $52, %xmm3
-psllq $12, %xmm4
-por %xmm4, %xmm3
-movdqa %xmm6, %xmm5
-psrlq $26, %xmm2
-pand %xmm3, %xmm5
-psrlq $26, %xmm3
-psrlq $40, %xmm0
-pand %xmm6, %xmm2
-pand %xmm6, %xmm3
-movdqa %xmm1, -520(%ebp)
-addl $32, %edx
-movdqa %xmm2, -504(%ebp)
-movdqa %xmm5, -488(%ebp)
-por -456(%ebp), %xmm0
-movl %esi, 240(%eax)
-jmp poly1305_blocks_sse2_8
-poly1305_blocks_sse2_7:
-movdqa (%eax), %xmm0
-movdqa 16(%eax), %xmm1
-movdqa 32(%eax), %xmm2
-movdqa %xmm0, -520(%ebp)
-movdqa %xmm1, -504(%ebp)
-movdqa %xmm2, -488(%ebp)
-movdqa 48(%eax), %xmm3
-movdqa 64(%eax), %xmm0
-poly1305_blocks_sse2_8:
-movdqa 80(%eax), %xmm4
-movdqa -552(%ebp), %xmm1
-movdqa %xmm4, -360(%ebp)
-movdqa %xmm1, %xmm4
-movdqa 96(%eax), %xmm5
-movdqa 112(%eax), %xmm6
-movdqa %xmm5, -392(%ebp)
-pmuludq %xmm5, %xmm4
-movdqa %xmm1, %xmm5
-pmuludq %xmm6, %xmm5
-movdqa %xmm6, -424(%ebp)
-movdqa %xmm1, %xmm6
-movdqa 128(%eax), %xmm7
-movdqa 144(%eax), %xmm2
-movdqa %xmm7, -472(%ebp)
-movdqa %xmm2, -568(%ebp)
-pmuludq %xmm7, %xmm6
-pmuludq %xmm2, %xmm1
-cmpl $64, %ecx
-jb poly1305_blocks_sse2_12
-poly1305_blocks_sse2_9:
-movdqa %xmm6, -408(%ebp)
-movdqa %xmm1, -376(%ebp)
-movdqa 160(%eax), %xmm6
-movdqa -552(%ebp), %xmm1
-movdqa %xmm6, -312(%ebp)
-movdqa %xmm1, %xmm6
-movdqa 176(%eax), %xmm7
-movaps %xmm0, -168(%ebp)
-movdqa %xmm7, -232(%ebp)
-movdqa 192(%eax), %xmm0
-pmuludq %xmm7, %xmm6
-movdqa %xmm1, %xmm7
-pmuludq %xmm0, %xmm7
-movdqa %xmm5, -440(%ebp)
-movdqa %xmm0, -216(%ebp)
-movdqa %xmm1, %xmm0
-movdqa 208(%eax), %xmm2
-movdqa 224(%eax), %xmm5
-pmuludq %xmm2, %xmm0
-pmuludq %xmm5, %xmm1
-movdqa %xmm5, -184(%ebp)
-movdqa %xmm6, -248(%ebp)
-movdqa %xmm0, -280(%ebp)
-movdqa %xmm1, -296(%ebp)
-movdqa %xmm2, -200(%ebp)
-movdqa %xmm7, -264(%ebp)
-movaps -168(%ebp), %xmm0
-movdqa %xmm4, -536(%ebp)
-movaps %xmm3, -328(%ebp)
-jmp poly1305_blocks_sse2_10
-.p2align 5,,31
-poly1305_blocks_sse2_10:
-movq 8(%edx), %xmm2
-addl $-64, %ecx
-movq (%edx), %xmm4
-movhpd 24(%edx), %xmm2
-movdqa -344(%ebp), %xmm1
-movaps %xmm2, %xmm7
-movhpd 16(%edx), %xmm4
-movdqa %xmm1, %xmm6
-pand %xmm4, %xmm6
-movaps %xmm4, %xmm5
-psrlq $52, %xmm4
-psllq $12, %xmm7
-movaps %xmm2, %xmm3
-psrlq $26, %xmm5
-por %xmm7, %xmm4
-psrlq $14, %xmm3
-pand %xmm1, %xmm5
-pand %xmm1, %xmm4
-pand %xmm1, %xmm3
-psrlq $40, %xmm2
-movdqu 32(%edx), %xmm1
-movdqu 48(%edx), %xmm7
-movdqa %xmm6, -152(%ebp)
-movdqa %xmm1, %xmm6
-punpckldq %xmm7, %xmm6
-addl $64, %edx
-punpckhdq %xmm7, %xmm1
-movaps -328(%ebp), %xmm7
-movaps %xmm0, -168(%ebp)
-pmuludq -248(%ebp), %xmm0
-pmuludq -264(%ebp), %xmm7
-movdqa %xmm1, -72(%ebp)
-movdqa -488(%ebp), %xmm1
-pmuludq -280(%ebp), %xmm1
-paddq %xmm7, %xmm0
-movdqa -504(%ebp), %xmm7
-pmuludq -296(%ebp), %xmm7
-paddq %xmm1, %xmm0
-movdqa -520(%ebp), %xmm1
-paddq %xmm7, %xmm0
-movdqa -312(%ebp), %xmm7
-pmuludq %xmm7, %xmm1
-por -456(%ebp), %xmm2
-paddq %xmm1, %xmm0
-movdqa -536(%ebp), %xmm1
-pmuludq %xmm2, %xmm1
-paddq %xmm1, %xmm0
-movdqa -440(%ebp), %xmm1
-pmuludq %xmm3, %xmm1
-paddq %xmm1, %xmm0
-movdqa -408(%ebp), %xmm1
-pmuludq %xmm4, %xmm1
-paddq %xmm1, %xmm0
-movdqa -376(%ebp), %xmm1
-movaps %xmm4, -120(%ebp)
-movdqa %xmm1, %xmm4
-pmuludq %xmm5, %xmm4
-paddq %xmm4, %xmm0
-movdqa -360(%ebp), %xmm4
-movdqa %xmm5, -136(%ebp)
-movdqa %xmm4, %xmm5
-pmuludq -152(%ebp), %xmm5
-pmuludq %xmm3, %xmm4
-paddq %xmm5, %xmm0
-pxor %xmm5, %xmm5
-movdqa %xmm6, -88(%ebp)
-punpckldq %xmm5, %xmm6
-paddq %xmm6, %xmm0
-movdqa %xmm0, -56(%ebp)
-movaps -168(%ebp), %xmm6
-movaps -328(%ebp), %xmm0
-pmuludq -296(%ebp), %xmm6
-pmuludq %xmm7, %xmm0
-movdqa -488(%ebp), %xmm7
-pmuludq -232(%ebp), %xmm7
-paddq %xmm0, %xmm6
-movdqa -504(%ebp), %xmm0
-pmuludq -216(%ebp), %xmm0
-paddq %xmm7, %xmm6
-paddq %xmm0, %xmm6
-movdqa -520(%ebp), %xmm0
-movdqa %xmm0, %xmm7
-pmuludq -200(%ebp), %xmm7
-paddq %xmm7, %xmm6
-movdqa %xmm1, %xmm7
-pmuludq %xmm2, %xmm7
-pmuludq -120(%ebp), %xmm1
-paddq %xmm7, %xmm6
-movdqa -392(%ebp), %xmm7
-pmuludq -120(%ebp), %xmm7
-paddq %xmm4, %xmm6
-movdqa -424(%ebp), %xmm4
-pmuludq -136(%ebp), %xmm4
-paddq %xmm7, %xmm6
-movdqa -472(%ebp), %xmm7
-paddq %xmm4, %xmm6
-movdqa -152(%ebp), %xmm4
-pmuludq %xmm4, %xmm7
-paddq %xmm7, %xmm6
-movdqa -72(%ebp), %xmm7
-punpckhdq %xmm5, %xmm7
-psllq $18, %xmm7
-movaps -328(%ebp), %xmm5
-paddq %xmm7, %xmm6
-pmuludq -280(%ebp), %xmm5
-movaps -168(%ebp), %xmm7
-pmuludq -264(%ebp), %xmm7
-movdqa %xmm6, -40(%ebp)
-movdqa -488(%ebp), %xmm6
-pmuludq -296(%ebp), %xmm6
-paddq %xmm5, %xmm7
-movdqa -504(%ebp), %xmm5
-paddq %xmm6, %xmm7
-movdqa -312(%ebp), %xmm6
-pmuludq %xmm6, %xmm5
-paddq %xmm5, %xmm7
-movdqa -232(%ebp), %xmm5
-pmuludq %xmm5, %xmm0
-paddq %xmm0, %xmm7
-movdqa -440(%ebp), %xmm0
-pmuludq %xmm2, %xmm0
-paddq %xmm0, %xmm7
-movdqa -408(%ebp), %xmm0
-pmuludq %xmm3, %xmm0
-movdqa %xmm3, -104(%ebp)
-movdqa -360(%ebp), %xmm3
-paddq %xmm0, %xmm7
-movdqa %xmm3, %xmm0
-pmuludq -136(%ebp), %xmm0
-pmuludq %xmm2, %xmm3
-pmuludq -408(%ebp), %xmm2
-paddq %xmm1, %xmm7
-movdqa -392(%ebp), %xmm1
-paddq %xmm0, %xmm7
-movdqa %xmm1, %xmm0
-pmuludq %xmm4, %xmm0
-paddq %xmm0, %xmm7
-movdqa -88(%ebp), %xmm0
-pxor %xmm4, %xmm4
-punpckhdq %xmm4, %xmm0
-psllq $6, %xmm0
-movdqa -56(%ebp), %xmm4
-paddq %xmm0, %xmm7
-psrlq $26, %xmm4
-paddq %xmm4, %xmm7
-movdqa %xmm7, -24(%ebp)
-movaps -168(%ebp), %xmm7
-movaps %xmm7, %xmm0
-pmuludq %xmm6, %xmm0
-pmuludq -280(%ebp), %xmm7
-movaps -328(%ebp), %xmm6
-movaps %xmm6, %xmm4
-pmuludq %xmm5, %xmm4
-pmuludq -296(%ebp), %xmm6
-paddq %xmm4, %xmm0
-paddq %xmm6, %xmm7
-movdqa -488(%ebp), %xmm4
-movdqa %xmm4, %xmm5
-pmuludq -216(%ebp), %xmm5
-pmuludq -312(%ebp), %xmm4
-paddq %xmm5, %xmm0
-paddq %xmm4, %xmm7
-movdqa -504(%ebp), %xmm5
-pmuludq -200(%ebp), %xmm5
-paddq %xmm5, %xmm0
-movdqa -520(%ebp), %xmm5
-pmuludq -184(%ebp), %xmm5
-paddq %xmm5, %xmm0
-movdqa -104(%ebp), %xmm5
-pmuludq %xmm5, %xmm1
-pmuludq -376(%ebp), %xmm5
-paddq %xmm3, %xmm0
-movdqa -424(%ebp), %xmm3
-movdqa -504(%ebp), %xmm6
-pmuludq -120(%ebp), %xmm3
-pmuludq -232(%ebp), %xmm6
-paddq %xmm1, %xmm0
-paddq %xmm6, %xmm7
-paddq %xmm3, %xmm0
-movdqa -472(%ebp), %xmm1
-movdqa -520(%ebp), %xmm4
-pmuludq -136(%ebp), %xmm1
-pmuludq -216(%ebp), %xmm4
-paddq %xmm1, %xmm0
-paddq %xmm4, %xmm7
-movdqa -152(%ebp), %xmm3
-pxor %xmm4, %xmm4
-movdqa -568(%ebp), %xmm1
-pmuludq %xmm3, %xmm1
-pmuludq -424(%ebp), %xmm3
-paddq %xmm2, %xmm7
-paddq %xmm1, %xmm0
-paddq %xmm5, %xmm7
-paddq -456(%ebp), %xmm0
-movaps -120(%ebp), %xmm2
-pmuludq -360(%ebp), %xmm2
-movdqa -136(%ebp), %xmm6
-pmuludq -392(%ebp), %xmm6
-paddq %xmm2, %xmm7
-movdqa -40(%ebp), %xmm1
-psrlq $26, %xmm1
-paddq %xmm1, %xmm0
-paddq %xmm6, %xmm7
-movdqa -72(%ebp), %xmm1
-movdqa %xmm0, %xmm5
-punpckldq %xmm4, %xmm1
-psrlq $26, %xmm5
-paddq %xmm3, %xmm7
-pmuludq -552(%ebp), %xmm5
-psllq $12, %xmm1
-paddq %xmm1, %xmm7
-movdqa -24(%ebp), %xmm1
-movdqa %xmm1, %xmm3
-movdqa -344(%ebp), %xmm6
-psrlq $26, %xmm3
-movdqa -56(%ebp), %xmm2
-pand %xmm6, %xmm1
-pand %xmm6, %xmm2
-pand %xmm6, %xmm0
-paddq %xmm3, %xmm7
-paddq %xmm5, %xmm2
-movdqa %xmm6, %xmm5
-movaps %xmm7, %xmm3
-movdqa -40(%ebp), %xmm4
-pand %xmm2, %xmm5
-psrlq $26, %xmm2
-pand %xmm6, %xmm4
-psrlq $26, %xmm3
-paddq %xmm2, %xmm1
-paddq %xmm3, %xmm4
-movdqa %xmm6, %xmm2
-pand %xmm7, %xmm2
-movdqa %xmm6, %xmm7
-pand %xmm4, %xmm7
-psrlq $26, %xmm4
-movdqa %xmm5, -520(%ebp)
-movdqa %xmm1, -504(%ebp)
-movdqa %xmm2, -488(%ebp)
-movaps %xmm7, -328(%ebp)
-paddq %xmm4, %xmm0
-cmpl $64, %ecx
-jae poly1305_blocks_sse2_10
-poly1305_blocks_sse2_11:
-movdqa -376(%ebp), %xmm1
-movdqa -408(%ebp), %xmm6
-movdqa -440(%ebp), %xmm5
-movdqa -536(%ebp), %xmm4
-movaps -328(%ebp), %xmm3
-poly1305_blocks_sse2_12:
-cmpl $32, %ecx
-jb poly1305_blocks_sse2_16
-poly1305_blocks_sse2_13:
-movaps %xmm3, -328(%ebp)
-pmuludq %xmm0, %xmm4
-pmuludq %xmm5, %xmm3
-pmuludq %xmm0, %xmm5
-paddq %xmm3, %xmm4
-movdqa -488(%ebp), %xmm3
-movdqa %xmm3, %xmm7
-pmuludq %xmm6, %xmm7
-movdqa -504(%ebp), %xmm2
-pmuludq %xmm1, %xmm2
-paddq %xmm7, %xmm4
-movdqa -360(%ebp), %xmm7
-paddq %xmm2, %xmm4
-movdqa -520(%ebp), %xmm2
-pmuludq %xmm7, %xmm2
-paddq %xmm2, %xmm4
-movdqa %xmm4, -536(%ebp)
-movaps -328(%ebp), %xmm4
-movaps %xmm4, %xmm2
-pmuludq %xmm6, %xmm2
-pmuludq %xmm0, %xmm6
-paddq %xmm2, %xmm5
-movdqa %xmm3, %xmm2
-pmuludq %xmm1, %xmm2
-paddq %xmm2, %xmm5
-movdqa -504(%ebp), %xmm2
-pmuludq %xmm7, %xmm2
-movdqa -520(%ebp), %xmm7
-paddq %xmm2, %xmm5
-movdqa -392(%ebp), %xmm2
-pmuludq %xmm2, %xmm7
-paddq %xmm7, %xmm5
-movdqa %xmm5, -440(%ebp)
-movaps %xmm4, %xmm5
-pmuludq %xmm1, %xmm5
-movdqa %xmm3, %xmm7
-pmuludq %xmm0, %xmm1
-paddq %xmm5, %xmm6
-movdqa -360(%ebp), %xmm5
-pmuludq %xmm5, %xmm7
-pmuludq %xmm5, %xmm0
-paddq %xmm7, %xmm6
-movdqa -504(%ebp), %xmm7
-pmuludq %xmm2, %xmm7
-movdqa -520(%ebp), %xmm2
-paddq %xmm7, %xmm6
-movdqa -424(%ebp), %xmm7
-pmuludq %xmm7, %xmm2
-paddq %xmm2, %xmm6
-movdqa %xmm6, -408(%ebp)
-movaps %xmm4, %xmm6
-pmuludq %xmm5, %xmm6
-paddq %xmm6, %xmm1
-movdqa -392(%ebp), %xmm2
-movdqa %xmm3, %xmm6
-pmuludq %xmm2, %xmm6
-pmuludq %xmm2, %xmm4
-pmuludq -424(%ebp), %xmm3
-paddq %xmm6, %xmm1
-paddq %xmm4, %xmm0
-movdqa -504(%ebp), %xmm6
-pmuludq %xmm7, %xmm6
-paddq %xmm3, %xmm0
-paddq %xmm6, %xmm1
-movdqa -472(%ebp), %xmm6
-movdqa -504(%ebp), %xmm4
-pmuludq %xmm6, %xmm4
-movdqa -520(%ebp), %xmm7
-movdqa -520(%ebp), %xmm2
-pmuludq -568(%ebp), %xmm2
-pmuludq %xmm6, %xmm7
-paddq %xmm4, %xmm0
-paddq %xmm7, %xmm1
-paddq %xmm2, %xmm0
-movdqa -536(%ebp), %xmm4
-movdqa -440(%ebp), %xmm5
-movdqa -408(%ebp), %xmm6
-testl %edx, %edx
-je poly1305_blocks_sse2_15
-poly1305_blocks_sse2_14:
-movdqu (%edx), %xmm2
-movdqu 16(%edx), %xmm7
-movdqa %xmm2, %xmm3
-movaps %xmm0, -168(%ebp)
-punpckldq %xmm7, %xmm3
-pxor %xmm0, %xmm0
-punpckhdq %xmm7, %xmm2
-movdqa %xmm3, %xmm7
-punpckhdq %xmm0, %xmm3
-psllq $6, %xmm3
-paddq %xmm3, %xmm5
-movdqa %xmm2, %xmm3
-punpckldq %xmm0, %xmm3
-punpckhdq %xmm0, %xmm2
-psllq $12, %xmm3
-punpckldq %xmm0, %xmm7
-psllq $18, %xmm2
-movaps -168(%ebp), %xmm0
-paddq -456(%ebp), %xmm0
-paddq %xmm7, %xmm4
-paddq %xmm3, %xmm6
-paddq %xmm2, %xmm1
-poly1305_blocks_sse2_15:
-movdqa %xmm1, %xmm7
-movdqa %xmm4, %xmm3
-psrlq $26, %xmm7
-psrlq $26, %xmm3
-paddq %xmm7, %xmm0
-paddq %xmm3, %xmm5
-movaps %xmm0, %xmm3
-movdqa %xmm5, %xmm2
-psrlq $26, %xmm3
-psrlq $26, %xmm2
-pmuludq -552(%ebp), %xmm3
-paddq %xmm2, %xmm6
-movdqa -344(%ebp), %xmm2
-movdqa %xmm6, %xmm7
-pand %xmm2, %xmm4
-pand %xmm2, %xmm1
-paddq %xmm3, %xmm4
-psrlq $26, %xmm7
-movdqa %xmm2, %xmm3
-paddq %xmm7, %xmm1
-pand %xmm4, %xmm3
-pand %xmm2, %xmm5
-psrlq $26, %xmm4
-pand %xmm2, %xmm0
-movdqa %xmm3, -520(%ebp)
-movdqa %xmm2, %xmm3
-paddq %xmm4, %xmm5
-movdqa %xmm2, %xmm4
-pand %xmm1, %xmm3
-psrlq $26, %xmm1
-pand %xmm6, %xmm4
-movdqa %xmm5, -504(%ebp)
-movdqa %xmm4, -488(%ebp)
-paddq %xmm1, %xmm0
-poly1305_blocks_sse2_16:
-testl %edx, %edx
-je poly1305_blocks_sse2_19
-poly1305_blocks_sse2_17:
-movdqa -520(%ebp), %xmm1
-movdqa -504(%ebp), %xmm2
-movdqa -488(%ebp), %xmm4
-movdqa %xmm1, (%eax)
-movdqa %xmm2, 16(%eax)
-movdqa %xmm4, 32(%eax)
-movdqa %xmm3, 48(%eax)
-movdqa %xmm0, 64(%eax)
-poly1305_blocks_sse2_18:
-movl -4(%ebp), %esi
-movl -8(%ebp), %edi
-addl $(568+8+63), %esp
-popl %ebp
-ret
-poly1305_blocks_sse2_19:
-movdqa -520(%ebp), %xmm2
-movdqa %xmm2, %xmm1
-movdqa -504(%ebp), %xmm5
-psrldq $8, %xmm1
-movdqa %xmm5, %xmm4
-paddq %xmm1, %xmm2
-psrldq $8, %xmm4
-movaps %xmm3, %xmm1
-movd %xmm2, %ecx
-movdqa -488(%ebp), %xmm7
-paddq %xmm4, %xmm5
-movdqa %xmm7, %xmm6
-movl %ecx, %edx
-movd %xmm5, %esi
-andl $67108863, %ecx
-psrldq $8, %xmm6
-paddq %xmm6, %xmm7
-shrl $26, %edx
-psrldq $8, %xmm1
-addl %edx, %esi
-movd %xmm7, %edx
-movl %esi, %edi
-paddq %xmm1, %xmm3
-shrl $26, %edi
-andl $67108863, %esi
-movl %eax, -568(%ebp)
-addl %edi, %edx
-movd %xmm3, %eax
-movaps %xmm0, %xmm3
-psrldq $8, %xmm3
-paddq %xmm3, %xmm0
-movl %edx, %edi
-andl $67108863, %edx
-shrl $26, %edi
-addl %edi, %eax
-movd %xmm0, %edi
-movl %eax, -564(%ebp)
-shrl $26, %eax
-addl %eax, %edi
-movl %edi, %eax
-andl $67108863, %edi
-shrl $26, %eax
-lea (%eax,%eax,4), %eax
-addl %eax, %ecx
-movl %ecx, %eax
-andl $67108863, %ecx
-shrl $26, %eax
-addl %eax, %esi
-movl %esi, %eax
-andl $67108863, %esi
-shrl $26, %eax
-addl %eax, %edx
-movl %edx, %eax
-andl $67108863, %eax
-movl %eax, -560(%ebp)
-movl -564(%ebp), %eax
-shrl $26, %edx
-andl $67108863, %eax
-addl %edx, %eax
-movl %eax, %edx
-shrl $26, %eax
-andl $67108863, %edx
-addl %eax, %edi
-movl %edi, %eax
-shrl $26, %edi
-andl $67108863, %eax
-movl %eax, -552(%ebp)
-movl %edx, -556(%ebp)
-lea (%edi,%edi,4), %edi
-addl %edi, %ecx
-movl %ecx, %edi
-andl $67108863, %edi
-shrl $26, %ecx
-addl %ecx, %esi
-movl %esi, -548(%ebp)
-lea 5(%edi), %ecx
-movl %ecx, -544(%ebp)
-shrl $26, %ecx
-addl %esi, %ecx
-movl %ecx, -540(%ebp)
-shrl $26, %ecx
-movl -560(%ebp), %esi
-addl %esi, %ecx
-movl %ecx, -536(%ebp)
-shrl $26, %ecx
-addl %edx, %ecx
-movl %ecx, -532(%ebp)
-shrl $26, %ecx
-movl -544(%ebp), %edx
-andl $67108863, %edx
-lea -67108864(%ecx,%eax), %eax
-movl %eax, -528(%ebp)
-shrl $31, %eax
-decl %eax
-movl %eax, %ecx
-andl %eax, %edx
-notl %ecx
-andl %ecx, %edi
-orl %edx, %edi
-movl -568(%ebp), %edx
-movl %ecx, -524(%ebp)
-movl %edi, (%edx)
-movl -548(%ebp), %edi
-andl %ecx, %edi
-movl -540(%ebp), %ecx
-andl $67108863, %ecx
-andl %eax, %ecx
-orl %ecx, %edi
-movl -536(%ebp), %ecx
-andl $67108863, %ecx
-movl %edi, 4(%edx)
-andl %eax, %ecx
-movl -524(%ebp), %edi
-andl %edi, %esi
-orl %ecx, %esi
-movl %esi, 8(%edx)
-movl -532(%ebp), %esi
-andl $67108863, %esi
-movl -556(%ebp), %ecx
-andl %eax, %esi
-andl %edi, %ecx
-orl %esi, %ecx
-movl -528(%ebp), %esi
-andl -552(%ebp), %edi
-andl %eax, %esi
-orl %esi, %edi
-movl %ecx, 12(%edx)
-movl %edi, 16(%edx)
-jmp poly1305_blocks_sse2_18
-ENDFN(poly1305_blocks)
+jmp poly1305_init_ext_sse2_9
+FN_END poly1305_init_ext_sse2
 
-
-FN(poly1305_finish_ext)
-poly1305_finish_ext_sse2_local:
-pushl %ebp
-movl %esp, %ebp
-andl $-64, %esp
-pushl %esi
-pushl %edi
-pushl %ebx
-subl $116, %esp
-pxor %xmm0, %xmm0
-movaps %xmm0, 64(%esp)
-movaps %xmm0, 80(%esp)
-poly1305_finish_ext_sse2_2:
-movl 16(%ebp), %ebx
-movl 8(%ebp), %esi
-testl %ebx, %ebx
-je poly1305_finish_ext_sse2_19
-poly1305_finish_ext_sse2_3:
-movl 12(%ebp), %edx
-testb $16, %bl
-je poly1305_finish_ext_sse2_5
-poly1305_finish_ext_sse2_4:
-movl $16, %eax
-movdqu (%edx), %xmm0
-movdqa %xmm0, 64(%esp)
-jmp poly1305_finish_ext_sse2_6
-poly1305_finish_ext_sse2_5:
-xorl %eax, %eax
-poly1305_finish_ext_sse2_6:
-testb $8, %bl
-je poly1305_finish_ext_sse2_8
-poly1305_finish_ext_sse2_7:
-movl (%eax,%edx), %ecx
-movl 4(%eax,%edx), %edi
-movl %ecx, 64(%esp,%eax)
-movl %edi, 68(%esp,%eax)
-addl $8, %eax
-poly1305_finish_ext_sse2_8:
-testb $4, %bl
-je poly1305_finish_ext_sse2_10
-poly1305_finish_ext_sse2_9:
-movl (%eax,%edx), %ecx
-movl %ecx, 64(%esp,%eax)
-addl $4, %eax
-poly1305_finish_ext_sse2_10:
-testb $2, %bl
-je poly1305_finish_ext_sse2_12
-poly1305_finish_ext_sse2_11:
-movzwl (%eax,%edx), %ecx
-movw %cx, 64(%esp,%eax)
-addl $2, %eax
-poly1305_finish_ext_sse2_12:
-testb $1, %bl
-je poly1305_finish_ext_sse2_14
-poly1305_finish_ext_sse2_13:
-movzbl (%eax,%edx), %edx
-movb %dl, 64(%esp,%eax)
-poly1305_finish_ext_sse2_14:
-cmpl $16, %ebx
-je poly1305_finish_ext_sse2_17
-poly1305_finish_ext_sse2_15:
-movb $1, 64(%esp,%ebx)
-jae poly1305_finish_ext_sse2_17
-poly1305_finish_ext_sse2_16:
-movl $8, %eax
-jmp poly1305_finish_ext_sse2_18
-poly1305_finish_ext_sse2_17:
-movl $4, %eax
-poly1305_finish_ext_sse2_18:
-orl %eax, 240(%esi)
-movl %esi, %eax
-movl $32, %ecx
-lea 64(%esp), %edx
-call poly1305_blocks_sse2_local
-poly1305_finish_ext_sse2_19:
-testb $1, 240(%esi)
-je poly1305_finish_ext_sse2_25
-poly1305_finish_ext_sse2_20:
-testl %ebx, %ebx
-je poly1305_finish_ext_sse2_22
-poly1305_finish_ext_sse2_21:
-cmpl $16, %ebx
-jbe poly1305_finish_ext_sse2_23
-poly1305_finish_ext_sse2_22:
-movl 84(%esi), %eax
-movl 92(%esi), %edx
-movl 100(%esi), %ecx
-movl 108(%esi), %ebx
-movl 116(%esi), %edi
-movl %eax, 88(%esi)
-movl %edx, 104(%esi)
-movl %ecx, 120(%esi)
-movl %ebx, 136(%esi)
-movl %edi, 152(%esi)
-jmp poly1305_finish_ext_sse2_24
-poly1305_finish_ext_sse2_23:
-movl 84(%esi), %eax
-movl 92(%esi), %edx
-movl 100(%esi), %ecx
-movl 108(%esi), %ebx
-movl 116(%esi), %edi
-movl %eax, 80(%esi)
-xorl %eax, %eax
-movl $1, 88(%esi)
-movl %edx, 96(%esi)
-movl %eax, 104(%esi)
-movl %ecx, 112(%esi)
-movl %eax, 120(%esi)
-movl %ebx, 128(%esi)
-movl %eax, 136(%esi)
-movl %edi, 144(%esi)
-movl %eax, 152(%esi)
-poly1305_finish_ext_sse2_24:
-movl %esi, %eax
-xorl %edx, %edx
-movl $32, %ecx
-call poly1305_blocks_sse2_local
-poly1305_finish_ext_sse2_25:
-movl 20(%ebp), %edi
-movl 8(%esi), %eax
-movl %edi, 96(%esp)
-movl %eax, %edi
-movl 4(%esi), %ecx
-movl %ecx, %edx
-shrl $6, %ecx
-shll $20, %edi
-movl 12(%esi), %ebx
-orl %edi, %ecx
-movl %ebx, %edi
-shrl $12, %eax
-shll $14, %edi
-pxor %xmm0, %xmm0
-orl %edi, %eax
-movl 16(%esi), %edi
-shll $26, %edx
-shrl $18, %ebx
-shll $8, %edi
-orl (%esi), %edx
-orl %edi, %ebx
-movdqa %xmm0, 0(%esi)
-movdqa %xmm0, 16(%esi)
-movdqa %xmm0, 32(%esi)
-movdqa %xmm0, 48(%esi)
-movdqa %xmm0, 64(%esi)
-movdqa %xmm0, 80(%esi)
-movdqa %xmm0, 96(%esi)
-addl 124(%esi), %edx
-movdqa %xmm0, 112(%esi)
-adcl 132(%esi), %ecx
-adcl 140(%esi), %eax
-movdqa %xmm0, 128(%esi)
-adcl 148(%esi), %ebx
-movdqa %xmm0, 144(%esi)
-movdqa %xmm0, 160(%esi)
-movdqa %xmm0, 176(%esi)
-movdqa %xmm0, 192(%esi)
-movdqa %xmm0, 208(%esi)
-movdqa %xmm0, 224(%esi)
-movl 96(%esp), %edi
-movl %ebx, 12(%edi)
-movl %eax, 8(%edi)
-movl %ecx, 4(%edi)
-movl %edx, (%edi)
-addl $116, %esp
-popl %ebx
-popl %edi
-popl %esi
-movl %ebp, %esp
-popl %ebp
-ret
-ENDFN(poly1305_finish_ext)
-
-
-FN(poly1305_auth)
-pushl %ebp
-pushl %edi
-movl %esp, %ebp
-subl $244, %esp
-andl $~63, %esp
-movl %esp, %edi
-movl %edi, %eax
-movl 24(%ebp), %edx
-movl 20(%ebp), %ecx
-subl $16, %esp
-movl $0, 12(%esp)
-call poly1305_init_ext_sse2_local
-movl 20(%ebp), %ecx
-andl $~31, %ecx
-jz poly1305_auth_sse2_no_data
-movl %edi, %eax
-movl 16(%ebp), %edx
-addl %ecx, 16(%ebp)
-call poly1305_blocks_sse2_local
-poly1305_auth_sse2_no_data:
-pushl 12(%ebp)
-movl 20(%ebp), %ecx
-andl $31, %ecx
-pushl %ecx
-pushl 16(%ebp)
-pushl %edi
-call poly1305_finish_ext_sse2_local
-movl %ebp, %esp
-popl %edi
-popl %ebp
-ret
-ENDFN(poly1305_auth)
-
-ENDFILE()
