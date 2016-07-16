@@ -31,6 +31,8 @@ int crypto_aead_encrypt(
 	/* encrypt message */
 	ae_encrypt(cxt, (unsigned char*)m, mlen, c);
 
+	free(cxt);
+
 	return RETURN_SUCCESS;
 }
 
@@ -61,6 +63,8 @@ int crypto_aead_decrypt(
 
 	/* decrypt ciphertext */
 	ae_decrypt(cxt, m, clen, (unsigned char*)c, tag);
+
+	free(cxt);
 
 	/* compare the tag */
 	int i;

@@ -18,6 +18,8 @@ int crypto_aead_encrypt(unsigned char *c,unsigned long long *clen,
   unsigned char *header = malloc((size_t) (adlen+CRYPTO_NPUBBYTES));
   unsigned char *tag = c+mlen;
 
+  errno = 0;
+
   *clen=mlen+CRYPTO_NPUBBYTES;
   keysetup(&ctx, k);
   memcpy(header,ad,adlen);
@@ -43,6 +45,8 @@ int crypto_aead_decrypt(unsigned char *m,unsigned long long *mlen,
   unsigned char *header =  malloc((size_t) (adlen+CRYPTO_NPUBBYTES));
   unsigned char tag[CRYPTO_NPUBBYTES];
   int result;
+
+  errno = 0;
 
   if(clen < CRYPTO_NPUBBYTES) return -1;
   *mlen = clen - CRYPTO_NPUBBYTES;

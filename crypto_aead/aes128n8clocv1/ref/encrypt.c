@@ -1,5 +1,6 @@
 #include "crypto_aead.h"
 #include <string.h>
+#include <stdlib.h>
 #include "api.h"
 #include "cloc.h"
 
@@ -32,6 +33,8 @@ int crypto_aead_encrypt(
     
     /* copy the tag to the end of ciphertext */
     memcpy(c+mlen, tag, CRYPTO_ABYTES);
+
+	free(cxt);
 	return RETURN_SUCCESS;
 }
 
@@ -62,6 +65,8 @@ int crypto_aead_decrypt(
     /* decrypt ciphertext */
     ae_encrypt(cxt, m, *mlen, (unsigned char*)c, tag, CRYPTO_ABYTES, DEC);
     
+	free(cxt);
+
     /* compare the tag */
     int i;
     for(i = 0; i < CRYPTO_ABYTES; i++)

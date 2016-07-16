@@ -170,17 +170,20 @@ void p256scalarmult(point *c, point *a, const unsigned char e[32]){
   unsigned int bit=0;
   unsigned int index=0;
   unsigned int first=1;
+  int i;
+  int j;
+  int k;
   point current;
   point temp;
   point p;
   point table[16];//let's do 2 bit first, then increase
   p256cmov(&table[1], a, 1);
   p256dbl(&table[2], a);
-  for(int i=3; i<16; i++){
+  for(i=3; i<16; i++){
     p256add(&table[i], &table[i-1], a);
   }
-  for(int i=0; i<32; i++){ //make it big endian, and high bit first
-    for(int j=4; j>=0; j-=4){
+  for(i=0; i<32; i++){ //make it big endian, and high bit first
+    for(j=4; j>=0; j-=4){
       index=(e[i]>>j)&0x0f; //Constant time
       bit=(index!=0);
       if(!first){
@@ -191,7 +194,7 @@ void p256scalarmult(point *c, point *a, const unsigned char e[32]){
       }
       first = 0;
       //load table[index] in constant time
-      for(int k=0; k<16; k++){
+      for(k=0; k<16; k++){
         p256cmov(&p, &table[k], (k==index));
       }
       p256add(&temp, &current, &p);
@@ -248,22 +251,25 @@ void p256dblmult_base(point *c, point *a, const unsigned char ea[32],
   point bp;
   point table[16];
   int index;
+  int i;
+  int j;
+  int k;
   p256unpack(&bp, basep);
   p256identity(&current);
   p256identity(&table[0]);
   /*Ebase changes faster: 4*ebasebits+eabits*/
-  for(int i=1; i<4; i++){
+  for(i=1; i<4; i++){
     p256add_total(&table[i], &table[i-1], a);
   }
-  for(int j=1; j<4; j++){
+  for(j=1; j<4; j++){
     p256add_total(&table[4*j], &table[4*(j-1)], &bp);
-    for(int i=1; i<4; i++){
+    for(i=1; i<4; i++){
       p256add_total(&table[4*j+i], &table[4*j+i-1], a);
     }
   }
 
-  for(int i=0; i<32; i++){
-    for(int j=6; j>=0; j-=2){
+  for(i=0; i<32; i++){
+    for(j=6; j>=0; j-=2){
       p256dbl_total(&current, &current);
       p256dbl_total(&current, &current);
       index = 4*((ebase[i]>>j)&0x03) + ((ea[i]>>j)&0x03);

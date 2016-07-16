@@ -242,7 +242,7 @@ do
 	    echo "=== `date` === trying CC=$c CXX=$cpp CFLAGS=$copts CXXFLAGS=$cppopts ABI=$gmpabi"
 	    rm -rf "$top/$target/work"
 	    mkdir -p "$top/$target/work"
-	    cp -pr gmp-6.0.0/* "$top/$target/work"
+	    cp -pr gmp-6.1.1/* "$top/$target/work"
 	    ( cd "$top/$target/work" \
 	      && ./configure --enable-cxx \
 	         ABI="$gmpabi" \

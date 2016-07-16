@@ -81,7 +81,7 @@ void measure(void)
         for (i = 0;i < TIMINGS;++i) cycles[i] = cycles[i + 1] - cycles[i];
         printentry(1000000 * adlen + mlen,"decrypt_cycles",cycles,TIMINGS);
         if (clen > 0) {
-          ++c[clen - 1];
+          ++c[clen/2];
           for (i = 0;i <= TIMINGS;++i) {
             cycles[i] = cpucycles();
             crypto_aead_decrypt(m,&tlen,nsec,c,clen,ad,adlen,npub,k);

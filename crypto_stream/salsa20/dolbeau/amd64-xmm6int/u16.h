@@ -1,5 +1,5 @@
 /*
-u16.h version $Date: 2014/09/24 12:07:11 $
+u16.h version $Date: 2014/09/24 12:11:29 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.

@@ -11,6 +11,13 @@ static double osfreq(void)
     if (s > 0) return result;
   }
 
+  f = fopen("/sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed", "r");
+  if (f) {
+    s = fscanf(f,"%lf",&result);
+    fclose(f);
+    if (s > 0) return 1000.0 * result;
+  }
+
   f = fopen("/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq", "r");
   if (f) {
     s = fscanf(f,"%lf",&result);

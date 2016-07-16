@@ -1,5 +1,5 @@
 /*
-chacha.c version $Date: 2014/09/07 16:10:57 $
+chacha.c version $Date: 2014/09/08 17:38:05 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.
@@ -10,6 +10,7 @@ Public domain.
 
 #include <immintrin.h>
 #include <stdio.h>
+#define ROUNDS 20
 
 #define ROTATE(v,c) (ROTL32(v,c))
 #define XOR(v,w) ((v) ^ (w))
@@ -28,7 +29,7 @@ static void salsa20_wordtobyte(u8 output[64],const u32 input[16])
   int i;
 
   for (i = 0;i < 16;++i) x[i] = input[i];
-  for (i = 20;i > 0;i -= 2) {
+  for (i = ROUNDS;i > 0;i -= 2) {
     QUARTERROUND( 0, 4, 8,12)
     QUARTERROUND( 1, 5, 9,13)
     QUARTERROUND( 2, 6,10,14)

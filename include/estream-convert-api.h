@@ -76,6 +76,10 @@ int crypto_stream(
   if (!flaginitialized) { ECRYPT_init(); flaginitialized = 1; }
   ECRYPT_keysetup(&ctx,k,crypto_stream_KEYBYTES * 8,crypto_stream_NONCEBYTES * 8);
   ECRYPT_ivsetup(&ctx,n);
+  while (clen > 65536) {
+    ECRYPT_keystream_bytes(&ctx,c,65536);
+    c += 65536; clen -= 65536;
+  }
   ECRYPT_keystream_bytes(&ctx,c,clen);
   return 0;
 #else
@@ -85,6 +89,10 @@ int crypto_stream(
   ECRYPT_keysetup(&ctx,k,crypto_stream_KEYBYTES * 8,crypto_stream_NONCEBYTES * 8);
   ECRYPT_ivsetup(&ctx,n);
   for (i = 0;i < clen;++i) c[i] = 0;
+  while (clen > 65536) {
+    ECRYPT_encrypt_bytes(&ctx,c,c,65536);
+    c += 65536; clen -= 65536;
+  }
   ECRYPT_encrypt_bytes(&ctx,c,c,clen);
   return 0;
 #endif
@@ -101,6 +109,10 @@ int crypto_stream_xor(
   if (!flaginitialized) { ECRYPT_init(); flaginitialized = 1; }
   ECRYPT_keysetup(&ctx,k,crypto_stream_KEYBYTES * 8,crypto_stream_NONCEBYTES * 8);
   ECRYPT_ivsetup(&ctx,n);
+  while (mlen > 65536) {
+    ECRYPT_encrypt_bytes(&ctx,m,c,65536);
+    m += 65536; c += 65536; mlen -= 65536;
+  }
   ECRYPT_encrypt_bytes(&ctx,m,c,mlen);
   return 0;
 }

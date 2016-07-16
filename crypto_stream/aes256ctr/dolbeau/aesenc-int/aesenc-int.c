@@ -1,5 +1,5 @@
 /*
-  aesenc-int.c version $Date: 2014/08/22 16:49:12 $
+  aesenc-int.c version $Date: 2016/04/01 17:05:23 $
   AES-CTR
   Romain Dolbeau
   Public Domain
@@ -23,47 +23,37 @@
 #define _bswap(a) __builtin_bswap(a)
 #endif
 
-static inline void aesni_key256_expand(const unsigned char* key, __m128 rkeys[16]) {
-  __m128 key0 = _mm_loadu_ps((const float *)(key+0));
-  __m128 key1 = _mm_loadu_ps((const float *)(key+16));
-  __m128 temp0, temp1, temp2, temp4;
+static inline void aesni_key256_expand(const unsigned char* key, __m128i rkeys[16]) {
+  __m128i key0 = _mm_loadu_si128((const unsigned int *)(key+0));
+  __m128i key1 = _mm_loadu_si128((const unsigned int *)(key+16));
+  __m128i temp0, temp1, temp2, temp4;
   int idx = 0;
 
   rkeys[idx++] = key0;
   temp0 = key0;
   temp2 = key1;
-  temp4 = _mm_setzero_ps();
 
-  /* why single precision floating-point rather than integer instructions ?
-     because _mm_shuffle_ps takes two inputs, while _mm_shuffle_epi32 only
-     takes one - it doesn't perform the same computation...
-     _mm_shuffle_ps takes the lower 64 bits of the result from the first
-     operand, and the higher 64 bits of the result from the second operand
-     (in both cases, all four input floats are accessible).
-     I don't like the non-orthogonal naming scheme :-(
-     
-     This is all strongly inspired by the openssl assembly code.
-  */
-#define BLOCK1(IMM)                                                     \
-  temp1 = (__m128)_mm_aeskeygenassist_si128((__m128i)temp2, IMM);       \
-  rkeys[idx++] = temp2;                                                 \
-  temp4 = _mm_shuffle_ps(temp4, temp0, 0x10);                           \
-  temp0 = _mm_xor_ps(temp0, temp4);                                     \
-  temp4 = _mm_shuffle_ps(temp4, temp0, 0x8c);                           \
-  temp0 = _mm_xor_ps(temp0, temp4);                                     \
-  temp1 = _mm_shuffle_ps(temp1, temp1, 0xff);                           \
-  temp0 = _mm_xor_ps(temp0, temp1)
-  
-#define BLOCK2(IMM)                                                     \
-  temp1 = (__m128)_mm_aeskeygenassist_si128((__m128i)temp0, IMM);       \
-  rkeys[idx++] = temp0;                                                 \
-  temp4 = _mm_shuffle_ps(temp4, temp2, 0x10);                           \
-  temp2 = _mm_xor_ps(temp2, temp4);                                     \
-  temp4 = _mm_shuffle_ps(temp4, temp2, 0x8c);                           \
-  temp2 = _mm_xor_ps(temp2, temp4);                                     \
-  temp1 = _mm_shuffle_ps(temp1, temp1, 0xaa);                           \
-  temp2 = _mm_xor_ps(temp2, temp1)
-  
+  /* blockshift-based block by Cedric Bourrasset & Romain Dolbeau */
+#define BLOCK1(IMM)                              \
+  temp1 = _mm_aeskeygenassist_si128(temp2, IMM); \
+  rkeys[idx++] = temp2;                          \
+  temp4 = _mm_slli_si128(temp0,4);               \
+  temp0 = _mm_xor_si128(temp0,temp4);            \
+  temp4 = _mm_slli_si128(temp0,8);               \
+  temp0 = _mm_xor_si128(temp0,temp4);            \
+  temp1 = _mm_shuffle_epi32(temp1,0xff);         \
+  temp0 = _mm_xor_si128(temp0,temp1)
+
+#define BLOCK2(IMM)                              \
+  temp1 = _mm_aeskeygenassist_si128(temp0, IMM); \
+  rkeys[idx++] = temp0;                          \
+  temp4 = _mm_slli_si128(temp2,4);               \
+  temp2 = _mm_xor_si128(temp2,temp4);            \
+  temp4 = _mm_slli_si128(temp2,8);               \
+  temp2 = _mm_xor_si128(temp2,temp4);            \
+  temp1 = _mm_shuffle_epi32(temp1,0xaa);         \
+  temp2 = _mm_xor_si128(temp2,temp1)
+
   BLOCK1(0x01);
   BLOCK2(0x01);
 
@@ -215,7 +205,7 @@ const unsigned char *n,
 const unsigned char *k
 )
 {
-  __m128 rkeys[16];
+  __m128i rkeys[16];
   ALIGN16 unsigned char n2[16];
   unsigned long long i, j;
   aesni_key256_expand(k, rkeys);
@@ -227,8 +217,8 @@ const unsigned char *k
 #define LOOP(iter)                                       \
   int lb = iter * 16;                                    \
   for (i = 0 ; i < outlen ; i+= lb) {                    \
-    ALIGN16 unsigned char outni[lb];       \
-    aesni_encrypt##iter(outni, n2, (__m128i*)rkeys);     \
+    ALIGN16 unsigned char outni[lb];                     \
+    aesni_encrypt##iter(outni, n2, rkeys);               \
     unsigned long long mj = lb;                          \
     if ((i+mj)>=outlen)                                  \
       mj = outlen-i;                                     \
@@ -249,7 +239,7 @@ const unsigned char *n,
 const unsigned char *k
 )
 {
-  __m128 rkeys[16];
+  __m128i rkeys[16];
   ALIGN16 unsigned char n2[16];
   unsigned long long i, j;
   aesni_key256_expand(k, rkeys);
@@ -261,8 +251,8 @@ const unsigned char *k
 #define LOOPXOR(iter)                                    \
   int lb = iter * 16;                                    \
   for (i = 0 ; i < inlen ; i+= lb) {                     \
-    ALIGN16 unsigned char outni[lb];       \
-    aesni_encrypt##iter(outni, n2, (__m128i*)rkeys);     \
+    ALIGN16 unsigned char outni[lb];                     \
+    aesni_encrypt##iter(outni, n2, rkeys);               \
     unsigned long long mj = lb;                          \
     if ((i+mj)>=inlen)                                   \
       mj = inlen-i;                                      \

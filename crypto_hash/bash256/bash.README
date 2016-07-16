@@ -1,0 +1,27 @@
+Bash is a cryptographic hash function. 
+Bash is intended to become Belarusian standard STB 34.101.77. 
+
+Bash is based on sponge function with the state of 1536 bits. 
+The output hash value sizes are 256, 384 and 512 bits. 
+The reference implementation is available 
+at https://github.com/agievich/bee2/ as a part of the library bee2. 
+The implementation optimized using avx2 instructions is available 
+at https://github.com/bcrypto/bee2/tree/bash-avx2.
+
+This submission contains reference and avx2-optimized code. 
+The code of bash with value sizes of 256, 384 and 512 bits is located 
+in 'bash256', 'bash384' and 'bash512' subdirectories correspondingly. 
+The main files (bash.h, bash.c, bash_avx2.h, bash_avx2.c) are the same, 
+the difference is api.h and hash.c files. 
+
+The reference implementation is located in 'ref' subdirectoreis. 
+Though it is intended to be run on any platform 
+that has a C compiler supporting 64 bit integral types, 
+the main target architectures are 64-bit ones. 
+
+The avx2-optimized code is located in 'avx2' subdirectories 
+and detects avx2 intrinsics with the __AVX2__ macro. 
+The issue might be with the I(W,n) macro in bash_avx2.c, 
+I(W,n) should return the n-th 64-bit word of the W register. 
+The code has been tested with msvc-12 and gcc-4.9.2 compilers. 
+

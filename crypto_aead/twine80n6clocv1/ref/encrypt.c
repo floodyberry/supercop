@@ -1,5 +1,6 @@
 #include "crypto_aead.h"
 #include <string.h>
+#include <stdlib.h>
 #include "api.h"
 #include "cloc.h"
 
@@ -12,14 +13,14 @@ int crypto_aead_encrypt(
 		const unsigned char *k
 		)
 {
-    /* set ciphertext length */
-    *clen = mlen + CRYPTO_ABYTES;
-    
     unsigned char tag[CRYPTO_ABYTES];
     ae_cxt* cxt = ae_allocate();
     if(!cxt)
         return RETURN_MEMORY_FAIL;
     
+    /* set ciphertext length */
+    *clen = mlen + CRYPTO_ABYTES;
+
     /* set key and compute round keys */
     ae_init(cxt, k, CRYPTO_KEYBYTES * 8);
     
@@ -31,6 +32,9 @@ int crypto_aead_encrypt(
     
     /* copy the tag to the end of ciphertext */
     memcpy(c+mlen, tag, CRYPTO_ABYTES);
+
+	free(cxt);
+
 	return RETURN_SUCCESS;
 }
 
@@ -43,13 +47,13 @@ int crypto_aead_decrypt(
 		const unsigned char *k
 		)
 {
-    /* set plaintext length */
-    *mlen = clen - CRYPTO_ABYTES;
-    
     unsigned char tag[CRYPTO_ABYTES];
     ae_cxt* cxt = ae_allocate();
     if(!cxt)
         return RETURN_MEMORY_FAIL;
+    
+    /* set plaintext length */
+    *mlen = clen - CRYPTO_ABYTES;
     
     /* set key and compute round keys */
     ae_init(cxt, k, CRYPTO_KEYBYTES * 8);
@@ -60,6 +64,8 @@ int crypto_aead_decrypt(
     /* decrypt ciphertext */
     ae_encrypt(cxt, m, *mlen, (unsigned char*)c, tag, CRYPTO_ABYTES, DEC);
     
+	free(cxt);
+
     /* compare the tag */
     int i;
     for(i = 0; i < CRYPTO_ABYTES; i++)

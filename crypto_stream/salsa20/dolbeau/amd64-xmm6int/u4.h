@@ -1,5 +1,5 @@
 /*
-u4.h version $Date: 2014/09/24 12:11:29 $
+u4.h version $Date: 2014/11/11 11:03:38 $
 D. J. Bernstein
 Romain Dolbeau
 Public domain.

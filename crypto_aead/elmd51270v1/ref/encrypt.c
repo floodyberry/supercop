@@ -161,7 +161,10 @@ const unsigned char *k
 	
 	if(((clen % 16) != 1)||(clen < 33))
 		return -1;
-	
+        // Bugfix from Nilanjan Datta, 22 Sep 2014
+        if((c[clen-1]!= 0x00) && (c[clen-1]!=0x01))
+         return -1;
+
 	key_schedule(k);
 	
 	/* =========== Generate the Masks ========== */

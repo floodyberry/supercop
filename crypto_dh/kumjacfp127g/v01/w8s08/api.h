@@ -1,0 +1,7 @@
+#define crypto_dh_kumjacfp127g_v01_w8s08_SECRETKEYBYTES 32
+#define crypto_dh_kumjacfp127g_v01_w8s08_PUBLICKEYBYTES 48
+#define crypto_dh_kumjacfp127g_v01_w8s08_BYTES 48
+
+#define SECRETKEY_BYTES crypto_dh_kumjacfp127g_v01_w8s08_SECRETKEYBYTES
+#define PUBLICKEY_BYTES crypto_dh_kumjacfp127g_v01_w8s08_PUBLICKEYBYTES
+#define SHAREDSECRET_BYTES crypto_dh_kumjacfp127g_w8s08_var_BYTES
