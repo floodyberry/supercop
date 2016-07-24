@@ -8,6 +8,8 @@ const char *abi(void)
    return "x86";
 #elif defined(__ia64__) || defined(__IA64__) || defined(__M_IA64)
    return "ia64";
+#elif defined(__aarch64__)
+   return "aarch64";
 #elif defined(__SPU__)
    return "cellspu";
 #elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(_ARCH_PPC64)

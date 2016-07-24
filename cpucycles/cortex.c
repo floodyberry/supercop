@@ -16,6 +16,30 @@ static unsigned long long prevcycles = 0;
 static int now[3];
 static long long cyclespersec = 0;
 
+#if defined(__aarch64__)
+#define V8FREQ 1
+long long cpucycles_cortex(void)
+{
+  long long Rt;
+  asm volatile("mrs %0,  CNTVCT_EL0" : "=r" (Rt));
+  return Rt * V8FREQ;
+}
+long long cpucycles_cortex_persecond(void) {
+  struct timeval t0,t1;
+  long long c0,c1;
+  double d0,d1;
+  gettimeofday(&t0,(struct timezone *) 0);
+  c0 = cpucycles_cortex();
+  sleep(1);
+  gettimeofday(&t1,(struct timezone *) 0);
+  c1 = cpucycles_cortex();
+  d0 = (double) t0.tv_sec;
+  d0 += ((double) t0.tv_usec) / 1000000.0;
+  d1 = (double) t1.tv_sec;
+  d1 += ((double) t1.tv_usec) / 1000000.0;
+  return  (c1-c0)/(d1-d0);
+}
+#else
 static void readticks(unsigned int *result)
 {
   struct timeval t;
@@ -71,3 +95,4 @@ long long cpucycles_cortex_persecond(void)
   while (!cyclespersec) cpucycles_cortex();
   return cyclespersec * SCALE;
 }
+#endif

@@ -1,3 +1,12 @@
+Changes from 20160715:
+
+   * New crypto_aead/*jambu*v2.
+   * Fixes for crypto_aead/pi*v2.
+   * Fixes for crypto_aead/hs1*.
+   * TWEAK_LOW_LATENCY for crypto_aead/norx*.
+   * Initial aarch64 support from Romain Dolbeau.
+   * Prioritize scaling_setspeed over scaling_max_freq in reports.
+
 Changes from 20141014:
 
    * Updated poly1305/moon.
