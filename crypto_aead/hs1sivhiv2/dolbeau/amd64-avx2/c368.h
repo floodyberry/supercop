@@ -297,7 +297,7 @@ __m256i x_15 = _mm256_set1_epi32(x[15]);
       _mm256_storeu_si256((__m256i*)(out+128), t_##c );                 \
       _mm256_storeu_si256((__m256i*)(out+192), t_##d );                 \
       _mm256_storeu_si256((__m256i*)(out+256), t_##a2);                 \
-      _mm_storel_epi64((__m128i*)(out+320), _mm256_castsi256_si128(t_##b2)); \
+      _mm_storeu_si128((__m128i*)(out+320), _mm256_castsi256_si128(t_##b2)); \
     }
 
     ONEOCTO_FIRST(0,1,2,3,4,5,6,7);

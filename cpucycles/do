@@ -45,6 +45,10 @@ okabi | (
 	arm*)
 	  echo cortex
           echo dev4ns
+          ;;
+	aarch64)
+          echo cortex
+          echo vct
 	  ;;
       esac
 

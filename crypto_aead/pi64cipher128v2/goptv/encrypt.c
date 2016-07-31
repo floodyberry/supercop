@@ -66,18 +66,18 @@ int crypto_aead_encrypt(
 
 
 /*
-   int PI_DECRYPT_SIMPLE(
+        int PI_DECRYPT_SIMPLE(
         void *msg,
-        uint16_t *msg_len_B,
-		void *nonce_secret,
-		const void *cipher,
-        uint16_t cipher_len_B,
+        size_t *msg_len_B,
+        void *nonce_secret,
+        const void *cipher,
+        size_t cipher_len_B,
         const void *ad,
-        uint16_t ad_len_B,
+        size_t ad_len_B,
         const void *nonce_public,
-        uint16_t nonce_public_len_B,
+        size_t nonce_public_len_B,
         const void *key,
-        uint16_t key_len_B
+        size_t key_len_B
         );
  */
 int crypto_aead_decrypt(
@@ -105,8 +105,8 @@ int crypto_aead_decrypt(
 	r = PI_DECRYPT_SIMPLE(
 	        m,
 	        &ml,
-			nsec,
-			c,
+		nsec,
+		c,
 	        clen,
 	        ad,
 	        adlen,

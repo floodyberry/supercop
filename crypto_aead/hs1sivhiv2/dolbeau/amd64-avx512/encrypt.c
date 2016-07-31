@@ -321,8 +321,8 @@ static inline void prf_hash2_3_finalize(uint64_t *h, const uint64_t s[6], const 
     s0_3 = poly_finalize(s[4]);
     s1_3 = poly_finalize(s[5]);
     write64le(h+0, (uint64_t)asu_hash(s1_1, asukey+3) << 32 | asu_hash(s0_1, asukey+0));
-    write64le(h+1, (uint64_t)asu_hash(s1_2, asukey+6) << 32 | asu_hash(s0_2, asukey+3));
-    write64le(h+2, (uint64_t)asu_hash(s1_3, asukey+9) << 32 | asu_hash(s0_3, asukey+6));
+    write64le(h+1, (uint64_t)asu_hash(s1_2, asukey+9) << 32 | asu_hash(s0_2, asukey+6));
+    write64le(h+2, (uint64_t)asu_hash(s1_3, asukey+15) << 32 | asu_hash(s0_3, asukey+12));
 }
 
 /* does all 3 hashes at once */

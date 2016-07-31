@@ -22,9 +22,13 @@
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define GET_BIT(buf, addr) ((((uint8_t*)(buf))[(addr) / 8] >> (addr & 7)) & 1)
 
 #define DEBUG 0
+
+#ifndef PARALLEL
 #define PARALLEL 1
+#endif
 
 #ifdef LITTLE_ENDIAN
 #undef LITTLE_ENDIAN
@@ -151,7 +155,7 @@ const char* pi_cipher_name = XSTR(PI_CIPHER_NAME);
 
 size_t dbg_l;
 const uint8_t *dbg_x;
-uint8_t dump;
+uint8_t dump = 5;
 
 
 static
@@ -186,8 +190,9 @@ void hexdump_block(
 
 static void dump_state(const word_t* a)
 {
-    if (dump || 1) {
-        printf("\tCIS:\n");
+    if (dump) {
+        dump--;
+        printf("\tCIS (%d):\n", (int)dump);
         printf("\t%"PRI_xw" %"PRI_xw" %"PRI_xw" %"PRI_xw"\n",   a[ 0], a[ 1], a[ 2], a[ 3]);
         printf("\t%"PRI_xw" %"PRI_xw" %"PRI_xw" %"PRI_xw"\n",   a[ 4], a[ 5], a[ 6], a[ 7]);
         printf("\t%"PRI_xw" %"PRI_xw" %"PRI_xw" %"PRI_xw"\n",   a[ 8], a[ 9], a[10], a[11]);
@@ -196,6 +201,7 @@ static void dump_state(const word_t* a)
 }
 #else
 #define printf(...)
+#define dump_state(...)
 #endif
 
 #if 0
@@ -306,7 +312,8 @@ vchunk_t vect_ast_precomputed_ny(vchunk_t x)
 }
 
 
-#if DEBUG
+
+#if DEBUG && 0
 void precompute_const(void)
 {
 	int i;
@@ -595,9 +602,13 @@ static void e2(
 #endif
 
 
+static void pi(
+        state_t a );
+
 static void pi_q(
         state_t a[4] )
 {
+#if 1
     static const chunk_t c[6] = PI_CONST_PRECOMP;
     qstate_t x, t;
     int i, j;
@@ -623,6 +634,16 @@ static void pi_q(
 			a[i][j][3] = x[j][3][i];
         }
 	}
+#else
+    pi(a[0]);
+    pi(a[1]);
+    pi(a[2]);
+    pi(a[3]);
+#endif
+    dump_state((word_t*)a[0]);
+    dump_state((word_t*)a[1]);
+    dump_state((word_t*)a[2]);
+    dump_state((word_t*)a[3]);
 }
 
 static void pi(
@@ -638,6 +659,7 @@ static void pi(
     e1(t, c[4], x);
     e2(x, c[5], t);
     memcpy(a, x, sizeof(state_t));
+    dump_state((word_t*)a);
 }
 
 static inline
@@ -653,6 +675,7 @@ void add_tag(
     ctx->tag[2 + 4] += a[2][2];
     ctx->tag[3 + 0] += a[0][3];
     ctx->tag[3 + 4] += a[2][3];
+    dump_state((word_t *)a);
 }
 
 static void ctr_trans(
@@ -843,10 +866,10 @@ void PI_PROCESS_AD_BLOCK_Q(
 {
     state_t a[4];
     ctr_trans_q(ctx, a, ad_num);
-    inject_block(a[0], ad);
-    inject_block(a[1], ad);
-    inject_block(a[2], ad);
-    inject_block(a[3], ad);
+    inject_block(a[0], &((uint8_t *)ad)[0 * PI_AD_BLOCK_LENGTH_BYTES]);
+    inject_block(a[1], &((uint8_t *)ad)[1 * PI_AD_BLOCK_LENGTH_BYTES]);
+    inject_block(a[2], &((uint8_t *)ad)[2 * PI_AD_BLOCK_LENGTH_BYTES]);
+    inject_block(a[3], &((uint8_t *)ad)[3 * PI_AD_BLOCK_LENGTH_BYTES]);
     pi_q(a);
     add_tag(ctx, a[0]);
     add_tag(ctx, a[1]);
@@ -1007,7 +1030,35 @@ void PI_DECRYPT_BLOCK(
     add_tag(ctx, a);
 }
 
-#define GET_BIT(buf, addr) ((((uint8_t*)(buf))[(addr) / 8] >> (addr & 7)) & 1)
+void PI_DECRYPT_BLOCK_Q(
+        PI_CTX *ctx,
+        void *dest,
+        const void *src,
+        unsigned long num )
+{
+    state_t a[4];
+    ctr_trans_q(ctx, a, num);
+    inject_block(a[0], &((uint8_t*)src)[PI_CT_BLOCK_LENGTH_BYTES * 0]);
+    inject_block(a[1], &((uint8_t*)src)[PI_CT_BLOCK_LENGTH_BYTES * 1]);
+    inject_block(a[2], &((uint8_t*)src)[PI_CT_BLOCK_LENGTH_BYTES * 2]);
+    inject_block(a[3], &((uint8_t*)src)[PI_CT_BLOCK_LENGTH_BYTES * 3]);
+    if (dest) {
+        extract_block(&((uint8_t*)dest)[PI_PT_BLOCK_LENGTH_BYTES * 0], a[0]);
+        extract_block(&((uint8_t*)dest)[PI_PT_BLOCK_LENGTH_BYTES * 1], a[1]);
+        extract_block(&((uint8_t*)dest)[PI_PT_BLOCK_LENGTH_BYTES * 2], a[2]);
+        extract_block(&((uint8_t*)dest)[PI_PT_BLOCK_LENGTH_BYTES * 3], a[3]);
+    }
+    replace_block(a[0], &((uint8_t*)src)[PI_CT_BLOCK_LENGTH_BYTES * 0]);
+    replace_block(a[1], &((uint8_t*)src)[PI_CT_BLOCK_LENGTH_BYTES * 1]);
+    replace_block(a[2], &((uint8_t*)src)[PI_CT_BLOCK_LENGTH_BYTES * 2]);
+    replace_block(a[3], &((uint8_t*)src)[PI_CT_BLOCK_LENGTH_BYTES * 3]);
+    pi_q(a);
+    add_tag(ctx, a[0]);
+    add_tag(ctx, a[1]);
+    add_tag(ctx, a[2]);
+    add_tag(ctx, a[3]);
+}
+
 
 void PI_DECRYPT_LAST_BLOCK(
         PI_CTX *ctx,
@@ -1113,11 +1164,12 @@ int PI_DECRYPT_SIMPLE(
     unsigned i;
     PI_CTX ctx;
 
+#if DEBUG
     unsigned long clen = cipher_len_B, alen = ad_len_B;
     uint8_t bck_c[clen], bck_ad[alen];
     memcpy(bck_c, cipher, clen);
     memcpy(bck_ad, ad, alen);
-
+#endif
     uint8_t tmp_tag[PI_TAG_BYTES];
     if (nonce_secret && (cipher_len_B < PI_CT_BLOCK_LENGTH_BYTES + PI_TAG_BYTES)) {
     	return -3;
@@ -1127,6 +1179,14 @@ int PI_DECRYPT_SIMPLE(
         return -2;
     }
     i = 1;
+#if PARALLEL
+    while (ad_len_B >= PI_AD_BLOCK_LENGTH_BYTES * 4) {
+        PI_PROCESS_AD_BLOCK_Q(&ctx, ad, i);
+        i += 4;
+        ad_len_B -= PI_AD_BLOCK_LENGTH_BYTES * 4;
+        ad = &((const uint8_t*)ad)[PI_AD_BLOCK_LENGTH_BYTES * 4];
+    }
+#endif
     while (ad_len_B >= PI_AD_BLOCK_LENGTH_BYTES) {
         PI_PROCESS_AD_BLOCK(&ctx, ad, i++);
         ad_len_B -= PI_AD_BLOCK_LENGTH_BYTES;
@@ -1140,7 +1200,18 @@ int PI_DECRYPT_SIMPLE(
         cipher = &((uint8_t*)cipher)[PI_CT_BLOCK_LENGTH_BYTES];
     }
     i = 1;
-    while (cipher_len_B - PI_TAG_BYTES >= PI_PT_BLOCK_LENGTH_BYTES) {
+#if PARALLEL
+    while (cipher_len_B - PI_TAG_BYTES >= PI_CT_BLOCK_LENGTH_BYTES * 4) {
+        PI_DECRYPT_BLOCK_Q(&ctx, msg, cipher, i);
+        i += 4;
+        msg = &((uint8_t*)msg)[PI_PT_BLOCK_LENGTH_BYTES * 4];
+        cipher = &((uint8_t*)cipher)[PI_CT_BLOCK_LENGTH_BYTES * 4];
+        cipher_len_B -= PI_CT_BLOCK_LENGTH_BYTES * 4;
+        *msg_len_B += PI_PT_BLOCK_LENGTH_BYTES * 4;
+    }
+
+#endif
+    while (cipher_len_B - PI_TAG_BYTES >= PI_CT_BLOCK_LENGTH_BYTES) {
         PI_DECRYPT_BLOCK(&ctx, msg, cipher, i++);
         msg = &((uint8_t*)msg)[PI_PT_BLOCK_LENGTH_BYTES];
         cipher = &((uint8_t*)cipher)[PI_CT_BLOCK_LENGTH_BYTES];

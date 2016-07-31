@@ -19,9 +19,11 @@ http://creativecommons.org/publicdomain/zero/1.0/
 /** For the documentation, see PlSnP-documentation.h.
  */
 
-#define KeccakP800times4_implementation        "64-bit optimized ARM NEON assembler implementation"
-#define KeccakP800times4_stateSizeInBytes      (100*4)
-#define KeccakP800times4_stateAlignment        64
+#include "KeccakP-800-SnP.h"
+
+#define KeccakP800times4_implementation         "fallback on serial implementation (" KeccakP800_implementation ")"
+#define KeccakP800times4_statesSizeInBytes      (((KeccakP800_stateSizeInBytes+(KeccakP800_stateAlignment-1))/KeccakP800_stateAlignment)*KeccakP800_stateAlignment*4)
+#define KeccakP800times4_statesAlignment        KeccakP800_stateAlignment
 
 void KeccakP800times4_StaticInitialize( void );
 void KeccakP800times4_InitializeAll(void *states);

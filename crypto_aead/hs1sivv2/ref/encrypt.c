@@ -1,37 +1,20 @@
 /*
-// HS1-SIV v2.0 reference code.
+// HS1-SIV v2 reference code.
 //
 // Note: This implements HS1-SIV v2, and not v1 or Draft v2.
 //
 // ** This version is slow and susceptible to side-channel attacks. **
 // ** Do not use for any purpose other than to understand HS1-SIV.  **
 //
-// Written by Ted Krovetz (ted@krovetz.net). Last modified 12 Sep 2015.
+// Written by Ted Krovetz (ted@krovetz.net). Last modified 28 July 2016.
 //
-// This is free and unencumbered software released into the public domain.
+// To the extent possible under law, the author has dedicated all copyright
+// and related and neighboring rights to this software to the public
+// domain worldwide. This software is distributed without any warranty.
 //
-// Anyone is free to copy, modify, publish, use, compile, sell, or
-// distribute this software, either in source code form or as a compiled
-// binary, for any purpose, commercial or non-commercial, and by any
-// means.
-//
-// In jurisdictions that recognize copyright laws, the author or authors
-// of this software dedicate any and all copyright interest in the
-// software to the public domain. We make this dedication for the benefit
-// of the public at large and to the detriment of our heirs and
-// successors. We intend this dedication to be an overt act of
-// relinquishment in perpetuity of all present and future rights to this
-// software under copyright law.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-// IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-// OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-// OTHER DEALINGS IN THE SOFTWARE.
-//
-// For more information, please refer to <http://unlicense.org/>
+// You should have received a copy of the CC0 Public Domain Dedication
+// along with this software. If not, see
+// <http://creativecommons.org/publicdomain/zero/1.0/>
 //
 // The author knows of no intellectual property claims relevant to this work.
 */
@@ -54,23 +37,24 @@
 #define HS1_SIV_NH_LEN      64
 #define HS1_SIV_HASH_RNDS    2
 #define HS1_SIV_CHACHA_RNDS  8
-#define HS1_SIV_SIV_LEN      CRYPTO_ABYTES
+#define HS1_SIV_SIV_LEN      8
 #elif HS1_SIV
 #define HS1_SIV_NH_LEN      64
 #define HS1_SIV_HASH_RNDS    4
 #define HS1_SIV_CHACHA_RNDS 12
-#define HS1_SIV_SIV_LEN     CRYPTO_ABYTES
+#define HS1_SIV_SIV_LEN     16
 #elif HS1_SIV_HI
 #define HS1_SIV_NH_LEN      64
 #define HS1_SIV_HASH_RNDS    6
 #define HS1_SIV_CHACHA_RNDS 20
-#define HS1_SIV_SIV_LEN     CRYPTO_ABYTES
+#define HS1_SIV_SIV_LEN     32
 #endif
 
 #define __STDC_LIMIT_MACROS
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #if __GNUC__
     #define HS1_SIV_ALIGN(n) __attribute__ ((aligned(n)))
@@ -88,7 +72,7 @@ typedef struct {
     unsigned char chacha_key[32];
     unsigned char nh_key[HS1_SIV_NH_LEN+16*(HS1_SIV_HASH_RNDS-1)];
     unsigned char poly_key[HS1_SIV_HASH_RNDS*8];
-    #if HS1_SIV_ASU_HASH /* ASU */
+    #if (HS1_SIV_HASH_RNDS > 4) /* ASU */
     unsigned char asu_key[HS1_SIV_HASH_RNDS*24];
     #else
     unsigned char asu_key[];
@@ -232,30 +216,22 @@ void hs1siv_chacha256(void *out, unsigned outbytes,
 static const uint64_t m60 = ((uint64_t)1 << 60) - 1;
 static const uint64_t m61 = ((uint64_t)1 << 61) - 1;
 
-#if (__GNUC__ && __LP64__)
-static uint64_t poly_step(uint64_t a, uint64_t m, uint64_t k) {
-    __uint128_t tmp = (__uint128_t)a * (__uint128_t)k;
-    return ((uint64_t)tmp & m61) + (uint64_t)(tmp >> 61) + m;
-}
-#else
-/* dh:dl = a * b : since a and b are both < 64 bits, no overflow in m. */
-static void pmul64(uint64_t *dh, uint64_t *dl, uint64_t a, uint64_t b) {
-    uint64_t m = (uint64_t)(uint32_t)(a>>32) * (uint64_t)(uint32_t)b
-               + (uint64_t)(uint32_t)(b>>32) * (uint64_t)(uint32_t)a;
-    uint64_t h = (uint64_t)(uint32_t)(a>>32) * (uint64_t)(uint32_t)(b>>32);
-    uint64_t l = (uint64_t)(uint32_t)a * (uint64_t)(uint32_t)b;
-    h += (m >> 32); l += (m << 32);  /* h:l += (m>>32):(m<<32)      */
-    if (l < (m << 32)) h += 1;       /* Check for carry from l to h */
-    *dl=l; *dh=h;
-}
-
 /* Return 62 bits congruent to ak+m % (2^61-1). Assumes 60-bit k,m; 62-bit a */
-static uint64_t poly_step(uint64_t a, uint64_t m, uint64_t k) {
-        uint64_t h,l;
-        pmul64(&h,&l,a,k);
-        return (l & m61) + ((h << 3) | (l >> 61)) + m;
+static uint64_t poly_step(uint64_t a, uint64_t b, uint64_t k) {
+    #if (__SIZEOF_INT128__)  /* 128-bit type available */
+        unsigned __int128 tmp = (unsigned __int128)a * (unsigned __int128)k;
+        return ((uint64_t)tmp & m61) + (uint64_t)(tmp >> 61) + b;
+    #else
+        uint64_t m = (uint64_t)(uint32_t)(a>>32) * (uint64_t)(uint32_t)k
+                   + (uint64_t)(uint32_t)(k>>32) * (uint64_t)(uint32_t)a;
+        uint64_t h = (uint64_t)(uint32_t)(a>>32) * (uint64_t)(uint32_t)(k>>32);
+        uint64_t l = (uint64_t)(uint32_t)a * (uint64_t)(uint32_t)k;
+        h += (m >> 32); l += (m << 32);  /* h:l += (m>>32):(m<<32)      */
+        /* CAUTION: Potential timing leak. Good compiler will eliminate */
+        if (l < (m << 32)) h += 1;       /* Check for carry from l to h */
+        return (l & m61) + ((h << 3) | (l >> 61)) + b;
+    #endif
 }
-#endif
 
 static uint64_t poly_finalize(uint64_t a) {
     a = (a & m61) + (a >> 61);   /* a may be 62 bits, so one final reduction */
@@ -339,7 +315,7 @@ void prf_hash2(uint64_t *h, uint32_t *in, unsigned inbytes, uint32_t *nhkey,
     #if (HS1_SIV_HASH_RNDS > 4)
     write64le(h, (uint64_t)asu_hash(s1, asukey+3) << 32 | asu_hash(s0, asukey));
     #else
-    (void)asukey;
+    (void)asukey;  /* Suppress warning */
     write64le(h,s0);
     write64le(h+1,s1);
     #endif
@@ -353,13 +329,13 @@ void hs1_hash(hs1siv_ctx_t *ctx, void *in, unsigned inbytes, void *out) {
               (uint64_t *)ctx->poly_key, (uint64_t *)ctx->asu_key);
     #if HS1_SIV_HASH_RNDS > 2
     prf_hash2(h+k, (uint32_t *)in, inbytes, (uint32_t *)ctx->nh_key+8,
-              (uint64_t *)ctx->poly_key+2, (uint64_t *)ctx->asu_key+3);
+              (uint64_t *)ctx->poly_key+2, (uint64_t *)ctx->asu_key+6);
     #if HS1_SIV_HASH_RNDS > 4
     prf_hash2(h+2*k, (uint32_t *)in, inbytes, (uint32_t *)ctx->nh_key+16,
-              (uint64_t *)ctx->poly_key+4, (uint64_t *)ctx->asu_key+6);
+              (uint64_t *)ctx->poly_key+4, (uint64_t *)ctx->asu_key+12);
     #if HS1_SIV_HASH_RNDS > 6
     prf_hash2(h+3*k, (uint32_t *)in, inbytes, (uint32_t *)ctx->nh_key+24,
-              (uint64_t *)ctx->poly_key+6, (uint64_t *)ctx->asu_key+9);
+              (uint64_t *)ctx->poly_key+6, (uint64_t *)ctx->asu_key+18);
     #endif
     #endif
     #endif
@@ -371,23 +347,10 @@ void hs1_hash(hs1siv_ctx_t *ctx, void *in, unsigned inbytes, void *out) {
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/*
-typedef struct {
-    unsigned char chacha_key[32];
-    unsigned char nh_key[HS1_SIV_NH_LEN+16*(HS1_SIV_HASH_RNDS-1)];
-    unsigned char poly_key[HS1_SIV_HASH_RNDS*8];
-    #if (HS1_SIV_HASH_RNDS > 4)
-    unsigned char asu_key[HS1_SIV_HASH_RNDS*24];
-    #else
-    unsigned char asu_key[];
-    #endif
-} hs1siv_ctx_t;
-*/
-
 void hs1siv_subkeygen(hs1siv_ctx_t *ctx, void *user_key, unsigned key_bytes)
 {
     unsigned char chacha_key[32];
-    unsigned char iv[12];
+    unsigned char iv[12] = {0};
     unsigned i=0;
 
     /* Copy user_key as many times as needed to fill 32 byte chacha key */
@@ -399,7 +362,6 @@ void hs1siv_subkeygen(hs1siv_ctx_t *ctx, void *user_key, unsigned key_bytes)
     }
 
     /* Build key-derivation nonce and fill context */
-    memset(iv,0,12);
     iv[0] = key_bytes;
     iv[2] = HS1_SIV_SIV_LEN;
     iv[4] = HS1_SIV_CHACHA_RNDS;
@@ -450,7 +412,7 @@ void hs1siv_encrypt(hs1siv_ctx_t *ctx, void *m, unsigned mbytes,
     unsigned i;
     unsigned abuflen = (abytes+HS1_SIV_NH_LEN-1)/HS1_SIV_NH_LEN*HS1_SIV_NH_LEN;
     unsigned buflen = abuflen + (mbytes+15)/16*16 + 16;
-    unsigned char tmp_t[HS1_SIV_SIV_LEN];
+    uint32_t tmp_t[HS1_SIV_SIV_LEN/4];
     unsigned char *buf = (unsigned char *)malloc(buflen);
     memset(buf, 0, buflen);
     memcpy(buf, a, abytes);
@@ -475,9 +437,10 @@ int hs1siv_decrypt(hs1siv_ctx_t *ctx, void *c, unsigned cbytes,
     unsigned abuflen = (abytes+HS1_SIV_NH_LEN-1)/HS1_SIV_NH_LEN*HS1_SIV_NH_LEN;
     unsigned buflen = abuflen + (cbytes+15)/16*16 + 16;
     unsigned char *maybe_m = (unsigned char *)malloc(cbytes);
-    unsigned char maybe_t[HS1_SIV_SIV_LEN];
+    uint32_t maybe_t[HS1_SIV_SIV_LEN/4];
     unsigned char *buf = (unsigned char *)malloc(cbytes+64);
-    hs1(ctx, t, HS1_SIV_SIV_LEN, n, buf, cbytes+64);
+    memcpy(maybe_t,t,HS1_SIV_SIV_LEN);  /* move to aligned buffer */
+    hs1(ctx, maybe_t, HS1_SIV_SIV_LEN, n, buf, cbytes+64);
     for (i=0; i<cbytes; i++)
         ((unsigned char *)maybe_m)[i] = ((unsigned char *)c)[i] ^ buf[64+i];
     free(buf);
@@ -512,8 +475,8 @@ int crypto_aead_encrypt(
     (void)nsec;
     hs1siv_subkeygen(&ctx, (void *)k, CRYPTO_KEYBYTES);
     if (clen) *clen = mlen+CRYPTO_ABYTES;
-    hs1siv_encrypt(&ctx, (void *)m, mlen, (void *)ad, adlen, (void *)npub,
-                   c+mlen, c);
+    hs1siv_encrypt(&ctx, (void *)m, (unsigned)mlen, (void *)ad,
+            (unsigned)adlen, (void *)npub, c+mlen, c);
     return 0;
 }
 
@@ -530,6 +493,7 @@ int crypto_aead_decrypt(
     (void)nsec;
     if (mlen) *mlen = clen-CRYPTO_ABYTES;
     hs1siv_subkeygen(&ctx, (void *)k, CRYPTO_KEYBYTES);
-    return hs1siv_decrypt(&ctx, (void *)c, clen-CRYPTO_ABYTES,
-    	(void *)ad, adlen, (void *)npub, (void *)(c+clen-CRYPTO_ABYTES), m);
+    return hs1siv_decrypt(&ctx, (void *)c, (unsigned)clen-CRYPTO_ABYTES,
+    	    (void *)ad, (unsigned)adlen, (void *)npub,
+    	    (void *)(c+clen-CRYPTO_ABYTES), m);
 }

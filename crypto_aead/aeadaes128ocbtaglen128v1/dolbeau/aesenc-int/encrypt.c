@@ -579,6 +579,7 @@ static int ocb_crypt(unsigned char *out, unsigned char *k, unsigned char *n,
     /* L_$ = double(L_*) */
     ldollar = double_block_si128(lstar); 
     max = abytes >= inbytes ? abytes/4 : inbytes/4;
+    max = (max < 2 ? 2 : max);
     /* only precompute what's really needed;
        look at the number of leading zero (to find the leftmost bit set to one)
        all trailing zero will be at the right of it so we have an upper bound

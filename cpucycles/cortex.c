@@ -4,6 +4,17 @@ D. J. Bernstein
 Public domain.
 */
 
+/*
+ * To use this, your kernel must enable reading the cycle counter
+ * from userland code.
+ *
+ * Sample code for Armv7 (32 bits):
+ * <https://github.com/thoughtpolice/enable_arm_pmu>
+ *
+ * Sample code for Armv8/Aarch64 (64 bits):
+ * <https://github.com/rdolbeau/enable_arm_pmu>
+ */
+
 #define SCALE 1
 #include <time.h>
 #include <unistd.h>
@@ -17,12 +28,11 @@ static int now[3];
 static long long cyclespersec = 0;
 
 #if defined(__aarch64__)
-#define V8FREQ 1
 long long cpucycles_cortex(void)
 {
   long long Rt;
-  asm volatile("mrs %0,  CNTVCT_EL0" : "=r" (Rt));
-  return Rt * V8FREQ;
+  asm volatile("mrs %0, PMCCNTR_EL0" : "=r" (Rt));
+  return Rt;
 }
 long long cpucycles_cortex_persecond(void) {
   struct timeval t0,t1;

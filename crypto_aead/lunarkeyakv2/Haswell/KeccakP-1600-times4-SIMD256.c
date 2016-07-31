@@ -91,7 +91,7 @@ void KeccakP1600times4_AddBytes(void *states, unsigned int instanceIndex, const 
     unsigned int lanePosition = offset/SnP_laneLengthInBytes;
     unsigned int offsetInLane = offset%SnP_laneLengthInBytes;
     const unsigned char *curData = data;
-    UINT64 *statesAsLanes = states;
+    UINT64 *statesAsLanes = (UINT64 *)states;
 
     if ((sizeLeft > 0) && (offsetInLane != 0)) {
         unsigned int bytesInLane = SnP_laneLengthInBytes - offsetInLane;
@@ -122,7 +122,7 @@ void KeccakP1600times4_AddBytes(void *states, unsigned int instanceIndex, const 
 
 void KeccakP1600times4_AddLanesAll(void *states, const unsigned char *data, unsigned int laneCount, unsigned int laneOffset)
 {
-    V256 *stateAsLanes = states;
+    V256 *stateAsLanes = (V256 *)states;
     unsigned int i;
     const UINT64 *curData0 = (const UINT64 *)data;
     const UINT64 *curData1 = (const UINT64 *)(data+laneOffset*SnP_laneLengthInBytes);
@@ -171,7 +171,7 @@ void KeccakP1600times4_OverwriteBytes(void *states, unsigned int instanceIndex, 
     unsigned int lanePosition = offset/SnP_laneLengthInBytes;
     unsigned int offsetInLane = offset%SnP_laneLengthInBytes;
     const unsigned char *curData = data;
-    UINT64 *statesAsLanes = states;
+    UINT64 *statesAsLanes = (UINT64 *)states;
 
     if ((sizeLeft > 0) && (offsetInLane != 0)) {
         unsigned int bytesInLane = SnP_laneLengthInBytes - offsetInLane;
@@ -198,7 +198,7 @@ void KeccakP1600times4_OverwriteBytes(void *states, unsigned int instanceIndex, 
 
 void KeccakP1600times4_OverwriteLanesAll(void *states, const unsigned char *data, unsigned int laneCount, unsigned int laneOffset)
 {
-    V256 *stateAsLanes = states;
+    V256 *stateAsLanes = (V256 *)states;
     unsigned int i;
     const UINT64 *curData0 = (const UINT64 *)data;
     const UINT64 *curData1 = (const UINT64 *)(data+laneOffset*SnP_laneLengthInBytes);
@@ -245,7 +245,7 @@ void KeccakP1600times4_OverwriteWithZeroes(void *states, unsigned int instanceIn
 {
     unsigned int sizeLeft = byteCount;
     unsigned int lanePosition = 0;
-    UINT64 *statesAsLanes = states;
+    UINT64 *statesAsLanes = (UINT64 *)states;
 
     while(sizeLeft >= SnP_laneLengthInBytes) {
         statesAsLanes[laneIndex(instanceIndex, lanePosition)] = 0;
@@ -264,7 +264,7 @@ void KeccakP1600times4_ExtractBytes(const void *states, unsigned int instanceInd
     unsigned int lanePosition = offset/SnP_laneLengthInBytes;
     unsigned int offsetInLane = offset%SnP_laneLengthInBytes;
     unsigned char *curData = data;
-    const UINT64 *statesAsLanes = states;
+    const UINT64 *statesAsLanes = (const UINT64 *)states;
 
     if ((sizeLeft > 0) && (offsetInLane != 0)) {
         unsigned int bytesInLane = SnP_laneLengthInBytes - offsetInLane;
@@ -345,7 +345,7 @@ void KeccakP1600times4_ExtractAndAddBytes(const void *states, unsigned int insta
     unsigned int offsetInLane = offset%SnP_laneLengthInBytes;
     const unsigned char *curInput = input;
     unsigned char *curOutput = output;
-    const UINT64 *statesAsLanes = states;
+    const UINT64 *statesAsLanes = (const UINT64 *)states;
 
     if ((sizeLeft > 0) && (offsetInLane != 0)) {
         unsigned int bytesInLane = SnP_laneLengthInBytes - offsetInLane;
@@ -801,7 +801,7 @@ static ALIGN(KeccakP1600times4_statesAlignment) const UINT64 KeccakF1600RoundCon
 
 void KeccakP1600times4_PermuteAll_24rounds(void *states)
 {
-    V256 *statesAsLanes = states;
+    V256 *statesAsLanes = (V256 *)states;
     declareABCDE
     #ifndef KeccakP1600times4_fullUnrolling
     unsigned int i;
@@ -814,7 +814,7 @@ void KeccakP1600times4_PermuteAll_24rounds(void *states)
 
 void KeccakP1600times4_PermuteAll_12rounds(void *states)
 {
-    V256 *statesAsLanes = states;
+    V256 *statesAsLanes = (V256 *)states;
     declareABCDE
     #ifndef KeccakP1600times4_fullUnrolling
     unsigned int i;
@@ -836,7 +836,7 @@ size_t KeccakF1600times4_FastLoop_Absorb(void *states, unsigned int laneCount, u
         const UINT64 *curData3 = (const UINT64 *)(data+laneOffsetParallel*3*SnP_laneLengthInBytes);
 
         while(dataByteLen >= (laneOffsetParallel*3 + laneCount)*8) {
-            V256 *stateAsLanes = states;
+            V256 *stateAsLanes = (V256 *)states;
             V256 lanes0, lanes1, lanes2, lanes3, lanesL01, lanesL23, lanesH01, lanesH23;
             #define Xor_In( argIndex ) \
                 XOReq256(stateAsLanes[argIndex], LOAD4_64(curData3[argIndex], curData2[argIndex], curData1[argIndex], curData0[argIndex]))
@@ -873,7 +873,7 @@ size_t KeccakF1600times4_FastLoop_Absorb(void *states, unsigned int laneCount, u
         const UINT64 *curData1 = (const UINT64 *)(data+laneOffsetParallel*1*SnP_laneLengthInBytes);
         const UINT64 *curData2 = (const UINT64 *)(data+laneOffsetParallel*2*SnP_laneLengthInBytes);
         const UINT64 *curData3 = (const UINT64 *)(data+laneOffsetParallel*3*SnP_laneLengthInBytes);
-        V256 *statesAsLanes = states;
+        V256 *statesAsLanes = (V256 *)states;
         declareABCDE
 
         copyFromState(A, statesAsLanes)
@@ -920,108 +920,6 @@ size_t KeccakF1600times4_FastLoop_Absorb(void *states, unsigned int laneCount, u
         while(dataByteLen >= (laneOffsetParallel*3 + laneCount)*8) {
             KeccakP1600times4_AddLanesAll(states, data, laneCount, laneOffsetParallel);
             KeccakP1600times4_PermuteAll_24rounds(states);
-            data += laneOffsetSerial*8;
-            dataByteLen -= laneOffsetSerial*8;
-        }
-        return data - dataStart;
-    }
-}
-
-size_t KeccakP1600times4_12rounds_FastLoop_Absorb(void *states, unsigned int laneCount, unsigned int laneOffsetParallel, unsigned int laneOffsetSerial, const unsigned char *data, size_t dataByteLen)
-{
-    if (laneCount == 21) {
-#if 0
-        const unsigned char *dataStart = data;
-        const UINT64 *curData0 = (const UINT64 *)data;
-        const UINT64 *curData1 = (const UINT64 *)(data+laneOffsetParallel*1*SnP_laneLengthInBytes);
-        const UINT64 *curData2 = (const UINT64 *)(data+laneOffsetParallel*2*SnP_laneLengthInBytes);
-        const UINT64 *curData3 = (const UINT64 *)(data+laneOffsetParallel*3*SnP_laneLengthInBytes);
-
-        while(dataByteLen >= (laneOffsetParallel*3 + laneCount)*8) {
-            V256 *stateAsLanes = states;
-            V256 lanes0, lanes1, lanes2, lanes3, lanesL01, lanesL23, lanesH01, lanesH23;
-            #define Xor_In( argIndex ) \
-                XOReq256(stateAsLanes[argIndex], LOAD4_64(curData3[argIndex], curData2[argIndex], curData1[argIndex], curData0[argIndex]))
-            #define Xor_In4( argIndex ) \
-                lanes0 = LOAD256u( curData0[argIndex]),\
-                lanes1 = LOAD256u( curData1[argIndex]),\
-                lanes2 = LOAD256u( curData2[argIndex]),\
-                lanes3 = LOAD256u( curData3[argIndex]),\
-                INTLEAVE(),\
-                XOReq256( stateAsLanes[argIndex+0], lanes0 ),\
-                XOReq256( stateAsLanes[argIndex+1], lanes1 ),\
-                XOReq256( stateAsLanes[argIndex+2], lanes2 ),\
-                XOReq256( stateAsLanes[argIndex+3], lanes3 )
-            Xor_In4( 0 );
-            Xor_In4( 4 );
-            Xor_In4( 8 );
-            Xor_In4( 12 );
-            Xor_In4( 16 );
-            Xor_In( 20 );
-            #undef  Xor_In
-            #undef  Xor_In4
-            KeccakP1600times4_PermuteAll_12rounds(states);
-            curData0 += laneOffsetSerial;
-            curData1 += laneOffsetSerial;
-            curData2 += laneOffsetSerial;
-            curData3 += laneOffsetSerial;
-            dataByteLen -= laneOffsetSerial*8;
-        }
-        return (const unsigned char *)curData0 - dataStart;
-#else
-        unsigned int i;
-        const unsigned char *dataStart = data;
-        const UINT64 *curData0 = (const UINT64 *)data;
-        const UINT64 *curData1 = (const UINT64 *)(data+laneOffsetParallel*1*SnP_laneLengthInBytes);
-        const UINT64 *curData2 = (const UINT64 *)(data+laneOffsetParallel*2*SnP_laneLengthInBytes);
-        const UINT64 *curData3 = (const UINT64 *)(data+laneOffsetParallel*3*SnP_laneLengthInBytes);
-        V256 *statesAsLanes = states;
-        declareABCDE
-
-        copyFromState(A, statesAsLanes)
-        while(dataByteLen >= (laneOffsetParallel*3 + laneCount)*8) {
-            #define XOR_In( Xxx, argIndex ) \
-                XOReq256(Xxx, LOAD4_64(curData3[argIndex], curData2[argIndex], curData1[argIndex], curData0[argIndex]))
-            XOR_In( Aba, 0 );
-            XOR_In( Abe, 1 );
-            XOR_In( Abi, 2 );
-            XOR_In( Abo, 3 );
-            XOR_In( Abu, 4 );
-            XOR_In( Aga, 5 );
-            XOR_In( Age, 6 );
-            XOR_In( Agi, 7 );
-            XOR_In( Ago, 8 );
-            XOR_In( Agu, 9 );
-            XOR_In( Aka, 10 );
-            XOR_In( Ake, 11 );
-            XOR_In( Aki, 12 );
-            XOR_In( Ako, 13 );
-            XOR_In( Aku, 14 );
-            XOR_In( Ama, 15 );
-            XOR_In( Ame, 16 );
-            XOR_In( Ami, 17 );
-            XOR_In( Amo, 18 );
-            XOR_In( Amu, 19 );
-            XOR_In( Asa, 20 );
-            #undef XOR_In
-            rounds12
-            curData0 += laneOffsetSerial;
-            curData1 += laneOffsetSerial;
-            curData2 += laneOffsetSerial;
-            curData3 += laneOffsetSerial;
-            dataByteLen -= laneOffsetSerial*8;
-        }
-        copyToState(statesAsLanes, A)
-        return (const unsigned char *)curData0 - dataStart;
-#endif
-    }
-    else {
-        unsigned int i;
-        const unsigned char *dataStart = data;
-
-        while(dataByteLen >= (laneOffsetParallel*3 + laneCount)*8) {
-            KeccakP1600times4_AddLanesAll(states, data, laneCount, laneOffsetParallel);
-            KeccakP1600times4_PermuteAll_12rounds(states);
             data += laneOffsetSerial*8;
             dataByteLen -= laneOffsetSerial*8;
         }
