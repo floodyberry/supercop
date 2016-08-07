@@ -1,3 +1,10 @@
+Changes from 20160731:
+
+   * hs1siv{,lo}v2: faster implementations from Romain Dolbeau.
+   * Various AVX512 implementations: fixes from Romain Dolbeau.
+   * stribob192r2/neon/wbob_pineon.c: fixes.
+   * *poet* fast implementations: fixes.
+
 Changes from 20160724:
 
    * trivia0v2: faster implementation (sse4).

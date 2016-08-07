@@ -703,11 +703,18 @@ void encrypt_final(poet_ctx_t *ctx,
         z = vxor(z, s);
         storeu(tag, z);
     } else if (plen % BLOCKLEN == 0) { // No tag splitting
+        if (plen == 2*BLOCKLEN) {
+            aes_encrypt_3blocks(x, y, z, hk, k, tmp_x, tmp_y, tmp_z, plaintext, ciphertext);
+            plaintext += BLOCKLEN;
+            ciphertext += BLOCKLEN;
+            plen -= BLOCKLEN;
+        }
+        
         z = vxor(z, s);
         x = vxor(x, s);
         aes_encrypt_3blocks_no_whitening(x, y, z, k, hk);
         storeu(ciphertext, vxor3(z, y, s));
-
+        
         // Generate tag
         y = z;
         z = vxor(x, ctx->tau);
@@ -862,6 +869,7 @@ int decrypt_final(poet_ctx_t *ctx,
         aes_decrypt_2blocks(x, z, hk, k);
         z = vxor(z, ctx->tau);
         x = vxor(x, s);
+        
         return _mm_testc_si128(z, x) - 1;
     } else if (clen == BLOCKLEN) { // No tag splitting
         z = vxor(z, s);
