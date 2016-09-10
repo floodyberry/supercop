@@ -1,3 +1,10 @@
+Changes from 20160806:
+
+   * Bug fixes for *keyakv2/ARM*.
+   * Many more compiler options.
+
+Beware that this version will take considerably longer to run than the previous version.
+
 Changes from 20160731:
 
    * hs1siv{,lo}v2: faster implementations from Romain Dolbeau.
