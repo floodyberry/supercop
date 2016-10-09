@@ -1,3 +1,8 @@
+Changes from 20160910:
+
+   * New crypto_dh/k298.
+   * New crypto_dh/gls254/opt implementation.
+
 Changes from 20160806:
 
    * Bug fixes for *keyakv2/ARM*.
