@@ -1,3 +1,11 @@
+Changes from 20161009:
+
+   * CAESAR tweaks: acorn, cloc+silc, deoxys, ketje, morus, norx.
+   * New *keyak* reference implementation.
+   * New *jambu* naming.
+   * New SHA-2 implementations from Dolbeau.
+   * New crypto_dh/gls254prot/opt implementation.
+
 Changes from 20160910:
 
    * New crypto_dh/k298.
