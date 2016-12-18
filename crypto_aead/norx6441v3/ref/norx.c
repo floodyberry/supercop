@@ -648,14 +648,19 @@ void norx_aead_encrypt(
   const unsigned char *key
 )
 {
+    unsigned char k[BYTES(NORX_K)];
     norx_state_t state;
-    norx_init(state, key, nonce);
+
+    memcpy(k, key, sizeof(k));
+    norx_init(state, k, nonce);
     norx_absorb_data(state, a, alen, HEADER_TAG);
     norx_encrypt_data(state, c, m, mlen);
     norx_absorb_data(state, z, zlen, TRAILER_TAG);
-    norx_finalise(state, c + mlen, key);
+    norx_finalise(state, c + mlen, k);
     *clen = mlen + BYTES(NORX_T);
+
     burn(state, 0, sizeof(norx_state_t));
+    burn(k, 0, sizeof(k));
 }
 
 int norx_aead_decrypt(
@@ -667,19 +672,21 @@ int norx_aead_decrypt(
   const unsigned char *key
 )
 {
-    int result = -1;
+    unsigned char k[BYTES(NORX_K)];
     unsigned char tag[BYTES(NORX_T)];
     norx_state_t state;
+    int result = -1;
 
     if (clen < BYTES(NORX_T)) {
         return -1;
     }
 
-    norx_init(state, key, nonce);
+    memcpy(k, key, sizeof(k));
+    norx_init(state, k, nonce);
     norx_absorb_data(state, a, alen, HEADER_TAG);
     norx_decrypt_data(state, m, c, clen - BYTES(NORX_T));
     norx_absorb_data(state, z, zlen, TRAILER_TAG);
-    norx_finalise(state, tag, key);
+    norx_finalise(state, tag, k);
     *mlen = clen - BYTES(NORX_T);
 
     result = norx_verify_tag(c + clen - BYTES(NORX_T), tag);
@@ -687,6 +694,6 @@ int norx_aead_decrypt(
         burn(m, 0, clen - BYTES(NORX_T));
     }
     burn(state, 0, sizeof(norx_state_t));
-
+    burn(k, 0, sizeof(k));
     return result;
 }

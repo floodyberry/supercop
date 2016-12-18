@@ -351,13 +351,13 @@ do                                                               \
     memcpy(OUT, lastblock, INLEN);                               \
 } while(0)
 
-#define INITIALISE(S, NONCE, KEY)                     \
+#define INITIALISE(S, NONCE, K0, K1)                  \
 do                                                    \
 {                                                     \
     S[0] = LOADU(NONCE +  0);                         \
     S[1] = LOADU(NONCE + 16);                         \
-    S[2] = LOADU(KEY +  0);                           \
-    S[3] = LOADU(KEY + 16);                           \
+    S[2] = K0;                                        \
+    S[3] = K1;                                        \
     S[4] = _mm_set_epi64x( U9,  U8);                  \
     S[5] = _mm_set_epi64x(U11, U10);                  \
     S[6] = _mm_set_epi64x(U13, U12);                  \
@@ -365,7 +365,7 @@ do                                                    \
     S[6] = XOR(S[6], _mm_set_epi64x(NORX_L, NORX_W)); \
     S[7] = XOR(S[7], _mm_set_epi64x(NORX_T, NORX_P)); \
     PERMUTE(S);                                       \
-    INJECT_KEY(S, LOADU(KEY + 0), LOADU(KEY + 16));   \
+    INJECT_KEY(S, K0, K1);                            \
 } while(0)
 
 #define ABSORB_DATA(S, IN, INLEN, TAG)       \
@@ -419,14 +419,14 @@ do                                                \
     }                                             \
 } while(0)
 
-#define FINALISE(S, KEY)                            \
+#define FINALISE(S, K0, K1)                         \
 do                                                  \
 {                                                   \
     INJECT_DOMAIN_CONSTANT(S, FINAL_TAG);           \
     PERMUTE(S);                                     \
-    INJECT_KEY(S, LOADU(KEY + 0), LOADU(KEY + 16)); \
+    INJECT_KEY(S, K0, K1);                          \
     PERMUTE(S);                                     \
-    INJECT_KEY(S, LOADU(KEY + 0), LOADU(KEY + 16)); \
+    INJECT_KEY(S, K0, K1);                          \
 } while(0)
 
 #define PAD(OUT, OUTLEN, IN, INLEN) \
@@ -458,14 +458,16 @@ void norx_aead_encrypt(
   const unsigned char *key
 )
 {
+    const __m128i K0 = LOADU(key +  0);
+    const __m128i K1 = LOADU(key + 16);
     __m128i S[8];
 
     *clen = mlen + BYTES(NORX_T);
-    INITIALISE(S, nonce, key);
+    INITIALISE(S, nonce, K0, K1);
     ABSORB_DATA(S, a, alen, HEADER_TAG);
     ENCRYPT_DATA(S, c, m, mlen);
     ABSORB_DATA(S, z, zlen, TRAILER_TAG);
-    FINALISE(S, key);
+    FINALISE(S, K0, K1);
     STOREU(c + mlen,                   S[6]);
     STOREU(c + mlen + BYTES(NORX_T)/2, S[7]);
 }
@@ -480,17 +482,19 @@ int norx_aead_decrypt(
   const unsigned char *key
 )
 {
+    const __m128i K0 = LOADU(key +  0);
+    const __m128i K1 = LOADU(key + 16);
     __m128i S[8];
 
     if (clen < BYTES(NORX_T)) { return -1; }
 
     *mlen = clen - BYTES(NORX_T);
 
-    INITIALISE(S, nonce, key);
+    INITIALISE(S, nonce, K0, K1);
     ABSORB_DATA(S, a, alen, HEADER_TAG);
     DECRYPT_DATA(S, m, c, clen - BYTES(NORX_T));
     ABSORB_DATA(S, z, zlen, TRAILER_TAG);
-    FINALISE(S, key);
+    FINALISE(S, K0, K1);
 
     /* Verify tag */
     S[6] = _mm_cmpeq_epi8(S[6], LOADU(c + clen - BYTES(NORX_T)  ));

@@ -281,11 +281,11 @@ do                                                               \
     memcpy(OUT, lastblock, INLEN);                               \
 } while(0)
 
-#define INITIALISE(S, NONCE, KEY) do {                                          \
+#define INITIALISE(S, NONCE, K0, K1) do {                                       \
     S[0] = LOADU(NONCE +  0);                                                   \
     S[1] = LOADU(NONCE + 16);                                                   \
-    S[2] = LOADU(KEY +  0);                                                     \
-    S[3] = LOADU(KEY + 16);                                                     \
+    S[2] = K0;                                                                  \
+    S[3] = K1;                                                                  \
     S[4] = vcombine_u64( vcreate_u64( U8), vcreate_u64( U9) );                  \
     S[5] = vcombine_u64( vcreate_u64(U10), vcreate_u64(U11) );                  \
     S[6] = vcombine_u64( vcreate_u64(U12), vcreate_u64(U13) );                  \
@@ -293,7 +293,7 @@ do                                                               \
     S[6] = XOR(S[6], vcombine_u64( vcreate_u64(NORX_W), vcreate_u64(NORX_L) )); \
     S[7] = XOR(S[7], vcombine_u64( vcreate_u64(NORX_P), vcreate_u64(NORX_T) )); \
     PERMUTE(S);                                                                 \
-    INJECT_KEY(S, LOADU(KEY + 0), LOADU(KEY + 16));                             \
+    INJECT_KEY(S, K0, K1);                                                      \
 } while(0)
 
 #define ABSORB_DATA(S, IN, INLEN, TAG)       \
@@ -347,14 +347,14 @@ do                                                \
     }                                             \
 } while(0)
 
-#define FINALISE(S)                                 \
+#define FINALISE(S, K0, K1)                         \
 do                                                  \
 {                                                   \
     INJECT_DOMAIN_CONSTANT(S, FINAL_TAG);           \
     PERMUTE(S);                                     \
-    INJECT_KEY(S, LOADU(KEY + 0), LOADU(KEY + 16)); \
+    INJECT_KEY(S, K0, K1);                          \
     PERMUTE(S);                                     \
-    INJECT_KEY(S, LOADU(KEY + 0), LOADU(KEY + 16)); \
+    INJECT_KEY(S, K0, K1);                          \
 } while(0)
 
 #define PAD(OUT, OUTLEN, IN, INLEN) \
@@ -386,15 +386,16 @@ void norx_aead_encrypt(
   const unsigned char *key
 )
 {
-
+    const uint64x2_t K0 = LOADU(key +  0);
+    const uint64x2_t K1 = LOADU(key + 16);
     uint64x2_t S[8];
 
     *clen = mlen + BYTES(NORX_T);
-    INITIALISE(S, nonce, key);
+    INITIALISE(S, nonce, K0, K1);
     ABSORB_DATA(S, a, alen, HEADER_TAG);
     ENCRYPT_DATA(S, c, m, mlen);
     ABSORB_DATA(S, z, zlen, TRAILER_TAG);
-    FINALISE(S, key);
+    FINALISE(S, K0, K1);
     STOREU(c + mlen,                   S[6]);
     STOREU(c + mlen + BYTES(NORX_T)/2, S[7]);
 }
@@ -409,6 +410,8 @@ int norx_aead_decrypt(
   const unsigned char *key
 )
 {
+    const uint64x2_t K0 = LOADU(key +  0);
+    const uint64x2_t K1 = LOADU(key + 16);
     uint64x2_t S[8];
     uint32x4_t T[2];
 
@@ -416,11 +419,11 @@ int norx_aead_decrypt(
 
     *mlen = clen - BYTES(NORX_T);
 
-    INITIALISE(S, nonce, key);
+    INITIALISE(S, nonce, K0, K1);
     ABSORB_DATA(S, a, alen, HEADER_TAG);
     DECRYPT_DATA(S, m, c, clen - BYTES(NORX_T));
     ABSORB_DATA(S, z, zlen, TRAILER_TAG);
-    FINALISE(S, key);
+    FINALISE(S, K0, K1);
 
     /* Verify tag */
     T[0] = vceqq_u32(U64TOU32(S[6]), U8TOU32( vld1q_u8((uint8_t *)(c + clen - BYTES(NORX_T)  )) ));

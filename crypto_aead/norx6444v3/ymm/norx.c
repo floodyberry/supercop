@@ -250,14 +250,14 @@ const char * norx_version = "3.0";
   memcpy(OUT, lastblock, INLEN);                                          \
 } while(0)
 
-#define INITIALISE(A, B, C, D, NONCE, KEY) do {                          \
+#define INITIALISE(A, B, C, D, NONCE, K) do {                            \
   A = LOADU(NONCE);                                                      \
-  B = LOADU(KEY);                                                        \
+  B = K;                                                                 \
   C = _mm256_set_epi64x(U11, U10,  U9,  U8);                             \
   D = _mm256_set_epi64x(U15, U14, U13, U12);                             \
   D = XOR(D, _mm256_set_epi64x(NORX_T, NORX_P, NORX_L, NORX_W));         \
   PERMUTE(A, B, C, D);                                                   \
-  INJECT_KEY(A, B, C, D, LOADU(KEY));                                    \
+  INJECT_KEY(A, B, C, D, K);                                             \
 } while(0)
 
 #define ABSORB_DATA(A, B, C, D, IN, INLEN, TAG) do {  \
@@ -299,12 +299,12 @@ const char * norx_version = "3.0";
   }                                                    \
 } while(0)
 
-#define FINALISE(A, B, C, D, KEY) do {           \
+#define FINALISE(A, B, C, D, K) do {             \
   INJECT_DOMAIN_CONSTANT(A, B, C, D, FINAL_TAG); \
   PERMUTE(A, B, C, D);                           \
-  INJECT_KEY(A, B, C, D, LOADU(KEY));            \
+  INJECT_KEY(A, B, C, D, K);                     \
   PERMUTE(A, B, C, D);                           \
-  INJECT_KEY(A, B, C, D, LOADU(KEY));            \
+  INJECT_KEY(A, B, C, D, K);                     \
 } while(0)
 
 #define PAD(OUT, OUTLEN, IN, INLEN) do { \
@@ -650,14 +650,15 @@ void norx_aead_encrypt(
   const unsigned char *nonce,
   const unsigned char *key
 ) {
+  const __m256i K = LOADU(key);
   __m256i A, B, C, D;
 
   *clen = mlen + BYTES(NORX_T);
-  INITIALISE(A, B, C, D, nonce, key);
+  INITIALISE(A, B, C, D, nonce, K);
   ABSORB_DATA(A, B, C, D, a, alen, HEADER_TAG);
   ENCRYPT_DATA_V4(A, B, C, D, c, m, mlen);
   ABSORB_DATA(A, B, C, D, z, zlen, TRAILER_TAG);
-  FINALISE(A, B, C, D, key);
+  FINALISE(A, B, C, D, K);
   STOREU(c + mlen, D);
 }
 
@@ -670,17 +671,18 @@ int norx_aead_decrypt(
   const unsigned char *nonce,
   const unsigned char *key
 ) {
+  const __m256i K = LOADU(key);
   __m256i A, B, C, D;
 
   if (clen < BYTES(NORX_T)) { return -1; }
 
   *mlen = clen - BYTES(NORX_T);
 
-  INITIALISE(A, B, C, D, nonce, key);
+  INITIALISE(A, B, C, D, nonce, K);
   ABSORB_DATA(A, B, C, D, a, alen, HEADER_TAG);
   DECRYPT_DATA_V4(A, B, C, D, m, c, clen - BYTES(NORX_T));
   ABSORB_DATA(A, B, C, D, z, zlen, TRAILER_TAG);
-  FINALISE(A, B, C, D, key);
+  FINALISE(A, B, C, D, K);
 
   /* Verify tag */
   D = _mm256_cmpeq_epi8(D, LOADU(c + clen - BYTES(NORX_T)));

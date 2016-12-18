@@ -1,3 +1,10 @@
+Changes from 20161026:
+
+   * New k277mon and k277taa.
+   * crypto_aead/norx*v3: fix neon compilation errors.
+   * crypto_aead/norx*v3: handle overlap better.
+   * More checksums.
+
 Changes from 20161009:
 
    * CAESAR tweaks: acorn, cloc+silc, deoxys, ketje, morus, norx.
