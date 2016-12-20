@@ -1,3 +1,6 @@
+Changes from 20161218: Finally included the tweaked version of Ascon.
+Sorry for letting this slip through the cracks before!
+
 Changes from 20161026:
 
    * New k277mon and k277taa.
