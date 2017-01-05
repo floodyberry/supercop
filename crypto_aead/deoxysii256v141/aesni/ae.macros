@@ -1,4 +1,3 @@
-
 #define ADD_TO_TWEAK(t,x) \
     t = permute(add64(permute(t,PERM_MASK),x), PERM_MASK);
 

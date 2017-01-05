@@ -1,7 +1,7 @@
 /*
- * Deoxys=-128-128 Reference C Implementation
+ * Deoxys-I-128 Table-Based C Implementation
  *
- * Copyright 2014:
+ * Copyright 2016:
  *     Jeremy Jean <JJean@ntu.edu.sg>
  *     Ivica Nikolic <INikolic@ntu.edu.sg>
  *     Thomas Peyrin <thomas.peyrin@ntu.edu.sg>

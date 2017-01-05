@@ -1,8 +1,7 @@
 /*
- * Deoxys-II-128 Reference C Implementation
+ * Deoxys-II-128 Optimized AES-NI C Implementation
  *
  * Copyright 2016:
- *     Jeremy Jean <JJean@ntu.edu.sg>
  *     Ivica Nikolic <inikolic@ntu.edu.sg>
  *
  * This program is free software; you can redistribute it and/or

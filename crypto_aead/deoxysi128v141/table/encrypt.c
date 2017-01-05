@@ -1,9 +1,10 @@
 /*
- * Deoxys-I-128 Reference C Implementation
+ * Deoxys-I-128 Table-Based C Implementation
  *
  * Copyright 2016:
  *     Jeremy Jean <JJean@ntu.edu.sg>
- *     Ivica Nikolic <inikolic@ntu.edu.sg>
+ *     Ivica Nikolic <INikolic@ntu.edu.sg>
+ *     Thomas Peyrin <thomas.peyrin@ntu.edu.sg>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -21,7 +22,6 @@
  * 02110-1301, USA.
  *
  */
-
 
 #include <stdlib.h>
 #include "api.h"

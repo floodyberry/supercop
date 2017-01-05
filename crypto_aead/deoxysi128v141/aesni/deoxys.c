@@ -21,7 +21,6 @@
  * 
  */
 
-
 #include <string.h>
 #include <time.h>
 #include <xmmintrin.h>              /* SSE instructions and _mm_malloc */

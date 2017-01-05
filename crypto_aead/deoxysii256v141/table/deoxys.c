@@ -1,5 +1,5 @@
 /*
- * Deoxys-II-256 Reference C Implementation
+ * Deoxys-II-256 Table-Based C Implementation
  *
  * Copyright 2016:
  *     Jeremy Jean <JJean@ntu.edu.sg>
@@ -36,13 +36,12 @@
 #define MSB_AD 			      (0x2<<4)
 #define MSB_AD_LAST		      (0x6<<4)
 #define MSB_M			      (0x0<<4)
-#define MSB_M_LAST_ZERO		      (0x1<<4)
-#define MSB_M_LAST_NONZERO	      (0x4<<4)
+#define MSB_M_LAST_ZERO		  (0x1<<4)
+#define MSB_M_LAST_NONZERO	  (0x4<<4)
 #define MSB_CHKSUM		      (0x5<<4)
 
 /* Number of bits in the TWEAKEY state (256 or 384) */
 #define TWEAKEY_STATE_SIZE    384
-
 
 /*
 ** Modifiy the block number in the tweak value

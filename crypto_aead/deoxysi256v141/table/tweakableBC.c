@@ -1,5 +1,5 @@
 /*
- * Deoxys-I-256 Reference C Implementation
+ * Deoxys-I-256 Table-Based C Implementation
  *
  * Copyright 2016:
  *     Jeremy Jean <JJean@ntu.edu.sg>
