@@ -666,6 +666,13 @@ void encrypt_final(poet_ctx_t *ctx,
         z = vxor(z, s); 
         storeu(tag, z);
     } else if (plen % BLOCKLEN == 0) { // No tag splitting
+        if (plen == 2*BLOCKLEN) {
+            aes_encrypt_3blocks(x, y, z, ctx->aes_enc, ctx->aes_axu, plaintext, ciphertext, tmp_x, tmp_y, tmp_z);
+            plaintext += BLOCKLEN;
+            ciphertext += BLOCKLEN;
+            plen -= BLOCKLEN;
+        }
+        
         z = vxor(z, s);
         x = vxor(x, s);
         aes_encrypt_3blocks_no_whitening(x, y, z, ctx->aes_enc, ctx->aes_axu);

@@ -378,14 +378,14 @@ if (bytes >= 1024)
       z##b = _mm512_unpackhi_epi64(y##a, y##b);                         \
       z##c = _mm512_unpacklo_epi64(y##c, y##d);                         \
       z##d = _mm512_unpackhi_epi64(y##c, y##d);                         \
-      t0 = _mm512_xor_si512(z##a, _mm512_i64gather_epi64(gvv, m+  0, 1)); \
-      t1 = _mm512_xor_si512(z##b, _mm512_i64gather_epi64(gvv, m+ 64, 1)); \
-      t2 = _mm512_xor_si512(z##c, _mm512_i64gather_epi64(gvv, m+128, 1)); \
-      t3 = _mm512_xor_si512(z##d, _mm512_i64gather_epi64(gvv, m+192, 1)); \
-      _mm512_i64scatter_epi64(out+  0, gvv, t0, 1);                     \
-      _mm512_i64scatter_epi64(out+ 64, gvv, t1, 1);                     \
-      _mm512_i64scatter_epi64(out+128, gvv, t2, 1);                     \
-      _mm512_i64scatter_epi64(out+192, gvv, t3, 1);                     \
+      t0 = _mm512_xor_si512(z##a, _mm512_i64gather_epi64(gvv, (const long long*)(m+  0), 1)); \
+      t1 = _mm512_xor_si512(z##b, _mm512_i64gather_epi64(gvv, (const long long*)(m+ 64), 1)); \
+      t2 = _mm512_xor_si512(z##c, _mm512_i64gather_epi64(gvv, (const long long*)(m+128), 1)); \
+      t3 = _mm512_xor_si512(z##d, _mm512_i64gather_epi64(gvv, (const long long*)(m+192), 1)); \
+      _mm512_i64scatter_epi64((long long*)(out+  0), gvv, t0, 1);                     \
+      _mm512_i64scatter_epi64((long long*)(out+ 64), gvv, t1, 1);                     \
+      _mm512_i64scatter_epi64((long long*)(out+128), gvv, t2, 1);                     \
+      _mm512_i64scatter_epi64((long long*)(out+192), gvv, t3, 1);                     \
     }
 #define ONEQUAD(a,b,c,d) ONEQUAD_TRANSPOSE_SCATTERGATHER(a,b,c,d)
 

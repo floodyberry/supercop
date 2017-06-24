@@ -4,7 +4,7 @@
 // ** This version is slow and susceptible to side-channel attacks. **
 // ** Do not use for any purpose other than to understand AEZ.      **
 //
-// Written by Ted Krovetz (ted@krovetz.net). Last modified 13 September 2015.
+// Written by Ted Krovetz (ted@krovetz.net). Last modified 19 July 2016.
 //
 // This is free and unencumbered software released into the public domain.
 //
@@ -137,17 +137,20 @@ static void E(byte *K, unsigned kbytes, int j, unsigned i,
         	mult_block(i,I,buf); xor_bytes(buf, src, 16, buf);
         	rijndaelEncryptRound(aes4_key, 99, buf, 4);
         } else if (j==1 || j==2) {
-        	mult_block((1<<(3+(i-1)/8))+(i-1)%8,I,buf);
-        	xor_bytes(buf, src, 16, buf);
+        	mult_block((i-1)%8,I,delta);
+        	for (i=3+(i-1)/8; i>0; i--) mult_block(2,I,I);
+        	xor_bytes(delta, I, 16, delta);
+        	xor_bytes(delta, src, 16, buf);
         	rijndaelEncryptRound(aes4_key, 99, buf, 4);
         } else if (j>=3 && i==0) {
         	mult_block(1<<(j-3),L,delta); xor_bytes(delta, src, 16, buf);
         	rijndaelEncryptRound(aes4_key, 99, buf, 4);
         	xor_bytes(buf, delta, 16, buf);
         } else {
-        	mult_block(1<<(j-3),L,buf);
-        	mult_block((1<<(3+(i-1)/8))+(i-1)%8,J,delta);
-        	xor_bytes(delta, buf, 16, delta);
+        	mult_block(1<<(j-3),L,delta);
+        	mult_block((i-1)%8,J,buf); xor_bytes(delta, buf, 16, delta);
+        	for (i=3+(i-1)/8; i>0; i--) mult_block(2,J,J);
+        	xor_bytes(delta, J, 16, delta);
         	xor_bytes(src, delta, 16, buf);
         	rijndaelEncryptRound(aes4_key, 99, buf, 4);
         	xor_bytes(buf, delta, 16, buf);

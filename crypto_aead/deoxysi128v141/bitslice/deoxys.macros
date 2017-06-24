@@ -1,0 +1,432 @@
+/*
+ * Deoxys-I-128 Bit-Sliced C Implementation
+ *
+ * Copyright 2016:
+ *     Jeremy Jean <JJean@ntu.edu.sg>
+ *     Ivica Nikolic <inikolic@ntu.edu.sg>
+ *     Haoyang Wang <wang1153@e.ntu.edu.sg>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ *
+ */
+
+#define SET32           _mm_set_epi32
+#define SET8            _mm_set_epi8
+#define mask_55         SET32(0x55555555,0x55555555,0x55555555,0x55555555)
+#define mask_33         SET32(0x33333333,0x33333333,0x33333333,0x33333333)
+#define mask_0f         SET32(0x0f0f0f0f,0x0f0f0f0f,0x0f0f0f0f,0x0f0f0f0f)
+#define permute(a,b)    _mm_shuffle_epi8(a,b)
+#define shuffle_pack(a) permute(a, SET8(15,11,7,3,14,10,6,2,13,9,5,1,12,8,4,0) )
+#define shuffle_sr(a)   permute(a, SET8(14,13,12,15, 9,8,11,10 , 4,7,6,5, 3,2,1,0))
+#define shuffle_isr(a)  permute(a, SET8(12,15,14,13, 9,8,11,10 , 6,5,4,7, 3,2,1,0))
+#define rl32(a)         _mm_shuffle_epi32(a, 0x39)
+#define rl64(a)         _mm_shuffle_epi32(a, 0x4e)
+#define rl96(a)         _mm_shuffle_epi32(a, 0x93)
+#define XOR(a,b)        _mm_xor_si128(a,b)
+#define AND(x,y)        _mm_and_si128((x),(y))
+#define OR(x,y)         _mm_or_si128((x),(y))
+#define SHR(x,y)        _mm_srli_epi64(x,y)
+#define SHL(x,y)        _mm_slli_epi64(x,y)
+#define LOAD(src)       _mm_loadu_si128((__m128i *)(src))
+#define STORE(dest,src) _mm_storeu_si128((__m128i *)(dest),(src))
+#define add8(a,b)       _mm_add_epi8(a,b)
+#define add64(a,b)      _mm_add_epi64(a,b)
+#define mask_f          SET32(0xffffffff,0xffffffff,0xffffffff,0xffffffff)
+#define mask_h          SET8( 9,8,11,10, 6,5,4,7,  3,2,1,0, 12,15,14,13)
+#define mask_w          SET8(0,0,0xff,0, 0,0,0xff,0, 0,0,0xff,0, 0,0,0xff,0)
+#define mask_w1         SET8(0,0,0xff,0, 0,0,0xff,0, 0,0,0xff,0, 0,0,0xff,0xff)
+#define mask_w2         SET8(0,0,0xff,0, 0,0,0xff,0, 0,0,0xff,0xff, 0,0,0xff,0)
+#define mask_w3         SET8(0,0,0xff,0, 0,0,0xff,0xff, 0,0,0xff,0, 0,0,0xff,0)
+#define mask_w4         SET8(0,0,0xff,0xff, 0,0,0xff,0, 0,0,0xff,0, 0,0,0xff,0)
+#define mask_s1         SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xff)
+#define mask_s2         SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xff, 0,0,0,0)
+#define mask_s3         SET8(0,0,0,0, 0,0,0,0xff, 0,0,0,0, 0,0,0,0)
+#define mask_s4         SET8(0,0,0,0xff, 0,0,0,0, 0,0,0,0, 0,0,0,0)
+#define mask_15         SET8(0xff,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0)
+#define mask_14         SET8(0,0,0,0, 0xff,0,0,0, 0,0,0,0, 0,0,0,0)
+#define mask_8          SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xff,0,0)
+#define mask_9          SET8(0,0,0,0, 0,0,0,0, 0,0xff,0,0, 0,0,0,0)
+#define mask_6          SET8(0,0,0,0, 0,0,0xff,0, 0,0,0,0, 0,0,0,0)
+#define mask_7          SET8(0,0,0xff,0, 0,0,0,0, 0,0,0,0, 0,0,0,0)
+#define mask_1          SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xff, 0,0,0,0)
+#define mask_0          SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xff)
+#define PERM_MASK       SET8( 8,9,10,11,12,13,14,15,7,6,5,4,3,2,1,0)
+#define CARRY           SET8( 0,0,0,0,  0,0,0x01,0, 0,0,0,0,  0,0,0,0)
+#define ONE             SET8( 1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 )
+
+
+#define KEY_SCHEDULE( key, subkey ) do{\
+    __m128i v;\
+    v=LOAD(key);\
+    for(i=0;i<8;i++)\
+    	subkey[0][i]=v;\
+    packing(subkey[0]);\
+    for(i=1;i<15;i++){\
+        subkey[i][0] = permute( XOR(subkey[i-1][5], subkey[i-1][7]), mask_h );\
+        subkey[i][1] = permute(subkey[i-1][0], mask_h );\
+        subkey[i][2] = permute(subkey[i-1][1], mask_h );\
+        subkey[i][3] = permute(subkey[i-1][2], mask_h );\
+        subkey[i][4] = permute(subkey[i-1][3], mask_h );\
+        subkey[i][5] = permute(subkey[i-1][4], mask_h );\
+        subkey[i][6] = permute(subkey[i-1][5], mask_h );\
+        subkey[i][7] = permute(subkey[i-1][6], mask_h );\
+    }\
+    subkey[0][0] = XOR(subkey[0][0], mask_w1);\
+    subkey[0][1] = XOR(subkey[0][1], mask_w2);\
+    subkey[0][2] = XOR(subkey[0][2], mask_w3);\
+    subkey[0][3] = XOR(subkey[0][3], mask_w4);\
+    subkey[0][5] = XOR(subkey[0][5], mask_w);\
+    subkey[1][0] = XOR(subkey[1][0], mask_s1);\
+    subkey[1][1] = XOR(subkey[1][1], mask_w2);\
+    subkey[1][2] = XOR(subkey[1][2], mask_w3);\
+    subkey[1][3] = XOR(subkey[1][3], mask_w4);\
+    subkey[1][4] = XOR(subkey[1][4], mask_w);\
+    subkey[1][6] = XOR(subkey[1][6], mask_w);\
+    subkey[2][0] = XOR(subkey[2][0], mask_s1);\
+    subkey[2][1] = XOR(subkey[2][1], mask_s2);\
+    subkey[2][2] = XOR(subkey[2][2], mask_w3);\
+    subkey[2][3] = XOR(subkey[2][3], mask_w4);\
+    subkey[2][4] = XOR(subkey[2][4], mask_w);\
+    subkey[2][5] = XOR(subkey[2][5], mask_w);\
+    subkey[2][7] = XOR(subkey[2][7], mask_w);\
+    subkey[3][0] = XOR(subkey[3][0], mask_w1);\
+    subkey[3][1] = XOR(subkey[3][1], mask_w2);\
+    subkey[3][2] = XOR(subkey[3][2], mask_s3);\
+    subkey[3][3] = XOR(subkey[3][3], mask_s4);\
+    subkey[3][5] = XOR(subkey[3][5], mask_w);\
+    subkey[3][6] = XOR(subkey[3][6], mask_w);\
+    subkey[4][0] = XOR(subkey[4][0], mask_s1);\
+    subkey[4][1] = XOR(subkey[4][1], mask_w2);\
+    subkey[4][2] = XOR(subkey[4][2], mask_w3);\
+    subkey[4][3] = XOR(subkey[4][3], mask_s4);\
+    subkey[4][6] = XOR(subkey[4][6], mask_w);\
+    subkey[4][7] = XOR(subkey[4][7], mask_w);\
+    subkey[5][0] = XOR(subkey[5][0], mask_w1);\
+    subkey[5][1] = XOR(subkey[5][1], mask_w2);\
+    subkey[5][2] = XOR(subkey[5][2], mask_w3);\
+    subkey[5][3] = XOR(subkey[5][3], mask_s4);\
+    subkey[5][4] = XOR(subkey[5][4], mask_w);\
+    subkey[5][7] = XOR(subkey[5][7], mask_w);\
+    subkey[6][0] = XOR(subkey[6][0], mask_w1);\
+    subkey[6][1] = XOR(subkey[6][1], mask_s2);\
+    subkey[6][2] = XOR(subkey[6][2], mask_w3);\
+    subkey[6][3] = XOR(subkey[6][3], mask_s4);\
+    subkey[6][4] = XOR(subkey[6][4], mask_w);\
+    subkey[6][5] = XOR(subkey[6][5], mask_w);\
+    subkey[7][0] = XOR(subkey[7][0], mask_s1);\
+    subkey[7][1] = XOR(subkey[7][1], mask_w2);\
+    subkey[7][2] = XOR(subkey[7][2], mask_s3);\
+    subkey[7][3] = XOR(subkey[7][3], mask_w4);\
+    subkey[7][5] = XOR(subkey[7][5], mask_w);\
+    subkey[7][6] = XOR(subkey[7][6], mask_w);\
+    subkey[8][0] = XOR(subkey[8][0], mask_s1);\
+    subkey[8][1] = XOR(subkey[8][1], mask_s2);\
+    subkey[8][2] = XOR(subkey[8][2], mask_w3);\
+    subkey[8][3] = XOR(subkey[8][3], mask_s4);\
+    subkey[8][4] = XOR(subkey[8][4], mask_w);\
+    subkey[8][6] = XOR(subkey[8][6], mask_w);\
+    subkey[8][7] = XOR(subkey[8][7], mask_w);\
+    subkey[9][0] = XOR(subkey[9][0], mask_w1);\
+    subkey[9][1] = XOR(subkey[9][1], mask_w2);\
+    subkey[9][2] = XOR(subkey[9][2], mask_s3);\
+    subkey[9][3] = XOR(subkey[9][3], mask_s4);\
+    subkey[9][4] = XOR(subkey[9][4], mask_w);\
+    subkey[9][5] = XOR(subkey[9][5], mask_w);\
+    subkey[9][7] = XOR(subkey[9][7], mask_w);\
+    subkey[10][0] = XOR(subkey[10][0], mask_w1);\
+    subkey[10][1] = XOR(subkey[10][1], mask_s2);\
+    subkey[10][2] = XOR(subkey[10][2], mask_w3);\
+    subkey[10][3] = XOR(subkey[10][3], mask_w4);\
+    subkey[10][4] = XOR(subkey[10][4], mask_w);\
+    subkey[10][5] = XOR(subkey[10][5], mask_w);\
+    subkey[10][6] = XOR(subkey[10][6], mask_w);\
+    subkey[11][0] = XOR(subkey[11][0], mask_s1);\
+    subkey[11][1] = XOR(subkey[11][1], mask_w2);\
+    subkey[11][2] = XOR(subkey[11][2], mask_s3);\
+    subkey[11][3] = XOR(subkey[11][3], mask_w4);\
+    subkey[11][4] = XOR(subkey[11][4], mask_w);\
+    subkey[11][5] = XOR(subkey[11][5], mask_w);\
+    subkey[11][6] = XOR(subkey[11][6], mask_w);\
+    subkey[11][7] = XOR(subkey[11][7], mask_w);\
+    subkey[12][0] = XOR(subkey[12][0], mask_w1);\
+    subkey[12][1] = XOR(subkey[12][1], mask_w2);\
+    subkey[12][2] = XOR(subkey[12][2], mask_w3);\
+    subkey[12][3] = XOR(subkey[12][3], mask_w4);\
+    subkey[12][5] = XOR(subkey[12][5], mask_w);\
+    subkey[12][6] = XOR(subkey[12][6], mask_w);\
+    subkey[12][7] = XOR(subkey[12][7], mask_w);\
+    subkey[13][0] = XOR(subkey[13][0], mask_w1);\
+    subkey[13][1] = XOR(subkey[13][1], mask_s2);\
+    subkey[13][2] = XOR(subkey[13][2], mask_w3);\
+    subkey[13][3] = XOR(subkey[13][3], mask_s4);\
+    subkey[13][6] = XOR(subkey[13][6], mask_w);\
+    subkey[13][7] = XOR(subkey[13][7], mask_w);\
+    subkey[14][0] = XOR(subkey[14][0], mask_w1);\
+    subkey[14][1] = XOR(subkey[14][1], mask_s2);\
+    subkey[14][2] = XOR(subkey[14][2], mask_s3);\
+    subkey[14][3] = XOR(subkey[14][3], mask_s4);\
+    subkey[14][4] = XOR(subkey[14][4], mask_w);\
+    subkey[14][7] = XOR(subkey[14][7], mask_w);\
+} while(0);
+
+#define FIRST_ROUNDKEYS_ASS( subkey, rk) do{\
+    memcpy( rk, subkey, 1920);\
+    rk[0][5] = XOR(subkey[0][5], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xff));\
+    rk[1][5] = XOR(subkey[1][5], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xff, 0,0,0,0));\
+    rk[2][5] = XOR(subkey[2][5], SET8(0,0,0,0, 0,0,0xff,0, 0,0,0,0, 0,0,0,0));\
+    rk[3][5] = XOR(subkey[3][5], SET8(0xff,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[4][5] = XOR(subkey[4][5], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xff,0,0));\
+    rk[5][5] = XOR(subkey[5][5], SET8(0,0,0,0, 0,0,0,0, 0,0xff,0,0, 0,0,0,0));\
+    rk[6][5] = XOR(subkey[6][5], SET8(0,0,0,0, 0xff,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[7][5] = XOR(subkey[7][5], SET8(0,0,0xff,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[8][5] = XOR(subkey[8][5], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xff));\
+    rk[9][5] = XOR(subkey[9][5], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xff, 0,0,0,0));\
+    rk[10][5] = XOR(subkey[10][5], SET8(0,0,0,0, 0,0,0xff,0, 0,0,0,0, 0,0,0,0));\
+    rk[11][5] = XOR(subkey[11][5], SET8(0xff,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[12][5] = XOR(subkey[12][5], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xff,0,0));\
+    rk[13][5] = XOR(subkey[13][5], SET8(0,0,0,0, 0,0,0,0, 0,0xff,0,0, 0,0,0,0));\
+    rk[14][5] = XOR(subkey[14][5], SET8(0,0,0,0, 0xff,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[0][2] = XOR(subkey[0][2], SET8(0xf0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[0][1] = XOR(subkey[0][1], SET8(0xcc,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[0][0] = XOR(subkey[0][0], SET8(0xaa,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[1][2] = XOR(subkey[1][2], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xf0,0,0));\
+    rk[1][1] = XOR(subkey[1][1], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xcc,0,0));\
+    rk[1][0] = XOR(subkey[1][0], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xaa,0,0));\
+    rk[2][2] = XOR(subkey[2][2], SET8(0,0,0,0, 0,0,0,0, 0,0xf0,0,0, 0,0,0,0));\
+    rk[2][1] = XOR(subkey[2][1], SET8(0,0,0,0, 0,0,0,0, 0,0xcc,0,0, 0,0,0,0));\
+    rk[2][0] = XOR(subkey[2][0], SET8(0,0,0,0, 0,0,0,0, 0,0xaa,0,0, 0,0,0,0));\
+    rk[3][2] = XOR(subkey[3][2], SET8(0,0,0,0, 0xf0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[3][1] = XOR(subkey[3][1], SET8(0,0,0,0, 0xcc,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[3][0] = XOR(subkey[3][0], SET8(0,0,0,0, 0xaa,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[4][2] = XOR(subkey[4][2], SET8(0,0,0xf0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[4][1] = XOR(subkey[4][1], SET8(0,0,0xcc,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[4][0] = XOR(subkey[4][0], SET8(0,0,0xaa,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[5][2] = XOR(subkey[5][2], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xf0));\
+    rk[5][1] = XOR(subkey[5][1], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xcc));\
+    rk[5][0] = XOR(subkey[5][0], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xaa));\
+    rk[6][2] = XOR(subkey[6][2], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xf0, 0,0,0,0));\
+    rk[6][1] = XOR(subkey[6][1], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xcc, 0,0,0,0));\
+    rk[6][0] = XOR(subkey[6][0], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xaa, 0,0,0,0));\
+    rk[7][2] = XOR(subkey[7][2], SET8(0,0,0,0, 0,0,0xf0,0, 0,0,0,0, 0,0,0,0));\
+    rk[7][1] = XOR(subkey[7][1], SET8(0,0,0,0, 0,0,0xcc,0, 0,0,0,0, 0,0,0,0));\
+    rk[7][0] = XOR(subkey[7][0], SET8(0,0,0,0, 0,0,0xaa,0, 0,0,0,0, 0,0,0,0));\
+    rk[8][2] = XOR(subkey[8][2], SET8(0xf0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[8][1] = XOR(subkey[8][1], SET8(0xcc,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[8][0] = XOR(subkey[8][0], SET8(0xaa,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[9][2] = XOR(subkey[9][2], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xf0,0,0));\
+    rk[9][1] = XOR(subkey[9][1], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xcc,0,0));\
+    rk[9][0] = XOR(subkey[9][0], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0xaa,0,0));\
+    rk[10][2] = XOR(subkey[10][2], SET8(0,0,0,0, 0,0,0,0, 0,0xf0,0,0, 0,0,0,0));\
+    rk[10][1] = XOR(subkey[10][1], SET8(0,0,0,0, 0,0,0,0, 0,0xcc,0,0, 0,0,0,0));\
+    rk[10][0] = XOR(subkey[10][0], SET8(0,0,0,0, 0,0,0,0, 0,0xaa,0,0, 0,0,0,0));\
+    rk[11][2] = XOR(subkey[11][2], SET8(0,0,0,0, 0xf0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[11][1] = XOR(subkey[11][1], SET8(0,0,0,0, 0xcc,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[11][0] = XOR(subkey[11][0], SET8(0,0,0,0, 0xaa,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[12][2] = XOR(subkey[12][2], SET8(0,0,0xf0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[12][1] = XOR(subkey[12][1], SET8(0,0,0xcc,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[12][0] = XOR(subkey[12][0], SET8(0,0,0xaa,0, 0,0,0,0, 0,0,0,0, 0,0,0,0));\
+    rk[13][2] = XOR(subkey[13][2], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xf0));\
+    rk[13][1] = XOR(subkey[13][1], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xcc));\
+    rk[13][0] = XOR(subkey[13][0], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0xaa));\
+    rk[14][2] = XOR(subkey[14][2], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xf0, 0,0,0,0));\
+    rk[14][1] = XOR(subkey[14][1], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xcc, 0,0,0,0));\
+    rk[14][0] = XOR(subkey[14][0], SET8(0,0,0,0, 0,0,0,0, 0,0,0,0xaa, 0,0,0,0));\
+} while(0);
+
+#define ADD_TO_TWEAK(tweak, x)\
+    tweak= permute(add64(permute(tweak, PERM_MASK), x), PERM_MASK);
+
+#define RENEW_TWEAKS(Tweaks, Tweak)\
+    Tweaks[0][0] = Tweak;                   Tweaks[0][1]  = add8(Tweaks[0][0],ONE);\
+    Tweaks[0][2] = add8(Tweaks[0][1],ONE);  Tweaks[0][3]  = add8(Tweaks[0][2],ONE);\
+    Tweaks[0][4] = add8(Tweaks[0][3],ONE);  Tweaks[0][5]  = add8(Tweaks[0][4],ONE);\
+    Tweaks[0][6] = add8(Tweaks[0][5],ONE);  Tweaks[0][7]  = add8(Tweaks[0][6],ONE);\
+
+#define TWEAK_SCHEDULE(Tweaks)\
+    packing(Tweaks[0]);\
+    for(j=1;j<15;j++){\
+        Tweaks[j][0] = permute(Tweaks[j-1][0], mask_h );\
+        Tweaks[j][1] = permute(Tweaks[j-1][1], mask_h );\
+        Tweaks[j][2] = permute(Tweaks[j-1][2], mask_h );\
+        Tweaks[j][3] = permute(Tweaks[j-1][3], mask_h );\
+        Tweaks[j][4] = permute(Tweaks[j-1][4], mask_h );\
+        Tweaks[j][5] = permute(Tweaks[j-1][5], mask_h );\
+        Tweaks[j][6] = permute(Tweaks[j-1][6], mask_h );\
+        Tweaks[j][7] = permute(Tweaks[j-1][7], mask_h );\
+    }\
+
+#define ONE_KEYROUND(Tweaks, subkey, rk )\
+    rk[0]=XOR(subkey[0], Tweaks[0]);     rk[1]=XOR(subkey[1], Tweaks[1]);\
+    rk[2]=XOR(subkey[2], Tweaks[2]);     rk[3]=XOR(subkey[3], Tweaks[3]);\
+    rk[4]=XOR(subkey[4], Tweaks[4]);     rk[5]=XOR(subkey[5], Tweaks[5]);\
+    rk[6]=XOR(subkey[6], Tweaks[6]);     rk[7]=XOR(subkey[7], Tweaks[7]);\
+
+#define ROUNDKEY( Tweaks, subkey, rk)\
+    TWEAK_SCHEDULE(Tweaks);\
+    ONE_KEYROUND(Tweaks[0], subkey[0], rk[0]);\
+    ONE_KEYROUND(Tweaks[1], subkey[1], rk[1]);\
+    ONE_KEYROUND(Tweaks[2], subkey[2], rk[2]);\
+    ONE_KEYROUND(Tweaks[3], subkey[3], rk[3]);\
+    ONE_KEYROUND(Tweaks[4], subkey[4], rk[4]);\
+    ONE_KEYROUND(Tweaks[5], subkey[5], rk[5]);\
+    ONE_KEYROUND(Tweaks[6], subkey[6], rk[6]);\
+    ONE_KEYROUND(Tweaks[7], subkey[7], rk[7]);\
+    ONE_KEYROUND(Tweaks[8], subkey[8], rk[8]);\
+    ONE_KEYROUND(Tweaks[9], subkey[9], rk[9]);\
+    ONE_KEYROUND(Tweaks[10], subkey[10], rk[10]);\
+    ONE_KEYROUND(Tweaks[11], subkey[11], rk[11]);\
+    ONE_KEYROUND(Tweaks[12], subkey[12], rk[12]);\
+    ONE_KEYROUND(Tweaks[13], subkey[13], rk[13]);\
+    ONE_KEYROUND(Tweaks[14], subkey[14], rk[14]);\
+
+#define UPDATE_SUBKEYS_3th(rk)\
+    rk[0][3] = XOR(rk[0][3], mask_15); rk[8][3]  = XOR(rk[8][3], mask_15);\
+    rk[1][3] = XOR(rk[1][3], mask_8);  rk[9][3]  = XOR(rk[9][3], mask_8);\
+    rk[2][3] = XOR(rk[2][3], mask_9);  rk[10][3] = XOR(rk[10][3], mask_9);\
+    rk[3][3] = XOR(rk[3][3], mask_14); rk[11][3] = XOR(rk[11][3], mask_14);\
+    rk[4][3] = XOR(rk[4][3], mask_7);  rk[12][3] = XOR(rk[12][3], mask_7);\
+    rk[5][3] = XOR(rk[5][3], mask_0);  rk[13][3] = XOR(rk[13][3], mask_0);\
+    rk[6][3] = XOR(rk[6][3], mask_1);  rk[14][3] = XOR(rk[14][3], mask_1);\
+    rk[7][3] = XOR(rk[7][3], mask_6);\
+
+#define UPDATE_SUBKEYS_4th(rk)\
+    rk[0][4] = XOR(rk[0][4], mask_15); rk[8][4]  = XOR(rk[8][4], mask_15);\
+    rk[1][4] = XOR(rk[1][4], mask_8);  rk[9][4]  = XOR(rk[9][4], mask_8);\
+    rk[2][4] = XOR(rk[2][4], mask_9);  rk[10][4] = XOR(rk[10][4], mask_9);\
+    rk[3][4] = XOR(rk[3][4], mask_14); rk[11][4] = XOR(rk[11][4], mask_14);\
+    rk[4][4] = XOR(rk[4][4], mask_7);  rk[12][4] = XOR(rk[12][4], mask_7);\
+    rk[5][4] = XOR(rk[5][4], mask_0);  rk[13][4] = XOR(rk[13][4], mask_0);\
+    rk[6][4] = XOR(rk[6][4], mask_1);  rk[14][4] = XOR(rk[14][4], mask_1);\
+    rk[7][4] = XOR(rk[7][4], mask_6);\
+
+#define UPDATE_SUBKEYS_5th(rk)\
+    rk[0][5] = XOR(rk[0][5], mask_15); rk[8][5]  = XOR(rk[8][5], mask_15);\
+    rk[1][5] = XOR(rk[1][5], mask_8);  rk[9][5]  = XOR(rk[9][5], mask_8);\
+    rk[2][5] = XOR(rk[2][5], mask_9);  rk[10][5] = XOR(rk[10][5], mask_9);\
+    rk[3][5] = XOR(rk[3][5], mask_14); rk[11][5] = XOR(rk[11][5], mask_14);\
+    rk[4][5] = XOR(rk[4][5], mask_7);  rk[12][5] = XOR(rk[12][5], mask_7);\
+    rk[5][5] = XOR(rk[5][5], mask_0);  rk[13][5] = XOR(rk[13][5], mask_0);\
+    rk[6][5] = XOR(rk[6][5], mask_1);  rk[14][5] = XOR(rk[14][5], mask_1);\
+    rk[7][5] = XOR(rk[7][5], mask_6);\
+
+#define UPDATE_SUBKEYS_6th(rk)\
+    rk[0][6] = XOR(rk[0][6], mask_15); rk[8][6]  = XOR(rk[8][6], mask_15);\
+    rk[1][6] = XOR(rk[1][6], mask_8);  rk[9][6]  = XOR(rk[9][6], mask_8);\
+    rk[2][6] = XOR(rk[2][6], mask_9);  rk[10][6] = XOR(rk[10][6], mask_9);\
+    rk[3][6] = XOR(rk[3][6], mask_14); rk[11][6] = XOR(rk[11][6], mask_14);\
+    rk[4][6] = XOR(rk[4][6], mask_7);  rk[12][6] = XOR(rk[12][6], mask_7);\
+    rk[5][6] = XOR(rk[5][6], mask_0);  rk[13][6] = XOR(rk[13][6], mask_0);\
+    rk[6][6] = XOR(rk[6][6], mask_1);  rk[14][6] = XOR(rk[14][6], mask_1);\
+    rk[7][6] = XOR(rk[7][6], mask_6);\
+
+#define UPDATE_SUBKEYS_7th(rk)\
+    rk[0][7] = XOR(rk[0][7], mask_15); rk[8][7]  = XOR(rk[8][7], mask_15);\
+    rk[1][7] = XOR(rk[1][7], mask_8);  rk[9][7]  = XOR(rk[9][7], mask_8);\
+    rk[2][7] = XOR(rk[2][7], mask_9);  rk[10][7] = XOR(rk[10][7], mask_9);\
+    rk[3][7] = XOR(rk[3][7], mask_14); rk[11][7] = XOR(rk[11][7], mask_14);\
+    rk[4][7] = XOR(rk[4][7], mask_7);  rk[12][7] = XOR(rk[12][7], mask_7);\
+    rk[5][7] = XOR(rk[5][7], mask_0);  rk[13][7] = XOR(rk[13][7], mask_0);\
+    rk[6][7] = XOR(rk[6][7], mask_1);  rk[14][7] = XOR(rk[14][7], mask_1);\
+    rk[7][7] = XOR(rk[7][7], mask_6);\
+
+#define UPDATE_SUBKEYS(rk, i) do{\
+	switch(i%32){\
+		case 1  : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 2  : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); break;}\
+		case 3  : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 4  : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); UPDATE_SUBKEYS_5th(rk); break;}\
+		case 5  : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 6  : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); break;}\
+		case 7  : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 8  : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); UPDATE_SUBKEYS_5th(rk); UPDATE_SUBKEYS_6th(rk); break;}\
+		case 9  : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 10 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); break;}\
+		case 11 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 12 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); UPDATE_SUBKEYS_5th(rk); break;}\
+		case 13 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 14 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); break;}\
+		case 15 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 16 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); UPDATE_SUBKEYS_5th(rk); UPDATE_SUBKEYS_6th(rk); UPDATE_SUBKEYS_7th(rk); break;}\
+		case 17 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 18 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); break;}\
+		case 19 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 20 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); UPDATE_SUBKEYS_5th(rk); break;}\
+		case 21 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 22 : {UPDATE_SUBKEYS_3th(rk);  UPDATE_SUBKEYS_4th(rk) break;}\
+		case 23 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 24 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); UPDATE_SUBKEYS_5th(rk); UPDATE_SUBKEYS_6th(rk); break;}\
+		case 25 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 26 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); break;}\
+		case 27 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 28 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); UPDATE_SUBKEYS_5th(rk); break;}\
+		case 29 : {UPDATE_SUBKEYS_3th(rk); break;}\
+		case 30 : {UPDATE_SUBKEYS_3th(rk); UPDATE_SUBKEYS_4th(rk); break;}\
+		case 31 : {UPDATE_SUBKEYS_3th(rk); break;}\
+	}\
+} while(0);
+
+#define SWAP(a,b,m,n) do{\
+    __m128i t;\
+    t=AND(XOR(SHR(a,n),b),m);\
+    b=XOR(b,t);\
+    a=XOR(a,SHL(t,n));\
+} while(0);
+
+#define packing(x) do{\
+    SWAP((x)[0],(x)[1],mask_55,1);\
+    SWAP((x)[2],(x)[3],mask_55,1);\
+    SWAP((x)[4],(x)[5],mask_55,1);\
+    SWAP((x)[6],(x)[7],mask_55,1);\
+    SWAP((x)[0],(x)[2],mask_33,2);\
+    SWAP((x)[1],(x)[3],mask_33,2);\
+    SWAP((x)[4],(x)[6],mask_33,2);\
+    SWAP((x)[5],(x)[7],mask_33,2);\
+    SWAP((x)[0],(x)[4],mask_0f,4);\
+    SWAP((x)[1],(x)[5],mask_0f,4);\
+    SWAP((x)[2],(x)[6],mask_0f,4);\
+    SWAP((x)[3],(x)[7],mask_0f,4);\
+    (x)[0] = shuffle_pack((x)[0]);\
+    (x)[1] = shuffle_pack((x)[1]);\
+    (x)[2] = shuffle_pack((x)[2]);\
+    (x)[3] = shuffle_pack((x)[3]);\
+    (x)[4] = shuffle_pack((x)[4]);\
+    (x)[5] = shuffle_pack((x)[5]);\
+    (x)[6] = shuffle_pack((x)[6]);\
+    (x)[7] = shuffle_pack((x)[7]);\
+} while(0);
+
+#define unpacking(x) do{\
+    (x)[0] = shuffle_pack((x)[0]);\
+    (x)[1] = shuffle_pack((x)[1]);\
+    (x)[2] = shuffle_pack((x)[2]);\
+    (x)[3] = shuffle_pack((x)[3]);\
+    (x)[4] = shuffle_pack((x)[4]);\
+    (x)[5] = shuffle_pack((x)[5]);\
+    (x)[6] = shuffle_pack((x)[6]);\
+    (x)[7] = shuffle_pack((x)[7]);\
+    SWAP((x)[0],(x)[4],mask_0f,4);\
+    SWAP((x)[1],(x)[5],mask_0f,4);\
+    SWAP((x)[2],(x)[6],mask_0f,4);\
+    SWAP((x)[3],(x)[7],mask_0f,4);\
+    SWAP((x)[0],(x)[2],mask_33,2);\
+    SWAP((x)[1],(x)[3],mask_33,2);\
+    SWAP((x)[4],(x)[6],mask_33,2);\
+    SWAP((x)[5],(x)[7],mask_33,2);\
+    SWAP((x)[0],(x)[1],mask_55,1);\
+    SWAP((x)[2],(x)[3],mask_55,1);\
+    SWAP((x)[4],(x)[5],mask_55,1);\
+    SWAP((x)[6],(x)[7],mask_55,1);\
+} while(0);

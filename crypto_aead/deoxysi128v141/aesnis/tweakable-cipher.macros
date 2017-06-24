@@ -1,0 +1,1256 @@
+#define enc(a,b) _mm_aesenc_si128(a,b) 
+#define dec(a,b) _mm_aesdec_si128(a,b) 
+#define dec_last(a,b) _mm_aesdeclast_si128(a,b) 
+#define mc_inv(a)     _mm_aesimc_si128(a)
+#define xor(a,b) _mm_xor_si128(a,b) 
+#define and(a,b) _mm_and_si128(a,b)
+#define permute(a,b) _mm_shuffle_epi8(a,b) 
+#define add8(a,b)  _mm_add_epi8  (a,b)
+#define add64(a,b) _mm_add_epi64 (a,b)
+#define load(p)       _mm_load_si128((__m128i *)(p))
+#define loadu(p)       _mm_loadu_si128((__m128i *)(p))
+#define store(p,x)    _mm_store_si128((__m128i *)(p), (x))
+#define constant8(b15,b14,b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0)   _mm_set_epi8 ((b0),(b1),(b2),(b3),(b4),(b5),(b6),(b7),(b8),(b9),(b10),(b11),(b12),(b13),(b14),(b15))
+#define constant32(b3,b2,b1,b0)   	_mm_set_epi32((b0),(b1),(b2),(b3))
+#define constant64(b1,b0)   		_mm_set_epi64((b0),(b1))
+#define constant8_same(a) 			_mm_set1_epi8(a)
+
+  
+  
+#define LFSR2( key, new_key ) \
+  new_key = xor( _mm_and_si128( mask_bottom_1_bit, _mm_srli_epi32( key, 5 ) ), \
+                xor( _mm_and_si128( mask_top_7_bits  , _mm_slli_epi32( key, 1 )) , \
+                _mm_and_si128( mask_bottom_1_bit, _mm_srli_epi32( key, 7 )) ) );
+ 
+#define ONE_KEY_ROUND(key, new_key)\
+  LFSR2( key, new_key );\
+  new_key = permute( new_key, H_PERMUTATION);
+
+#define RCONST(i) constant8( 1,2,4,8, rcon[i], rcon[i], rcon[i], rcon[i],  0,0,0,0,  0,0,0,0)
+
+#define TWEAKEY_SCHEDULE2( subkeys, key, tmp1, tmp2 )\
+  tmp1 = _mm_loadu_si128((__m128i*)key); 	subkeys[ 0] = xor( tmp1, RCONST( 0) ); \
+  ONE_KEY_ROUND( tmp1, tmp2 );	subkeys[ 1] = xor( tmp2, RCONST( 1) ); \
+  ONE_KEY_ROUND( tmp2, tmp1 );	subkeys[ 2] = xor( tmp1, RCONST( 2) ); \
+  ONE_KEY_ROUND( tmp1, tmp2 );	subkeys[ 3] = xor( tmp2, RCONST( 3) ); \
+  ONE_KEY_ROUND( tmp2, tmp1 );	subkeys[ 4] = xor( tmp1, RCONST( 4) ); \
+  ONE_KEY_ROUND( tmp1, tmp2 );	subkeys[ 5] = xor( tmp2, RCONST( 5) ); \
+  ONE_KEY_ROUND( tmp2, tmp1 );	subkeys[ 6] = xor( tmp1, RCONST( 6) ); \
+  ONE_KEY_ROUND( tmp1, tmp2 );	subkeys[ 7] = xor( tmp2, RCONST( 7) ); \
+  ONE_KEY_ROUND( tmp2, tmp1 );	subkeys[ 8] = xor( tmp1, RCONST( 8) ); \
+  ONE_KEY_ROUND( tmp1, tmp2 );	subkeys[ 9] = xor( tmp2, RCONST( 9) ); \
+  ONE_KEY_ROUND( tmp2, tmp1 );	subkeys[10] = xor( tmp1, RCONST(10) ); \
+  ONE_KEY_ROUND( tmp1, tmp2 );	subkeys[11] = xor( tmp2, RCONST(11) ); \
+  ONE_KEY_ROUND( tmp2, tmp1 );	subkeys[12] = xor( tmp1, RCONST(12) ); \
+  ONE_KEY_ROUND( tmp1, tmp2 );	subkeys[13] = xor( tmp2, RCONST(13) ); \
+  ONE_KEY_ROUND( tmp2, tmp1 );	subkeys[14] = xor( tmp1, RCONST(14) );
+
+
+
+#define TWEAKEY_SCHEDULE2_INVERSE( subkeys, dsubkeys )\
+  dsubkeys[ 0] =        subkeys[14];\
+  dsubkeys[ 1] = mc_inv(subkeys[13]);\
+  dsubkeys[ 2] = mc_inv(subkeys[12]);\
+  dsubkeys[ 3] = mc_inv(subkeys[11]);\
+  dsubkeys[ 4] = mc_inv(subkeys[10]);\
+  dsubkeys[ 5] = mc_inv(subkeys[ 9]);\
+  dsubkeys[ 6] = mc_inv(subkeys[ 8]);\
+  dsubkeys[ 7] = mc_inv(subkeys[ 7]);\
+  dsubkeys[ 8] = mc_inv(subkeys[ 6]);\
+  dsubkeys[ 9] = mc_inv(subkeys[ 5]);\
+  dsubkeys[10] = mc_inv(subkeys[ 4]);\
+  dsubkeys[11] = mc_inv(subkeys[ 3]);\
+  dsubkeys[12] = mc_inv(subkeys[ 2]);\
+  dsubkeys[13] = mc_inv(subkeys[ 1]);\
+  dsubkeys[14] =        subkeys[ 0];
+
+
+// Tweakable AES
+#define AES( s , subkeys , realtweak, t)\
+t = realtweak;\
+s = xor( s , xor( subkeys[ 0] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 1] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 2] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 3] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 4] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 5] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 6] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 7] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 8] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[ 9] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[10] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[11] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[12] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[13] , t ) );t=permute( t , H_PERMUTATION);\
+s = enc( s , xor( subkeys[14] , t ) );
+
+
+// Tweakable AES decryption
+#define AES_DEC( s , subkeys , realtweak, t)\
+t = realtweak;t=permute( t , H_PERMUTATION_14);\
+s = xor( s , xor( subkeys[ 0] , t ) );t=permute( t , H_PERMUTATION_INV);\
+s = mc_inv(s);\
+s = dec( s , xor( subkeys[ 1] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 2] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 3] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 4] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 5] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 6] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 7] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 8] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[ 9] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[10] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[11] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[12] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec( s , xor( subkeys[13] , mc_inv(t) ) );t=permute( t , H_PERMUTATION_INV);\
+s = dec_last( s , xor( subkeys[14] , t ) );
+
+
+// XOR of the same subkey and 8 different tweaks to 8 different states
+#define ONE_XOR( s, subkey, tweak )\
+tmp = xor(subkey, tweak );\
+s[0] = xor( s[0] , tmp ); \
+s[1] = xor( s[1] , xor(tmp , tw_c[0][1]) );\
+s[2] = xor( s[2] , xor(tmp , tw_c[0][2]) );\
+s[3] = xor( s[3] , xor(tmp , tw_c[0][3]) ); \
+s[4] = xor( s[4] , xor(tmp , tw_c[0][4]) ); \
+s[5] = xor( s[5] , xor(tmp , tw_c[0][5]) ); \
+s[6] = xor( s[6] , xor(tmp , tw_c[0][6]) ); \
+s[7] = xor( s[7] , xor(tmp , tw_c[0][7]) );\
+;
+
+
+#define ONE_XOR_DEC( s, subkey, tweak )\
+tmp = xor(subkey, tweak );\
+s[0] = xor( s[0] , tmp );                   s[0] = mc_inv(s[0]); \
+s[1] = xor( s[1] , xor(tmp , tw_c[14][1]) );s[1] = mc_inv(s[1]); \
+s[2] = xor( s[2] , xor(tmp , tw_c[14][2]) );s[2] = mc_inv(s[2]); \
+s[3] = xor( s[3] , xor(tmp , tw_c[14][3]) );s[3] = mc_inv(s[3]); \
+s[4] = xor( s[4] , xor(tmp , tw_c[14][4]) );s[4] = mc_inv(s[4]); \
+s[5] = xor( s[5] , xor(tmp , tw_c[14][5]) );s[5] = mc_inv(s[5]); \
+s[6] = xor( s[6] , xor(tmp , tw_c[14][6]) );s[6] = mc_inv(s[6]); \
+s[7] = xor( s[7] , xor(tmp , tw_c[14][7]) );s[7] = mc_inv(s[7]); \
+
+// One AES round with the same subkey and 8 different tweaks
+#define ONE_ROUND( s, subkey, tweak , Round )\
+tmp = xor(subkey, tweak );\
+s[0] = enc( s[0] , tmp );\
+s[1] = enc( s[1] , xor(tmp, tw_c[Round][1] ) );\
+s[2] = enc( s[2] , xor(tmp, tw_c[Round][2] ) );\
+s[3] = enc( s[3] , xor(tmp, tw_c[Round][3] ) );\
+s[4] = enc( s[4] , xor(tmp, tw_c[Round][4] ) );\
+s[5] = enc( s[5] , xor(tmp, tw_c[Round][5] ) );\
+s[6] = enc( s[6] , xor(tmp, tw_c[Round][6] ) );\
+s[7] = enc( s[7] , xor(tmp, tw_c[Round][7] ) );\
+;
+
+#define ONE_ROUND_DEC( s, subkey, tweak , Round )\
+tmp = xor(subkey, tweak );\
+s[0] = dec( s[0] , tmp );\
+s[1] = dec( s[1] , xor(tmp, tw_c_inv[Round][1] ) );\
+s[2] = dec( s[2] , xor(tmp, tw_c_inv[Round][2] ) );\
+s[3] = dec( s[3] , xor(tmp, tw_c_inv[Round][3] ) );\
+s[4] = dec( s[4] , xor(tmp, tw_c_inv[Round][4] ) );\
+s[5] = dec( s[5] , xor(tmp, tw_c_inv[Round][5] ) );\
+s[6] = dec( s[6] , xor(tmp, tw_c_inv[Round][6] ) );\
+s[7] = dec( s[7] , xor(tmp, tw_c_inv[Round][7] ) );
+
+#define ONE_ROUND_DEC_LAST( s, subkey, tweak )\
+tmp = xor(subkey, tweak );\
+s[0] = dec_last( s[0] , tmp );\
+s[1] = dec_last( s[1] , xor(tmp, tw_c[0][1] ) );\
+s[2] = dec_last( s[2] , xor(tmp, tw_c[0][2] ) );\
+s[3] = dec_last( s[3] , xor(tmp, tw_c[0][3] ) );\
+s[4] = dec_last( s[4] , xor(tmp, tw_c[0][4] ) );\
+s[5] = dec_last( s[5] , xor(tmp, tw_c[0][5] ) );\
+s[6] = dec_last( s[6] , xor(tmp, tw_c[0][6] ) );\
+s[7] = dec_last( s[7] , xor(tmp, tw_c[0][7] ) );
+
+
+#define ONE_XOR8( s, subkey, Tweaks )\
+    s[0] = xor( s[0] , xor(subkey, Tweaks[0]) );\
+    s[1] = xor( s[1] , xor(subkey, Tweaks[1]) );\
+    s[2] = xor( s[2] , xor(subkey, Tweaks[2]) );\
+    s[3] = xor( s[3] , xor(subkey, Tweaks[3]) );\
+    s[4] = xor( s[4] , xor(subkey, Tweaks[4]) );\
+    s[5] = xor( s[5] , xor(subkey, Tweaks[5]) );\
+    s[6] = xor( s[6] , xor(subkey, Tweaks[6]) );\
+    s[7] = xor( s[7] , xor(subkey, Tweaks[7]) );
+
+#define UPDATE_TWEAKS8( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION ); \
+    Tweaks[6] = permute( Tweaks[6], H_PERMUTATION ); \
+    Tweaks[7] = permute( Tweaks[7], H_PERMUTATION );
+
+#define ONE_ROUND8( s, subkey, Tweaks )\
+s[0] = enc( s[0] , xor( subkey, Tweaks[0]) );\
+s[1] = enc( s[1] , xor( subkey, Tweaks[1]) );\
+s[2] = enc( s[2] , xor( subkey, Tweaks[2]) );\
+s[3] = enc( s[3] , xor( subkey, Tweaks[3]) );\
+s[4] = enc( s[4] , xor( subkey, Tweaks[4]) );\
+s[5] = enc( s[5] , xor( subkey, Tweaks[5]) );\
+s[6] = enc( s[6] , xor( subkey, Tweaks[6]) );\
+s[7] = enc( s[7] , xor( subkey, Tweaks[7]) );
+
+#define AES8( states, subkeys , tweak ) \
+  ONE_XOR8  ( states , subkeys[ 0] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 1] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 2] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 3] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 4] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 5] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 6] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 7] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 8] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[ 9] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[10] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[11] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[12] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[13] , Tweaks ); UPDATE_TWEAKS8( Tweaks ); \
+  ONE_ROUND8( states , subkeys[14] , Tweaks );
+  ;
+
+
+
+/*
+ *
+ *  AES 7
+ *
+ */
+
+#define ONE_XOR7( s, subkey, Tweaks )\
+    s[0] = xor( s[0] , xor(subkey, Tweaks[0]) );\
+    s[1] = xor( s[1] , xor(subkey, Tweaks[1]) );\
+    s[2] = xor( s[2] , xor(subkey, Tweaks[2]) );\
+    s[3] = xor( s[3] , xor(subkey, Tweaks[3]) );\
+    s[4] = xor( s[4] , xor(subkey, Tweaks[4]) );\
+    s[5] = xor( s[5] , xor(subkey, Tweaks[5]) );\
+    s[6] = xor( s[6] , xor(subkey, Tweaks[6]) );
+
+#define UPDATE_TWEAKS7( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION ); \
+    Tweaks[6] = permute( Tweaks[6], H_PERMUTATION );
+
+#define ONE_ROUND7( s, subkey, Tweaks )\
+s[0] = enc( s[0] , xor( subkey, Tweaks[0]) );\
+s[1] = enc( s[1] , xor( subkey, Tweaks[1]) );\
+s[2] = enc( s[2] , xor( subkey, Tweaks[2]) );\
+s[3] = enc( s[3] , xor( subkey, Tweaks[3]) );\
+s[4] = enc( s[4] , xor( subkey, Tweaks[4]) );\
+s[5] = enc( s[5] , xor( subkey, Tweaks[5]) );\
+s[6] = enc( s[6] , xor( subkey, Tweaks[6]) );
+
+
+
+ #define AES7( states, subkeys , tweak ) \
+   ONE_XOR7  ( states , subkeys[ 0] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 1] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 2] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 3] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 4] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 5] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 6] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 7] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 8] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[ 9] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[10] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[11] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[12] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[13] , Tweaks ); UPDATE_TWEAKS7( Tweaks ); \
+   ONE_ROUND7( states , subkeys[14] , Tweaks );
+   ;
+
+/*
+ *
+ *  AES 6
+ *
+ */
+
+#define ONE_XOR6( s, subkey, Tweaks )\
+    s[0] = xor( s[0] , xor(subkey, Tweaks[0]) );\
+    s[1] = xor( s[1] , xor(subkey, Tweaks[1]) );\
+    s[2] = xor( s[2] , xor(subkey, Tweaks[2]) );\
+    s[3] = xor( s[3] , xor(subkey, Tweaks[3]) );\
+    s[4] = xor( s[4] , xor(subkey, Tweaks[4]) );\
+    s[5] = xor( s[5] , xor(subkey, Tweaks[5]) );
+
+#define UPDATE_TWEAKS6( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION );
+
+#define ONE_ROUND6( s, subkey, Tweaks )\
+    s[0] = enc( s[0] , xor( subkey, Tweaks[0]) );\
+    s[1] = enc( s[1] , xor( subkey, Tweaks[1]) );\
+    s[2] = enc( s[2] , xor( subkey, Tweaks[2]) );\
+    s[3] = enc( s[3] , xor( subkey, Tweaks[3]) );\
+    s[4] = enc( s[4] , xor( subkey, Tweaks[4]) );\
+    s[5] = enc( s[5] , xor( subkey, Tweaks[5]) );
+
+
+#define AES6( states, subkeys , tweak ) \
+   ONE_XOR6  ( states , subkeys[ 0] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 1] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 2] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 3] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 4] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 5] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 6] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 7] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 8] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[ 9] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[10] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[11] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[12] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[13] , Tweaks ); UPDATE_TWEAKS6( Tweaks ); \
+   ONE_ROUND6( states , subkeys[14] , Tweaks );
+   ;
+
+
+/*
+ *
+ *  AES 5
+ *
+ */
+
+#define ONE_XOR5( s, subkey, Tweaks )\
+    s[0] = xor( s[0] , xor(subkey, Tweaks[0]) );\
+    s[1] = xor( s[1] , xor(subkey, Tweaks[1]) );\
+    s[2] = xor( s[2] , xor(subkey, Tweaks[2]) );\
+    s[3] = xor( s[3] , xor(subkey, Tweaks[3]) );\
+    s[4] = xor( s[4] , xor(subkey, Tweaks[4]) );\
+
+#define UPDATE_TWEAKS5( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION );
+
+#define ONE_ROUND5( s, subkey, Tweaks )\
+    s[0] = enc( s[0] , xor( subkey, Tweaks[0]) );\
+    s[1] = enc( s[1] , xor( subkey, Tweaks[1]) );\
+    s[2] = enc( s[2] , xor( subkey, Tweaks[2]) );\
+    s[3] = enc( s[3] , xor( subkey, Tweaks[3]) );\
+    s[4] = enc( s[4] , xor( subkey, Tweaks[4]) );
+
+
+#define AES5( states, subkeys , tweak ) \
+   ONE_XOR5  ( states , subkeys[ 0] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 1] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 2] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 3] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 4] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 5] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 6] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 7] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 8] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[ 9] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[10] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[11] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[12] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[13] , Tweaks ); UPDATE_TWEAKS5( Tweaks ); \
+   ONE_ROUND5( states , subkeys[14] , Tweaks );
+   ;
+
+
+/*
+ *
+ *  AES 4
+ *
+ */
+
+#define ONE_XOR4( s, subkey, Tweaks )\
+    s[0] = xor( s[0] , xor(subkey, Tweaks[0]) );\
+    s[1] = xor( s[1] , xor(subkey, Tweaks[1]) );\
+    s[2] = xor( s[2] , xor(subkey, Tweaks[2]) );\
+    s[3] = xor( s[3] , xor(subkey, Tweaks[3]) );
+
+#define UPDATE_TWEAKS4( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION ); \
+
+#define ONE_ROUND4( s, subkey, Tweaks )\
+    s[0] = enc( s[0] , xor( subkey, Tweaks[0]) );\
+    s[1] = enc( s[1] , xor( subkey, Tweaks[1]) );\
+    s[2] = enc( s[2] , xor( subkey, Tweaks[2]) );\
+    s[3] = enc( s[3] , xor( subkey, Tweaks[3]) );
+
+
+#define AES4( states, subkeys , tweak ) \
+   ONE_XOR4  ( states , subkeys[ 0] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 1] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 2] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 3] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 4] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 5] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 6] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 7] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 8] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[ 9] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[10] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[11] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[12] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[13] , Tweaks ); UPDATE_TWEAKS4( Tweaks ); \
+   ONE_ROUND4( states , subkeys[14] , Tweaks );
+   ;
+
+
+
+
+/*
+ *
+ *  AES 3
+ *
+ */
+
+#define ONE_XOR3( s, subkey, Tweaks )\
+    s[0] = xor( s[0] , xor(subkey, Tweaks[0]) );\
+    s[1] = xor( s[1] , xor(subkey, Tweaks[1]) );\
+    s[2] = xor( s[2] , xor(subkey, Tweaks[2]) );
+
+#define UPDATE_TWEAKS3( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION );
+
+#define ONE_ROUND3( s, subkey, Tweaks )\
+    s[0] = enc( s[0] , xor( subkey, Tweaks[0]) );\
+    s[1] = enc( s[1] , xor( subkey, Tweaks[1]) );\
+    s[2] = enc( s[2] , xor( subkey, Tweaks[2]) );
+
+
+#define AES3( states, subkeys , tweak ) \
+   ONE_XOR3  ( states , subkeys[ 0] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 1] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 2] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 3] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 4] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 5] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 6] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 7] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 8] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[ 9] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[10] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[11] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[12] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[13] , Tweaks ); UPDATE_TWEAKS3( Tweaks ); \
+   ONE_ROUND3( states , subkeys[14] , Tweaks );
+   ;
+
+
+/*
+ *
+ *  AES 2
+ *
+ */
+
+#define ONE_XOR2( s, subkey, Tweaks )\
+    s[0] = xor( s[0] , xor(subkey, Tweaks[0]) );\
+    s[1] = xor( s[1] , xor(subkey, Tweaks[1]) );
+
+#define UPDATE_TWEAKS2( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION );
+
+#define ONE_ROUND2( s, subkey, Tweaks )\
+    s[0] = enc( s[0] , xor( subkey, Tweaks[0]) );\
+    s[1] = enc( s[1] , xor( subkey, Tweaks[1]) );
+
+#define AES2( states, subkeys , tweak ) \
+   ONE_XOR2  ( states , subkeys[ 0] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 1] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 2] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 3] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 4] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 5] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 6] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 7] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 8] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[ 9] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[10] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[11] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[12] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[13] , Tweaks ); UPDATE_TWEAKS2( Tweaks ); \
+   ONE_ROUND2( states , subkeys[14] , Tweaks );
+
+
+
+
+
+
+/*
+ *
+ *  AES 8 - DECRYPTION
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS8( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION_INV ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION_INV ); \
+    Tweaks[6] = permute( Tweaks[6], H_PERMUTATION_INV ); \
+    Tweaks[7] = permute( Tweaks[7], H_PERMUTATION_INV );
+
+#define ONE_ROUND_DEC8( s, subkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );\
+    s[4] = dec( s[4] , xor( subkey, mc_inv(Tweaks[4])) );\
+    s[5] = dec( s[5] , xor( subkey, mc_inv(Tweaks[5])) );\
+    s[6] = dec( s[6] , xor( subkey, mc_inv(Tweaks[6])) );\
+    s[7] = dec( s[7] , xor( subkey, mc_inv(Tweaks[7])) );
+
+
+#define AES8_DEC( states, sk , Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    Tweaks[4] = permute( Tweaks[4] , H_PERMUTATION_14); \
+    Tweaks[5] = permute( Tweaks[5] , H_PERMUTATION_14); \
+    Tweaks[6] = permute( Tweaks[6] , H_PERMUTATION_14); \
+    Tweaks[7] = permute( Tweaks[7] , H_PERMUTATION_14); \
+    ONE_XOR8       ( states , sk[ 0] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    states[4] = mc_inv( states[4] );\
+    states[5] = mc_inv( states[5] );\
+    states[6] = mc_inv( states[6] );\
+    states[7] = mc_inv( states[7] );\
+    ONE_ROUND_DEC8 ( states , sk[ 1] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[ 2] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[ 3] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[ 4] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[ 5] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[ 6] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[ 7] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[ 8] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[ 9] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[10] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[11] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[12] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    ONE_ROUND_DEC8 ( states , sk[13] , Tweaks ); UPDATE_DEC_TWEAKS8( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );\
+    states[4] = dec_last( states[4] , xor( sk[14], Tweaks[4]) );\
+    states[5] = dec_last( states[5] , xor( sk[14], Tweaks[5]) );\
+    states[6] = dec_last( states[6] , xor( sk[14], Tweaks[6]) );\
+    states[7] = dec_last( states[7] , xor( sk[14], Tweaks[7]) );
+
+
+/*
+ *
+ *  AES 8 - DECRYPTION P
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS8P( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION_INV ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION_INV ); \
+    Tweaks[6] = permute( Tweaks[6], H_PERMUTATION_INV ); \
+    Tweaks[7] = permute( Tweaks[7], H_PERMUTATION );
+
+#define ONE_ROUND_DEC8P( s, subkey, rsubkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );\
+    s[4] = dec( s[4] , xor( subkey, mc_inv(Tweaks[4])) );\
+    s[5] = dec( s[5] , xor( subkey, mc_inv(Tweaks[5])) );\
+    s[6] = dec( s[6] , xor( subkey, mc_inv(Tweaks[6])) );\
+    s[7] = enc( s[7] , xor(rsubkey, Tweaks[7]) );
+
+
+#define AES8_DECP( states, sk , rsk,  Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    Tweaks[4] = permute( Tweaks[4] , H_PERMUTATION_14); \
+    Tweaks[5] = permute( Tweaks[5] , H_PERMUTATION_14); \
+    Tweaks[6] = permute( Tweaks[6] , H_PERMUTATION_14); \
+    ONE_XOR7       ( states , sk[ 0] , Tweaks ); \
+    states[7] = xor( states[7] , xor(rsk[0], Tweaks[7]) );\
+    UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    states[4] = mc_inv( states[4] );\
+    states[5] = mc_inv( states[5] );\
+    states[6] = mc_inv( states[6] );\
+    ONE_ROUND_DEC8P ( states , sk[ 1] , rsk[ 1], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[ 2] , rsk[ 2], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[ 3] , rsk[ 3], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[ 4] , rsk[ 4], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[ 5] , rsk[ 5], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[ 6] , rsk[ 6], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[ 7] , rsk[ 7], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[ 8] , rsk[ 8], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[ 9] , rsk[ 9], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[10] , rsk[10], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[11] , rsk[11], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[12] , rsk[12], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    ONE_ROUND_DEC8P ( states , sk[13] , rsk[13], Tweaks ); UPDATE_DEC_TWEAKS8P( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );\
+    states[4] = dec_last( states[4] , xor( sk[14], Tweaks[4]) );\
+    states[5] = dec_last( states[5] , xor( sk[14], Tweaks[5]) );\
+    states[6] = dec_last( states[6] , xor( sk[14], Tweaks[6]) );\
+    states[7] = enc     ( states[7] , xor(rsk[14], Tweaks[7]) );
+
+
+
+/*
+ *
+ *  AES 7 - DECRYPTION
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS7( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION_INV ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION_INV ); \
+    Tweaks[6] = permute( Tweaks[6], H_PERMUTATION_INV );
+
+#define ONE_ROUND_DEC7( s, subkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );\
+    s[4] = dec( s[4] , xor( subkey, mc_inv(Tweaks[4])) );\
+    s[5] = dec( s[5] , xor( subkey, mc_inv(Tweaks[5])) );\
+    s[6] = dec( s[6] , xor( subkey, mc_inv(Tweaks[6])) );
+
+
+#define AES7_DEC( states, sk , Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    Tweaks[4] = permute( Tweaks[4] , H_PERMUTATION_14); \
+    Tweaks[5] = permute( Tweaks[5] , H_PERMUTATION_14); \
+    Tweaks[6] = permute( Tweaks[6] , H_PERMUTATION_14); \
+    ONE_XOR7       ( states , sk[ 0] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    states[4] = mc_inv( states[4] );\
+    states[5] = mc_inv( states[5] );\
+    states[6] = mc_inv( states[6] );\
+    ONE_ROUND_DEC7 ( states , sk[ 1] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[ 2] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[ 3] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[ 4] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[ 5] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[ 6] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[ 7] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[ 8] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[ 9] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[10] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[11] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[12] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    ONE_ROUND_DEC7 ( states , sk[13] , Tweaks ); UPDATE_DEC_TWEAKS7( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );\
+    states[4] = dec_last( states[4] , xor( sk[14], Tweaks[4]) );\
+    states[5] = dec_last( states[5] , xor( sk[14], Tweaks[5]) );\
+    states[6] = dec_last( states[6] , xor( sk[14], Tweaks[6]) );
+
+
+
+/*
+ *
+ *  AES 7 - DECRYPTION P
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS7P( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION_INV ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION_INV ); \
+    Tweaks[6] = permute( Tweaks[6], H_PERMUTATION );
+
+#define ONE_ROUND_DEC7P( s, subkey, rsubkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );\
+    s[4] = dec( s[4] , xor( subkey, mc_inv(Tweaks[4])) );\
+    s[5] = dec( s[5] , xor( subkey, mc_inv(Tweaks[5])) );\
+    s[6] = enc( s[6] , xor(rsubkey, Tweaks[6]) );
+
+
+#define AES7_DECP( states, sk , rsk,  Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    Tweaks[4] = permute( Tweaks[4] , H_PERMUTATION_14); \
+    Tweaks[5] = permute( Tweaks[5] , H_PERMUTATION_14); \
+    ONE_XOR6       ( states , sk[ 0] , Tweaks ); \
+    states[6] = xor( states[6] , xor(rsk[0], Tweaks[6]) );\
+    UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    states[4] = mc_inv( states[4] );\
+    states[5] = mc_inv( states[5] );\
+    ONE_ROUND_DEC7P ( states , sk[ 1] , rsk[ 1], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[ 2] , rsk[ 2], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[ 3] , rsk[ 3], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[ 4] , rsk[ 4], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[ 5] , rsk[ 5], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[ 6] , rsk[ 6], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[ 7] , rsk[ 7], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[ 8] , rsk[ 8], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[ 9] , rsk[ 9], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[10] , rsk[10], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[11] , rsk[11], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[12] , rsk[12], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    ONE_ROUND_DEC7P ( states , sk[13] , rsk[13], Tweaks ); UPDATE_DEC_TWEAKS7P( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );\
+    states[4] = dec_last( states[4] , xor( sk[14], Tweaks[4]) );\
+    states[5] = dec_last( states[5] , xor( sk[14], Tweaks[5]) );\
+    states[6] = enc     ( states[6] , xor(rsk[14], Tweaks[6]) );
+
+
+/*
+ *
+ *  AES 6 - DECRYPTION
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS6( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION_INV ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION_INV );
+
+#define ONE_ROUND_DEC6( s, subkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );\
+    s[4] = dec( s[4] , xor( subkey, mc_inv(Tweaks[4])) );\
+    s[5] = dec( s[5] , xor( subkey, mc_inv(Tweaks[5])) );
+
+
+#define AES6_DEC( states, sk , Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    Tweaks[4] = permute( Tweaks[4] , H_PERMUTATION_14); \
+    Tweaks[5] = permute( Tweaks[5] , H_PERMUTATION_14); \
+    ONE_XOR6       ( states , sk[ 0] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    states[4] = mc_inv( states[4] );\
+    states[5] = mc_inv( states[5] );\
+    ONE_ROUND_DEC6 ( states , sk[ 1] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[ 2] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[ 3] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[ 4] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[ 5] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[ 6] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[ 7] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[ 8] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[ 9] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[10] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[11] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[12] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    ONE_ROUND_DEC6 ( states , sk[13] , Tweaks ); UPDATE_DEC_TWEAKS6( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );\
+    states[4] = dec_last( states[4] , xor( sk[14], Tweaks[4]) );\
+    states[5] = dec_last( states[5] , xor( sk[14], Tweaks[5]) );
+
+
+/*
+ *
+ *  AES 6 - DECRYPTION P
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS6P( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION_INV ); \
+    Tweaks[5] = permute( Tweaks[5], H_PERMUTATION );
+
+#define ONE_ROUND_DEC6P( s, subkey, rsubkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );\
+    s[4] = dec( s[4] , xor( subkey, mc_inv(Tweaks[4])) );\
+    s[5] = enc( s[5] , xor(rsubkey, Tweaks[5]) );
+
+
+#define AES6_DECP( states, sk , rsk,  Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    Tweaks[4] = permute( Tweaks[4] , H_PERMUTATION_14); \
+    ONE_XOR5       ( states , sk[ 0] , Tweaks ); \
+    states[5] = xor( states[5] , xor(rsk[0], Tweaks[5]) );\
+    UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    states[4] = mc_inv( states[4] );\
+    ONE_ROUND_DEC6P ( states , sk[ 1] , rsk[ 1], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[ 2] , rsk[ 2], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[ 3] , rsk[ 3], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[ 4] , rsk[ 4], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[ 5] , rsk[ 5], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[ 6] , rsk[ 6], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[ 7] , rsk[ 7], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[ 8] , rsk[ 8], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[ 9] , rsk[ 9], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[10] , rsk[10], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[11] , rsk[11], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[12] , rsk[12], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    ONE_ROUND_DEC6P ( states , sk[13] , rsk[13], Tweaks ); UPDATE_DEC_TWEAKS6P( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );\
+    states[4] = dec_last( states[4] , xor( sk[14], Tweaks[4]) );\
+    states[5] = enc     ( states[5] , xor(rsk[14], Tweaks[5]) );
+
+/*
+ *
+ *  AES 5 - DECRYPTION
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS5( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION_INV );
+
+#define ONE_ROUND_DEC5( s, subkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );\
+    s[4] = dec( s[4] , xor( subkey, mc_inv(Tweaks[4])) );
+
+
+#define AES5_DEC( states, sk , Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    Tweaks[4] = permute( Tweaks[4] , H_PERMUTATION_14); \
+    ONE_XOR5       ( states , sk[ 0] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    states[4] = mc_inv( states[4] );\
+    ONE_ROUND_DEC5 ( states , sk[ 1] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[ 2] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[ 3] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[ 4] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[ 5] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[ 6] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[ 7] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[ 8] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[ 9] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[10] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[11] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[12] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    ONE_ROUND_DEC5 ( states , sk[13] , Tweaks ); UPDATE_DEC_TWEAKS5( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );\
+    states[4] = dec_last( states[4] , xor( sk[14], Tweaks[4]) );
+
+
+
+/*
+ *
+ *  AES 5 - DECRYPTION P
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS5P( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV ); \
+    Tweaks[4] = permute( Tweaks[4], H_PERMUTATION );
+
+#define ONE_ROUND_DEC5P( s, subkey, rsubkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );\
+    s[4] = enc( s[4] , xor(rsubkey, Tweaks[4]) );
+
+
+#define AES5_DECP( states, sk , rsk,  Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    ONE_XOR4       ( states , sk[ 0] , Tweaks ); \
+    states[4] = xor( states[4] , xor(rsk[0], Tweaks[4]) );\
+    UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    ONE_ROUND_DEC5P ( states , sk[ 1] , rsk[ 1], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[ 2] , rsk[ 2], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[ 3] , rsk[ 3], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[ 4] , rsk[ 4], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[ 5] , rsk[ 5], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[ 6] , rsk[ 6], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[ 7] , rsk[ 7], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[ 8] , rsk[ 8], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[ 9] , rsk[ 9], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[10] , rsk[10], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[11] , rsk[11], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[12] , rsk[12], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    ONE_ROUND_DEC5P ( states , sk[13] , rsk[13], Tweaks ); UPDATE_DEC_TWEAKS5P( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );\
+    states[4] = enc     ( states[4] , xor(rsk[14], Tweaks[4]) );
+
+/*
+ *
+ *  AES 4 - DECRYPTION
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS4( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION_INV );
+
+#define ONE_ROUND_DEC4( s, subkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = dec( s[3] , xor( subkey, mc_inv(Tweaks[3])) );
+
+
+#define AES4_DEC( states, sk , Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    Tweaks[3] = permute( Tweaks[3] , H_PERMUTATION_14); \
+    ONE_XOR4       ( states , sk[ 0] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    states[3] = mc_inv( states[3] );\
+    ONE_ROUND_DEC4 ( states , sk[ 1] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[ 2] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[ 3] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[ 4] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[ 5] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[ 6] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[ 7] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[ 8] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[ 9] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[10] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[11] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[12] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    ONE_ROUND_DEC4 ( states , sk[13] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = dec_last( states[3] , xor( sk[14], Tweaks[3]) );
+
+/*
+ *
+ *  AES 4 - DECRYPTION P
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS4P( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV ); \
+    Tweaks[3] = permute( Tweaks[3], H_PERMUTATION );
+
+#define ONE_ROUND_DEC4P( s, subkey, rsubkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );\
+    s[3] = enc( s[3] , xor(rsubkey, Tweaks[3]) );
+
+#define AES4_DECP( states, sk , rsk,  Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    ONE_XOR3       ( states , sk[ 0] , Tweaks ); \
+    states[3] = xor( states[3] , xor(rsk[0], Tweaks[3]) );\
+    UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    ONE_ROUND_DEC4P ( states , sk[ 1] , rsk[ 1], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[ 2] , rsk[ 2], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[ 3] , rsk[ 3], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[ 4] , rsk[ 4], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[ 5] , rsk[ 5], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[ 6] , rsk[ 6], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[ 7] , rsk[ 7], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[ 8] , rsk[ 8], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[ 9] , rsk[ 9], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[10] , rsk[10], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[11] , rsk[11], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[12] , rsk[12], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    ONE_ROUND_DEC4P ( states , sk[13] , rsk[13], Tweaks ); UPDATE_DEC_TWEAKS4P( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );\
+    states[3] = enc     ( states[3] , xor(rsk[14], Tweaks[3]) );
+
+/*
+ *
+ *  AES 3 - DECRYPTION
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS3( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION_INV );
+
+#define ONE_ROUND_DEC3( s, subkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = dec( s[2] , xor( subkey, mc_inv(Tweaks[2])) );
+
+#define AES3_DEC( states, sk , Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    Tweaks[2] = permute( Tweaks[2] , H_PERMUTATION_14); \
+    ONE_XOR3       ( states , sk[ 0] , Tweaks ); UPDATE_DEC_TWEAKS4( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    states[2] = mc_inv( states[2] );\
+    ONE_ROUND_DEC3 ( states , sk[ 1] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[ 2] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[ 3] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[ 4] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[ 5] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[ 6] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[ 7] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[ 8] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[ 9] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[10] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[11] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[12] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    ONE_ROUND_DEC3 ( states , sk[13] , Tweaks ); UPDATE_DEC_TWEAKS3( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = dec_last( states[2] , xor( sk[14], Tweaks[2]) );
+
+
+/*
+ *
+ *  AES 3 - DECRYPTION P
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS3P( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV ); \
+    Tweaks[2] = permute( Tweaks[2], H_PERMUTATION );
+
+#define ONE_ROUND_DEC3P( s, subkey, rsubkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );\
+    s[2] = enc( s[2] , xor(rsubkey, Tweaks[2]) );
+
+#define AES3_DECP( states, sk , rsk,  Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    ONE_XOR2       ( states , sk[ 0] , Tweaks ); \
+    states[2] = xor( states[2] , xor(rsk[0], Tweaks[2]) );\
+    UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    ONE_ROUND_DEC3P ( states , sk[ 1] , rsk[ 1], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[ 2] , rsk[ 2], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[ 3] , rsk[ 3], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[ 4] , rsk[ 4], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[ 5] , rsk[ 5], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[ 6] , rsk[ 6], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[ 7] , rsk[ 7], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[ 8] , rsk[ 8], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[ 9] , rsk[ 9], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[10] , rsk[10], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[11] , rsk[11], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[12] , rsk[12], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    ONE_ROUND_DEC3P ( states , sk[13] , rsk[13], Tweaks ); UPDATE_DEC_TWEAKS3P( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );\
+    states[2] = enc     ( states[2] , xor(rsk[14], Tweaks[2]) );
+
+/*
+ *
+ *  AES 2 - DECRYPTION
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS2( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION_INV );
+
+#define ONE_ROUND_DEC2( s, subkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = dec( s[1] , xor( subkey, mc_inv(Tweaks[1])) );
+
+#define AES2_DEC( states, sk , Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    Tweaks[1] = permute( Tweaks[1] , H_PERMUTATION_14); \
+    ONE_XOR2       ( states , sk[ 0] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    states[1] = mc_inv( states[1] );\
+    ONE_ROUND_DEC2 ( states , sk[ 1] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[ 2] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[ 3] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[ 4] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[ 5] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[ 6] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[ 7] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[ 8] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[ 9] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[10] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[11] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[12] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    ONE_ROUND_DEC2 ( states , sk[13] , Tweaks ); UPDATE_DEC_TWEAKS2( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = dec_last( states[1] , xor( sk[14], Tweaks[1]) );
+
+/*
+ *
+ *  AES 2 - DECRYPTION P
+ *
+ */
+
+
+
+#define UPDATE_DEC_TWEAKS2P( Tweaks )\
+    Tweaks[0] = permute( Tweaks[0], H_PERMUTATION_INV ); \
+    Tweaks[1] = permute( Tweaks[1], H_PERMUTATION );
+
+#define ONE_ROUND_DEC2P( s, subkey, rsubkey, Tweaks )\
+    s[0] = dec( s[0] , xor( subkey, mc_inv(Tweaks[0])) );\
+    s[1] = enc( s[1] , xor(rsubkey, Tweaks[1]) );
+
+#define AES2_DECP( states, sk , rsk,  Tweaks ) \
+    Tweaks[0] = permute( Tweaks[0] , H_PERMUTATION_14); \
+    states[0] = xor( states[0], xor(sk[0], Tweaks[0] ) ); \
+    states[1] = xor( states[1], xor(rsk[0], Tweaks[1]) );\
+    UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    states[0] = mc_inv( states[0] );\
+    ONE_ROUND_DEC2P ( states , sk[ 1] , rsk[ 1], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[ 2] , rsk[ 2], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[ 3] , rsk[ 3], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[ 4] , rsk[ 4], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[ 5] , rsk[ 5], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[ 6] , rsk[ 6], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[ 7] , rsk[ 7], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[ 8] , rsk[ 8], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[ 9] , rsk[ 9], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[10] , rsk[10], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[11] , rsk[11], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[12] , rsk[12], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    ONE_ROUND_DEC2P ( states , sk[13] , rsk[13], Tweaks ); UPDATE_DEC_TWEAKS2P( Tweaks ); \
+    states[0] = dec_last( states[0] , xor( sk[14], Tweaks[0]) );\
+    states[1] = enc     ( states[1] , xor(rsk[14], Tweaks[1]) );

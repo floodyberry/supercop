@@ -1,3 +1,64 @@
+Changes from 20170105: colm* implementations.
+
+Changes from 20161220: More deoxysi* implementations.
+
+Changes from 20161218: Finally included the tweaked version of Ascon.
+Sorry for letting this slip through the cracks before!
+
+Changes from 20161026:
+
+   * New k277mon and k277taa.
+   * crypto_aead/norx*v3: fix neon compilation errors.
+   * crypto_aead/norx*v3: handle overlap better.
+   * More checksums.
+
+Changes from 20161009:
+
+   * CAESAR tweaks: acorn, cloc+silc, deoxys, ketje, morus, norx.
+   * New *keyak* reference implementation.
+   * New *jambu* naming.
+   * New SHA-2 implementations from Dolbeau.
+   * New crypto_dh/gls254prot/opt implementation.
+
+Changes from 20160910:
+
+   * New crypto_dh/k298.
+   * New crypto_dh/gls254/opt implementation.
+
+Changes from 20160806:
+
+   * Bug fixes for *keyakv2/ARM*.
+   * Many more compiler options.
+
+Beware that this version will take considerably longer to run than the previous version.
+
+Changes from 20160731:
+
+   * hs1siv{,lo}v2: faster implementations from Romain Dolbeau.
+   * Various AVX512 implementations: fixes from Romain Dolbeau.
+   * stribob192r2/neon/wbob_pineon.c: fixes.
+   * *poet* fast implementations: fixes.
+
+Changes from 20160724:
+
+   * trivia0v2: faster implementation (sse4).
+   * hs1*v2: bug fixes and faster implementations.
+   * aeadaes*ocbtaglen128v1: bug fixes in dolbeau implementations.
+   * pi*v2: bug fixes in goptv implementations.
+   * *keyakv2: bug fixes in several implementations.
+   * simonjambu*: bug fixes.
+   * aarch64 PMCCNTR_EL0 support from Romain Dolbeau.
+   * aarch64 CNTVCT_EL0 preliminary support.
+
+Changes from 20160715:
+
+   * New crypto_aead/*jambu*v2.
+   * Fixes for crypto_aead/pi*v2.
+   * Fixes for crypto_aead/hs1*.
+   * TWEAK_LOW_LATENCY for crypto_aead/norx*.
+   * Initial aarch64 support from Romain Dolbeau.
+   * Prioritize scaling_setspeed over scaling_max_freq in reports.
+
 Changes from 20141014:
 
    * Updated poly1305/moon.

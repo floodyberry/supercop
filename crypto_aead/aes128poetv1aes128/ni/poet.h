@@ -1,66 +1,53 @@
 #ifndef _POET_H_
-#define _POET_HL_
+#define _POET_H_
 
-#include <stdint.h>
+#include <emmintrin.h>
+#include <smmintrin.h>
+#include <wmmintrin.h>
 #include "api.h"
-#include "aes-ni.h"
+
+// ---------------------------------------------------------------------
 
 #define BLOCKLEN      CRYPTO_NPUBBYTES
-#define BLOCKLEN_BITS CRYPTO_NPUBBYTES*8
 #define KEYLEN        CRYPTO_KEYBYTES
-#define KEYLEN_BITS   KEYLEN*8
+#define TAGLEN        CRYPTO_ABYTES
+#define ROUNDS         10
+#define ROUND_KEYS     11
 
-#define SUCCESS 0
-#define FAIL    1
+typedef __m128i  AES_KEY[ROUND_KEYS];
+typedef __m128i  AXU_KEY[ROUND_KEYS];
 
-typedef unsigned char block[BLOCKLEN];
+// ---------------------------------------------------------------------
 
-typedef int boolean;
+typedef struct {
+    AES_KEY aes_enc;   // Expanded encryption key for the AES
+    AES_KEY aes_dec;   // Expanded decryption key for the AES
+    AXU_KEY aes_lt;    // Expanded key for the top AXU hash function
+    AXU_KEY aes_lb;    // Expanded key for the bottom AXU hash function
+    __m128i tm;        // Key for the tag block
+    __m128i l;         // Masking key for the header-processing step
+    __m128i x;         // Top-chaining value
+    __m128i y;         // Bottom-chaining value
+    __m128i tau;       // Result of the header-processing step
+    unsigned long long mlen;     // Message length
+} poet_ctx_t;
 
-#ifdef ARC_BIG_ENDIAN
-  #define TO_LITTLE_ENDIAN_64(n) bswap_64(n)
-  #define TO_LITTLE_ENDIAN_32(n) bswap_32(n)
-#else
-  #define TO_LITTLE_ENDIAN_64(n) (n)
-  #define TO_LITTLE_ENDIAN_32(n) (n)
-#endif
+// ---------------------------------------------------------------------
 
+void keysetup(poet_ctx_t *ctx, const unsigned char key[KEYLEN]);
 
-struct poet_ctx {
-  AES_KEY aes_enc;
-  AES_KEY aes_dec;
-  AES_KEY aes_lt;
-  AES_KEY aes_lb;
+void process_header(poet_ctx_t *ctx,
+                    const unsigned char *header,
+                    unsigned long long header_len);
+void encrypt_final(poet_ctx_t *ctx,
+                   const unsigned char *plaintext,
+                   unsigned long long plen,
+                   unsigned char *ciphertext,
+                   unsigned char tag[BLOCKLEN]);
+int decrypt_final(poet_ctx_t *ctx,
+                  const unsigned char *ciphertext,
+                  unsigned long long clen,
+                  const unsigned char tag[BLOCKLEN],
+                  unsigned char *plaintext);
 
-  block k; /* block cipher key */
-  block tm; /* masking keys */
-  block l; /* pmac key */
-  block lt; /* AXU key top */
-  block lb; /* AXU key bottom*/
-  block x; /* top chaining value */
-  block y; /* buttom chaining value */
-  block tau; /* tag computation value */
-  uint64_t mlen;
-};
-
-void keysetup(struct poet_ctx *ctx, const uint8_t key[KEYLEN]);
-
-void process_header(struct poet_ctx *ctx, const uint8_t  *header,
-		    uint64_t header_len );
-
-
-void encrypt_block(struct poet_ctx *ctx, const uint8_t plaintext[16],
-		   uint8_t ciphertext[16]);
-
-void encrypt_final(struct poet_ctx *ctx, const uint8_t *plaintext,
-		   uint64_t plen, uint8_t *ciphertext,
-		   uint8_t tag[BLOCKLEN]);
-
-
-void decrypt_block(struct poet_ctx *ctx, const uint8_t ciphertext[16],
-		   uint8_t plaintext[16]);
-
-int decrypt_final(struct poet_ctx *ctx, const uint8_t *ciphertext,
-		   uint64_t clen, const uint8_t tag[BLOCKLEN],
-		  uint8_t *plaintext);
 #endif //  _POET_H_

@@ -342,13 +342,13 @@ void wbob_pi(w512_t *s512)
     d1.val[1] = x1;
     d1.val[2] = x2;
     d1.val[3] = x3;
-    vst4_u8(st +  0, d1);
+    vst4_u8(&s512->b[0], d1);
 
     d1.val[0] = x4;
     d1.val[1] = x5;
     d1.val[2] = x6;
     d1.val[3] = x7;
-    vst4_u8(st + 32, d1);
+    vst4_u8(&s512->b[32], d1);
 
 }
 

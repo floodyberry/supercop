@@ -321,9 +321,31 @@ static inline void prf_hash2_3_finalize(uint64_t *h, const uint64_t s[6], const 
     s0_3 = poly_finalize(s[4]);
     s1_3 = poly_finalize(s[5]);
     write64le(h+0, (uint64_t)asu_hash(s1_1, asukey+3) << 32 | asu_hash(s0_1, asukey+0));
-    write64le(h+1, (uint64_t)asu_hash(s1_2, asukey+6) << 32 | asu_hash(s0_2, asukey+3));
-    write64le(h+2, (uint64_t)asu_hash(s1_3, asukey+9) << 32 | asu_hash(s0_3, asukey+6));
+    write64le(h+1, (uint64_t)asu_hash(s1_2, asukey+9) << 32 | asu_hash(s0_2, asukey+6));
+    write64le(h+2, (uint64_t)asu_hash(s1_3, asukey+15) << 32 | asu_hash(s0_3, asukey+12));
 }
+
+#ifndef __INTEL_COMPILER
+unsigned long long _mm512_reduce_add_epi64 (__m512i a) {
+        unsigned long long b;
+        asm(
+        "vextracti64x4 $1, %%zmm0, %%ymm1\n"
+        "vpaddq %%ymm0, %%ymm1, %%ymm2\n"
+        "valignq   $3, %%zmm2, %%zmm2, %%zmm3\n"
+        "valignq   $2, %%zmm2, %%zmm2, %%zmm4\n"
+        "valignq   $1, %%zmm2, %%zmm2, %%zmm5\n"
+        "vpaddq    %%xmm5, %%xmm4, %%xmm6\n"
+        "vpaddq    %%xmm2, %%xmm3, %%xmm7\n"
+        "vpaddq    %%xmm7, %%xmm6, %%xmm8\n"
+        "vmovd     %%xmm8, %[b]"
+        : [b] "=r" (b)
+        : [a] "Yz" (a)
+        : "%zmm1", "%zmm2", "%zmm3", "%zmm4",
+          "%zmm5", "%zmm6", "%zmm7", "%zmm8");
+    return b;
+}
+#endif
+
 
 /* does all 3 hashes at once */
 static inline void prf_hash2_3(uint64_t s[6], const uint32_t *in,  unsigned inbytes, const uint32_t *nhkey, const uint64_t *polykey) {

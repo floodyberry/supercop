@@ -138,14 +138,14 @@ if (bytes>=1024) {
       x_##b = _mm512_unpackhi_epi64(t_##a, t_##b);                         \
       x_##c = _mm512_unpacklo_epi64(t_##c, t_##d);                         \
       x_##d = _mm512_unpackhi_epi64(t_##c, t_##d);                         \
-      t0 = _mm512_xor_si512(x_##a, _mm512_i64gather_epi64(gvv, m+  0, 1)); \
-      t1 = _mm512_xor_si512(x_##b, _mm512_i64gather_epi64(gvv, m+ 64, 1)); \
-      t2 = _mm512_xor_si512(x_##c, _mm512_i64gather_epi64(gvv, m+128, 1)); \
-      t3 = _mm512_xor_si512(x_##d, _mm512_i64gather_epi64(gvv, m+192, 1)); \
-      _mm512_i64scatter_epi64(out+  0, gvv, t0, 1);                     \
-      _mm512_i64scatter_epi64(out+ 64, gvv, t1, 1);                     \
-      _mm512_i64scatter_epi64(out+128, gvv, t2, 1);                     \
-      _mm512_i64scatter_epi64(out+192, gvv, t3, 1);                     \
+      t0 = _mm512_xor_si512(x_##a, _mm512_i64gather_epi64(gvv, (const long long*)(m+  0), 1)); \
+      t1 = _mm512_xor_si512(x_##b, _mm512_i64gather_epi64(gvv, (const long long*)(m+ 64), 1)); \
+      t2 = _mm512_xor_si512(x_##c, _mm512_i64gather_epi64(gvv, (const long long*)(m+128), 1)); \
+      t3 = _mm512_xor_si512(x_##d, _mm512_i64gather_epi64(gvv, (const long long*)(m+192), 1)); \
+      _mm512_i64scatter_epi64((long long*)(out+  0), gvv, t0, 1);                     \
+      _mm512_i64scatter_epi64((long long*)(out+ 64), gvv, t1, 1);                     \
+      _mm512_i64scatter_epi64((long long*)(out+128), gvv, t2, 1);                     \
+      _mm512_i64scatter_epi64((long long*)(out+192), gvv, t3, 1);                     \
     }
 #define ONEQUAD_TRANSPOSE_SCATTERGATHER_NOXOR(a,b,c,d)                  \
     {                                                                   \
@@ -162,10 +162,10 @@ if (bytes>=1024) {
       x_##b = _mm512_unpackhi_epi64(t_##a, t_##b);                      \
       x_##c = _mm512_unpacklo_epi64(t_##c, t_##d);                      \
       x_##d = _mm512_unpackhi_epi64(t_##c, t_##d);                      \
-      _mm512_i64scatter_epi64(out+  0, gvv, x_##a, 1);                  \
-      _mm512_i64scatter_epi64(out+ 64, gvv, x_##b, 1);                  \
-      _mm512_i64scatter_epi64(out+128, gvv, x_##c, 1);                  \
-      _mm512_i64scatter_epi64(out+192, gvv, x_##d, 1);                  \
+      _mm512_i64scatter_epi64((long long*)(out+  0), gvv, x_##a, 1);                  \
+      _mm512_i64scatter_epi64((long long*)(out+ 64), gvv, x_##b, 1);                  \
+      _mm512_i64scatter_epi64((long long*)(out+128), gvv, x_##c, 1);                  \
+      _mm512_i64scatter_epi64((long long*)(out+192), gvv, x_##d, 1);                  \
     }
 #ifndef CHACHA_NO_XOR
 #define ONEQUAD(a,b,c,d) ONEQUAD_TRANSPOSE_SCATTERGATHER(a,b,c,d)
